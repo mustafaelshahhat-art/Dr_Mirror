@@ -2,10 +2,19 @@ using System.Text;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Features.Auth;
 using DrMirror.Api.Features.Auth.Common;
+using DrMirror.Api.Features.Admin;
+using DrMirror.Api.Features.Cart;
+using DrMirror.Api.Features.Cart.Common;
 using DrMirror.Api.Features.Catalog;
+using DrMirror.Api.Features.Checkout;
+using DrMirror.Api.Features.Orders;
+using DrMirror.Api.Features.Orders.Common;
+using Coravel;
+using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.Persistence.Seed;
+using DrMirror.Api.Infrastructure.Storage;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -161,6 +170,54 @@ try
     builder.Services.AddScoped<RefreshCookieWriter>();
     builder.Services.AddScoped<DevCatalogSeeder>();
     builder.Services.AddScoped<DatabaseSeeder>();
+    builder.Services.AddScoped<CartService>();
+    builder.Services.AddSingleton<OrderStateMachine>();
+    builder.Services.AddSingleton(TimeProvider.System);
+    builder.Services.AddScoped<OrderNumberGenerator>();
+
+    // -----------------------------------------------------------------------
+    // File storage — env-switched between local filesystem and Cloudinary.
+    // -----------------------------------------------------------------------
+    builder.Services.AddOptions<FileStorageOptions>()
+        .Bind(builder.Configuration.GetSection(FileStorageOptions.SectionName))
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
+
+    var storageProvider = builder.Configuration[$"{FileStorageOptions.SectionName}:Provider"] ?? "local";
+    if (storageProvider.Equals("cloudinary", StringComparison.OrdinalIgnoreCase))
+    {
+        builder.Services.AddSingleton<IFileStorageService, CloudinaryFileStorageService>();
+    }
+    else
+    {
+        builder.Services.AddSingleton<IFileStorageService, LocalFileStorageService>();
+    }
+
+    // -----------------------------------------------------------------------
+    // Email — dev defaults to log-only; mailkit kicks in when SMTP is configured.
+    // -----------------------------------------------------------------------
+    builder.Services.AddOptions<EmailOptions>()
+        .Bind(builder.Configuration.GetSection(EmailOptions.SectionName))
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
+
+    var emailProvider = builder.Configuration[$"{EmailOptions.SectionName}:Provider"] ?? "logonly";
+    if (emailProvider.Equals("mailkit", StringComparison.OrdinalIgnoreCase))
+    {
+        builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
+    }
+    else
+    {
+        builder.Services.AddSingleton<IEmailSender, LogOnlyEmailSender>();
+    }
+
+    // -----------------------------------------------------------------------
+    // Coravel — fire-and-forget job queue. Each invocable runs in its own scope.
+    // -----------------------------------------------------------------------
+    builder.Services.AddQueue();
+    builder.Services.AddTransient<SendOrderConfirmationJob>();
+    builder.Services.AddTransient<SendPaymentReviewNeededJob>();
+    builder.Services.AddTransient<SendStatusChangedJob>();
 
     // FluentValidation — discover validators in this assembly.
     builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -222,6 +279,14 @@ try
     app.UseStatusCodePages();
     app.UseCors(CorsPolicy);
 
+    // Static files for the local upload provider — serves payment-proof images
+    // under /uploads/* directly from wwwroot/uploads. The Cloudinary provider
+    // doesn't need this middleware (it serves from its own CDN).
+    var webRoot = app.Environment.WebRootPath ??
+                  Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+    Directory.CreateDirectory(Path.Combine(webRoot, "uploads"));
+    app.UseStaticFiles();
+
     app.UseAuthentication();
     app.UseAuthorization();
 
@@ -234,6 +299,10 @@ try
 
     app.MapAuthEndpoints();
     app.MapCatalogEndpoints();
+    app.MapCartEndpoints();
+    app.MapCheckoutEndpoints();
+    app.MapOrderEndpoints();
+    app.MapAdminEndpoints();
 
     Log.Information("Dr_Mirror API starting up — env={Env}", app.Environment.EnvironmentName);
     app.Run();

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { useAuth } from '../../features/auth/useAuth';
+import { CartButton } from '../../features/cart/components/CartButton';
 
 import { LangSwitcher } from './LangSwitcher';
 import { ThemeToggle } from './ThemeToggle';
@@ -54,6 +55,7 @@ export function Header() {
             </Link>
           ) : null}
 
+          <CartButton />
           <LangSwitcher />
           <ThemeToggle />
         </div>

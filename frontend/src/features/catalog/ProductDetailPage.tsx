@@ -1,8 +1,10 @@
 import { Button, Spinner } from '@heroui/react';
-import { ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, Check, ShoppingBag } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
+
+import { useCart } from '../cart/useCart';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
@@ -29,6 +31,18 @@ export function ProductDetailPage() {
   const categoryName = useLocalizedField(product?.category);
   const [activeImage, setActiveImage] = useState(0);
   const variantSelection = useVariantSelection(product);
+  const { addItem, cart } = useCart();
+  const [addState, setAddState] = useState<'idle' | 'adding' | 'added' | 'error'>(
+    'idle',
+  );
+  const [addError, setAddError] = useState<string | null>(null);
+
+  // Auto-clear the "added" badge so the user can add the same item again.
+  useEffect(() => {
+    if (addState !== 'added') return;
+    const t = window.setTimeout(() => setAddState('idle'), 2000);
+    return () => window.clearTimeout(t);
+  }, [addState]);
 
   if (query.isLoading) {
     return (
@@ -191,14 +205,77 @@ export function ProductDetailPage() {
           </p>
 
           <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center">
-            <Button variant="primary" isDisabled fullWidth>
-              {t('catalog.detail.addToCartSoon')}
+            <Button
+              variant="primary"
+              fullWidth
+              isDisabled={
+                addState === 'adding' ||
+                !variantSelection.selectedVariant ||
+                variantSelection.selectedVariant.stock <= 0
+              }
+              onPress={async () => {
+                const v = variantSelection.selectedVariant;
+                if (!v || !product) return;
+                setAddState('adding');
+                setAddError(null);
+                try {
+                  await addItem({
+                    productVariantId: v.id,
+                    quantity: 1,
+                    productId: product.id,
+                    productSlug: product.slug,
+                    nameAr: product.nameAr,
+                    nameEn: product.nameEn,
+                    size: v.size,
+                    colorName: v.colorName,
+                    colorNameAr: v.colorNameAr,
+                    colorHex: v.colorHex,
+                    sku: v.sku,
+                    unitPrice: product.price,
+                    primaryImageUrl: product.images[0]?.url ?? null,
+                    variantStock: v.stock,
+                  });
+                  setAddState('added');
+                } catch (err) {
+                  setAddState('error');
+                  const message =
+                    err instanceof Error ? err.message : t('cart.addError');
+                  setAddError(message);
+                }
+              }}
+            >
+              <span className="inline-flex items-center gap-2">
+                {addState === 'added' ? (
+                  <Check className="size-4" aria-hidden />
+                ) : (
+                  <ShoppingBag className="size-4" aria-hidden />
+                )}
+                {addState === 'adding'
+                  ? t('cart.adding')
+                  : addState === 'added'
+                    ? t('cart.addedToCart')
+                    : !variantSelection.selectedVariant
+                      ? t('cart.selectVariantFirst')
+                      : variantSelection.selectedVariant.stock <= 0
+                        ? t('cart.outOfStockShort')
+                        : t('cart.addToCart')}
+              </span>
             </Button>
             <Button variant="outline" isDisabled fullWidth>
               {t('catalog.detail.inquireSoon')}
             </Button>
           </div>
-          <p className="text-xs text-default-500">{t('catalog.detail.cartHint')}</p>
+          {addError ? (
+            <p className="text-xs text-danger" role="alert">
+              {addError}
+            </p>
+          ) : (
+            <p className="text-xs text-default-500">
+              {cart.totalQuantity > 0
+                ? t('cart.subtitle', { count: cart.totalQuantity })
+                : t('catalog.detail.cartHint')}
+            </p>
+          )}
         </section>
       </div>
     </article>

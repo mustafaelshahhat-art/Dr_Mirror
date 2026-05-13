@@ -53,3 +53,4 @@ secrets.json
 tmp/
 temp/
 .windsurf/workflows/review.md
+backend/src/DrMirror.Api/wwwroot/uploads/

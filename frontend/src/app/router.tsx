@@ -6,6 +6,7 @@ import {
   PublicOnlyRoute,
 } from '../features/auth/ProtectedRoute';
 import { RegisterPage } from '../features/auth/RegisterPage';
+import { CartPage } from '../features/cart/CartPage';
 import { CatalogPage } from '../features/catalog/CatalogPage';
 import { ProductDetailPage } from '../features/catalog/ProductDetailPage';
 import { Layout } from '../shared/components/Layout';
@@ -38,6 +39,7 @@ export function AppRoutes() {
       <Route element={<Layout />}>
         <Route index element={<CatalogPage />} />
         <Route path="products/:slug" element={<ProductDetailPage />} />
+        <Route path="cart" element={<CartPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="account" element={<ShellPage />} />

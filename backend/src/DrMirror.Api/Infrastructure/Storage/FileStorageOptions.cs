@@ -1,0 +1,51 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace DrMirror.Api.Infrastructure.Storage;
+
+/// <summary>
+/// Storage-provider configuration. Bound from the <c>FileStorage</c> section.
+/// </summary>
+public sealed class FileStorageOptions
+{
+    public const string SectionName = "FileStorage";
+
+    /// <summary><c>local</c> (default, dev) or <c>cloudinary</c>.</summary>
+    [Required]
+    public string Provider { get; set; } = "local";
+
+    /// <summary>
+    /// For the local provider: directory under <c>wwwroot</c> that gets served
+    /// as static files. Defaults to <c>uploads</c>.
+    /// </summary>
+    public string LocalDirectory { get; set; } = "uploads";
+
+    /// <summary>
+    /// For the local provider: base URL the SPA can hit to fetch the uploaded
+    /// file. Defaults to <c>/uploads</c> (served statically by the API).
+    /// </summary>
+    public string LocalPublicBaseUrl { get; set; } = "/uploads";
+
+    /// <summary>
+    /// Maximum upload size in bytes. Default: 10 MB.
+    /// Reasonable for screenshots of bank-transfer receipts.
+    /// </summary>
+    public long MaxFileSizeBytes { get; set; } = 10 * 1024 * 1024;
+
+    /// <summary>
+    /// Whitelisted MIME prefixes. Anything not matching is rejected with 415.
+    /// Default: image-only.
+    /// </summary>
+    public string[] AllowedContentTypes { get; set; } = new[]
+    {
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/heic",
+        "image/heif",
+    };
+
+    // -- Cloudinary-specific. --
+    public string? CloudinaryCloudName { get; set; }
+    public string? CloudinaryApiKey { get; set; }
+    public string? CloudinaryApiSecret { get; set; }
+}

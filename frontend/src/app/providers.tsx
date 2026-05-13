@@ -6,6 +6,7 @@ import { I18nextProvider, useTranslation } from 'react-i18next';
 import { useHref, useNavigate } from 'react-router-dom';
 
 import { AuthProvider } from '../features/auth/AuthProvider';
+import { CartProvider } from '../features/cart/CartProvider';
 import i18n from '../shared/lib/i18n';
 import {
   DEFAULT_LANG,
@@ -83,7 +84,9 @@ export function Providers({ children }: { children: ReactNode }) {
           <I18nextProvider i18n={i18n}>
             <LocaleScope>
               <DirectionSync>
-                <AuthProvider>{children}</AuthProvider>
+                <AuthProvider>
+                  <CartProvider>{children}</CartProvider>
+                </AuthProvider>
               </DirectionSync>
             </LocaleScope>
           </I18nextProvider>

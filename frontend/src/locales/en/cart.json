@@ -1,0 +1,39 @@
+{
+  "title": "Your cart",
+  "subtitle_zero": "No items yet",
+  "subtitle_one": "1 item",
+  "subtitle_other": "{{count}} items",
+  "openLabel": "Open cart",
+  "countSr_zero": "Cart is empty",
+  "countSr_one": "1 item in cart",
+  "countSr_other": "{{count}} items in cart",
+  "loading": "Loading your cart...",
+  "subTotal": "Sub-total",
+  "summary": "Summary",
+  "shippingNote": "Shipping",
+  "calculatedAtCheckout": "Calculated at checkout",
+  "estimatedTotal": "Estimated total",
+  "continueShopping": "Continue shopping",
+  "viewCart": "View cart",
+  "proceedToCheckout": "Proceed to checkout",
+  "backToCatalog": "Back to catalog",
+  "clear": "Empty cart",
+  "empty": {
+    "title": "Your cart is empty",
+    "subtitle": "Add scrubs, lab coats, or footwear to get started.",
+    "cta": "Browse catalog"
+  },
+  "line": {
+    "sizeLabel": "Size",
+    "increaseQuantity": "Increase quantity",
+    "decreaseQuantity": "Decrease quantity",
+    "remove": "Remove item",
+    "unavailable": "No longer available"
+  },
+  "addToCart": "Add to cart",
+  "addedToCart": "Added to cart",
+  "adding": "Adding...",
+  "selectVariantFirst": "Pick a color and size first",
+  "outOfStockShort": "Out of stock",
+  "addError": "Couldn't add this item to your cart. Please try again."
+}

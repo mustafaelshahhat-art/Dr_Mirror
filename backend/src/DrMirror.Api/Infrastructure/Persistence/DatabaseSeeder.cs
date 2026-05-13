@@ -62,7 +62,77 @@ public sealed class DatabaseSeeder
 
         await EnsureRolesAsync();
         await EnsureAdminAsync();
+        await EnsurePaymentMethodsAsync(ct);
         await EnsureCatalogAsync(ct);
+    }
+
+    /// <summary>
+    /// Idempotently seed the buyer-selectable payment methods. Phase 2a ships
+    /// only Cash-on-Delivery; Instapay + Wallet land in Phase 2b alongside the
+    /// payment-proof upload pipeline.
+    /// </summary>
+    private async Task EnsurePaymentMethodsAsync(CancellationToken ct)
+    {
+        // Each method is keyed by its stable Code. Adding a new method on a
+        // later boot is a no-op for existing ones.
+        var seedMethods = new[]
+        {
+            new PaymentMethod
+            {
+                Id = Guid.NewGuid(),
+                Code = "cod",
+                Kind = Domain.Orders.PaymentMethodKind.Cod,
+                NameEn = "Cash on Delivery",
+                NameAr = "الدفع عند الاستلام",
+                InstructionsEn = "Pay in cash to the courier when your order arrives.",
+                InstructionsAr = "ادفع نقدًا لمندوب الشحن عند استلام الطلب.",
+                IsActive = true,
+                DisplayOrder = 0,
+            },
+            new PaymentMethod
+            {
+                Id = Guid.NewGuid(),
+                Code = "instapay",
+                Kind = Domain.Orders.PaymentMethodKind.Instapay,
+                NameEn = "Instapay",
+                NameAr = "إنستاباي",
+                InstructionsEn = "Transfer the total to the Instapay handle below, then upload a screenshot of the receipt.",
+                InstructionsAr = "حوّل المبلغ إلى حساب إنستاباي التالي، ثم ارفع لقطة شاشة من إيصال التحويل.",
+                AccountNumber = "drmirror@instapay",
+                AccountHolder = "Dr. Mirror Sales",
+                IsActive = true,
+                DisplayOrder = 1,
+            },
+            new PaymentMethod
+            {
+                Id = Guid.NewGuid(),
+                Code = "wallet",
+                Kind = Domain.Orders.PaymentMethodKind.Wallet,
+                NameEn = "Mobile Wallet",
+                NameAr = "محفظة إلكترونية",
+                InstructionsEn = "Send the total to the wallet number below (Vodafone Cash / Etisalat Cash / Orange Money / We Pay) and upload the confirmation.",
+                InstructionsAr = "حوّل المبلغ إلى رقم المحفظة التالي (فودافون كاش / اتصالات كاش / أورنج موني / وي باي) وارفع لقطة شاشة من التأكيد.",
+                AccountNumber = "01001234567",
+                AccountHolder = "Dr. Mirror Sales",
+                IsActive = true,
+                DisplayOrder = 2,
+            },
+        };
+
+        var existingCodes = await _db.PaymentMethods
+            .Select(m => m.Code)
+            .ToListAsync(ct);
+
+        var toAdd = seedMethods.Where(m => !existingCodes.Contains(m.Code)).ToList();
+        if (toAdd.Count == 0) return;
+
+        _db.PaymentMethods.AddRange(toAdd);
+        await _db.SaveChangesAsync(ct);
+
+        foreach (var m in toAdd)
+        {
+            _logger.LogInformation("Seeded payment method: {Code} ({NameEn})", m.Code, m.NameEn);
+        }
     }
 
     /// <summary>
