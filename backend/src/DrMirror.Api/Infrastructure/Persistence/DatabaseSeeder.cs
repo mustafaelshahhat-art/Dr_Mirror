@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
-using System.Text;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Identity;
+using DrMirror.Api.Infrastructure.Persistence.Seed;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +26,7 @@ public sealed class DatabaseSeeder
     private readonly IConfiguration _config;
     private readonly IHostEnvironment _env;
     private readonly ILogger<DatabaseSeeder> _logger;
+    private readonly DevCatalogSeeder _catalogSeeder;
 
     public DatabaseSeeder(
         AppDbContext db,
@@ -33,7 +34,8 @@ public sealed class DatabaseSeeder
         RoleManager<IdentityRole<Guid>> roleManager,
         IConfiguration config,
         IHostEnvironment env,
-        ILogger<DatabaseSeeder> logger)
+        ILogger<DatabaseSeeder> logger,
+        DevCatalogSeeder catalogSeeder)
     {
         _db = db;
         _userManager = userManager;
@@ -41,6 +43,7 @@ public sealed class DatabaseSeeder
         _config = config;
         _env = env;
         _logger = logger;
+        _catalogSeeder = catalogSeeder;
     }
 
     public async Task SeedAsync(CancellationToken ct = default)
@@ -59,6 +62,22 @@ public sealed class DatabaseSeeder
 
         await EnsureRolesAsync();
         await EnsureAdminAsync();
+        await EnsureCatalogAsync(ct);
+    }
+
+    /// <summary>
+    /// In Development with <c>Catalog:SeedSamples=true</c>, populate a small
+    /// catalog so the SPA has data to render. Idempotent — skips if any
+    /// products already exist.
+    /// </summary>
+    private async Task EnsureCatalogAsync(CancellationToken ct)
+    {
+        if (!_env.IsDevelopment()) return;
+
+        var enabled = _config.GetValue("Catalog:SeedSamples", false);
+        if (!enabled) return;
+
+        await _catalogSeeder.SeedAsync(ct);
     }
 
     private async Task EnsureRolesAsync()

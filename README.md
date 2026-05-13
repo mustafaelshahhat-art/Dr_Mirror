@@ -1,6 +1,6 @@
 # Dr_Mirror
 
-Arabic-first (RTL) single-vendor B2B marketplace for medical scraps, used/refurbished medical equipment, surplus clinic inventory, and medical spare parts.
+Arabic-first (RTL) specialist store for **medical scrubs and uniforms** — scrub tops, scrub pants, lab coats, surgical headwear, and medical footwear. Bilingual (ar / en), bilingual product copy, full size × colour variant matrix, single-currency (EGP).
 
 > **Before doing any work in this repo, read both:**
 > - `PROJECT_MAP.md` — the durable architecture map (tech, flow, structure, deferred items).
@@ -58,6 +58,7 @@ Secrets are never committed. Configure via environment variables (see §7 of the
 - `Admin__SeedEmail`, `Admin__SeedPassword` (first boot only)
 - `Cors__AllowedOrigins`
 - `Auth__UseCrossSiteCookies` (set `true` in prod when SPA + API are on different origins)
+- `Catalog__SeedSamples` (Development only — populates 5 categories + 15 products with picsum.photos image URLs on first boot when `true`; default `true` in `appsettings.Development.json`)
 
 ### Dev secrets (user-secrets)
 

@@ -52,3 +52,4 @@ secrets.json
 # === Cloudinary / upload temp ===
 tmp/
 temp/
+.windsurf/workflows/review.md

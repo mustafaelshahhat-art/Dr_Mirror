@@ -3,45 +3,56 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../features/auth/useAuth';
 
 /**
- * The protected landing surface. Shows a personalized welcome plus the
- * mixed-script render test that proved out the typography stack in M0.
- *
- * Once we wire feature dashboards (M2+), this page will redirect by role.
+ * Authenticated account landing. Mounted at <c>/account</c> behind
+ * <c>ProtectedRoute</c>. M2 ships the bare minimum — name, email, role —
+ * with placeholders for the buyer-flow features (orders, addresses,
+ * inquiries) that arrive in M3+.
  */
 export function ShellPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  if (!user) return null;
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <section className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">
-          {user
-            ? t('shell.welcomeBack', { name: user.fullName })
-            : t('shell.welcome')}
+          {t('account.welcome', { name: user.fullName })}
         </h1>
-        <p className="max-w-prose text-base leading-relaxed text-default-500">
-          {user
-            ? t('shell.subtitleSignedIn', { role: user.roles.join(', ') })
-            : t('shell.subtitle')}
+        <p className="max-w-prose text-sm text-default-500">
+          {t('account.subtitle')}
         </p>
       </section>
 
-      <section
-        className="rounded-large border border-divider/60 bg-content1 p-6"
-        aria-labelledby="mixed-script-label"
-      >
-        <div className="space-y-2">
-          <span
-            id="mixed-script-label"
-            className="text-xs font-medium uppercase tracking-wide text-default-400"
-          >
-            {t('shell.mixedScriptLabel')}
-          </span>
-          <p className="text-base">{t('shell.mixedScriptText')}</p>
-          <p className="text-sm tabular-nums text-default-500">
-            0 1 2 3 4 5 6 7 8 9 — 12,345.67 EGP
-          </p>
-        </div>
+      <section className="rounded-large border border-divider/60 bg-content1 p-6">
+        <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div>
+            <dt className="text-xs uppercase tracking-wide text-default-500">
+              {t('account.fields.fullName')}
+            </dt>
+            <dd className="mt-1 text-sm font-medium">{user.fullName}</dd>
+          </div>
+          <div>
+            <dt className="text-xs uppercase tracking-wide text-default-500">
+              {t('account.fields.email')}
+            </dt>
+            <dd className="mt-1 text-sm font-medium">{user.email}</dd>
+          </div>
+          <div>
+            <dt className="text-xs uppercase tracking-wide text-default-500">
+              {t('account.fields.role')}
+            </dt>
+            <dd className="mt-1 text-sm font-medium">{user.roles.join(', ')}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section className="rounded-large border border-divider/60 bg-content1 p-6">
+        <h2 className="text-base font-semibold">{t('account.upcoming.title')}</h2>
+        <ul className="mt-3 space-y-1.5 text-sm text-default-500">
+          <li>• {t('account.upcoming.orders')}</li>
+          <li>• {t('account.upcoming.addresses')}</li>
+          <li>• {t('account.upcoming.inquiries')}</li>
+        </ul>
       </section>
     </div>
   );

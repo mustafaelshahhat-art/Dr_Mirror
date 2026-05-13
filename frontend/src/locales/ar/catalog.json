@@ -1,0 +1,69 @@
+{
+  "title": "السكرابات الطبية واليونيفورم",
+  "subtitle": "تصفح السكرابات الطبية واليونيفورم الطبي بتصميمات وخامات متنوعة.",
+  "search": {
+    "label": "البحث في المنتجات",
+    "placeholder": "ابحث بالاسم أو الماركة أو الكود...",
+    "clear": "مسح البحث"
+  },
+  "sort": {
+    "label": "الترتيب",
+    "Newest": "الأحدث أولًا",
+    "PriceAsc": "السعر: من الأقل إلى الأعلى",
+    "PriceDesc": "السعر: من الأعلى إلى الأقل",
+    "NameAsc": "الاسم (أ–ي)"
+  },
+  "filters": {
+    "all": "كل الفئات",
+    "categoryLabel": "تصفية حسب الفئة"
+  },
+  "gender": {
+    "men": "رجالي",
+    "women": "حريمي",
+    "unisex": "للجنسين"
+  },
+  "list": {
+    "soldOut": "نفدت الكمية",
+    "sizesAvailable_one": "مقاس واحد",
+    "sizesAvailable_other": "{{count}} مقاسات"
+  },
+  "empty": {
+    "title": "لا توجد منتجات تطابق التصفية",
+    "subtitle": "جرّب مسح البحث أو اختيار فئة أخرى."
+  },
+  "errors": {
+    "loadFailed": "تعذّر تحميل المنتجات. حاول مرة أخرى."
+  },
+  "pagination": {
+    "label": "ترقيم الصفحات",
+    "previous": "السابق",
+    "next": "التالي",
+    "pageOf": "صفحة {{page}} من {{total}}",
+    "results_one": "نتيجة واحدة",
+    "results_other": "{{count}} نتيجة"
+  },
+  "detail": {
+    "loading": "جاري تحميل المنتج...",
+    "notFoundTitle": "المنتج غير موجود",
+    "notFoundSubtitle": "ربما تم حذفه أو لم يكن موجودًا أصلًا.",
+    "errorTitle": "تعذّر تحميل المنتج",
+    "errorSubtitle": "حدث خطأ ما. حاول مرة أخرى.",
+    "backToCatalog": "العودة إلى المنتجات",
+    "brand": "الماركة",
+    "material": "الخامة",
+    "sku": "كود المنتج",
+    "skuVariant": "كود المقاس واللون",
+    "availability": "التوفر",
+    "colorLabel": "اللون",
+    "sizeLabel": "المقاس",
+    "sizeAria": "مقاس {{size}}",
+    "availableColors": "الألوان المتاحة",
+    "pickVariant": "اختر اللون والمقاس",
+    "stockForVariant_one": "قطعة واحدة متوفرة — {{size}} / {{color}}",
+    "stockForVariant_other": "{{count}} قطع متوفرة — {{size}} / {{color}}",
+    "stockOut": "هذا اللون والمقاس غير متوفر حاليًا",
+    "addToCartSoon": "إضافة إلى السلة (قريبًا)",
+    "inquireSoon": "طلب عرض سعر (قريبًا)",
+    "cartHint": "السلة وطلبات الأسعار في المرحلة القادمة."
+  }
+}

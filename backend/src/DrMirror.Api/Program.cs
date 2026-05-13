@@ -2,8 +2,10 @@ using System.Text;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Features.Auth;
 using DrMirror.Api.Features.Auth.Common;
+using DrMirror.Api.Features.Catalog;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Infrastructure.Persistence.Seed;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -157,6 +159,7 @@ try
     builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
     builder.Services.AddScoped<RefreshTokenIssuer>();
     builder.Services.AddScoped<RefreshCookieWriter>();
+    builder.Services.AddScoped<DevCatalogSeeder>();
     builder.Services.AddScoped<DatabaseSeeder>();
 
     // FluentValidation — discover validators in this assembly.
@@ -230,6 +233,7 @@ try
         .WithTags("Diagnostics");
 
     app.MapAuthEndpoints();
+    app.MapCatalogEndpoints();
 
     Log.Information("Dr_Mirror API starting up — env={Env}", app.Environment.EnvironmentName);
     app.Run();

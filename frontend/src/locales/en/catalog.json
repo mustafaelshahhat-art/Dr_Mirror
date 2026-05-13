@@ -1,0 +1,69 @@
+{
+  "title": "Medical Scrubs & Uniforms",
+  "subtitle": "Browse medical scrubs and uniforms in a range of designs and fabrics.",
+  "search": {
+    "label": "Search products",
+    "placeholder": "Search by name, brand, or SKU...",
+    "clear": "Clear search"
+  },
+  "sort": {
+    "label": "Sort",
+    "Newest": "Newest first",
+    "PriceAsc": "Price: low to high",
+    "PriceDesc": "Price: high to low",
+    "NameAsc": "Name (A–Z)"
+  },
+  "filters": {
+    "all": "All categories",
+    "categoryLabel": "Filter by category"
+  },
+  "gender": {
+    "men": "Men",
+    "women": "Women",
+    "unisex": "Unisex"
+  },
+  "list": {
+    "soldOut": "Sold out",
+    "sizesAvailable_one": "1 size",
+    "sizesAvailable_other": "{{count}} sizes"
+  },
+  "empty": {
+    "title": "No products match your filters",
+    "subtitle": "Try clearing the search or picking a different category."
+  },
+  "errors": {
+    "loadFailed": "Could not load the catalog. Please try again."
+  },
+  "pagination": {
+    "label": "Pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{total}}",
+    "results_one": "{{count}} result",
+    "results_other": "{{count}} results"
+  },
+  "detail": {
+    "loading": "Loading product...",
+    "notFoundTitle": "Product not found",
+    "notFoundSubtitle": "This item may have been delisted or never existed.",
+    "errorTitle": "Couldn't load product",
+    "errorSubtitle": "Something went wrong. Please try again.",
+    "backToCatalog": "Back to catalog",
+    "brand": "Brand",
+    "material": "Material",
+    "sku": "Style SKU",
+    "skuVariant": "Variant SKU",
+    "availability": "Availability",
+    "colorLabel": "Color",
+    "sizeLabel": "Size",
+    "sizeAria": "Size {{size}}",
+    "availableColors": "Available colors",
+    "pickVariant": "Pick a color and size",
+    "stockForVariant_one": "1 in stock — {{size}} / {{color}}",
+    "stockForVariant_other": "{{count}} in stock — {{size}} / {{color}}",
+    "stockOut": "This variant is out of stock",
+    "addToCartSoon": "Add to cart (coming soon)",
+    "inquireSoon": "Request a quote (coming soon)",
+    "cartHint": "Cart and quotes ship in the next milestone."
+  }
+}

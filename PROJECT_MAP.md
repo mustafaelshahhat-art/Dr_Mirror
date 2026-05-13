@@ -38,10 +38,21 @@ Hosting
 - Backend → MonsterASP.NET (IIS / Windows)
 - DB → MonsterASP.NET MSSQL
 
+## [DOMAIN]
+
+**Dr. Mirror is a specialist store for medical scrubs and medical uniforms — apparel only.** Equipment, refurbished devices, spare parts, surplus inventory, and any other non-apparel commerce concepts are explicitly out of scope. All architecture, naming, copy, and SEO direction must align with apparel/fashion commerce.
+
+Catalog axes:
+- **Categories** — Scrub Tops, Scrub Pants, Lab Coats, Surgical Headwear, Medical Footwear (extensible).
+- **Gender** — Men / Women / Unisex (kids deferred).
+- **Variants** — every buyable SKU is a Size × Color permutation; stock and SKU codes live on the variant, not the parent product.
+- **Material / fabric** — free-form composition string on the parent product.
+- **Apparel galleries** — multiple images per product, optionally seeded per colour for colour-specific photography.
+
 ## [SYSTEM_FLOW]
 
 Customer
-  Browse → Product → Cart → Checkout
+  Browse (filter by category / gender / size / color) → Product (pick colour + size) → Cart → Checkout
     → choose Payment Method
         - COD          → Order (Confirmed)
         - Instapay/Wallet → upload proof → Order (PendingPaymentReview)
@@ -49,7 +60,7 @@ Customer
 
 Admin
   Login → Dashboard
-    Catalog: Category CRUD, Product CRUD (Cloudinary upload)
+    Catalog: Category CRUD, Product CRUD (master + variant matrix; Cloudinary upload)
     Orders: queue by status; transitions via OrderStateMachine
     Payments: CRUD payment methods (numbers, enabled flag)
     Inquiries: inbox
@@ -98,10 +109,18 @@ Security
 
 ## [ARCHITECTURE NOTES]
 
-- **HeroUI v3 / Tailwind v4** — `HeroUIProvider` does not exist in v3; use `RouterProvider` + `I18nProvider` from `@heroui/react` (both re-exported from React Aria Components). Button variants are `primary | secondary | tertiary | outline | ghost | danger | danger-soft`; the legacy `light` was renamed to `ghost`.
+- **HeroUI v3 / Tailwind v4** — `HeroUIProvider` does not exist in v3; use `RouterProvider` + `I18nProvider` from `@heroui/react` (both re-exported from React Aria Components). Button variants are `primary | secondary | tertiary | outline | ghost | danger | danger-soft`; the legacy `light` was renamed to `ghost`. HeroUI v3 `Button` does NOT accept `as`/polymorphism — use a styled `<Link>` for link-shaped buttons.
 - **Identity bootstrap** — `AddIdentityCore<User>` is used (not `AddIdentity<,>`) so no Cookie auth handler is registered. JWT Bearer is the sole auth scheme, ensuring unauthenticated API requests return 401 (not a redirect to a non-existent `/Account/Login`).
 - **Refresh token model** — Raw 256-bit token in httpOnly cookie at `Path=/api/auth`; SHA-256 hash persisted. Rotation on every use. Reuse of a revoked token triggers cascade revocation of all of the user's outstanding sessions (credential-theft heuristic).
 - **Auto-migration** — `DatabaseSeeder` calls `MigrateAsync` on startup **only in Development**. Production migrations are a deployment step.
+- **`[AsParameters]` is strict** — Minimal-API request-delegate factory treats every non-nullable property as required, even when the C# class declares a default. Make every optional query property nullable and resolve defaults via `Effective*` accessors in the request DTO.
+- **Catalog localization model** — Bilingual columns (`NameAr`/`NameEn`, `DescriptionAr`/`DescriptionEn`) on a single `Product` row. Variants additionally carry `ColorName` + `ColorNameAr` so colour pickers render natively in both locales. No translations table. Frontend picks the locale via `useLocalizedField` / `useLocalizedDescription` with fallback to the other side if one is empty.
+- **Slugs** — ASCII-only, lowercase-kebab, generated from `NameEn` via `Shared/Slugs/SlugGenerator`. Globally unique on `Product`/`Category`. Collisions resolved by appending `-2`/`-3`. URLs are stable when names change because slugs are stored separately.
+- **Product image URLs (M2 dev only)** — `ProductImage.Url` carries an absolute HTTPS URL; M2 seeds `picsum.photos/seed/<slug>-<color>-<i>` placeholders so each colour variant gets a distinct gallery in dev. M4 swaps in real Cloudinary uploads (and adds `CloudinaryPublicId` non-breakingly).
+- **Variant matrix** — `ProductVariant` is the buyable SKU. Stock and `Sku` live on the variant, never on Product. Unique on `(ProductId, Size, ColorName)` and on `Sku`. Variant SKU convention: `{ProductSku}-{Size}-{ColorSlug}` (e.g. `CHK-VST-001-M-NAVY`).
+- **Catalog public visibility** — A product is public iff `IsPublished=true` AND `Category.IsActive=true`. Variant-level filters additionally require `IsActive=true AND Stock>0`. Filters applied at the LINQ level in every public catalog endpoint.
+- **Currency display** — `1,250.00 ج.م` in `ar`, `EGP 1,250.00` in `en`. Western numerals only (`numberingSystem: 'latn'`). Centralized in `frontend/src/shared/lib/format.ts` — never inline-format prices in components.
+- **HeroUI v3 picker accessibility** — colour and size pickers are RAC `radiogroup`s (one selectable role at a time, keyboard arrow-key navigation). Out-of-stock sizes stay rendered but disabled + line-through so the size system is always visible to the buyer.
 
 ## [ORPHANS & PENDING]
 
@@ -112,8 +131,25 @@ Security
 - Buyer signup → confirmed immediately, no email verification (M1 decision; revisit in M3+ when SMTP lands).
 - MSSQL → local SQL Server Express via Windows Integrated Auth (connection string in `appsettings.Development.json`).
 
+### Resolved at M2
+- **Domain pivot (locked at M2 close)** → equipment / refurbished / surplus / spare-parts framing **removed** in favour of medical scrubs & uniforms only. All naming, copy, and SEO follow apparel/fashion commerce.
+- Currency display format → `1,250.00 ج.م` in ar / `EGP 1,250.00` in en, both with Western numerals + tabular-nums.
+- Product localization → bilingual columns on a single row (`NameAr`/`NameEn`/`DescriptionAr`/`DescriptionEn`); no translations table.
+- Dev image storage → `picsum.photos/seed/<slug>-<color>-<i>/...` URLs (colour-keyed) in seed data; M4 swaps in Cloudinary uploads.
+- Slug strategy → ASCII lowercase-kebab from `NameEn`, dedup with numeric suffix, separate column from name.
+- Category hierarchy → flat for now (no `ParentId`); add later non-breakingly if needed.
+- Apparel categories (M2 baseline) → Scrub Tops, Scrub Pants, Lab Coats, Surgical Headwear, Medical Footwear.
+- Apparel taxonomy → `ProductGender` enum (`Men=0 | Women=1 | Unisex=2`) on Product. No `Condition` field.
+- Variant model → `ProductVariant(Id, ProductId, Size, ColorName, ColorNameAr, ColorHex, Sku, Stock, IsActive, …)` with unique constraint on `(ProductId, Size, ColorName)` and a unique `Sku`. **Stock lives on the variant, not on Product.**
+- Sizes → free-form string column (max 16 chars). Apparel uses XS / S / M / L / XL / XXL / XXXL / OS; footwear uses EU numerics 36–46. Validation happens in the admin upload UI (M4), not at the schema level.
+- Colours → English + Arabic display name + 7-char hex on each variant. No separate Colors table in V1.
+- Material / fabric → free-form string on Product (max 200), e.g. `"65% polyester / 35% cotton"`.
+- Catalog filters → `categoryId`, `q` (over name + brand + sku), `gender`, `size`, `color` (matched against either `ColorName` or `ColorNameAr` so the same query works in both locales), `minPrice`, `maxPrice`, `sort`.
+- Catalog pagination → offset-based, default 24, max 60; envelope `{ items, page, pageSize, totalCount, totalPages }`.
+- Catalog visibility filter → `IsPublished=true AND Category.IsActive=true` for all public reads. Variant-level filters additionally require `IsActive=true AND Stock>0`.
+- Summary aggregates → `availableSizes`, `availableColors`, `totalStock` projected server-side from the variant matrix so cards render swatches + sold-out state without an extra round-trip.
+
 ### Still open (will be resolved per milestone)
-- Currency display format (LE prefix vs ج.م suffix) — M2
 - Order number scheme — M3
 - Address field set per Egyptian market — M4
 - SMTP provider — M3

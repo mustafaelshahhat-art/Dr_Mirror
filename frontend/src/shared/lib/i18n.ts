@@ -3,8 +3,10 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
 import arAuth from '../../locales/ar/auth.json';
+import arCatalog from '../../locales/ar/catalog.json';
 import arCommon from '../../locales/ar/common.json';
 import enAuth from '../../locales/en/auth.json';
+import enCatalog from '../../locales/en/catalog.json';
 import enCommon from '../../locales/en/common.json';
 
 import {
@@ -18,15 +20,15 @@ void i18n
   .use(initReactI18next)
   .init({
     resources: {
-      ar: { common: arCommon, auth: arAuth },
-      en: { common: enCommon, auth: enAuth },
+      ar: { common: arCommon, auth: arAuth, catalog: arCatalog },
+      en: { common: enCommon, auth: enAuth, catalog: enCatalog },
     },
     fallbackLng: DEFAULT_LANG,
     supportedLngs: [...SUPPORTED_LANGS],
     // Flat key lookup: t('auth.signIn') reads from the 'auth' namespace.
     fallbackNS: 'common',
     defaultNS: 'common',
-    ns: ['common', 'auth'],
+    ns: ['common', 'auth', 'catalog'],
     // Allow t('auth.signIn') to resolve via nsSeparator on the key.
     nsSeparator: '.',
     interpolation: { escapeValue: false },

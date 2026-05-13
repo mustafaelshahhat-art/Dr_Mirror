@@ -1,17 +1,27 @@
 {
   "appName": "د. ميرور",
-  "tagline": "سوق المعدات الطبية المستعملة والخردة الطبية",
+  "tagline": "متجر متخصص للسكرابات الطبية واليونيفورم",
   "header": {
     "switchTheme": "تبديل السمة",
-    "switchLanguage": "تبديل اللغة"
+    "switchLanguage": "تبديل اللغة",
+    "marketplace": "السوق",
+    "myAccount": "حسابي",
+    "signIn": "تسجيل الدخول"
   },
-  "shell": {
-    "welcome": "مرحبا بك في د. ميرور",
-    "welcomeBack": "مرحبا، {{name}}",
-    "subtitle": "منصة B2B متخصصة في المعدات الطبية المستعملة والمتجددة وقطع الغيار",
-    "subtitleSignedIn": "تم تسجيل دخولك بصلاحية: {{role}}",
-    "mixedScriptLabel": "اختبار العرض المختلط",
-    "mixedScriptText": "مرحبا hello در Mirror 2026"
+  "account": {
+    "welcome": "مرحبا، {{name}}",
+    "subtitle": "هذه صفحة حسابك. سيُضاف المزيد من الأدوات في المراحل القادمة.",
+    "fields": {
+      "fullName": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "role": "الصلاحية"
+    },
+    "upcoming": {
+      "title": "قريبًا",
+      "orders": "الطلبات وسجل الشراء",
+      "addresses": "عناوين الشحن المحفوظة",
+      "inquiries": "طلبات عروض الأسعار والاستفسارات"
+    }
   },
   "theme": {
     "dark": "داكن",

@@ -1,0 +1,62 @@
+import { useTranslation } from 'react-i18next';
+
+import type { ProductVariantDto } from '../types';
+
+interface SizePickerProps {
+  /** Sizes available for the currently-selected colour. */
+  sizes: string[];
+  /** Variant rows scoped to the current colour, used to read per-size stock. */
+  variantsForColor: ProductVariantDto[];
+  selected: string | null;
+  onSelect: (size: string) => void;
+}
+
+/**
+ * Button row of sizes scoped to the active colour. Out-of-stock sizes are
+ * still rendered (so the user can see the size system), but disabled.
+ */
+export function SizePicker({
+  sizes,
+  variantsForColor,
+  selected,
+  onSelect,
+}: SizePickerProps) {
+  const { t } = useTranslation();
+  const stockMap = new Map<string, number>();
+  for (const v of variantsForColor) stockMap.set(v.size, v.stock);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-baseline justify-between text-sm">
+        <span className="font-medium">{t('catalog.detail.sizeLabel')}</span>
+      </div>
+      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t('catalog.detail.sizeLabel')}>
+        {sizes.map((s) => {
+          const stock = stockMap.get(s) ?? 0;
+          const isSelected = s === selected;
+          const isOut = stock <= 0;
+          return (
+            <button
+              key={s}
+              type="button"
+              role="radio"
+              aria-checked={isSelected}
+              aria-label={t('catalog.detail.sizeAria', { size: s })}
+              disabled={isOut}
+              onClick={() => onSelect(s)}
+              className={
+                isOut
+                  ? 'inline-flex min-w-[3rem] items-center justify-center rounded-medium border border-divider/40 bg-default-100/40 px-3 py-1.5 text-sm text-default-400 line-through cursor-not-allowed'
+                  : isSelected
+                    ? 'inline-flex min-w-[3rem] items-center justify-center rounded-medium border-2 border-foreground bg-content1 px-3 py-1.5 text-sm font-medium text-foreground'
+                    : 'inline-flex min-w-[3rem] items-center justify-center rounded-medium border border-divider/60 bg-content1 px-3 py-1.5 text-sm text-default-700 transition-colors hover:border-default-400 hover:text-foreground dark:text-default-300'
+              }
+            >
+              {s}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

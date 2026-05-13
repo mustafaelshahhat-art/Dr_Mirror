@@ -1,17 +1,27 @@
 {
   "appName": "Dr. Mirror",
-  "tagline": "B2B marketplace for used medical equipment & medical surplus",
+  "tagline": "Specialist store for medical scrubs & uniforms",
   "header": {
     "switchTheme": "Switch theme",
-    "switchLanguage": "Switch language"
+    "switchLanguage": "Switch language",
+    "marketplace": "Marketplace",
+    "myAccount": "My account",
+    "signIn": "Sign in"
   },
-  "shell": {
-    "welcome": "Welcome to Dr. Mirror",
-    "welcomeBack": "Welcome, {{name}}",
-    "subtitle": "Specialized B2B platform for refurbished medical equipment and spare parts",
-    "subtitleSignedIn": "Signed in as {{role}}",
-    "mixedScriptLabel": "Mixed-script rendering test",
-    "mixedScriptText": "مرحبا hello در Mirror 2026"
+  "account": {
+    "welcome": "Welcome, {{name}}",
+    "subtitle": "Your account home. More tools land in the next milestones.",
+    "fields": {
+      "fullName": "Full name",
+      "email": "Email",
+      "role": "Role"
+    },
+    "upcoming": {
+      "title": "Coming soon",
+      "orders": "Orders & purchase history",
+      "addresses": "Saved shipping addresses",
+      "inquiries": "Quote requests & inquiries"
+    }
   },
   "theme": {
     "dark": "Dark",
