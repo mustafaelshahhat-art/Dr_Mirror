@@ -1,0 +1,75 @@
+/* ============================================================================
+ * Dr_Mirror — globals.css
+ *
+ * Single CSS entry. HeroUI's preset imports tailwindcss + tw-animate-css and
+ * sets up base/components/theme/utilities layers. We add:
+ *   - self-hosted @font-face declarations
+ *   - --font-en / --font-ar CSS variables (mixed-script fallback stacks)
+ *   - html[lang] rule to swap the primary font per locale
+ *   - tabular-nums on body (Western digits everywhere, per A18)
+ *
+ * Per DESIGN_PRINCIPLES.md:
+ *   - No custom type scale; HeroUI defaults stand.
+ *   - No glows, gradients, or shadows added here.
+ *   - Logical CSS only.
+ * ========================================================================== */
+
+@import '@heroui/react/styles';
+@import './fonts.css';
+
+@layer base {
+  :root {
+    /* Mixed-script stacks per A19: each stack lists BOTH families so Latin
+       runs use Satoshi and Arabic runs fall through to Alexandria (or vice
+       versa), without needing per-element font-family overrides. */
+    --font-en: 'Satoshi', 'Alexandria', system-ui, -apple-system, 'Segoe UI',
+      sans-serif;
+    --font-ar: 'Alexandria', 'Satoshi', 'Segoe UI', 'Tahoma', sans-serif;
+  }
+
+  html {
+    /* color-scheme follows the .dark / .light class on <html>. HeroUI handles
+       the actual colors via its layered theme architecture. */
+    color-scheme: light dark;
+    text-size-adjust: 100%;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  html.light {
+    color-scheme: light;
+  }
+
+  body {
+    font-family: var(--font-en);
+    font-variant-numeric: tabular-nums; /* Western 0–9 always tabular */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    margin: 0;
+    min-height: 100svh;
+  }
+
+  /* Locale-aware primary font (per A17 / A19). */
+  html[lang='ar'] body {
+    font-family: var(--font-ar);
+  }
+
+  html[lang='en'] body {
+    font-family: var(--font-en);
+  }
+
+  /* Honor reduced-motion globally — DESIGN_PRINCIPLES §7. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

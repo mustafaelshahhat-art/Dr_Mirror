@@ -1,0 +1,24 @@
+{
+  "appName": "Dr. Mirror",
+  "tagline": "B2B marketplace for used medical equipment & medical surplus",
+  "header": {
+    "switchTheme": "Switch theme",
+    "switchLanguage": "Switch language"
+  },
+  "shell": {
+    "welcome": "Welcome to Dr. Mirror",
+    "welcomeBack": "Welcome, {{name}}",
+    "subtitle": "Specialized B2B platform for refurbished medical equipment and spare parts",
+    "subtitleSignedIn": "Signed in as {{role}}",
+    "mixedScriptLabel": "Mixed-script rendering test",
+    "mixedScriptText": "مرحبا hello در Mirror 2026"
+  },
+  "theme": {
+    "dark": "Dark",
+    "light": "Light"
+  },
+  "language": {
+    "ar": "Arabic",
+    "en": "English"
+  }
+}

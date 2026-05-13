@@ -1,0 +1,31 @@
+/* ============================================================================
+ * Self-hosted variable fonts.
+ * - Satoshi: English primary (Latin glyphs); single variable WOFF2, weights 300–900.
+ * - Alexandria: Arabic primary (Arabic glyphs); single variable WOFF2, weights 100–900.
+ *
+ * Both files live in /public/fonts and are preloaded from index.html.
+ * font-display: swap → no invisible text during load.
+ * Mixed-script content is handled at the font-family level (see globals.css);
+ * Satoshi has no Arabic glyphs, so Arabic runs fall through to Alexandria,
+ * and vice versa.
+ * ========================================================================== */
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Variable.woff2') format('woff2-variations'),
+       url('/fonts/Satoshi-Variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Alexandria';
+  src: url('/fonts/Alexandria-Variable.woff2') format('woff2-variations'),
+       url('/fonts/Alexandria-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  /* Restrict Alexandria to the Arabic Unicode block; Latin glyphs fall to Satoshi. */
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
+}

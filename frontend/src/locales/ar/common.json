@@ -1,0 +1,24 @@
+{
+  "appName": "د. ميرور",
+  "tagline": "سوق المعدات الطبية المستعملة والخردة الطبية",
+  "header": {
+    "switchTheme": "تبديل السمة",
+    "switchLanguage": "تبديل اللغة"
+  },
+  "shell": {
+    "welcome": "مرحبا بك في د. ميرور",
+    "welcomeBack": "مرحبا، {{name}}",
+    "subtitle": "منصة B2B متخصصة في المعدات الطبية المستعملة والمتجددة وقطع الغيار",
+    "subtitleSignedIn": "تم تسجيل دخولك بصلاحية: {{role}}",
+    "mixedScriptLabel": "اختبار العرض المختلط",
+    "mixedScriptText": "مرحبا hello در Mirror 2026"
+  },
+  "theme": {
+    "dark": "داكن",
+    "light": "فاتح"
+  },
+  "language": {
+    "ar": "العربية",
+    "en": "English"
+  }
+}

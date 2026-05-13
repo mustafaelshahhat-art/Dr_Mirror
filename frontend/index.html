@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ar" dir="rtl" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
+    <title>Dr. Mirror</title>
+
+    <!--
+      Self-hosted variable fonts. Preloaded with crossorigin so the WOFF2
+      files are ready before first paint and there's no FOUT.
+      Per A17 / §1.3: zero third-party font CDN at runtime.
+    -->
+    <link
+      rel="preload"
+      href="/fonts/Satoshi-Variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/Alexandria-Variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <!--
+      Anti-FOUC theme + locale bootstrap. Runs synchronously BEFORE React
+      mounts, so the html element already has the correct class/lang/dir
+      before any pixel is painted. Storage keys MUST match
+      src/shared/lib/theme-storage.ts.
+    -->
+    <script>
+      (function () {
+        try {
+          var THEME_KEY = 'dr-mirror-theme';
+          var LANG_KEY = 'dr-mirror-lang';
+          var DEFAULT_THEME = 'dark';
+          var DEFAULT_LANG = 'ar';
+
+          var savedTheme = localStorage.getItem(THEME_KEY);
+          var savedLang = localStorage.getItem(LANG_KEY);
+          var theme =
+            savedTheme === 'dark' || savedTheme === 'light'
+              ? savedTheme
+              : DEFAULT_THEME;
+          var lang =
+            savedLang === 'ar' || savedLang === 'en' ? savedLang : DEFAULT_LANG;
+          var dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+          var html = document.documentElement;
+          html.classList.remove('light', 'dark');
+          html.classList.add(theme);
+          html.setAttribute('lang', lang);
+          html.setAttribute('dir', dir);
+        } catch (_e) {
+          /* localStorage unavailable — defaults already applied via attributes */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
