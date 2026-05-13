@@ -1,0 +1,97 @@
+{
+  "list": {
+    "title": "طلباتك",
+    "subtitle": "كل الطلبات اللي عملتها، الأحدث أولًا.",
+    "loading": "جاري تحميل الطلبات...",
+    "errorLoad": "تعذّر تحميل الطلبات. حدّث الصفحة من فضلك.",
+    "itemCount_zero": "لا توجد منتجات",
+    "itemCount_one": "منتج واحد",
+    "itemCount_two": "منتجان",
+    "itemCount_few": "{{count}} منتجات",
+    "itemCount_many": "{{count}} منتجًا",
+    "itemCount_other": "{{count}} منتج",
+    "empty": {
+      "title": "لم تطلب أي شيء بعد",
+      "subtitle": "بمجرد ما تعمل طلب هيظهر هنا.",
+      "cta": "تصفح المنتجات"
+    }
+  },
+  "detail": {
+    "loading": "جاري تحميل الطلب...",
+    "notFoundTitle": "الطلب غير موجود",
+    "notFoundSubtitle": "لم نتمكن من العثور على هذا الطلب في حسابك.",
+    "errorTitle": "تعذّر تحميل الطلب",
+    "errorSubtitle": "حدث خطأ ما. حاول مرة أخرى.",
+    "backToList": "العودة إلى طلباتي",
+    "subtitle_zero": "لا توجد منتجات · {{total}}",
+    "subtitle_one": "منتج واحد · {{total}}",
+    "subtitle_two": "منتجان · {{total}}",
+    "subtitle_few": "{{count}} منتجات · {{total}}",
+    "subtitle_many": "{{count}} منتجًا · {{total}}",
+    "subtitle_other": "{{count}} منتج · {{total}}",
+    "itemsHeading": "المنتجات",
+    "shippingHeading": "الشحن إلى",
+    "sizeLabel": "المقاس",
+    "summary": "ملخص الطلب",
+    "subTotal": "المجموع الفرعي",
+    "shipping": "الشحن",
+    "freeShipping": "مجاني",
+    "total": "الإجمالي",
+    "paymentMethod": "طريقة الدفع",
+    "timeline": "تتبع الطلب"
+  },
+  "status": {
+    "pending": "في انتظار الدفع",
+    "confirmed": "تم التأكيد",
+    "pendingPaymentReview": "مراجعة الدفع",
+    "paid": "تم الدفع",
+    "preparing": "جاري التحضير",
+    "shipped": "تم الشحن",
+    "delivered": "تم التوصيل",
+    "cancelled": "ملغي",
+    "unknown": "الحالة"
+  },
+  "paymentInstructions": {
+    "heading": "كيفية الدفع",
+    "fallback": "حوّل المبلغ إلى الحساب التالي ثم ارفع لقطة شاشة من الإيصال.",
+    "amount": "المبلغ المطلوب",
+    "accountNumber": "حوّل إلى",
+    "accountHolder": "اسم صاحب الحساب",
+    "copy": "نسخ",
+    "copied": "تم النسخ"
+  },
+  "proofs": {
+    "heading": "إثباتات الدفع",
+    "imageAlt": "صورة إثبات الدفع",
+    "reviewedAt": "تمت المراجعة في {{when}} بواسطة {{by}}",
+    "status": {
+      "pending": "في انتظار المراجعة",
+      "approved": "مقبول",
+      "rejected": "مرفوض"
+    }
+  },
+  "upload": {
+    "heading": "ارفع إثبات الدفع",
+    "subtitle": "JPEG أو PNG أو WebP أو HEIC. حتى 10 ميجابايت.",
+    "pickFile": "اختر ملف",
+    "previewAlt": "معاينة الملف اللي هترفعه",
+    "submit": "رفع",
+    "uploading": "جاري الرفع...",
+    "clear": "إزالة",
+    "errors": {
+      "tooLarge": "حجم الملف أكبر من {{mb}} ميجابايت.",
+      "unsupportedType": "نقبل فقط صور JPEG وPNG وWebP وHEIC.",
+      "unknown": "تعذّر رفع الملف. حاول مرة أخرى."
+    }
+  },
+  "cancel": {
+    "button": "إلغاء هذا الطلب",
+    "confirmHeading": "إلغاء الطلب؟",
+    "confirmSubtitle": "هتُعاد الكمية للمخزون. لا يمكن التراجع عن هذا الإجراء.",
+    "reasonPlaceholder": "السبب (اختياري)",
+    "confirm": "نعم، ألغِ الطلب",
+    "cancelling": "جاري الإلغاء...",
+    "dismiss": "الإبقاء على الطلب",
+    "errorUnknown": "تعذّر إلغاء الطلب. حاول مرة أخرى."
+  }
+}

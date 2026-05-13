@@ -1,0 +1,89 @@
+{
+  "list": {
+    "title": "Your orders",
+    "subtitle": "Every order you've placed, newest first.",
+    "loading": "Loading orders...",
+    "errorLoad": "Couldn't load your orders. Please refresh.",
+    "itemCount_one": "1 item",
+    "itemCount_other": "{{count}} items",
+    "empty": {
+      "title": "You haven't ordered yet",
+      "subtitle": "Once you place an order it'll show up here.",
+      "cta": "Browse catalog"
+    }
+  },
+  "detail": {
+    "loading": "Loading order...",
+    "notFoundTitle": "Order not found",
+    "notFoundSubtitle": "We couldn't find this order under your account.",
+    "errorTitle": "Couldn't load the order",
+    "errorSubtitle": "Something went wrong. Please try again.",
+    "backToList": "Back to my orders",
+    "subtitle_one": "1 item · {{total}}",
+    "subtitle_other": "{{count}} items · {{total}}",
+    "itemsHeading": "Items",
+    "shippingHeading": "Shipping to",
+    "sizeLabel": "Size",
+    "summary": "Summary",
+    "subTotal": "Sub-total",
+    "shipping": "Shipping",
+    "freeShipping": "Free",
+    "total": "Total",
+    "paymentMethod": "Payment method",
+    "timeline": "Timeline"
+  },
+  "status": {
+    "pending": "Awaiting payment",
+    "confirmed": "Confirmed",
+    "pendingPaymentReview": "Payment under review",
+    "paid": "Paid",
+    "preparing": "Preparing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled",
+    "unknown": "Status"
+  },
+  "paymentInstructions": {
+    "heading": "How to pay",
+    "fallback": "Transfer the total to the account below, then upload a screenshot of the receipt.",
+    "amount": "Amount due",
+    "accountNumber": "Send to",
+    "accountHolder": "Account holder",
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "proofs": {
+    "heading": "Payment proofs",
+    "imageAlt": "Payment proof image",
+    "reviewedAt": "Reviewed on {{when}} by {{by}}",
+    "status": {
+      "pending": "Awaiting review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "upload": {
+    "heading": "Upload payment proof",
+    "subtitle": "JPEG, PNG, WebP, or HEIC. Maximum 10 MB.",
+    "pickFile": "Choose a file",
+    "previewAlt": "Preview of the file you're about to upload",
+    "submit": "Upload",
+    "uploading": "Uploading...",
+    "clear": "Clear",
+    "errors": {
+      "tooLarge": "File is larger than {{mb}} MB.",
+      "unsupportedType": "Only JPEG, PNG, WebP, and HEIC images are allowed.",
+      "unknown": "Couldn't upload the file. Please try again."
+    }
+  },
+  "cancel": {
+    "button": "Cancel this order",
+    "confirmHeading": "Cancel this order?",
+    "confirmSubtitle": "Stock will be returned. This cannot be undone.",
+    "reasonPlaceholder": "Reason (optional)",
+    "confirm": "Yes, cancel order",
+    "cancelling": "Cancelling...",
+    "dismiss": "Keep order",
+    "errorUnknown": "Couldn't cancel the order. Please try again."
+  }
+}

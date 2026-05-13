@@ -94,10 +94,11 @@ export function CartButton() {
                 </span>
               </div>
               <div className="flex gap-2">
-                <Drawer.CloseTrigger>
-                  <Button variant="outline" fullWidth>
-                    {t('cart.continueShopping')}
-                  </Button>
+                {/* CloseTrigger renders its own native button — we style it
+                    directly rather than nesting another <Button> inside, which
+                    would produce invalid nested-buttons markup. */}
+                <Drawer.CloseTrigger className="inline-flex flex-1 items-center justify-center rounded-medium border border-divider bg-content1 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-default-100">
+                  {t('cart.continueShopping')}
                 </Drawer.CloseTrigger>
                 <Link
                   to="/cart"

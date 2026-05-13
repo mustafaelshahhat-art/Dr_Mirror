@@ -10,6 +10,11 @@
   },
   "account": {
     "welcome": "Welcome, {{name}}",
+    "quickLinks": "Quick links",
+    "myOrders": {
+      "title": "My orders",
+      "subtitle": "View, track, and manage every order you've placed."
+    },
     "subtitle": "Your account home. More tools land in the next milestones.",
     "fields": {
       "fullName": "Full name",

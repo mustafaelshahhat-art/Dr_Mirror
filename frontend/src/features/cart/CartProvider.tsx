@@ -130,14 +130,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     void (async () => {
       try {
-        await cartApi.merge({
+        const merged = await cartApi.merge({
           items: stash.map((l) => ({
             productVariantId: l.productVariantId,
             quantity: l.quantity,
           })),
         });
         clearGuestCart();
-        await queryClient.invalidateQueries({ queryKey: ['cart'] });
+        // The merge response IS the post-merge cart. Hand it to React Query
+        // directly so consumers see the merged cart immediately without an
+        // extra GET round-trip.
+        queryClient.setQueryData(['cart'], merged);
       } catch {
         // Leave the guest cart in place — buyer can retry on the cart page.
       }

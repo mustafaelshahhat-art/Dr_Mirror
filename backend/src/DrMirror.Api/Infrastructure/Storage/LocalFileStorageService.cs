@@ -35,8 +35,14 @@ public sealed class LocalFileStorageService : IFileStorageService
         CancellationToken ct)
     {
         var safeFolder = SanitiseFolder(folder);
-        var ext = Path.GetExtension(originalFileName);
-        if (string.IsNullOrWhiteSpace(ext)) ext = ExtensionFromContentType(contentType);
+        // Defense in depth: ALWAYS derive the extension from the validated
+        // content-type, never from the caller-supplied filename. A buyer
+        // uploading `evil.php` with `image/png` should still land on disk
+        // as `<guid>.png`, never `<guid>.php`. The endpoint validates the
+        // content-type against an image-only allow-list before we get here.
+        // The originalFileName is intentionally unused beyond logging.
+        _ = originalFileName;
+        var ext = ExtensionFromContentType(contentType);
         var safeName = $"{Guid.NewGuid():n}{ext}";
 
         var webRoot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");

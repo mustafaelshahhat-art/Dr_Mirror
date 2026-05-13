@@ -1,4 +1,6 @@
+import { Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 import { useAuth } from '../../features/auth/useAuth';
 
@@ -46,10 +48,31 @@ export function ShellPage() {
         </dl>
       </section>
 
+      <section aria-labelledby="quick-links" className="grid gap-3 sm:grid-cols-2">
+        <h2 id="quick-links" className="sr-only">
+          {t('account.quickLinks')}
+        </h2>
+        <Link
+          to="/account/orders"
+          className="group flex items-center gap-3 rounded-large border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
+        >
+          <span className="grid size-10 place-items-center rounded-medium bg-primary/10 text-primary">
+            <Package className="size-5" aria-hidden />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold text-foreground">
+              {t('account.myOrders.title')}
+            </span>
+            <span className="block text-xs text-default-500">
+              {t('account.myOrders.subtitle')}
+            </span>
+          </span>
+        </Link>
+      </section>
+
       <section className="rounded-large border border-divider/60 bg-content1 p-6">
         <h2 className="text-base font-semibold">{t('account.upcoming.title')}</h2>
         <ul className="mt-3 space-y-1.5 text-sm text-default-500">
-          <li>• {t('account.upcoming.orders')}</li>
           <li>• {t('account.upcoming.addresses')}</li>
           <li>• {t('account.upcoming.inquiries')}</li>
         </ul>

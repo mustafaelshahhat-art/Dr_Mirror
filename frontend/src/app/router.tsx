@@ -9,6 +9,9 @@ import { RegisterPage } from '../features/auth/RegisterPage';
 import { CartPage } from '../features/cart/CartPage';
 import { CatalogPage } from '../features/catalog/CatalogPage';
 import { ProductDetailPage } from '../features/catalog/ProductDetailPage';
+import { CheckoutPage } from '../features/checkout/CheckoutPage';
+import { OrderDetailPage } from '../features/orders/OrderDetailPage';
+import { OrdersListPage } from '../features/orders/OrdersListPage';
 import { Layout } from '../shared/components/Layout';
 import { ShellPage } from '../shared/components/ShellPage';
 
@@ -42,7 +45,10 @@ export function AppRoutes() {
         <Route path="cart" element={<CartPage />} />
 
         <Route element={<ProtectedRoute />}>
+          <Route path="checkout" element={<CheckoutPage />} />
           <Route path="account" element={<ShellPage />} />
+          <Route path="account/orders" element={<OrdersListPage />} />
+          <Route path="account/orders/:orderNumber" element={<OrderDetailPage />} />
         </Route>
       </Route>
     </Routes>

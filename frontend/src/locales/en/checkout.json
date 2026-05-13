@@ -1,0 +1,76 @@
+{
+  "title": "Checkout",
+  "subtitle": "Fill in shipping details, pick how you'd like to pay, then place your order.",
+  "loading": "Loading checkout...",
+  "backToCart": "Back to cart",
+  "back": "Back",
+  "continue": "Continue",
+  "placeOrder": "Place order",
+  "placing": "Placing order...",
+  "steps": {
+    "address": "Shipping",
+    "payment": "Payment",
+    "review": "Review"
+  },
+  "address": {
+    "heading": "Shipping address",
+    "recipientName": "Recipient name",
+    "phone": "Phone",
+    "governorate": "Governorate",
+    "city": "City / area",
+    "streetAddress": "Street + building",
+    "floor": "Floor",
+    "floorShort": "fl.",
+    "apartment": "Apartment",
+    "apartmentShort": "apt.",
+    "landmark": "Landmark (optional)",
+    "notes": "Notes for the courier (optional)",
+    "notesHint": "E.g. ring twice, use the side entrance, etc."
+  },
+  "payment": {
+    "heading": "Payment method",
+    "loading": "Loading payment methods...",
+    "noMethods": "No payment methods are available right now. Please contact support."
+  },
+  "buyerNote": {
+    "label": "Note for the order (optional)",
+    "hint": "Anything else we should know? Up to 1000 characters."
+  },
+  "review": {
+    "heading": "Review your order",
+    "shippingTo": "Shipping to",
+    "payingWith": "Paying with",
+    "noMethod": "(no payment method picked)"
+  },
+  "summary": {
+    "heading": "Order summary",
+    "subTotal": "Sub-total",
+    "shipping": "Shipping",
+    "shippingFreeM3": "Free",
+    "total": "Total"
+  },
+  "empty": {
+    "title": "Your cart is empty",
+    "subtitle": "Add at least one item before checking out.",
+    "cta": "Browse catalog"
+  },
+  "errors": {
+    "unknown": "Something went wrong while placing your order. Please try again.",
+    "recipientNameTooShort": "Recipient name must be at least 2 characters.",
+    "recipientNameTooLong": "Recipient name must be 100 characters or fewer.",
+    "phoneRequired": "Phone number is required.",
+    "phoneInvalid": "Phone number is not valid.",
+    "governorateRequired": "Governorate is required.",
+    "governorateTooLong": "Governorate must be 100 characters or fewer.",
+    "cityRequired": "City is required.",
+    "cityTooLong": "City must be 100 characters or fewer.",
+    "streetAddressRequired": "Street + building is required.",
+    "streetAddressTooLong": "Street + building must be 200 characters or fewer.",
+    "floorTooLong": "Floor must be 50 characters or fewer.",
+    "apartmentTooLong": "Apartment must be 50 characters or fewer.",
+    "landmarkTooLong": "Landmark must be 200 characters or fewer.",
+    "notesTooLong": "Notes must be 500 characters or fewer.",
+    "paymentMethodRequired": "Pick a payment method to continue.",
+    "buyerNoteTooLong": "Note must be 1000 characters or fewer."
+  }
+}
