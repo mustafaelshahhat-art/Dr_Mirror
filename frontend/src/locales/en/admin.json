@@ -1,0 +1,78 @@
+{
+  "list": {
+    "title": "All orders",
+    "subtitle": "The full order queue, newest first. Click a row to manage.",
+    "loading": "Loading orders...",
+    "errorLoad": "Couldn't load the order queue. Please refresh.",
+    "itemCount_one": "1 item",
+    "itemCount_other": "{{count}} items",
+    "empty": {
+      "title": "No orders yet",
+      "subtitle": "Once buyers place orders they'll show up here.",
+      "subtitleFiltered": "No orders match the current filter."
+    }
+  },
+  "filters": {
+    "status": "Status",
+    "all": "All statuses"
+  },
+  "detail": {
+    "loading": "Loading order...",
+    "notFoundTitle": "Order not found",
+    "notFoundSubtitle": "We couldn't find this order in the database.",
+    "errorTitle": "Couldn't load the order",
+    "errorSubtitle": "Something went wrong. Please try again.",
+    "backToList": "Back to all orders",
+    "subtitle_one": "1 item · {{total}}",
+    "subtitle_other": "{{count}} items · {{total}}",
+    "buyerHeading": "Buyer",
+    "buyerNoteHeading": "Buyer note",
+    "itemsHeading": "Items",
+    "shippingHeading": "Ship to",
+    "proofsHeading": "Payment proofs",
+    "summary": "Summary",
+    "subTotal": "Sub-total",
+    "shipping": "Shipping",
+    "freeShipping": "Free",
+    "total": "Total",
+    "paymentMethod": "Payment method",
+    "timeline": "Timeline",
+    "sizeLabel": "Size",
+    "floorShort": "fl.",
+    "apartmentShort": "apt.",
+    "landmark": "Landmark"
+  },
+  "transition": {
+    "heading": "Move order forward",
+    "terminalState": "This order is in a terminal state; no further transitions are possible.",
+    "confirmHeading": "Mark as {{status}}?",
+    "reasonPlaceholderOptional": "Optional note (visible in the order's audit log).",
+    "reasonPlaceholderRequired": "Why is the order being cancelled? (required, shown to the buyer)",
+    "reasonRequired": "A reason is required when cancelling an order.",
+    "confirm": "Confirm",
+    "submitting": "Working...",
+    "dismiss": "Dismiss",
+    "errorUnknown": "Couldn't update the order. Please try again."
+  },
+  "proofs": {
+    "noneYet": "The buyer hasn't uploaded a payment proof yet.",
+    "imageAlt": "Payment proof image",
+    "reviewedAt": "Reviewed on {{when}} by {{by}}",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveConfirm": "Approve this payment proof? The order will move to Paid.",
+    "rejectConfirm": "Reject this payment proof? Order bounces back to Pending and the buyer can re-upload.",
+    "notePlaceholderOptional": "Optional note (visible to the buyer).",
+    "notePlaceholderRequired": "Required reason (visible to the buyer).",
+    "rejectReasonRequired": "A reason is required when rejecting a proof.",
+    "confirm": "Confirm",
+    "submitting": "Working...",
+    "cancel": "Cancel",
+    "errorUnknown": "Couldn't update the proof. Please try again.",
+    "status": {
+      "pending": "Awaiting review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  }
+}

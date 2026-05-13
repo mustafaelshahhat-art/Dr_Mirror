@@ -1,7 +1,10 @@
 import { Route, Routes } from 'react-router-dom';
 
+import { AdminOrderDetailPage } from '../features/admin/AdminOrderDetailPage';
+import { AdminOrdersListPage } from '../features/admin/AdminOrdersListPage';
 import { LoginPage } from '../features/auth/LoginPage';
 import {
+  AdminRoute,
   ProtectedRoute,
   PublicOnlyRoute,
 } from '../features/auth/ProtectedRoute';
@@ -49,6 +52,11 @@ export function AppRoutes() {
           <Route path="account" element={<ShellPage />} />
           <Route path="account/orders" element={<OrdersListPage />} />
           <Route path="account/orders/:orderNumber" element={<OrderDetailPage />} />
+        </Route>
+
+        <Route element={<AdminRoute />}>
+          <Route path="admin/orders" element={<AdminOrdersListPage />} />
+          <Route path="admin/orders/:orderNumber" element={<AdminOrderDetailPage />} />
         </Route>
       </Route>
     </Routes>

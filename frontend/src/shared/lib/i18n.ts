@@ -2,12 +2,14 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
+import arAdmin from '../../locales/ar/admin.json';
 import arAuth from '../../locales/ar/auth.json';
 import arCart from '../../locales/ar/cart.json';
 import arCatalog from '../../locales/ar/catalog.json';
 import arCheckout from '../../locales/ar/checkout.json';
 import arCommon from '../../locales/ar/common.json';
 import arOrders from '../../locales/ar/orders.json';
+import enAdmin from '../../locales/en/admin.json';
 import enAuth from '../../locales/en/auth.json';
 import enCart from '../../locales/en/cart.json';
 import enCatalog from '../../locales/en/catalog.json';
@@ -33,6 +35,7 @@ void i18n
         cart: arCart,
         checkout: arCheckout,
         orders: arOrders,
+        admin: arAdmin,
       },
       en: {
         common: enCommon,
@@ -41,6 +44,7 @@ void i18n
         cart: enCart,
         checkout: enCheckout,
         orders: enOrders,
+        admin: enAdmin,
       },
     },
     fallbackLng: DEFAULT_LANG,
@@ -48,7 +52,7 @@ void i18n
     // Flat key lookup: t('auth.signIn') reads from the 'auth' namespace.
     fallbackNS: 'common',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'catalog', 'cart', 'checkout', 'orders'],
+    ns: ['common', 'auth', 'catalog', 'cart', 'checkout', 'orders', 'admin'],
     // Allow t('auth.signIn') to resolve via nsSeparator on the key.
     nsSeparator: '.',
     interpolation: { escapeValue: false },

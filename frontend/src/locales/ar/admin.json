@@ -1,0 +1,86 @@
+{
+  "list": {
+    "title": "كل الطلبات",
+    "subtitle": "طابور الطلبات بالكامل، الأحدث أولًا. اضغط على طلب لإدارته.",
+    "loading": "جاري تحميل الطلبات...",
+    "errorLoad": "تعذّر تحميل طابور الطلبات. حدّث الصفحة من فضلك.",
+    "itemCount_zero": "لا توجد منتجات",
+    "itemCount_one": "منتج واحد",
+    "itemCount_two": "منتجان",
+    "itemCount_few": "{{count}} منتجات",
+    "itemCount_many": "{{count}} منتجًا",
+    "itemCount_other": "{{count}} منتج",
+    "empty": {
+      "title": "لا توجد طلبات بعد",
+      "subtitle": "بمجرد ما يبدأ المشترين بطلب المنتجات، ستظهر هنا.",
+      "subtitleFiltered": "لا توجد طلبات تطابق التصفية الحالية."
+    }
+  },
+  "filters": {
+    "status": "الحالة",
+    "all": "كل الحالات"
+  },
+  "detail": {
+    "loading": "جاري تحميل الطلب...",
+    "notFoundTitle": "الطلب غير موجود",
+    "notFoundSubtitle": "لم نتمكن من العثور على هذا الطلب في قاعدة البيانات.",
+    "errorTitle": "تعذّر تحميل الطلب",
+    "errorSubtitle": "حدث خطأ ما. حاول مرة أخرى.",
+    "backToList": "العودة إلى كل الطلبات",
+    "subtitle_zero": "لا توجد منتجات · {{total}}",
+    "subtitle_one": "منتج واحد · {{total}}",
+    "subtitle_two": "منتجان · {{total}}",
+    "subtitle_few": "{{count}} منتجات · {{total}}",
+    "subtitle_many": "{{count}} منتجًا · {{total}}",
+    "subtitle_other": "{{count}} منتج · {{total}}",
+    "buyerHeading": "المشتري",
+    "buyerNoteHeading": "ملاحظة المشتري",
+    "itemsHeading": "المنتجات",
+    "shippingHeading": "الشحن إلى",
+    "proofsHeading": "إثباتات الدفع",
+    "summary": "ملخص الطلب",
+    "subTotal": "المجموع الفرعي",
+    "shipping": "الشحن",
+    "freeShipping": "مجاني",
+    "total": "الإجمالي",
+    "paymentMethod": "طريقة الدفع",
+    "timeline": "تتبع الطلب",
+    "sizeLabel": "المقاس",
+    "floorShort": "الدور",
+    "apartmentShort": "شقة",
+    "landmark": "علامة مميزة"
+  },
+  "transition": {
+    "heading": "تحريك الطلب للمرحلة التالية",
+    "terminalState": "هذا الطلب في حالة نهائية ولا يمكن تغييرها.",
+    "confirmHeading": "تأكيد الانتقال إلى {{status}}؟",
+    "reasonPlaceholderOptional": "ملاحظة اختيارية (تظهر في سجل الطلب).",
+    "reasonPlaceholderRequired": "لماذا تم إلغاء الطلب؟ (مطلوب، يظهر للمشتري)",
+    "reasonRequired": "السبب مطلوب عند إلغاء الطلب.",
+    "confirm": "تأكيد",
+    "submitting": "جاري العمل...",
+    "dismiss": "إلغاء",
+    "errorUnknown": "تعذّر تحديث الطلب. حاول مرة أخرى."
+  },
+  "proofs": {
+    "noneYet": "المشتري لم يرفع إثبات دفع حتى الآن.",
+    "imageAlt": "صورة إثبات الدفع",
+    "reviewedAt": "تمت المراجعة في {{when}} بواسطة {{by}}",
+    "approve": "اعتماد",
+    "reject": "رفض",
+    "approveConfirm": "هل تعتمد إثبات الدفع؟ الطلب سينتقل إلى حالة الدفع.",
+    "rejectConfirm": "هل ترفض هذا الإثبات؟ الطلب سيرجع إلى الانتظار ويمكن للمشتري رفع إثبات جديد.",
+    "notePlaceholderOptional": "ملاحظة اختيارية (تظهر للمشتري).",
+    "notePlaceholderRequired": "السبب مطلوب (يظهر للمشتري).",
+    "rejectReasonRequired": "السبب مطلوب عند رفض إثبات الدفع.",
+    "confirm": "تأكيد",
+    "submitting": "جاري العمل...",
+    "cancel": "تراجع",
+    "errorUnknown": "تعذّر تحديث الإثبات. حاول مرة أخرى.",
+    "status": {
+      "pending": "في انتظار المراجعة",
+      "approved": "مقبول",
+      "rejected": "مرفوض"
+    }
+  }
+}

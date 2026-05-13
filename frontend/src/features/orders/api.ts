@@ -51,12 +51,12 @@ export const ordersApi = {
   async uploadPaymentProof(orderNumber: string, file: File): Promise<OrderDetailDto> {
     const form = new FormData();
     form.append('file', file);
+    // Important: do NOT set Content-Type manually here. Axios detects FormData
+    // and emits `multipart/form-data; boundary=----WebKitFormBoundary…`. A manual
+    // header without a boundary makes the server's multipart parser fail.
     const { data } = await api.post<OrderDetailDto>(
       `/orders/${encodeURIComponent(orderNumber)}/proof`,
       form,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      },
     );
     return data;
   },

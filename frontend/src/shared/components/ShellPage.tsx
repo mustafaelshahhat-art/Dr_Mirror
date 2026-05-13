@@ -1,4 +1,4 @@
-import { Package } from 'lucide-react';
+import { LayoutDashboard, Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -68,6 +68,25 @@ export function ShellPage() {
             </span>
           </span>
         </Link>
+
+        {user.roles.includes('Admin') ? (
+          <Link
+            to="/admin/orders"
+            className="group flex items-center gap-3 rounded-large border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
+          >
+            <span className="grid size-10 place-items-center rounded-medium bg-secondary/10 text-secondary">
+              <LayoutDashboard className="size-5" aria-hidden />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold text-foreground">
+                {t('account.adminDashboard.title')}
+              </span>
+              <span className="block text-xs text-default-500">
+                {t('account.adminDashboard.subtitle')}
+              </span>
+            </span>
+          </Link>
+        ) : null}
       </section>
 
       <section className="rounded-large border border-divider/60 bg-content1 p-6">

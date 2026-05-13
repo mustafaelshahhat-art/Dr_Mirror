@@ -1,6 +1,6 @@
 import { Button } from '@heroui/react';
 import { UploadCloud } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isAxiosError } from 'axios';
 
@@ -27,6 +27,16 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [clientError, setClientError] = useState<string | null>(null);
   const upload = useUploadPaymentProofMutation(orderNumber);
+
+  // Revoke the blob URL when the component unmounts OR when previewUrl flips
+  // to a new value. Without this the URL persists for the lifetime of the
+  // document and we leak memory every time the buyer swaps files / navigates
+  // away mid-pick.
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   function onPickFile(file: File | null) {
     setClientError(null);

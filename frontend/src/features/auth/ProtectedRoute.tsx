@@ -30,6 +30,35 @@ export function ProtectedRoute() {
 }
 
 /**
+ * Gate for staff-only routes. Requires both an authenticated session AND the
+ * "Admin" role on the user. Buyers without the role get bounced to the
+ * catalog landing rather than the login page (they're not anonymous — they
+ * just lack permission). Mirrors the backend's <c>RequireRole(Admin)</c> on
+ * every /api/admin/* endpoint.
+ */
+export function AdminRoute() {
+  const { user, isBootstrapping } = useAuth();
+
+  if (isBootstrapping) {
+    return (
+      <div className="flex min-h-svh items-center justify-center bg-background">
+        <Spinner aria-label="Loading session..." />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!user.roles.includes('Admin')) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+}
+
+/**
  * The inverse: redirect to home if a logged-in user lands on /login or /register.
  */
 export function PublicOnlyRoute() {

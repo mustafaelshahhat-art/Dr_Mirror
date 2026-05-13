@@ -15,6 +15,10 @@
       "title": "My orders",
       "subtitle": "View, track, and manage every order you've placed."
     },
+    "adminDashboard": {
+      "title": "Admin dashboard",
+      "subtitle": "Review payment proofs and move orders through the pipeline."
+    },
     "subtitle": "Your account home. More tools land in the next milestones.",
     "fields": {
       "fullName": "Full name",
