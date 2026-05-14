@@ -160,7 +160,14 @@ export interface OrderDetailDto {
 
 export interface CreateOrderRequest {
   paymentMethodId: string;
-  shippingAddress: ShippingAddressDto;
+  /** When set, ships to a saved address. Mutually exclusive with shippingAddress. */
+  buyerAddressId: string | null;
+  /** Inline address payload — used when buyerAddressId is null. */
+  shippingAddress: ShippingAddressDto | null;
+  /** If true and shippingAddress is used, also persist to the buyer's address book. */
+  saveAsNewAddress: boolean;
+  /** Required when saveAsNewAddress is true. */
+  label: string | null;
   buyerNote: string | null;
 }
 

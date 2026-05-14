@@ -57,4 +57,13 @@ public class ProductVariant
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    /// <summary>
+    /// SQL Server <c>rowversion</c> token used as an EF Core concurrency
+    /// guard. When two checkouts race to decrement the same variant, the
+    /// loser gets a <see cref="Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException"/>
+    /// at <c>SaveChangesAsync</c>; <see cref="DrMirror.Api.Features.Checkout.CreateOrder.CreateOrderEndpoint"/>
+    /// catches it, re-reads stock, re-validates, and retries once.
+    /// </summary>
+    public byte[] RowVersion { get; set; } = [];
 }

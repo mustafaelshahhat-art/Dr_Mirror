@@ -113,7 +113,16 @@ public sealed record PaymentMethodDto(
 
 public sealed record CreateOrderRequest(
     Guid PaymentMethodId,
-    ShippingAddressDto ShippingAddress,
+    ShippingAddressDto? ShippingAddress,
+    /// <summary>
+    /// If set, the order ships to a saved address with this id (ownership
+    /// checked at the endpoint). Either <see cref="ShippingAddress"/> OR
+    /// <see cref="BuyerAddressId"/> must be present.
+    /// </summary>
+    Guid? BuyerAddressId,
+    /// <summary>If true and <see cref="ShippingAddress"/> is used, also save it to the buyer's address book.</summary>
+    bool SaveAsNewAddress,
+    string? Label,
     string? BuyerNote);
 
 public sealed record CancelOrderRequest(string? Reason);

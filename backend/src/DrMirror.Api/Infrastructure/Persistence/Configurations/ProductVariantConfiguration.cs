@@ -22,6 +22,12 @@ internal sealed class ProductVariantConfiguration : IEntityTypeConfiguration<Pro
         builder.Property(v => v.CreatedAt).HasDefaultValueSql("SYSUTCDATETIME()");
         builder.Property(v => v.UpdatedAt).HasDefaultValueSql("SYSUTCDATETIME()");
 
+        // SQL Server rowversion (8-byte auto-incrementing token). EF Core uses
+        // this column to detect concurrent updates: when two checkouts race
+        // to decrement the same variant's stock, the loser's SaveChanges
+        // throws DbUpdateConcurrencyException and the endpoint retries once.
+        builder.Property(v => v.RowVersion).IsRowVersion();
+
         // Variant SKUs are unique across the catalog — they're the canonical buyable identifier.
         builder.HasIndex(v => v.Sku).IsUnique();
 

@@ -11,7 +11,7 @@ public class OrderValidatorTests
     private static ShippingAddressDto ValidAddress() => new(
         RecipientName: "محمد عبد الرحمن",
         Phone: "+201001234567",
-        Governorate: "Cairo",
+        Governorate: "cairo",
         City: "Nasr City",
         StreetAddress: "12 Abbas El-Akkad Street",
         Floor: "3",
@@ -25,7 +25,7 @@ public class OrderValidatorTests
     public void CreateOrder_accepts_minimal_valid_request()
     {
         var validator = new CreateOrderValidator();
-        var request = new CreateOrderRequest(Guid.NewGuid(), ValidAddress(), BuyerNote: null);
+        var request = new CreateOrderRequest(Guid.NewGuid(), ValidAddress(), BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
 
         var result = validator.Validate(request);
 
@@ -36,7 +36,7 @@ public class OrderValidatorTests
     public void CreateOrder_rejects_empty_payment_method()
     {
         var validator = new CreateOrderValidator();
-        var request = new CreateOrderRequest(Guid.Empty, ValidAddress(), null);
+        var request = new CreateOrderRequest(Guid.Empty, ValidAddress(), BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
 
         var result = validator.Validate(request);
 
@@ -51,6 +51,9 @@ public class OrderValidatorTests
         var request = new CreateOrderRequest(
             Guid.NewGuid(),
             ValidAddress(),
+            BuyerAddressId: null,
+            SaveAsNewAddress: false,
+            Label: null,
             BuyerNote: new string('x', OrderLimits.MaxBuyerNote + 1));
 
         var result = validator.Validate(request);
@@ -65,7 +68,7 @@ public class OrderValidatorTests
     {
         var validator = new CreateOrderValidator();
         var address = ValidAddress() with { RecipientName = "" };
-        var request = new CreateOrderRequest(Guid.NewGuid(), address, null);
+        var request = new CreateOrderRequest(Guid.NewGuid(), address, BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
 
         var result = validator.Validate(request);
 
@@ -80,7 +83,7 @@ public class OrderValidatorTests
     {
         var validator = new CreateOrderValidator();
         var address = ValidAddress() with { Phone = phone };
-        var request = new CreateOrderRequest(Guid.NewGuid(), address, null);
+        var request = new CreateOrderRequest(Guid.NewGuid(), address, BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
 
         var result = validator.Validate(request);
 
@@ -95,7 +98,7 @@ public class OrderValidatorTests
     {
         var validator = new CreateOrderValidator();
         var address = ValidAddress() with { Phone = phone };
-        var request = new CreateOrderRequest(Guid.NewGuid(), address, null);
+        var request = new CreateOrderRequest(Guid.NewGuid(), address, BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
 
         var result = validator.Validate(request);
 

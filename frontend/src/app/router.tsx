@@ -15,6 +15,7 @@ import {
   PublicOnlyRoute,
 } from '../features/auth/ProtectedRoute';
 import { RegisterPage } from '../features/auth/RegisterPage';
+import { AddressBookPage } from '../features/addresses/AddressBookPage';
 import { CartPage } from '../features/cart/CartPage';
 import { CatalogPage } from '../features/catalog/CatalogPage';
 import { ProductDetailPage } from '../features/catalog/ProductDetailPage';
@@ -58,6 +59,7 @@ export function AppRoutes() {
           <Route path="account" element={<ShellPage />} />
           <Route path="account/orders" element={<OrdersListPage />} />
           <Route path="account/orders/:orderNumber" element={<OrderDetailPage />} />
+          <Route path="account/addresses" element={<AddressBookPage />} />
         </Route>
 
         <Route element={<AdminRoute />}>

@@ -2,6 +2,7 @@ using System.Text;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Features.Auth;
 using DrMirror.Api.Features.Auth.Common;
+using DrMirror.Api.Features.Addresses;
 using DrMirror.Api.Features.Admin;
 using DrMirror.Api.Features.Cart;
 using DrMirror.Api.Features.Cart.Common;
@@ -302,6 +303,7 @@ try
     app.MapCartEndpoints();
     app.MapCheckoutEndpoints();
     app.MapOrderEndpoints();
+    app.MapAddressEndpoints();
     app.MapAdminEndpoints();
 
     Log.Information("Dr_Mirror API starting up — env={Env}", app.Environment.EnvironmentName);

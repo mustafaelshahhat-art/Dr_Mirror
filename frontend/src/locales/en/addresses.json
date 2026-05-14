@@ -1,0 +1,42 @@
+{
+  "loading": "Loading addresses...",
+  "backToAccount": "Back to account",
+  "title": "Saved addresses",
+  "subtitle": "Manage your delivery addresses. The default address is pre-selected at checkout.",
+  "empty": "You haven't saved any addresses yet.",
+  "defaultBadge": "Default",
+  "apartmentShort": "apt.",
+  "floorShort": "fl.",
+  "landmark": "Landmark",
+  "actions": {
+    "add": "Add address",
+    "create": "Save address",
+    "creating": "Saving...",
+    "save": "Update address",
+    "saving": "Updating...",
+    "edit": "Edit",
+    "setDefault": "Set as default",
+    "delete": "Delete",
+    "cancel": "Cancel"
+  },
+  "fields": {
+    "label": "Label",
+    "labelHint": "E.g. Home, Work, Parents",
+    "recipientName": "Recipient name",
+    "phone": "Phone",
+    "phoneHint": "Egyptian mobile number, e.g. +201001234567",
+    "governorate": "Governorate",
+    "city": "City / area",
+    "streetAddress": "Street + building",
+    "floor": "Floor",
+    "apartment": "Apartment",
+    "landmark": "Landmark (optional)",
+    "notes": "Courier notes (optional)",
+    "setDefault": "Set as default address",
+    "firstAddressNote": "auto-set as default"
+  },
+  "errors": {
+    "governorateRequired": "Please select a governorate.",
+    "unknown": "Something went wrong. Please try again."
+  }
+}

@@ -25,7 +25,15 @@
     "apartmentShort": "apt.",
     "landmark": "Landmark (optional)",
     "notes": "Notes for the courier (optional)",
-    "notesHint": "E.g. ring twice, use the side entrance, etc."
+    "notesHint": "E.g. ring twice, use the side entrance, etc.",
+    "savedHeading": "Saved addresses",
+    "useNew": {
+      "title": "Use a new address",
+      "subtitle": "Fill in the shipping details below"
+    },
+    "saveAsNew": "Save this address to my address book",
+    "newLabel": "Address label",
+    "newLabelPlaceholder": "E.g. Home, Work"
   },
   "payment": {
     "heading": "Payment method",
@@ -71,6 +79,7 @@
     "landmarkTooLong": "Landmark must be 200 characters or fewer.",
     "notesTooLong": "Notes must be 500 characters or fewer.",
     "paymentMethodRequired": "Pick a payment method to continue.",
-    "buyerNoteTooLong": "Note must be 1000 characters or fewer."
+    "buyerNoteTooLong": "Note must be 1000 characters or fewer.",
+    "labelRequired": "Please enter a label for the new address."
   }
 }

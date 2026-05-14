@@ -1,3 +1,4 @@
+using DrMirror.Api.Domain.Catalog;
 using DrMirror.Api.Domain.Orders;
 using FluentValidation;
 
@@ -24,8 +25,13 @@ internal sealed class ShippingAddressValidator : AbstractValidator<ShippingAddre
         RuleFor(a => a.RecipientName).NotEmpty().MaximumLength(100);
         RuleFor(a => a.Phone)
             .NotEmpty()
-            .Must(p => PhoneRegex.IsMatch(p)).WithMessage("Phone number is not valid.");
-        RuleFor(a => a.Governorate).NotEmpty().MaximumLength(100);
+            .Must(p => PhoneRegex.IsMatch(p))
+            .WithMessage("Phone number is not valid.");
+        RuleFor(a => a.Governorate)
+            .NotEmpty()
+            .MaximumLength(100)
+            .Must(Governorates.IsValid)
+            .WithMessage("Governorate must be one of the 27 Egyptian governorates.");
         RuleFor(a => a.City).NotEmpty().MaximumLength(100);
         RuleFor(a => a.StreetAddress).NotEmpty().MaximumLength(200);
         RuleFor(a => a.Floor).MaximumLength(50);
@@ -40,7 +46,24 @@ public sealed class CreateOrderValidator : AbstractValidator<CreateOrderRequest>
     public CreateOrderValidator()
     {
         RuleFor(r => r.PaymentMethodId).NotEmpty();
-        RuleFor(r => r.ShippingAddress).NotNull().SetValidator(new ShippingAddressValidator());
+        // Exactly one of BuyerAddressId or ShippingAddress must be provided.
+        RuleFor(r => r)
+            .Must(r => r.BuyerAddressId.HasValue ^ r.ShippingAddress is not null)
+            .WithMessage("Provide either a saved buyerAddressId OR an inline shippingAddress, not both.");
+        // When inline, validate the embedded address.
+        When(r => r.ShippingAddress is not null, () =>
+        {
+            RuleFor(r => r.ShippingAddress!).SetValidator(new ShippingAddressValidator());
+        });
+        // Label is only used when persisting a new inline address.
+        When(r => r.SaveAsNewAddress, () =>
+        {
+            RuleFor(r => r.Label).NotEmpty().MaximumLength(64)
+                .WithMessage("Label is required when saving the address to the address book.");
+            RuleFor(r => r.ShippingAddress)
+                .NotNull()
+                .WithMessage("Cannot save a new address when checking out with a saved address id.");
+        });
         RuleFor(r => r.BuyerNote).MaximumLength(OrderLimits.MaxBuyerNote);
     }
 }

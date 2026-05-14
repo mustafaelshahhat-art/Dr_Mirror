@@ -2,19 +2,23 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
+import arAddresses from '../../locales/ar/addresses.json';
 import arAdmin from '../../locales/ar/admin.json';
 import arAuth from '../../locales/ar/auth.json';
 import arCart from '../../locales/ar/cart.json';
 import arCatalog from '../../locales/ar/catalog.json';
 import arCheckout from '../../locales/ar/checkout.json';
 import arCommon from '../../locales/ar/common.json';
+import arGovernates from '../../locales/ar/governorates.json';
 import arOrders from '../../locales/ar/orders.json';
+import enAddresses from '../../locales/en/addresses.json';
 import enAdmin from '../../locales/en/admin.json';
 import enAuth from '../../locales/en/auth.json';
 import enCart from '../../locales/en/cart.json';
 import enCatalog from '../../locales/en/catalog.json';
 import enCheckout from '../../locales/en/checkout.json';
 import enCommon from '../../locales/en/common.json';
+import enGovernates from '../../locales/en/governorates.json';
 import enOrders from '../../locales/en/orders.json';
 
 import {
@@ -36,6 +40,8 @@ void i18n
         checkout: arCheckout,
         orders: arOrders,
         admin: arAdmin,
+        addresses: arAddresses,
+        governorates: arGovernates,
       },
       en: {
         common: enCommon,
@@ -45,6 +51,8 @@ void i18n
         checkout: enCheckout,
         orders: enOrders,
         admin: enAdmin,
+        addresses: enAddresses,
+        governorates: enGovernates,
       },
     },
     fallbackLng: DEFAULT_LANG,
@@ -52,7 +60,7 @@ void i18n
     // Flat key lookup: t('auth.signIn') reads from the 'auth' namespace.
     fallbackNS: 'common',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'catalog', 'cart', 'checkout', 'orders', 'admin'],
+    ns: ['common', 'auth', 'catalog', 'cart', 'checkout', 'orders', 'admin', 'addresses', 'governorates'],
     // Allow t('auth.signIn') to resolve via nsSeparator on the key.
     nsSeparator: '.',
     interpolation: { escapeValue: false },

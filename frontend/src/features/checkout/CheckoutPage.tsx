@@ -10,6 +10,8 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import type { ProblemDetails } from '../auth/types';
 import { useAuth } from '../auth/useAuth';
 import { FormField } from '../auth/components/FormField';
+import { GovernorateSelect } from '../addresses/components/GovernorateSelect';
+import { useAddressesQuery } from '../addresses/hooks';
 import { useCart } from '../cart/useCart';
 import { useCreateOrderMutation, usePaymentMethodsQuery } from '../orders/hooks';
 
@@ -42,6 +44,13 @@ export function CheckoutPage() {
 
   const [step, setStep] = useState<CheckoutStep>('address');
   const [serverError, setServerError] = useState<string | null>(null);
+  // Saved-address mode: when set, the inline form is hidden and we send
+  // BuyerAddressId at submit time. null means inline form (which can
+  // optionally be saved as a new address via the checkbox below).
+  const [savedAddressId, setSavedAddressId] = useState<string | null>(null);
+  const [saveAsNewAddress, setSaveAsNewAddress] = useState(false);
+  const [newAddressLabel, setNewAddressLabel] = useState('');
+  const addressesQuery = useAddressesQuery();
 
   const {
     control,
@@ -114,8 +123,19 @@ export function CheckoutPage() {
 
   async function next() {
     if (step === 'address') {
+      // If the buyer picked a saved address, skip inline form validation.
+      if (savedAddressId !== null) {
+        setStep('payment');
+        return;
+      }
       const ok = await trigger('address');
-      if (ok) setStep('payment');
+      if (!ok) return;
+      // If they want to save the inline address, we additionally need a label.
+      if (saveAsNewAddress && newAddressLabel.trim().length === 0) {
+        setServerError(t('checkout.errors.labelRequired'));
+        return;
+      }
+      setStep('payment');
       return;
     }
     if (step === 'payment') {
@@ -133,19 +153,25 @@ export function CheckoutPage() {
   const onSubmit = handleSubmit(async (values) => {
     setServerError(null);
     try {
+      const usingSaved = savedAddressId !== null;
       const order = await createOrder.mutateAsync({
         paymentMethodId: values.paymentMethodId,
-        shippingAddress: {
-          recipientName: values.address.recipientName,
-          phone: values.address.phone,
-          governorate: values.address.governorate,
-          city: values.address.city,
-          streetAddress: values.address.streetAddress,
-          floor: values.address.floor || null,
-          apartment: values.address.apartment || null,
-          landmark: values.address.landmark || null,
-          notes: values.address.notes || null,
-        },
+        buyerAddressId: usingSaved ? savedAddressId : null,
+        shippingAddress: usingSaved
+          ? null
+          : {
+              recipientName: values.address.recipientName,
+              phone: values.address.phone,
+              governorate: values.address.governorate,
+              city: values.address.city,
+              streetAddress: values.address.streetAddress,
+              floor: values.address.floor || null,
+              apartment: values.address.apartment || null,
+              landmark: values.address.landmark || null,
+              notes: values.address.notes || null,
+            },
+        saveAsNewAddress: !usingSaved && saveAsNewAddress,
+        label: !usingSaved && saveAsNewAddress ? newAddressLabel.trim() : null,
         buyerNote: values.buyerNote?.trim() ? values.buyerNote.trim() : null,
       });
       navigate(`/account/orders/${encodeURIComponent(order.orderNumber)}`);
@@ -191,67 +217,168 @@ export function CheckoutPage() {
               <legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
                 {t('checkout.address.heading')}
               </legend>
-              <FormField
-                name="address.recipientName"
-                control={control}
-                label={t('checkout.address.recipientName')}
-                autoComplete="name"
-                isRequired
-              />
-              <FormField
-                name="address.phone"
-                control={control}
-                label={t('checkout.address.phone')}
-                type="tel"
-                autoComplete="tel"
-                isRequired
-              />
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  name="address.governorate"
-                  control={control}
-                  label={t('checkout.address.governorate')}
-                  autoComplete="address-level1"
-                  isRequired
-                />
-                <FormField
-                  name="address.city"
-                  control={control}
-                  label={t('checkout.address.city')}
-                  autoComplete="address-level2"
-                  isRequired
-                />
-              </div>
-              <FormField
-                name="address.streetAddress"
-                control={control}
-                label={t('checkout.address.streetAddress')}
-                autoComplete="street-address"
-                isRequired
-              />
-              <div className="grid gap-4 sm:grid-cols-3">
-                <FormField
-                  name="address.floor"
-                  control={control}
-                  label={t('checkout.address.floor')}
-                />
-                <FormField
-                  name="address.apartment"
-                  control={control}
-                  label={t('checkout.address.apartment')}
-                />
-                <FormField
-                  name="address.landmark"
-                  control={control}
-                  label={t('checkout.address.landmark')}
-                />
-              </div>
-              <FormField
-                name="address.notes"
-                control={control}
-                label={t('checkout.address.notes')}
-                description={t('checkout.address.notesHint')}
-              />
+
+              {(addressesQuery.data ?? []).length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-xs uppercase tracking-wide text-default-500">
+                    {t('checkout.address.savedHeading')}
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {(addressesQuery.data ?? []).map((a) => {
+                      const localizedGov = t(`governorates.${a.governorate}`, a.governorate);
+                      const isSelected = savedAddressId === a.id;
+                      return (
+                        <button
+                          key={a.id}
+                          type="button"
+                          role="radio"
+                          aria-checked={isSelected}
+                          onClick={() => setSavedAddressId(a.id)}
+                          className={[
+                            'rounded-medium border p-3 text-start transition-colors',
+                            isSelected
+                              ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                              : 'border-divider bg-content1 hover:bg-content2',
+                          ].join(' ')}
+                        >
+                          <p className="text-sm font-semibold">
+                            {a.label}
+                            {a.isDefault ? (
+                              <span className="ms-2 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2 py-0 text-xs font-medium text-primary">
+                                {t('addresses.defaultBadge')}
+                              </span>
+                            ) : null}
+                          </p>
+                          <p className="text-xs text-default-500" dir="ltr">
+                            {a.phone}
+                          </p>
+                          <p className="text-xs text-default-700 dark:text-default-300">
+                            {a.streetAddress}
+                          </p>
+                          <p className="text-xs text-default-700 dark:text-default-300">
+                            {a.city}, {localizedGov}
+                          </p>
+                        </button>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={savedAddressId === null}
+                      onClick={() => setSavedAddressId(null)}
+                      className={[
+                        'rounded-medium border p-3 text-start text-sm transition-colors',
+                        savedAddressId === null
+                          ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                          : 'border-divider bg-content1 hover:bg-content2',
+                      ].join(' ')}
+                    >
+                      <p className="font-semibold">{t('checkout.address.useNew.title')}</p>
+                      <p className="text-xs text-default-500">
+                        {t('checkout.address.useNew.subtitle')}
+                      </p>
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+
+              {savedAddressId === null ? (
+                <>
+                  <FormField
+                    name="address.recipientName"
+                    control={control}
+                    label={t('checkout.address.recipientName')}
+                    autoComplete="name"
+                    isRequired
+                  />
+                  <FormField
+                    name="address.phone"
+                    control={control}
+                    label={t('checkout.address.phone')}
+                    type="tel"
+                    autoComplete="tel"
+                    isRequired
+                  />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="flex flex-col gap-1.5 text-sm">
+                      <span className="text-sm font-medium">
+                        {t('checkout.address.governorate')}
+                      </span>
+                      <GovernorateSelect
+                        value={watch('address.governorate')}
+                        onChange={(slug) =>
+                          setValue('address.governorate', slug, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          })
+                        }
+                        required
+                      />
+                    </label>
+                    <FormField
+                      name="address.city"
+                      control={control}
+                      label={t('checkout.address.city')}
+                      autoComplete="address-level2"
+                      isRequired
+                    />
+                  </div>
+                  <FormField
+                    name="address.streetAddress"
+                    control={control}
+                    label={t('checkout.address.streetAddress')}
+                    autoComplete="street-address"
+                    isRequired
+                  />
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <FormField
+                      name="address.floor"
+                      control={control}
+                      label={t('checkout.address.floor')}
+                    />
+                    <FormField
+                      name="address.apartment"
+                      control={control}
+                      label={t('checkout.address.apartment')}
+                    />
+                    <FormField
+                      name="address.landmark"
+                      control={control}
+                      label={t('checkout.address.landmark')}
+                    />
+                  </div>
+                  <FormField
+                    name="address.notes"
+                    control={control}
+                    label={t('checkout.address.notes')}
+                    description={t('checkout.address.notesHint')}
+                  />
+
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={saveAsNewAddress}
+                      onChange={(e) => setSaveAsNewAddress(e.target.checked)}
+                      className="h-4 w-4 rounded border-divider"
+                    />
+                    <span>{t('checkout.address.saveAsNew')}</span>
+                  </label>
+                  {saveAsNewAddress ? (
+                    <label className="flex flex-col gap-1.5 text-sm">
+                      <span className="text-xs uppercase tracking-wide text-default-500">
+                        {t('checkout.address.newLabel')}
+                      </span>
+                      <input
+                        value={newAddressLabel}
+                        onChange={(e) => setNewAddressLabel(e.target.value)}
+                        maxLength={64}
+                        placeholder={t('checkout.address.newLabelPlaceholder')}
+                        className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm"
+                      />
+                    </label>
+                  ) : null}
+                </>
+              ) : null}
             </fieldset>
           ) : null}
 
