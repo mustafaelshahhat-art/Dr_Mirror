@@ -1,6 +1,7 @@
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Features.Auth.Common;
 using DrMirror.Api.Infrastructure.Identity;
+using DrMirror.Api.Shared.RateLimiting;
 using DrMirror.Api.Shared.Validation;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
@@ -25,6 +26,7 @@ public static class LoginEndpoint
         group.MapPost("/login", HandleAsync)
             .WithName("Login")
             .WithSummary("Exchange email + password for an access token + refresh cookie.")
+            .RequireRateLimiting(RateLimitPolicies.AuthStrict)
             .WithValidation<LoginRequest>()
             .Produces<AuthResponse>(StatusCodes.Status200OK)
             .ProducesValidationProblem()

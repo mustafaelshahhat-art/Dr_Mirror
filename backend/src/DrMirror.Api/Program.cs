@@ -17,8 +17,11 @@ using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.Persistence.Seed;
 using DrMirror.Api.Infrastructure.Storage;
+using DrMirror.Api.Shared.RateLimiting;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -255,6 +258,52 @@ try
 
     builder.Services.AddRouting();
 
+    // -----------------------------------------------------------------------
+    // Rate limiting — IP-keyed sliding/fixed windows on sensitive endpoints.
+    // Returns 429 with Retry-After on breach; no queue — reject immediately.
+    // -----------------------------------------------------------------------
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+        // Login + register — 10 req/60 s per IP (sliding window).
+        options.AddSlidingWindowLimiter(RateLimitPolicies.AuthStrict, o =>
+        {
+            o.Window = TimeSpan.FromMinutes(1);
+            o.SegmentsPerWindow = 6;
+            o.PermitLimit = 10;
+            o.QueueLimit = 0;
+            o.AutoReplenishment = true;
+        });
+
+        // Token refresh — 30 req/60 s per IP (sliding window).
+        options.AddSlidingWindowLimiter(RateLimitPolicies.AuthRefresh, o =>
+        {
+            o.Window = TimeSpan.FromMinutes(1);
+            o.SegmentsPerWindow = 6;
+            o.PermitLimit = 30;
+            o.QueueLimit = 0;
+            o.AutoReplenishment = true;
+        });
+
+        // Inquiry submit — 5 req/60 s per IP (fixed window).
+        options.AddFixedWindowLimiter(RateLimitPolicies.InquirySubmit, o =>
+        {
+            o.Window = TimeSpan.FromMinutes(1);
+            o.PermitLimit = 5;
+            o.QueueLimit = 0;
+            o.AutoReplenishment = true;
+        });
+
+        // Key by remote IP (falls back to empty string for non-TCP transports).
+        options.OnRejected = async (ctx, ct) =>
+        {
+            ctx.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            await ctx.HttpContext.Response.WriteAsync(
+                "Too many requests. Please slow down and try again later.", ct);
+        };
+    });
+
     var app = builder.Build();
 
     // -----------------------------------------------------------------------
@@ -292,6 +341,7 @@ try
 
     app.UseAuthentication();
     app.UseAuthorization();
+    app.UseRateLimiter();
 
     // -----------------------------------------------------------------------
     // Endpoints.

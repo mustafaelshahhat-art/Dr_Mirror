@@ -3,6 +3,7 @@ using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Features.Inquiries.Common;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.RateLimiting;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,7 @@ public static class SubmitInquiryEndpoint
         group.MapPost("/", HandleAsync)
             .WithName("Inquiries.Submit")
             .WithSummary("Submit a product or general inquiry.")
+            .RequireRateLimiting(RateLimitPolicies.InquirySubmit)
             .WithValidation<SubmitInquiryRequest>()
             .Produces<InquiryDto>(StatusCodes.Status201Created)
             .ProducesValidationProblem()

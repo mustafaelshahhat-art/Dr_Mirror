@@ -2,6 +2,7 @@ using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Features.Auth.Common;
 using DrMirror.Api.Infrastructure.Identity;
+using DrMirror.Api.Shared.RateLimiting;
 using DrMirror.Api.Shared.Validation;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
@@ -42,6 +43,7 @@ public static class RegisterEndpoint
         group.MapPost("/register", HandleAsync)
             .WithName("Register")
             .WithSummary("Create a new Buyer account and sign in immediately.")
+            .RequireRateLimiting(RateLimitPolicies.AuthStrict)
             .WithValidation<RegisterRequest>()
             .Produces<AuthResponse>(StatusCodes.Status201Created)
             .ProducesValidationProblem()

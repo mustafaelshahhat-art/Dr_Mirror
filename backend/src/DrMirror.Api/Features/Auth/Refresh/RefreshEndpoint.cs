@@ -2,6 +2,7 @@ using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Features.Auth.Common;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.RateLimiting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,7 @@ public static class RefreshEndpoint
         group.MapPost("/refresh", HandleAsync)
             .WithName("Refresh")
             .WithSummary("Rotate the refresh cookie and return a fresh access token.")
+            .RequireRateLimiting(RateLimitPolicies.AuthRefresh)
             .Produces<AuthResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
