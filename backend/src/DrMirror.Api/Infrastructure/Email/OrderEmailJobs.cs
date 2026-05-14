@@ -2,6 +2,7 @@ using Coravel.Invocable;
 using DrMirror.Api.Domain.Orders;
 using DrMirror.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace DrMirror.Api.Infrastructure.Email;
 
@@ -176,6 +177,67 @@ public sealed class SendStatusChangedJob : IInvocable, IInvocableWithPayload<Ord
         await _email.SendAsync(new EmailMessage(
             To: order.BuyerUser.Email,
             Subject: subject,
+            TextBody: body));
+    }
+}
+
+/// <summary>
+/// Fires when a visitor submits an inquiry. Sends a notification email to the
+/// configured admin address so staff are aware without polling the inbox.
+/// </summary>
+public sealed class SendInquiryReceivedJob : IInvocable, IInvocableWithPayload<Guid>
+{
+    public Guid Payload { get; set; }
+
+    private readonly AppDbContext _db;
+    private readonly IEmailSender _email;
+    private readonly EmailOptions _emailOptions;
+    private readonly ILogger<SendInquiryReceivedJob> _logger;
+
+    public SendInquiryReceivedJob(
+        AppDbContext db,
+        IEmailSender email,
+        IOptions<EmailOptions> emailOptions,
+        ILogger<SendInquiryReceivedJob> logger)
+    {
+        _db = db;
+        _email = email;
+        _emailOptions = emailOptions.Value;
+        _logger = logger;
+    }
+
+    public async Task Invoke()
+    {
+        var inquiry = await _db.Inquiries
+            .AsNoTracking()
+            .Include(i => i.Product)
+            .FirstOrDefaultAsync(i => i.Id == Payload);
+
+        if (inquiry is null)
+        {
+            _logger.LogWarning("InquiryReceived skipped — inquiry {InquiryId} not found", Payload);
+            return;
+        }
+
+        var adminEmail = _emailOptions.AdminNotificationEmail ?? _emailOptions.FromAddress;
+
+        var productLine = inquiry.Product is not null
+            ? $"Product: {inquiry.Product.NameEn}\n"
+            : "";
+
+        var body =
+            $"New inquiry received on Dr. Mirror.\n\n" +
+            $"From: {inquiry.FullName} <{inquiry.Email}>" +
+            (inquiry.Phone is not null ? $" | {inquiry.Phone}" : "") + "\n" +
+            productLine +
+            $"Subject: {inquiry.Subject}\n\n" +
+            $"Message:\n{inquiry.Message}\n\n" +
+            $"View in admin: /admin/inquiries\n" +
+            $"— Dr. Mirror System";
+
+        await _email.SendAsync(new EmailMessage(
+            To: adminEmail,
+            Subject: $"[Dr. Mirror] New inquiry: {inquiry.Subject}",
             TextBody: body));
     }
 }

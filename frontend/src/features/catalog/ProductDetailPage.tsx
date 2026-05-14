@@ -1,5 +1,5 @@
 import { Button, Spinner } from '@heroui/react';
-import { ArrowLeft, Check, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Check, MessageSquare, ShoppingBag } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
@@ -8,6 +8,8 @@ import { useCart } from '../cart/useCart';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
+
+import { InquiryForm } from '../inquiries/components/InquiryForm';
 
 import { ColorPicker } from './components/ColorPicker';
 import { GenderChip } from './components/GenderChip';
@@ -36,6 +38,7 @@ export function ProductDetailPage() {
     'idle',
   );
   const [addError, setAddError] = useState<string | null>(null);
+  const [showInquiry, setShowInquiry] = useState(false);
 
   // Auto-clear the "added" badge so the user can add the same item again.
   useEffect(() => {
@@ -261,10 +264,23 @@ export function ProductDetailPage() {
                         : t('cart.addToCart')}
               </span>
             </Button>
-            <Button variant="outline" isDisabled fullWidth>
-              {t('catalog.detail.inquireSoon')}
+            <Button
+              variant="outline"
+              fullWidth
+              onPress={() => setShowInquiry((v) => !v)}
+            >
+              <span className="inline-flex items-center gap-2">
+                <MessageSquare className="size-4" aria-hidden />
+                {t('catalog.detail.inquireCta')}
+              </span>
             </Button>
           </div>
+          {showInquiry ? (
+            <InquiryForm
+              productId={product.id}
+              defaultSubject={isAr ? product.nameAr : product.nameEn}
+            />
+          ) : null}
           {addError ? (
             <p className="text-xs text-danger" role="alert">
               {addError}

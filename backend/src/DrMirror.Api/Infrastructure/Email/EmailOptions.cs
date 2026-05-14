@@ -17,6 +17,12 @@ public sealed class EmailOptions
     /// <summary>Sender display name.</summary>
     public string FromName { get; set; } = "Dr. Mirror";
 
+    /// <summary>
+    /// Where to send admin-directed notifications (new inquiries, etc.).
+    /// Falls back to <see cref="FromAddress"/> when not set.
+    /// </summary>
+    public string? AdminNotificationEmail { get; set; }
+
     // -- MailKit/SMTP-specific. --
     public string? SmtpHost { get; set; }
     public int SmtpPort { get; set; } = 587;

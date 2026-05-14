@@ -4,7 +4,9 @@ using DrMirror.Api.Features.Admin.Orders.GetOrderByNumber;
 using DrMirror.Api.Features.Admin.Orders.ListOrders;
 using DrMirror.Api.Features.Admin.Orders.ReviewPaymentProof;
 using DrMirror.Api.Features.Admin.Orders.TransitionOrder;
+using DrMirror.Api.Features.Admin.Inquiries;
 using DrMirror.Api.Features.Admin.Payments;
+using DrMirror.Api.Features.Admin.Users;
 
 namespace DrMirror.Api.Features.Admin;
 
@@ -32,9 +34,19 @@ public static class AdminEndpoints
         products.MapAdminVariants();
         products.MapAdminProductImages();
 
+        // M6 admin inquiries inbox.
+        var inquiries = app.MapGroup("/api/admin/inquiries").WithTags("Admin: Inquiries");
+        inquiries.MapListInquiries();
+        inquiries.MapMarkInquiryRead();
+
         // M4 admin payment-method CRUD.
         var paymentMethods = app.MapGroup("/api/admin/payment-methods").WithTags("Admin: Payments");
         paymentMethods.MapAdminPaymentMethods();
+
+        // Admin user management.
+        var users = app.MapGroup("/api/admin/users").WithTags("Admin: Users");
+        users.MapListUsers();
+        users.MapUpdateUserRoles();
 
         return app;
     }

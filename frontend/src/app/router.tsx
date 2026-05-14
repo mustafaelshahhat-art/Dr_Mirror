@@ -1,6 +1,8 @@
 import { Route, Routes } from 'react-router-dom';
 
 import { AdminHubPage } from '../features/admin/AdminHubPage';
+import { AdminInquiriesPage } from '../features/admin/AdminInquiriesPage';
+import { AdminUsersPage } from '../features/admin/AdminUsersPage';
 import { AdminOrderDetailPage } from '../features/admin/AdminOrderDetailPage';
 import { AdminOrdersListPage } from '../features/admin/AdminOrdersListPage';
 import { AdminCategoriesPage } from '../features/admin/catalog/AdminCategoriesPage';
@@ -71,6 +73,8 @@ export function AppRoutes() {
           <Route path="admin/products/new" element={<AdminProductCreatePage />} />
           <Route path="admin/products/:id/edit" element={<AdminProductEditPage />} />
           <Route path="admin/payment-methods" element={<AdminPaymentMethodsPage />} />
+          <Route path="admin/inquiries" element={<AdminInquiriesPage />} />
+          <Route path="admin/users" element={<AdminUsersPage />} />
         </Route>
       </Route>
     </Routes>

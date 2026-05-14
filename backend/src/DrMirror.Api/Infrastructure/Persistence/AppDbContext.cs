@@ -34,6 +34,7 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
     public DbSet<OrderCounter> OrderCounters => Set<OrderCounter>();
     public DbSet<PaymentProof> PaymentProofs => Set<PaymentProof>();
+    public DbSet<Inquiry> Inquiries => Set<Inquiry>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

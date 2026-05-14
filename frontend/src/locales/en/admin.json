@@ -73,6 +73,14 @@
       "paymentMethods": {
         "title": "Payment methods",
         "subtitle": "Edit Instapay handle, wallet number, and instructions buyers see at checkout."
+      },
+      "inquiries": {
+        "title": "Inquiries",
+        "subtitle": "Pre-sale messages from customers. Reply by email, mark read."
+      },
+      "users": {
+        "title": "Users",
+        "subtitle": "Manage registered buyers and staff. Assign or revoke roles."
       }
     }
   },
@@ -241,5 +249,17 @@
       "approved": "Approved",
       "rejected": "Rejected"
     }
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "Manage registered accounts and their roles.",
+    "loading": "Loading users...",
+    "empty": "No users found.",
+    "searchPlaceholder": "Search by name or email",
+    "colName": "Name",
+    "colJoined": "Joined",
+    "colRoles": "Roles",
+    "addRole": "Add role {{role}}",
+    "removeRole": "Remove role {{role}}"
   }
 }

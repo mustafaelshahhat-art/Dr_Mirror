@@ -10,6 +10,7 @@ import arCatalog from '../../locales/ar/catalog.json';
 import arCheckout from '../../locales/ar/checkout.json';
 import arCommon from '../../locales/ar/common.json';
 import arGovernates from '../../locales/ar/governorates.json';
+import arInquiries from '../../locales/ar/inquiries.json';
 import arOrders from '../../locales/ar/orders.json';
 import enAddresses from '../../locales/en/addresses.json';
 import enAdmin from '../../locales/en/admin.json';
@@ -19,6 +20,7 @@ import enCatalog from '../../locales/en/catalog.json';
 import enCheckout from '../../locales/en/checkout.json';
 import enCommon from '../../locales/en/common.json';
 import enGovernates from '../../locales/en/governorates.json';
+import enInquiries from '../../locales/en/inquiries.json';
 import enOrders from '../../locales/en/orders.json';
 
 import {
@@ -42,6 +44,7 @@ void i18n
         admin: arAdmin,
         addresses: arAddresses,
         governorates: arGovernates,
+        inquiries: arInquiries,
       },
       en: {
         common: enCommon,
@@ -53,6 +56,7 @@ void i18n
         admin: enAdmin,
         addresses: enAddresses,
         governorates: enGovernates,
+        inquiries: enInquiries,
       },
     },
     fallbackLng: DEFAULT_LANG,
@@ -60,7 +64,7 @@ void i18n
     // Flat key lookup: t('auth.signIn') reads from the 'auth' namespace.
     fallbackNS: 'common',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'catalog', 'cart', 'checkout', 'orders', 'admin', 'addresses', 'governorates'],
+    ns: ['common', 'auth', 'catalog', 'cart', 'checkout', 'orders', 'admin', 'addresses', 'governorates', 'inquiries'],
     // Allow t('auth.signIn') to resolve via nsSeparator on the key.
     nsSeparator: '.',
     interpolation: { escapeValue: false },

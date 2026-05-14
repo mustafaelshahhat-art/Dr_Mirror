@@ -1,4 +1,4 @@
-import { ClipboardList, CreditCard, FolderTree, Package } from 'lucide-react';
+import { ClipboardList, CreditCard, FolderTree, MessageSquare, Package, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -42,6 +42,20 @@ export function AdminHubPage() {
           title={t('admin.hub.tiles.paymentMethods.title')}
           subtitle={t('admin.hub.tiles.paymentMethods.subtitle')}
           tone="success"
+        />
+        <Tile
+          to="/admin/inquiries"
+          icon={MessageSquare}
+          title={t('admin.hub.tiles.inquiries.title')}
+          subtitle={t('admin.hub.tiles.inquiries.subtitle')}
+          tone="primary"
+        />
+        <Tile
+          to="/admin/users"
+          icon={Users}
+          title={t('admin.hub.tiles.users.title')}
+          subtitle={t('admin.hub.tiles.users.subtitle')}
+          tone="secondary"
         />
       </div>
     </section>

@@ -8,6 +8,7 @@ using DrMirror.Api.Features.Cart;
 using DrMirror.Api.Features.Cart.Common;
 using DrMirror.Api.Features.Catalog;
 using DrMirror.Api.Features.Checkout;
+using DrMirror.Api.Features.Inquiries;
 using DrMirror.Api.Features.Orders;
 using DrMirror.Api.Features.Orders.Common;
 using Coravel;
@@ -219,6 +220,7 @@ try
     builder.Services.AddTransient<SendOrderConfirmationJob>();
     builder.Services.AddTransient<SendPaymentReviewNeededJob>();
     builder.Services.AddTransient<SendStatusChangedJob>();
+    builder.Services.AddTransient<SendInquiryReceivedJob>();
 
     // FluentValidation — discover validators in this assembly.
     builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -304,6 +306,7 @@ try
     app.MapCheckoutEndpoints();
     app.MapOrderEndpoints();
     app.MapAddressEndpoints();
+    app.MapInquiryEndpoints();
     app.MapAdminEndpoints();
 
     Log.Information("Dr_Mirror API starting up — env={Env}", app.Environment.EnvironmentName);
