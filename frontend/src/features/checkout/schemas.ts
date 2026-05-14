@@ -5,7 +5,7 @@ import { z } from 'zod';
  * <c>ShippingAddressValidator</c> in
  * <c>Features/Orders/Common/OrderValidators.cs</c>. Keep these symmetric.
  */
-const phoneRegex = /^\+?\d[\d\s\-]{8,18}\d$/;
+const phoneRegex = /^\+?\d[\d\s-]{8,18}\d$/;
 
 export const shippingAddressSchema = z.object({
   recipientName: z

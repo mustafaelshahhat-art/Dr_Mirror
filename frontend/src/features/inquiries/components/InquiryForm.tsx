@@ -103,6 +103,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
           onChange={(v) => update('fullName', v)}
           required
           maxLength={100}
+          autoComplete="name"
         />
         <Field
           label={t('inquiries.form.email')}
@@ -111,6 +112,8 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
           onChange={(v) => update('email', v)}
           required
           maxLength={200}
+          autoComplete="email"
+          dir="ltr"
         />
         <Field
           label={t('inquiries.form.phone')}
@@ -118,6 +121,8 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
           value={form.phone}
           onChange={(v) => update('phone', v)}
           maxLength={30}
+          autoComplete="tel"
+          dir="ltr"
         />
         <Field
           label={t('inquiries.form.subject')}
@@ -169,9 +174,11 @@ interface FieldProps {
   type?: 'text' | 'email' | 'tel';
   required?: boolean;
   maxLength?: number;
+  autoComplete?: string;
+  dir?: 'ltr' | 'rtl';
 }
 
-function Field({ label, value, onChange, type = 'text', required, maxLength }: FieldProps) {
+function Field({ label, value, onChange, type = 'text', required, maxLength, autoComplete, dir }: FieldProps) {
   return (
     <label className="block">
       <span className="mb-1 block text-xs font-medium text-default-700 dark:text-default-300">
@@ -183,6 +190,8 @@ function Field({ label, value, onChange, type = 'text', required, maxLength }: F
         onChange={(e) => onChange(e.target.value)}
         required={required}
         maxLength={maxLength}
+        autoComplete={autoComplete}
+        dir={dir}
         className="block w-full rounded-medium border border-divider bg-content1 px-3 py-2 text-sm text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
       />
     </label>

@@ -20,8 +20,7 @@ import type { BuyerAddressDto } from './types';
  * address inline.
  */
 export function AddressBookPage() {
-  const { t, i18n } = useTranslation();
-  const isAr = i18n.language?.startsWith('ar');
+  const { t } = useTranslation();
   const query = useAddressesQuery();
   const createMutation = useCreateAddressMutation();
   const updateMutation = useUpdateAddressMutation();
@@ -105,7 +104,6 @@ export function AddressBookPage() {
               ) : (
                 <Card
                   address={a}
-                  isAr={isAr}
                   onEdit={() => setEditingId(a.id)}
                   onDelete={() => void deleteMutation.mutateAsync(a.id)}
                   onSetDefault={() => void setDefaultMutation.mutateAsync(a.id)}
@@ -125,14 +123,12 @@ export function AddressBookPage() {
 
 function Card({
   address: a,
-  isAr,
   onEdit,
   onDelete,
   onSetDefault,
   isMutating,
 }: {
   address: BuyerAddressDto;
-  isAr: boolean;
   onEdit: () => void;
   onDelete: () => void;
   onSetDefault: () => void;

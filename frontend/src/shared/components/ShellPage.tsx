@@ -37,7 +37,7 @@ export function ShellPage() {
             <dt className="text-xs uppercase tracking-wide text-default-500">
               {t('account.fields.email')}
             </dt>
-            <dd className="mt-1 text-sm font-medium">{user.email}</dd>
+            <dd className="mt-1 text-sm font-medium" dir="ltr">{user.email}</dd>
           </div>
           <div>
             <dt className="text-xs uppercase tracking-wide text-default-500">
@@ -106,12 +106,6 @@ export function ShellPage() {
         ) : null}
       </section>
 
-      <section className="rounded-large border border-divider/60 bg-content1 p-6">
-        <h2 className="text-base font-semibold">{t('account.upcoming.title')}</h2>
-        <ul className="mt-3 space-y-1.5 text-sm text-default-500">
-          <li>• {t('account.upcoming.inquiries')}</li>
-        </ul>
-      </section>
     </div>
   );
 }

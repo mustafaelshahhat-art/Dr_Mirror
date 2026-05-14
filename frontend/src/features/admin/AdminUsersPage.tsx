@@ -1,6 +1,6 @@
 import { Button, Spinner } from '@heroui/react';
 import { Search } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ALL_ROLES, type AdminUserDto, type UserRole } from './users/types';
@@ -16,13 +16,14 @@ export function AdminUsersPage() {
   const { t } = useTranslation();
   const [q, setQ] = useState('');
   const [debouncedQ, setDebouncedQ] = useState('');
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const query = useAdminUsersQuery(debouncedQ || undefined);
 
   function handleSearch(value: string) {
     setQ(value);
     const trimmed = value.trim();
-    clearTimeout((handleSearch as any)._timer);
-    (handleSearch as any)._timer = window.setTimeout(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => {
       setDebouncedQ(trimmed);
     }, 300);
   }
@@ -113,7 +114,7 @@ function UserRow({
     <tr className="bg-content1 transition-colors hover:bg-content2">
       <td className="px-4 py-3">
         <p className="font-medium text-foreground">{user.fullName}</p>
-        <p className="text-xs text-default-500">{user.email}</p>
+        <p className="text-xs text-default-500" dir="ltr">{user.email}</p>
       </td>
       <td className="hidden px-4 py-3 tabular-nums text-default-500 sm:table-cell">
         {dateFmt.format(new Date(user.createdAt))}

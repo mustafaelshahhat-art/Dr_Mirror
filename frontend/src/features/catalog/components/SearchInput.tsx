@@ -20,9 +20,8 @@ export function SearchInput({ value, onCommit, debounceMs = 350 }: SearchInputPr
   const [draft, setDraft] = useState(value);
 
   // External resets (e.g. clearing filters) should refill the box.
-  useEffect(() => {
-    setDraft(value);
-  }, [value]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setDraft(value); }, [value]);
 
   // Debounced commit.
   useEffect(() => {

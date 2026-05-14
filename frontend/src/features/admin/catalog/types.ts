@@ -101,7 +101,7 @@ export interface AdminProductCreateRequest {
   categoryId: string;
 }
 
-export interface AdminProductUpdateRequest extends AdminProductCreateRequest {}
+export type AdminProductUpdateRequest = AdminProductCreateRequest;
 
 export interface AdminVariantUpsertRequest {
   size: string;
