@@ -25,6 +25,8 @@
   "list": {
     "soldOut": "نفدت الكمية",
     "sizesAvailable_one": "مقاس واحد",
+    "sizesAvailable_few": "{{count}} مقاسات",
+    "sizesAvailable_many": "{{count}} مقاساً",
     "sizesAvailable_other": "{{count}} مقاسات"
   },
   "empty": {
@@ -40,6 +42,8 @@
     "next": "التالي",
     "pageOf": "صفحة {{page}} من {{total}}",
     "results_one": "نتيجة واحدة",
+    "results_few": "{{count}} نتائج",
+    "results_many": "{{count}} نتيجة",
     "results_other": "{{count}} نتيجة"
   },
   "detail": {
@@ -60,6 +64,8 @@
     "availableColors": "الألوان المتاحة",
     "pickVariant": "اختر اللون والمقاس",
     "stockForVariant_one": "قطعة واحدة متوفرة — {{size}} / {{color}}",
+    "stockForVariant_few": "{{count}} قطع متوفرة — {{size}} / {{color}}",
+    "stockForVariant_many": "{{count}} قطعة متوفرة — {{size}} / {{color}}",
     "stockForVariant_other": "{{count}} قطع متوفرة — {{size}} / {{color}}",
     "stockOut": "هذا اللون والمقاس غير متوفر حاليًا",
     "addToCartSoon": "إضافة إلى السلة (قريبًا)",

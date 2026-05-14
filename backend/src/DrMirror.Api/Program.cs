@@ -1,9 +1,14 @@
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
+using Coravel;
 using DrMirror.Api.Domain.Entities;
-using DrMirror.Api.Features.Auth;
-using DrMirror.Api.Features.Auth.Common;
 using DrMirror.Api.Features.Addresses;
 using DrMirror.Api.Features.Admin;
+using DrMirror.Api.Features.Auth;
+using DrMirror.Api.Features.Auth.Common;
 using DrMirror.Api.Features.Cart;
 using DrMirror.Api.Features.Cart.Common;
 using DrMirror.Api.Features.Catalog;
@@ -11,7 +16,6 @@ using DrMirror.Api.Features.Checkout;
 using DrMirror.Api.Features.Inquiries;
 using DrMirror.Api.Features.Orders;
 using DrMirror.Api.Features.Orders.Common;
-using Coravel;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
@@ -20,9 +24,8 @@ using DrMirror.Api.Infrastructure.Storage;
 using DrMirror.Api.Shared.RateLimiting;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -257,6 +260,18 @@ try
     });
 
     builder.Services.AddRouting();
+
+    // -----------------------------------------------------------------------
+    // JSON serializer — use UnsafeRelaxedJsonEscaping so Arabic (and other
+    // non-ASCII) characters are written as native UTF-8 in responses instead
+    // of being escaped as \uXXXX sequences. The payload is still valid UTF-8
+    // JSON; clients receive readable Arabic text without any decoder step.
+    // -----------------------------------------------------------------------
+    builder.Services.ConfigureHttpJsonOptions(opts =>
+    {
+        opts.SerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+        opts.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
 
     // -----------------------------------------------------------------------
     // Rate limiting — IP-keyed sliding/fixed windows on sensitive endpoints.
