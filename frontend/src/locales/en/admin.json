@@ -54,6 +54,173 @@
     "dismiss": "Dismiss",
     "errorUnknown": "Couldn't update the order. Please try again."
   },
+  "hub": {
+    "title": "Admin dashboard",
+    "subtitle": "Catalog, orders, and payment methods — everything you need to run the store.",
+    "tiles": {
+      "orders": {
+        "title": "Orders",
+        "subtitle": "Review the queue, approve payments, and move orders through the pipeline."
+      },
+      "products": {
+        "title": "Products",
+        "subtitle": "Create, edit, and publish scrubs. Manage variants and gallery images."
+      },
+      "categories": {
+        "title": "Categories",
+        "subtitle": "Taxonomy that organises the catalog. Reorder, rename, or disable."
+      },
+      "paymentMethods": {
+        "title": "Payment methods",
+        "subtitle": "Edit Instapay handle, wallet number, and instructions buyers see at checkout."
+      }
+    }
+  },
+  "catalog": {
+    "loading": "Loading...",
+    "categories": {
+      "title": "Categories",
+      "subtitle": "Taxonomy nodes used to organise products in the catalog.",
+      "nameAr": "Arabic name",
+      "nameEn": "English name",
+      "displayOrder": "Order",
+      "productCount_one": "1 product",
+      "productCount_other": "{{count}} products",
+      "empty": "No categories yet. Create your first one above."
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "create": "Add",
+      "creating": "Adding...",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
+    },
+    "errors": {
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "products": {
+    "list": {
+      "title": "Products",
+      "subtitle": "Every product in the catalog, including drafts.",
+      "new": "New product",
+      "loading": "Loading products...",
+      "searchPlaceholder": "Search by name, brand, or SKU...",
+      "allCategories": "All categories",
+      "allGenders": "All genders",
+      "allStatuses": "All statuses",
+      "published": "Published",
+      "draft": "Draft",
+      "variantCount_one": "1 variant",
+      "variantCount_other": "{{count}} variants",
+      "totalStock_one": "1 in stock",
+      "totalStock_other": "{{count}} in stock",
+      "empty": "No products match the current filters."
+    },
+    "create": {
+      "title": "New product",
+      "subtitle": "Add the master record. You'll add variants and images on the next step.",
+      "back": "Back to products",
+      "loading": "Loading form...",
+      "submit": "Create draft",
+      "creating": "Creating..."
+    },
+    "edit": {
+      "back": "Back to products",
+      "loading": "Loading product...",
+      "errorLoad": "Couldn't load this product.",
+      "savedToast": "Saved."
+    },
+    "fields": {
+      "nameAr": "Arabic name",
+      "nameEn": "English name",
+      "nameEnHint": "The slug is derived from this on creation, then stays put.",
+      "descriptionAr": "Arabic description",
+      "descriptionEn": "English description",
+      "price": "Price (EGP)",
+      "gender": "Gender",
+      "material": "Material / fabric",
+      "brand": "Brand",
+      "sku": "Master SKU",
+      "category": "Category",
+      "pickCategory": "Pick a category..."
+    },
+    "actions": {
+      "publish": "Publish",
+      "unpublish": "Unpublish"
+    },
+    "variants": {
+      "heading": "Variants",
+      "add": "Add variant",
+      "emptyWarning": "This product has no variants yet. Add at least one before publishing.",
+      "size": "Size",
+      "colorName": "Color (en)",
+      "colorNameAr": "Color (ar)",
+      "hex": "Hex",
+      "sku": "SKU",
+      "stockLabel": "Stock",
+      "stock_one": "1 in stock",
+      "stock_other": "{{count}} in stock"
+    },
+    "images": {
+      "heading": "Images",
+      "upload": "Upload image",
+      "uploading": "Uploading...",
+      "altPlaceholder": "Alt text (a11y)",
+      "order": "Order",
+      "delete": "Remove",
+      "emptyWarning": "No images uploaded yet. Add at least one product photo.",
+      "errors": {
+        "tooLarge": "File is larger than {{mb}} MB.",
+        "unsupportedType": "Only JPEG, PNG, WebP, and HEIC images are allowed."
+      }
+    },
+    "errors": {
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "payments": {
+    "title": "Payment methods",
+    "subtitle": "Buyer-selectable payment methods. Code + kind are immutable on update.",
+    "loading": "Loading payment methods...",
+    "empty": "No payment methods yet. Add your first.",
+    "orderCount_one": "1 order placed",
+    "orderCount_other": "{{count}} orders placed",
+    "actions": {
+      "new": "Add method"
+    },
+    "create": {
+      "heading": "New payment method"
+    },
+    "editingNote": "Editing \"{{code}}\". Code and kind are locked.",
+    "kind": {
+      "cod": "Cash on Delivery",
+      "instapay": "Instapay",
+      "wallet": "Mobile Wallet",
+      "bankTransfer": "Bank Transfer"
+    },
+    "fields": {
+      "code": "Code (machine id)",
+      "kind": "Kind",
+      "nameAr": "Arabic name",
+      "nameEn": "English name",
+      "instructionsAr": "Arabic instructions",
+      "instructionsEn": "English instructions",
+      "accountNumber": "Account / handle / wallet number",
+      "accountHolder": "Account holder",
+      "displayOrder": "Order"
+    },
+    "errors": {
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
   "proofs": {
     "noneYet": "The buyer hasn't uploaded a payment proof yet.",
     "imageAlt": "Payment proof image",

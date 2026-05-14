@@ -15,6 +15,8 @@ internal sealed class ProductImageConfiguration : IEntityTypeConfiguration<Produ
         builder.Property(i => i.Url).HasMaxLength(500).IsRequired();
         builder.Property(i => i.Alt).HasMaxLength(180);
         builder.Property(i => i.DisplayOrder).HasDefaultValue(0);
+        builder.Property(i => i.FileKey).HasMaxLength(500);
+        builder.Property(i => i.ContentType).HasMaxLength(100);
         builder.Property(i => i.CreatedAt).HasDefaultValueSql("SYSUTCDATETIME()");
 
         // Most queries pull all images for a product, ordered by DisplayOrder.

@@ -53,12 +53,14 @@ Secrets are never committed. Configure via environment variables (see §7 of the
 
 - `ConnectionStrings__Default` — MSSQL connection string
 - `Jwt__Issuer`, `Jwt__Audience`, `Jwt__Secret`
-- `Cloudinary__CloudName`, `Cloudinary__ApiKey`, `Cloudinary__ApiSecret`
-- `Smtp__Host`, `Smtp__Port`, `Smtp__User`, `Smtp__Pass`, `Smtp__From`
 - `Admin__SeedEmail`, `Admin__SeedPassword` (first boot only)
 - `Cors__AllowedOrigins`
 - `Auth__UseCrossSiteCookies` (set `true` in prod when SPA + API are on different origins)
-- `Catalog__SeedSamples` (Development only — populates 5 categories + 15 products with picsum.photos image URLs on first boot when `true`; default `true` in `appsettings.Development.json`)
+- `Catalog__SeedSamples` (Development only — populates 5 apparel categories + 10 products + ~133 variants on first boot when `true`; default `true` in `appsettings.Development.json`)
+- `FileStorage__Provider` — `local` (default, dev) writes payment-proof uploads to `wwwroot/uploads`; `cloudinary` streams uploads to Cloudinary.
+- `FileStorage__CloudinaryCloudName`, `FileStorage__CloudinaryApiKey`, `FileStorage__CloudinaryApiSecret` — required when `FileStorage__Provider=cloudinary`.
+- `Email__Provider` — `logonly` (default, dev) writes outbound emails to Serilog at info level; `mailkit` sends via SMTP.
+- `Email__FromAddress`, `Email__FromName`, `Email__SmtpHost`, `Email__SmtpPort`, `Email__SmtpUseStartTls`, `Email__SmtpUsername`, `Email__SmtpPassword` — required when `Email__Provider=mailkit`.
 
 ### Dev secrets (user-secrets)
 
@@ -91,3 +93,9 @@ dotnet ef database update `
 ## Milestones
 
 Execution follows a milestone-driven roadmap (M0 → M10). Each milestone has a single binary acceptance check; nothing is "done" until it passes. See the architectural plan for the full roadmap.
+
+- **M0** — Frontend shell, RTL, dark/light theming, typography.
+- **M1** — Auth & Identity (register / login / refresh / logout / me; JWT + rotating refresh cookie; seeded admin).
+- **M2** — Public Catalog (browse + filter by category / gender / size / colour + product detail + variant picker). Domain locked to apparel only.
+- **M3** — Cart, Checkout & Orders. Hybrid cart (localStorage guest cart + server-side authed cart with merge-on-sign-in), multi-step checkout, three seeded payment methods (COD, Instapay, Wallet), payment-proof upload with `IFileStorageService` abstraction (local in dev, Cloudinary in prod), order state machine with eight statuses, buyer cancel + admin transitions, admin queue at `/admin/orders` with proof Approve / Reject, Coravel-queued status emails behind `IEmailSender`.
+- **M4+** — Admin catalog CRUD, address book, advanced order operations, inquiries, real-time review push, payments review polish, and beyond.

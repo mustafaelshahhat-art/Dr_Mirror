@@ -1,9 +1,9 @@
 namespace DrMirror.Api.Domain.Entities;
 
 /// <summary>
-/// A single image attached to a <see cref="Product"/>. In M2 we seed
-/// picsum.photos URLs; in M4 these become Cloudinary-managed and we
-/// add CloudinaryPublicId/etc. non-breakingly.
+/// A single image attached to a <see cref="Product"/>. M2 seeded picsum.photos
+/// URLs; M4 admin uploads route through <c>IFileStorageService</c> and populate
+/// <see cref="FileKey"/> so subsequent deletes can purge the underlying blob.
 /// </summary>
 public class ProductImage
 {
@@ -20,6 +20,19 @@ public class ProductImage
 
     /// <summary>Render order within the product's gallery. 0 = primary.</summary>
     public int DisplayOrder { get; set; }
+
+    /// <summary>
+    /// Storage-driver-specific key needed to purge the blob (Cloudinary
+    /// <c>public_id</c> or the local relative path). Null for legacy
+    /// seed rows that point at external URLs we don't manage.
+    /// </summary>
+    public string? FileKey { get; set; }
+
+    /// <summary>MIME type captured at upload time. Null for legacy rows.</summary>
+    public string? ContentType { get; set; }
+
+    /// <summary>File size in bytes. Null for legacy rows.</summary>
+    public long? SizeBytes { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

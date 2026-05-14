@@ -71,7 +71,7 @@ export function ShellPage() {
 
         {user.roles.includes('Admin') ? (
           <Link
-            to="/admin/orders"
+            to="/admin"
             className="group flex items-center gap-3 rounded-large border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
           >
             <span className="grid size-10 place-items-center rounded-medium bg-secondary/10 text-secondary">

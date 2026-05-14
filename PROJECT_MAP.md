@@ -52,23 +52,37 @@ Catalog axes:
 ## [SYSTEM_FLOW]
 
 Customer
-  Browse (filter by category / gender / size / color) → Product (pick colour + size) → Cart → Checkout
+  Browse (filter by category / gender / size / color) → Product (pick colour + size) → Cart
+    (guest cart lives in localStorage; merges into server cart on sign-in)
+  → Checkout (`/checkout` multi-step: address → payment → review, react-hook-form + zod)
     → choose Payment Method
         - COD          → Order (Confirmed)
-        - Instapay/Wallet → upload proof → Order (PendingPaymentReview)
-  Inquiry (per product or general) → Admin inbox + email
+        - Instapay/Wallet → Order (Pending) → buyer uploads proof → Order (PendingPaymentReview)
+  → Order detail (`/account/orders/:orderNumber`) shows timeline, payment instructions,
+    proof upload, status-aware cancel
+  Inquiry (per product or general) → Admin inbox + email *(M4 scope)*
 
 Admin
-  Login → Dashboard
-    Catalog: Category CRUD, Product CRUD (master + variant matrix; Cloudinary upload)
-    Orders: queue by status; transitions via OrderStateMachine
-    Payments: CRUD payment methods (numbers, enabled flag)
-    Inquiries: inbox
-    Users: role management
+  Login → Dashboard (`/admin/orders`, behind <AdminRoute /> role gate)
+    Catalog: Category CRUD, Product CRUD (master + variant matrix; Cloudinary upload) *(M4 scope)*
+    Orders: queue filtered by status; transitions via OrderStateMachine; proof Approve / Reject
+    Payments: seeded COD + Instapay + Wallet (admin CRUD lands in M4)
+    Inquiries: inbox *(M4 scope)*
+    Users: role management *(M4+ scope)*
 
 Async
-  Email sending → Coravel queue
-  Order-status emails → triggered by state-machine on transition
+  Email sending → Coravel queue (`IQueue` + `IInvocable` jobs)
+  Provider env-switched: `Email:Provider=logonly` (dev) | `mailkit` (prod)
+  Order-status emails: `SendOrderConfirmationJob`, `SendPaymentReviewNeededJob`,
+    `SendStatusChangedJob` — fired after every commit; carry the *event-time* status
+    in the payload so a later transition doesn't overwrite the subject line.
+
+File storage (payment proofs)
+  Provider env-switched: `FileStorage:Provider=local` (dev) | `cloudinary` (prod)
+  Local writes to `wwwroot/uploads/payment-proofs/<orderNumber>/<guid>.<ext>`;
+  Cloudinary streams the upload and returns a CDN URL + public id.
+  Extension is *always* derived from the validated content-type, never from
+  the user-supplied filename.
 
 ## [ARCHITECTURE]
 
@@ -121,6 +135,18 @@ Security
 - **Catalog public visibility** — A product is public iff `IsPublished=true` AND `Category.IsActive=true`. Variant-level filters additionally require `IsActive=true AND Stock>0`. Filters applied at the LINQ level in every public catalog endpoint.
 - **Currency display** — `1,250.00 ج.م` in `ar`, `EGP 1,250.00` in `en`. Western numerals only (`numberingSystem: 'latn'`). Centralized in `frontend/src/shared/lib/format.ts` — never inline-format prices in components.
 - **HeroUI v3 picker accessibility** — colour and size pickers are RAC `radiogroup`s (one selectable role at a time, keyboard arrow-key navigation). Out-of-stock sizes stay rendered but disabled + line-through so the size system is always visible to the buyer.
+- **Hybrid cart persistence** — guest cart lives in `localStorage` under `dr_mirror.guest_cart.v1`; server cart lives on `Cart`/`CartItem` keyed by `UserId`. On sign-in, `CartProvider` POSTs the localStorage cart to `/api/cart/merge` and clears localStorage. The merge endpoint dedupes duplicate variant ids in the request (summing quantities), drops disabled / out-of-stock variants, and removes existing lines whose variant has gone to zero stock.
+- **Order state machine** — `OrderStateMachine` owns the only legal transitions. Lookup keyed by `(fromStatus, OrderActor)` where actor ∈ `{ Buyer, Admin, System }`. COD orders skip `Pending` (System → `Confirmed` at checkout); non-COD orders stay `Pending` until proof upload bumps them to `PendingPaymentReview`. Admin reject sends them back to `Pending` so the buyer can re-upload. `Delivered` and `Cancelled` are terminal. The DTO exposes both `allowedNextStatesForBuyer` and `allowedNextStatesForAdmin` so the SPA never needs to recompute the matrix.
+- **Order numbers** — `DM-{YYYY}-{NNNNNN}`. `OrderNumberGenerator` reads/upserts a row in `OrderCounters` (`Year` is the PK, *non-IDENTITY* — `ValueGeneratedNever`). A static `SemaphoreSlim` serialises within a process. Counter increments are committed separately from the order itself; if order creation fails after the counter increment we tolerate the resulting gap rather than holding a lock. Multi-instance deployment would need to swap this for an MSSQL `SEQUENCE`.
+- **Transactions vs. EF retry strategy** — `UseSqlServer(...).EnableRetryOnFailure()` forbids user-initiated `BeginTransaction`. All M3 mutations rely on the implicit transaction around a single `SaveChangesAsync` call; we accept a one-row gap in `OrderCounter` on the very rare path where order creation fails after the counter increment. Don't reintroduce `BeginTransactionAsync` without an `ExecutionStrategy.ExecuteAsync` wrapper.
+- **Stock decrement on checkout** — variant stock is decremented in the same `SaveChangesAsync` that creates the order and clears the cart, so they're atomic. Cancel (buyer or admin) restocks. No row-level lock yet — two concurrent checkouts on the same variant can pass the stock check together; load-tested protection (`UPDLOCK`/rowversion + retry) is in the M4 backlog.
+- **Snapshots vs. live joins on `Order`** — Item name / colour / SKU / size / unit price are **snapshotted** onto `OrderItem` so historical orders survive upstream catalog edits. Payment-method name + kind are snapshotted on `Order`; instructions + receiving account number are read **live** from the `PaymentMethod` navigation. Admin can therefore rotate an Instapay handle without rewriting history (trade-off documented; M4 may snapshot all fields if the buyer mix demands it).
+- **File storage abstraction** — `IFileStorageService` with `LocalFileStorageService` (dev, writes to `wwwroot/uploads`) and `CloudinaryFileStorageService` (prod). Env-switched via `FileStorage:Provider`. The endpoint validates MIME against an image-only allow-list and enforces `MaxFileSizeBytes`; the storage layer **always** derives the on-disk extension from the validated content-type, never from `originalFileName`, to prevent footguns like `evil.php` being persisted with its original extension.
+- **Email abstraction** — `IEmailSender` with `LogOnlyEmailSender` (dev) and `MailKitEmailSender` (prod). Env-switched via `Email:Provider`. Coravel `IQueue` queues `IInvocable` jobs that own their own scoped `AppDbContext`. The status-changed job carries an `OrderStatusChangedPayload(OrderId, EventStatus)` — never reads "current" status — so rapid transitions don't collapse multiple emails into the final-state subject.
+- **Egyptian shipping address (M3 minimum)** — owned value object inlined on `Order` with columns `ShipRecipientName`, `ShipPhone`, `ShipGovernorate`, `ShipCity`, `ShipStreetAddress`, optional `ShipFloor`/`ShipApartment`/`ShipLandmark`/`ShipNotes`. Phone validated by a permissive regex (`^\+?\d[\d\s\-]{8,18}\d$`); governorate is free-text in M3 and will tighten to the 27-governorate enum in M4 once the admin UX lands. No multi-address book in V1.
+- **Admin authorization on the SPA** — `AdminRoute` (sibling of `ProtectedRoute`) requires `user.roles.includes('Admin')`. Buyers without the role bounce to `/` rather than `/login` — they're authenticated, just not authorized. Mirrors the backend's `RequireRole(Admin)` on every `/api/admin/*` endpoint.
+- **Multipart upload from Axios** — Axios v1 auto-emits `multipart/form-data; boundary=…` when a `FormData` body is detected, BUT only if no explicit `Content-Type` header is set. Setting it manually drops the boundary and breaks the server-side parser. Every multipart caller in this repo (currently `ordersApi.uploadPaymentProof`) lets Axios pick the header.
+- **Static files for /uploads** — `app.UseStaticFiles()` mounted before auth middleware; the `LocalFileStorageService` provider creates `wwwroot/uploads` at boot. URLs include an unguessable GUID and are only emitted in order-detail responses (which already require auth + ownership / admin role), so the lack of additional auth on the file URL itself is acceptable for V1.
 
 ## [ORPHANS & PENDING]
 
@@ -149,8 +175,23 @@ Security
 - Catalog visibility filter → `IsPublished=true AND Category.IsActive=true` for all public reads. Variant-level filters additionally require `IsActive=true AND Stock>0`.
 - Summary aggregates → `availableSizes`, `availableColors`, `totalStock` projected server-side from the variant matrix so cards render swatches + sold-out state without an extra round-trip.
 
+### Resolved at M3
+- **Cart persistence** → hybrid. Guest cart in `localStorage` (`dr_mirror.guest_cart.v1`), server cart on `Cart`/`CartItem` keyed by `UserId`. `CartProvider` auto-merges on sign-in via `/api/cart/merge`. Dedup on `(CartId, ProductVariantId)`.
+- **Order number scheme** → `DM-{YYYY}-{NNNNNN}` (6-digit yearly counter, semaphore-serialised within process).
+- **Order state machine** → 8 statuses (`Pending`, `Confirmed`, `PendingPaymentReview`, `Paid`, `Preparing`, `Shipped`, `Delivered`, `Cancelled`); transitions gated by `(from, actor)` matrix; `OrderStateMachine.Transition` is the only legal writer to `Order.Status`.
+- **Address field set (M3 minimum)** → owned value object on `Order`. `RecipientName`, `Phone` (Egyptian regex), `Governorate` (free string in M3, enum in M4), `City`, `StreetAddress`, optional `Floor`/`Apartment`/`Landmark`/`Notes`. No multi-address book in V1.
+- **Payment methods (seeded)** → COD, Instapay (`drmirror@instapay`), Wallet (`01001234567`). Admin CRUD UI lands M4; numbers are placeholders to be edited via the M4 admin tool.
+- **Payment proof storage abstraction** → `IFileStorageService` with `LocalFileStorageService` (dev) + `CloudinaryFileStorageService` (prod). Env-switched via `FileStorage:Provider`. Image-only MIME allow-list. Extension *always* derived from content-type, never from filename.
+- **Email abstraction + queue** → `IEmailSender` with `LogOnlyEmailSender` (dev) + `MailKitEmailSender` (prod). Env-switched via `Email:Provider`. Coravel `IQueue` + 3 `IInvocable` jobs (`SendOrderConfirmationJob`, `SendPaymentReviewNeededJob`, `SendStatusChangedJob`). Status job carries event-time status to avoid subject drift on rapid transitions.
+- **Stock semantics** → decrement on order creation, restock on cancel (buyer- or admin-initiated). No row lock yet — see M4 backlog.
+- **Admin role gate** → frontend `AdminRoute` (bounces unauthorised buyers to `/`), backend `RequireRole(Admin)` on every `/api/admin/*` endpoint.
+
 ### Still open (will be resolved per milestone)
-- Order number scheme — M3
-- Address field set per Egyptian market — M4
-- SMTP provider — M3
-- Production domain + Cloudinary credentials — M9
+- Concurrent-checkout stock-decrement race protection (`UPDLOCK` or rowversion retry) — M4 load-test follow-up
+- Address book (multiple saved addresses per buyer + default-address picker) — M4
+- Admin payment-method CRUD + product upload UI — M4
+- Admin orders bulk operations + CSV export — M4
+- Lock `Governorate` to the 27-Egyptian-governorate enum — M4
+- Real-time push when admin reviews a proof (SignalR or polling) — M5+
+- Inquiry slice (per-product + general) — M4
+- Production domain + Cloudinary credentials + real SMTP secrets — M9

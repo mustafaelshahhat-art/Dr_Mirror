@@ -62,6 +62,193 @@
     "dismiss": "إلغاء",
     "errorUnknown": "تعذّر تحديث الطلب. حاول مرة أخرى."
   },
+  "hub": {
+    "title": "لوحة الإدارة",
+    "subtitle": "المنتجات، الطلبات، طرق الدفع — كل ما تحتاجه لإدارة المتجر.",
+    "tiles": {
+      "orders": {
+        "title": "الطلبات",
+        "subtitle": "راجع الطابور، اعتمد الدفعات، وحرّك الطلبات في خط الإنتاج."
+      },
+      "products": {
+        "title": "المنتجات",
+        "subtitle": "أنشئ المنتجات، حرّر التفاصيل، وانشرها. أدِر المقاسات والألوان والصور."
+      },
+      "categories": {
+        "title": "الفئات",
+        "subtitle": "تصنيفات المنتجات. أعد ترتيبها، عدّل أسماءها، أو عطّلها."
+      },
+      "paymentMethods": {
+        "title": "طرق الدفع",
+        "subtitle": "عدّل حساب إنستاباي ورقم المحفظة والتعليمات التي يراها المشتري."
+      }
+    }
+  },
+  "catalog": {
+    "loading": "جاري التحميل...",
+    "categories": {
+      "title": "الفئات",
+      "subtitle": "تصنيفات لتنظيم المنتجات في الكتالوج.",
+      "nameAr": "الاسم بالعربي",
+      "nameEn": "الاسم بالإنجليزي",
+      "displayOrder": "الترتيب",
+      "productCount_zero": "لا توجد منتجات",
+      "productCount_one": "منتج واحد",
+      "productCount_two": "منتجان",
+      "productCount_few": "{{count}} منتجات",
+      "productCount_many": "{{count}} منتجًا",
+      "productCount_other": "{{count}} منتج",
+      "empty": "لا توجد فئات بعد. أنشئ أول فئة من النموذج بالأعلى."
+    },
+    "status": {
+      "active": "مفعّل",
+      "inactive": "معطّل"
+    },
+    "actions": {
+      "create": "إضافة",
+      "creating": "جاري الإضافة...",
+      "save": "حفظ",
+      "saving": "جاري الحفظ...",
+      "cancel": "إلغاء",
+      "edit": "تعديل",
+      "activate": "تفعيل",
+      "deactivate": "تعطيل"
+    },
+    "errors": {
+      "unknown": "حدث خطأ ما. حاول مرة أخرى."
+    }
+  },
+  "products": {
+    "list": {
+      "title": "المنتجات",
+      "subtitle": "كل منتجات الكتالوج، بما فيها المسودات.",
+      "new": "منتج جديد",
+      "loading": "جاري تحميل المنتجات...",
+      "searchPlaceholder": "ابحث بالاسم أو الماركة أو الكود...",
+      "allCategories": "كل الفئات",
+      "allGenders": "كل الفئات (للجنس)",
+      "allStatuses": "كل الحالات",
+      "published": "منشور",
+      "draft": "مسودة",
+      "variantCount_zero": "بدون مقاسات",
+      "variantCount_one": "مقاس واحد",
+      "variantCount_two": "مقاسان",
+      "variantCount_few": "{{count}} مقاسات",
+      "variantCount_many": "{{count}} مقاسًا",
+      "variantCount_other": "{{count}} مقاس",
+      "totalStock_zero": "نفدت الكمية",
+      "totalStock_one": "قطعة واحدة في المخزون",
+      "totalStock_two": "قطعتان في المخزون",
+      "totalStock_few": "{{count}} قطع في المخزون",
+      "totalStock_many": "{{count}} قطعة في المخزون",
+      "totalStock_other": "{{count}} في المخزون",
+      "empty": "لا توجد منتجات تطابق التصفية الحالية."
+    },
+    "create": {
+      "title": "منتج جديد",
+      "subtitle": "أدخل البيانات الأساسية. ستضيف المقاسات والصور في الخطوة التالية.",
+      "back": "العودة إلى المنتجات",
+      "loading": "جاري تحميل النموذج...",
+      "submit": "حفظ كمسودة",
+      "creating": "جاري الإنشاء..."
+    },
+    "edit": {
+      "back": "العودة إلى المنتجات",
+      "loading": "جاري تحميل المنتج...",
+      "errorLoad": "تعذّر تحميل هذا المنتج.",
+      "savedToast": "تم الحفظ."
+    },
+    "fields": {
+      "nameAr": "الاسم بالعربي",
+      "nameEn": "الاسم بالإنجليزي",
+      "nameEnHint": "الرابط (slug) يُشتق من هذا الاسم عند الإنشاء ويبقى ثابتًا.",
+      "descriptionAr": "الوصف بالعربي",
+      "descriptionEn": "الوصف بالإنجليزي",
+      "price": "السعر (ج.م)",
+      "gender": "للجنس",
+      "material": "الخامة / القماش",
+      "brand": "الماركة",
+      "sku": "الكود الرئيسي",
+      "category": "الفئة",
+      "pickCategory": "اختر فئة..."
+    },
+    "actions": {
+      "publish": "نشر",
+      "unpublish": "إلغاء النشر"
+    },
+    "variants": {
+      "heading": "المقاسات والألوان",
+      "add": "إضافة مقاس",
+      "emptyWarning": "لا توجد مقاسات لهذا المنتج بعد. أضف واحدًا على الأقل قبل النشر.",
+      "size": "المقاس",
+      "colorName": "اللون (إنجليزي)",
+      "colorNameAr": "اللون (عربي)",
+      "hex": "اللون",
+      "sku": "الكود",
+      "stockLabel": "المخزون",
+      "stock_zero": "نفدت الكمية",
+      "stock_one": "قطعة واحدة",
+      "stock_two": "قطعتان",
+      "stock_few": "{{count}} قطع",
+      "stock_many": "{{count}} قطعة",
+      "stock_other": "{{count}} في المخزون"
+    },
+    "images": {
+      "heading": "الصور",
+      "upload": "رفع صورة",
+      "uploading": "جاري الرفع...",
+      "altPlaceholder": "النص البديل (لإمكانية الوصول)",
+      "order": "الترتيب",
+      "delete": "إزالة",
+      "emptyWarning": "لم يتم رفع أي صور بعد. أضف صورة واحدة على الأقل.",
+      "errors": {
+        "tooLarge": "حجم الملف أكبر من {{mb}} ميجابايت.",
+        "unsupportedType": "نقبل فقط صور JPEG وPNG وWebP وHEIC."
+      }
+    },
+    "errors": {
+      "unknown": "حدث خطأ ما. حاول مرة أخرى."
+    }
+  },
+  "payments": {
+    "title": "طرق الدفع",
+    "subtitle": "طرق الدفع المتاحة للمشتري. الكود والنوع لا يمكن تعديلهما بعد الإنشاء.",
+    "loading": "جاري تحميل طرق الدفع...",
+    "empty": "لا توجد طرق دفع بعد. أضف أولى الطرق.",
+    "orderCount_zero": "لم يتم استخدامها في أي طلب",
+    "orderCount_one": "طلب واحد فقط",
+    "orderCount_two": "طلبان",
+    "orderCount_few": "{{count}} طلبات",
+    "orderCount_many": "{{count}} طلبًا",
+    "orderCount_other": "{{count}} طلب",
+    "actions": {
+      "new": "إضافة طريقة"
+    },
+    "create": {
+      "heading": "طريقة دفع جديدة"
+    },
+    "editingNote": "تعديل \"{{code}}\". الكود والنوع ثابتان.",
+    "kind": {
+      "cod": "الدفع عند الاستلام",
+      "instapay": "إنستاباي",
+      "wallet": "محفظة إلكترونية",
+      "bankTransfer": "تحويل بنكي"
+    },
+    "fields": {
+      "code": "الكود (معرّف داخلي)",
+      "kind": "النوع",
+      "nameAr": "الاسم بالعربي",
+      "nameEn": "الاسم بالإنجليزي",
+      "instructionsAr": "تعليمات الدفع (عربي)",
+      "instructionsEn": "تعليمات الدفع (إنجليزي)",
+      "accountNumber": "رقم الحساب / المحفظة",
+      "accountHolder": "صاحب الحساب",
+      "displayOrder": "الترتيب"
+    },
+    "errors": {
+      "unknown": "حدث خطأ ما. حاول مرة أخرى."
+    }
+  },
   "proofs": {
     "noneYet": "المشتري لم يرفع إثبات دفع حتى الآن.",
     "imageAlt": "صورة إثبات الدفع",

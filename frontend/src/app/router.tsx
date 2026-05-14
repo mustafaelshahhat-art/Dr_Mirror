@@ -1,7 +1,13 @@
 import { Route, Routes } from 'react-router-dom';
 
+import { AdminHubPage } from '../features/admin/AdminHubPage';
 import { AdminOrderDetailPage } from '../features/admin/AdminOrderDetailPage';
 import { AdminOrdersListPage } from '../features/admin/AdminOrdersListPage';
+import { AdminCategoriesPage } from '../features/admin/catalog/AdminCategoriesPage';
+import { AdminPaymentMethodsPage } from '../features/admin/catalog/AdminPaymentMethodsPage';
+import { AdminProductCreatePage } from '../features/admin/catalog/AdminProductCreatePage';
+import { AdminProductEditPage } from '../features/admin/catalog/AdminProductEditPage';
+import { AdminProductsListPage } from '../features/admin/catalog/AdminProductsListPage';
 import { LoginPage } from '../features/auth/LoginPage';
 import {
   AdminRoute,
@@ -55,8 +61,14 @@ export function AppRoutes() {
         </Route>
 
         <Route element={<AdminRoute />}>
+          <Route path="admin" element={<AdminHubPage />} />
           <Route path="admin/orders" element={<AdminOrdersListPage />} />
           <Route path="admin/orders/:orderNumber" element={<AdminOrderDetailPage />} />
+          <Route path="admin/categories" element={<AdminCategoriesPage />} />
+          <Route path="admin/products" element={<AdminProductsListPage />} />
+          <Route path="admin/products/new" element={<AdminProductCreatePage />} />
+          <Route path="admin/products/:id/edit" element={<AdminProductEditPage />} />
+          <Route path="admin/payment-methods" element={<AdminPaymentMethodsPage />} />
         </Route>
       </Route>
     </Routes>
