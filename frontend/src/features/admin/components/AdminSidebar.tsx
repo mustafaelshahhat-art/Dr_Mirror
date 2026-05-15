@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
+  LayoutDashboard,
   ClipboardList,
   Package,
   FolderTree,
@@ -11,6 +13,7 @@ import {
 } from 'lucide-react';
 
 const NAV_ITEMS = [
+  { to: '/admin', icon: LayoutDashboard, key: 'dashboard' },
   { to: '/admin/orders', icon: ClipboardList, key: 'orders' },
   { to: '/admin/products', icon: Package, key: 'products' },
   { to: '/admin/categories', icon: FolderTree, key: 'categories' },
@@ -28,11 +31,22 @@ export function AdminSidebar({
 }) {
   const { t } = useTranslation();
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
   return (
     <>
       {open ? (
         <div
-          className="fixed inset-0 z-50 bg-black/40 md:hidden"
+          className="fixed inset-0 top-14 z-40 bg-black/40 md:hidden"
           onClick={onClose}
           onKeyDown={(e) => {
             if (e.key === 'Escape') onClose();
@@ -43,11 +57,14 @@ export function AdminSidebar({
 
       <aside
         className={[
-          'fixed inset-y-0 start-0 top-14 z-50 flex w-56 flex-col border-e border-divider/60 bg-content1 transition-transform duration-200 motion-reduce:transition-none md:static md:z-auto md:translate-x-0',
+          'fixed inset-y-0 start-0 top-14 z-50 flex w-56 flex-col border-e border-divider/60 bg-background transition-transform duration-200 motion-reduce:transition-none md:static md:z-auto md:bg-content1 md:translate-x-0 md:rtl:translate-x-0',
           open ? 'translate-x-0' : '-translate-x-full rtl:translate-x-full',
         ].join(' ')}
       >
-        <div className="flex items-center justify-end p-2 md:hidden">
+        <div className="flex items-center justify-between border-b border-divider/60 px-3 py-3 md:hidden">
+          <span className="text-sm font-semibold tracking-tight text-foreground">
+            {t('admin.shell.navTitle')}
+          </span>
           <button
             type="button"
             onClick={onClose}
@@ -58,7 +75,7 @@ export function AdminSidebar({
           </button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-0.5 px-2 pb-4 pt-2">
+        <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-4 pt-2">
           {NAV_ITEMS.map(({ to, icon: Icon, key }) => (
             <NavItem key={to} to={to} icon={Icon} label={t(`admin.shell.nav.${key}`)} />
           ))}

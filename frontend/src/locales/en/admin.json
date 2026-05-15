@@ -266,7 +266,9 @@
     }
   },
   "shell": {
+    "navTitle": "Navigation",
     "nav": {
+      "dashboard": "Dashboard",
       "orders": "Orders",
       "products": "Products",
       "categories": "Categories",
