@@ -1,43 +1,37 @@
-# Dr_Mirror
+# Dr Mirror
 
-Arabic-first (RTL) specialist store for **medical scrubs and uniforms** — scrub tops, scrub pants, lab coats, surgical headwear, and medical footwear. Bilingual (ar / en), bilingual product copy, full size × colour variant matrix, single-currency (EGP).
-
-> **Before doing any work in this repo, read both:**
-> - `PROJECT_MAP.md` — the durable architecture map (tech, flow, structure, deferred items).
-> - `DESIGN_PRINCIPLES.md` — the durable UI rulebook (required reading for any UI change).
+An online store for medical scrubs and uniforms, built for the Egyptian market. The catalog covers scrub tops, scrub pants, lab coats, surgical headwear, and medical footwear — each in a full size × colour variant matrix. Arabic is the primary language (RTL), with English as a full second locale. Everything is priced in EGP and payment options are what actually work in Egypt: Cash on Delivery, Instapay, and mobile wallets.
 
 ## Stack
 
-- **Frontend** — React 19 + TypeScript + Vite + HeroUI + Tailwind CSS 4 + next-themes + i18next + React Query. Hosted on Vercel.
-- **Backend** — .NET 10 + ASP.NET Core (Minimal APIs, vertical slices) + EF Core + SQL Server + ASP.NET Identity + JWT + Serilog + Coravel + MailKit + Cloudinary. Hosted on MonsterASP.NET.
-- **Typography** — Self-hosted Satoshi (en) + Alexandria (ar), variable WOFF2, preloaded.
-- **Theming** — Dark-first; light + dark both ship; user choice persisted; full RTL parity.
+- **Backend** — .NET 10, ASP.NET Core (Minimal APIs, vertical slices), EF Core, SQL Server, ASP.NET Identity + JWT, Serilog, Coravel, MailKit, Cloudinary. Hosted on MonsterASP.NET.
+- **Frontend** — React 19, TypeScript, Vite, HeroUI, Tailwind CSS v4, i18next, React Query. Hosted on Vercel.
+- **Fonts** — Satoshi (Latin) and Alexandria (Arabic), self-hosted variable WOFF2, preloaded.
+- **Theming** — Dark-first; light and dark both ship; user choice persisted; full RTL parity.
 
-## Repo layout
+## Project structure
 
 ```
-backend/                 .NET 10 solution (DrMirror.slnx)
-  src/DrMirror.Api/      Single ASP.NET Core 10 project, vertical slices under /Features
+backend/
+  src/DrMirror.Api/      ASP.NET Core 10 — vertical slices under /Features
   tests/DrMirror.Tests/  xUnit
-frontend/                Vite + React + TypeScript project
+frontend/
   public/fonts/          Self-hosted WOFF2 variable fonts
   src/                   App, providers, features, shared, locales, styles
-PROJECT_MAP.md           Architecture map — single source of truth
-DESIGN_PRINCIPLES.md     UI rulebook — read before any UI change
 ```
 
 ## Quick start
 
-### Backend
+**Backend**
 
 ```powershell
 cd backend\src\DrMirror.Api
 dotnet run
 ```
 
-Health check: `http://localhost:5223/api/health`.
+Health check: `http://localhost:5223/api/health`
 
-### Frontend
+**Frontend**
 
 ```powershell
 cd frontend
@@ -45,37 +39,39 @@ npm install
 npm run dev
 ```
 
-Opens at `http://localhost:5173/` in `ar` + dark mode by default.
+Opens at `http://localhost:5173` in Arabic + dark mode.
 
 ## Environment
 
-Secrets are never committed. Configure via environment variables (see §7 of the architectural plan):
+Secrets are never committed. Configure via environment variables:
 
-- `ConnectionStrings__Default` — MSSQL connection string
-- `Jwt__Issuer`, `Jwt__Audience`, `Jwt__Secret`
-- `Admin__SeedEmail`, `Admin__SeedPassword` (first boot only)
-- `Cors__AllowedOrigins`
-- `Auth__UseCrossSiteCookies` (set `true` in prod when SPA + API are on different origins)
-- `Catalog__SeedSamples` (Development only — populates 5 apparel categories + 10 products + ~133 variants on first boot when `true`; default `true` in `appsettings.Development.json`)
-- `FileStorage__Provider` — `local` (default, dev) writes payment-proof uploads to `wwwroot/uploads`; `cloudinary` streams uploads to Cloudinary.
-- `FileStorage__CloudinaryCloudName`, `FileStorage__CloudinaryApiKey`, `FileStorage__CloudinaryApiSecret` — required when `FileStorage__Provider=cloudinary`.
-- `Email__Provider` — `logonly` (default, dev) writes outbound emails to Serilog at info level; `mailkit` sends via SMTP.
-- `Email__FromAddress`, `Email__FromName`, `Email__SmtpHost`, `Email__SmtpPort`, `Email__SmtpUseStartTls`, `Email__SmtpUsername`, `Email__SmtpPassword` — required when `Email__Provider=mailkit`.
+| Variable | Purpose |
+|---|---|
+| `ConnectionStrings__Default` | MSSQL connection string |
+| `Jwt__Issuer`, `Jwt__Audience`, `Jwt__Secret` | JWT config |
+| `Admin__SeedEmail`, `Admin__SeedPassword` | Seeded admin account (first boot only) |
+| `Cors__AllowedOrigins` | Allowed CORS origins |
+| `Auth__UseCrossSiteCookies` | Set `true` in prod when SPA and API are on different origins |
+| `Catalog__SeedSamples` | `true` in Development — seeds 5 categories, 10 products, ~133 variants on first boot |
+| `FileStorage__Provider` | `local` (dev) or `cloudinary` (prod) |
+| `FileStorage__CloudinaryCloudName`, `...ApiKey`, `...ApiSecret` | Required when provider is `cloudinary` |
+| `Email__Provider` | `logonly` (dev) or `mailkit` (prod) |
+| `Email__FromAddress`, `Email__FromName`, `Email__SmtpHost`, `Email__SmtpPort`, `Email__SmtpUseStartTls`, `Email__SmtpUsername`, `Email__SmtpPassword` | Required when provider is `mailkit` |
 
-### Dev secrets (user-secrets)
+### Dev secrets
 
-`Jwt__Secret` and `Admin__SeedPassword` are stored in [.NET user-secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) so they never enter source control:
+Store `Jwt__Secret` and `Admin__SeedPassword` in .NET user-secrets so they never enter source control:
 
 ```powershell
 dotnet user-secrets set "Jwt:Secret" "<64+ char random>" --project backend/src/DrMirror.Api/DrMirror.Api.csproj
 dotnet user-secrets set "Admin:SeedPassword" "<your-password>" --project backend/src/DrMirror.Api/DrMirror.Api.csproj
 ```
 
-If `Admin:SeedPassword` is **not** set, the seeder generates a strong random password on first boot and logs it **once** at warning level. Save that output — it will never be displayed again.
+If `Admin:SeedPassword` is not set, the seeder generates a strong random password on first boot and logs it once at warning level. Save it — it won't appear again.
 
 ### EF Core migrations
 
-In Development, the API auto-applies pending migrations on startup. To work with migrations manually:
+Migrations apply automatically in Development. To run them manually:
 
 ```powershell
 # Add a migration after a model change
@@ -84,18 +80,16 @@ dotnet ef migrations add <Name> `
   --startup-project backend/src/DrMirror.Api/DrMirror.Api.csproj `
   --output-dir Infrastructure/Persistence/Migrations
 
-# Apply migrations to the configured DB
+# Apply to the configured DB
 dotnet ef database update `
   --project backend/src/DrMirror.Api/DrMirror.Api.csproj `
   --startup-project backend/src/DrMirror.Api/DrMirror.Api.csproj
 ```
 
-## Milestones
+## Status
 
-Execution follows a milestone-driven roadmap (M0 → M10). Each milestone has a single binary acceptance check; nothing is "done" until it passes. See the architectural plan for the full roadmap.
+The store is functional end-to-end: customers can browse the catalog, manage a cart, check out, upload payment proof, and track orders through an eight-state lifecycle. Admins have a dashboard, order queue with proof approve/reject, product and category CRUD, and an inquiry inbox. Current focus is M4 — polishing admin workflows and advanced order operations.
 
-- **M0** — Frontend shell, RTL, dark/light theming, typography.
-- **M1** — Auth & Identity (register / login / refresh / logout / me; JWT + rotating refresh cookie; seeded admin).
-- **M2** — Public Catalog (browse + filter by category / gender / size / colour + product detail + variant picker). Domain locked to apparel only.
-- **M3** — Cart, Checkout & Orders. Hybrid cart (localStorage guest cart + server-side authed cart with merge-on-sign-in), multi-step checkout, three seeded payment methods (COD, Instapay, Wallet), payment-proof upload with `IFileStorageService` abstraction (local in dev, Cloudinary in prod), order state machine with eight statuses, buyer cancel + admin transitions, admin queue at `/admin/orders` with proof Approve / Reject, Coravel-queued status emails behind `IEmailSender`.
-- **M4+** — Admin catalog CRUD, address book, advanced order operations, inquiries, real-time review push, payments review polish, and beyond.
+---
+
+Architecture decisions and constraints live in [PROJECT_MAP.md](PROJECT_MAP.md). UI rules are in [DESIGN_PRINCIPLES.md](DESIGN_PRINCIPLES.md) — read that before touching the frontend.
