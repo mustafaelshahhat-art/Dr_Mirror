@@ -24,4 +24,10 @@ public static class RateLimitPolicies
     /// 5 requests per minute per IP — fixed window.
     /// </summary>
     public const string InquirySubmit = "inquiry-submit";
+
+    /// <summary>
+    /// Admin API endpoints — defense-in-depth for compromised accounts.
+    /// 120 requests per minute per authenticated user — fixed window.
+    /// </summary>
+    public const string AdminApi = "admin-api";
 }

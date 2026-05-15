@@ -48,6 +48,8 @@ public sealed class DatabaseSeeder
 
     public async Task SeedAsync(CancellationToken ct = default)
     {
+        if (_env.IsEnvironment("Testing")) return;
+
         if (_env.IsDevelopment())
         {
             // Auto-migrate in dev so the workflow is `dotnet run` and nothing else.

@@ -6,6 +6,7 @@ import {
   notifyAuthExpired,
   setAccessToken,
 } from './auth-storage';
+import { setForbiddenMessage } from './forbidden-store';
 
 /**
  * Single axios instance for the app.
@@ -103,9 +104,13 @@ api.interceptors.response.use(
         };
         return api.request(original);
       }
-      // Refresh failed — surrender the session.
       clearAccessToken();
       notifyAuthExpired();
+    }
+
+    if (status === 403) {
+      const detail = (error.response?.data as { detail?: string })?.detail ?? '';
+      setForbiddenMessage(detail || 'Forbidden');
     }
 
     return Promise.reject(error);

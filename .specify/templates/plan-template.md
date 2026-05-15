@@ -40,7 +40,27 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+For each principle, document how the plan complies — or, if it deviates, justify it in the
+Complexity Tracking table below.
+
+- **I. Arabic-First, RTL Parity (NON-NEGOTIABLE)** — Confirm every new UI element uses logical
+  CSS only (`ms-*`/`me-*`/`ps-*`/`pe-*`/`text-start`/`text-end`), ships strings in both `ar`
+  and `en` locale namespaces, and is verified in all four `(dark|light) × (rtl|ltr)` states.
+  Numerics use `tabular-nums` and Western digits. UI-less changes: write "N/A — no UI surface."
+- **II. Domain Discipline — Medical Apparel Only** — Confirm naming, taxonomy, copy, and SEO
+  remain within scrubs / lab coats / surgical headwear / medical footwear scope. If the change
+  touches catalog/taxonomy, list which apparel category it slots into.
+- **III. Vertical Slices & Single Source of Truth** — Confirm code lands in
+  `backend/src/DrMirror.Api/Features/<SliceName>` and `frontend/src/features/<SliceName>` (or
+  document why a `/Shared` or `/Infrastructure` placement is correct). List the `PROJECT_MAP.md`
+  sections that will be updated at milestone close.
+- **IV. Design Discipline** — For UI changes, confirm `DESIGN_PRINCIPLES.md` §10 checklist
+  will be applied at PR time and call out any rule (card nesting, font weights, accent hue,
+  spacing grid, motion) that needs justified deviation.
+- **V. Milestone-Driven Delivery with Binary Acceptance** — Identify the milestone this work
+  belongs to (M0–M10) and state its single binary acceptance check.
+
+Re-run this section after Phase 1 design; any new deviations move to Complexity Tracking.
 
 ## Project Structure
 

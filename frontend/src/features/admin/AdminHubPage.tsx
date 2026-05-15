@@ -86,7 +86,7 @@ function Tile({
   return (
     <Link
       to={to}
-      className="flex items-center gap-3 rounded-large border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
+      className="flex items-center gap-3 rounded-large border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2 motion-reduce:transition-none"
     >
       <span className={`grid size-10 place-items-center rounded-medium ${toneClasses[tone]}`}>
         <Icon className="size-5" aria-hidden />

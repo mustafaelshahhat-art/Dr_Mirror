@@ -63,12 +63,17 @@ Customer
   Inquiry (per product or general) → Admin inbox + email *(M4 scope)*
 
 Admin
-  Login → Dashboard (`/admin/orders`, behind <AdminRoute /> role gate)
-    Catalog: Category CRUD, Product CRUD (master + variant matrix; Cloudinary upload) *(M4 scope)*
+  Login → role-aware redirect (admin → `/admin`, buyer → `/`)
+    Admin shell: dedicated `<AdminLayout />` with `<AdminSidebar />` + `<AdminHeader />` (no storefront chrome)
+      Dashboard (`/admin`), Orders, Products, Categories, Payment Methods, Inquiries, Users
+    Customer shell: `<Layout />` with `<Header />` — storefront only (admins redirected to `/admin`)
+    Route gates: `<AdminRoute />` (admin only), `<CustomerRoute />` (anonymous + buyer), `<ProtectedRoute />` (buyer only for checkout/account)
+    `isAdmin` on auth context; `resolvePostAuthDestination` helper for post-login/register redirects
+    Catalog: Category CRUD, Product CRUD (master + variant matrix; Cloudinary upload)
     Orders: queue filtered by status; transitions via OrderStateMachine; proof Approve / Reject
-    Payments: seeded COD + Instapay + Wallet (admin CRUD lands in M4)
-    Inquiries: inbox *(M4 scope)*
-    Users: role management *(M4+ scope)*
+    Payments: seeded COD + Instapay + Wallet (admin CRUD)
+    Inquiries: inbox
+    Users: role management
 
 Async
   Email sending → Coravel queue (`IQueue` + `IInvocable` jobs)
@@ -113,6 +118,8 @@ Security
 - Role-based authorization, resource ownership checks on /me endpoints
 - ProblemDetails error contract
 - File upload MIME & size validation before Cloudinary stream
+- Admin API rate-limited at 120 req/min per user (defense-in-depth)
+- 403 response handler on SPA surfaces non-modal banner via forbidden-store
 
 ## [DESIGN]
 
@@ -144,9 +151,11 @@ Security
 - **File storage abstraction** — `IFileStorageService` with `LocalFileStorageService` (dev, writes to `wwwroot/uploads`) and `CloudinaryFileStorageService` (prod). Env-switched via `FileStorage:Provider`. The endpoint validates MIME against an image-only allow-list and enforces `MaxFileSizeBytes`; the storage layer **always** derives the on-disk extension from the validated content-type, never from `originalFileName`, to prevent footguns like `evil.php` being persisted with its original extension.
 - **Email abstraction** — `IEmailSender` with `LogOnlyEmailSender` (dev) and `MailKitEmailSender` (prod). Env-switched via `Email:Provider`. Coravel `IQueue` queues `IInvocable` jobs that own their own scoped `AppDbContext`. The status-changed job carries an `OrderStatusChangedPayload(OrderId, EventStatus)` — never reads "current" status — so rapid transitions don't collapse multiple emails into the final-state subject.
 - **Egyptian shipping address (M3 minimum)** — owned value object inlined on `Order` with columns `ShipRecipientName`, `ShipPhone`, `ShipGovernorate`, `ShipCity`, `ShipStreetAddress`, optional `ShipFloor`/`ShipApartment`/`ShipLandmark`/`ShipNotes`. Phone validated by a permissive regex (`^\+?\d[\d\s\-]{8,18}\d$`); governorate is free-text in M3 and will tighten to the 27-governorate enum in M4 once the admin UX lands. No multi-address book in V1.
-- **Admin authorization on the SPA** — `AdminRoute` (sibling of `ProtectedRoute`) requires `user.roles.includes('Admin')`. Buyers without the role bounce to `/` rather than `/login` — they're authenticated, just not authorized. Mirrors the backend's `RequireRole(Admin)` on every `/api/admin/*` endpoint.
+- **Admin authorization on the SPA** — Route tree is split into customer shell (`<Layout />` + `<Header />` with `<CustomerRoute />` gate for storefront, `<ProtectedRoute />` for checkout/account) and admin shell (`<AdminLayout />` + `<AdminSidebar />` + `<AdminHeader />` under `<AdminRoute />`). `isAdmin` is derived once on the auth context (`user?.roles.includes('Admin') ?? false`). `resolvePostAuthDestination(user, from)` governs every post-login/register redirect: admin → `/admin`, buyer → recorded `from` (non-admin URL) or `/`. Admins cannot reach `/`, `/products/*`, `/cart`, `/checkout`, `/account/*`; buyers cannot reach `/admin/*`. All gates block on `isBootstrapping` (spinner) to prevent flash of unauthorized content. Customer `Header` short-circuits to `null` when `isAdmin` is true as a defensive guard.
 - **Multipart upload from Axios** — Axios v1 auto-emits `multipart/form-data; boundary=…` when a `FormData` body is detected, BUT only if no explicit `Content-Type` header is set. Setting it manually drops the boundary and breaks the server-side parser. Every multipart caller in this repo (currently `ordersApi.uploadPaymentProof`) lets Axios pick the header.
 - **Static files for /uploads** — `app.UseStaticFiles()` mounted before auth middleware; the `LocalFileStorageService` provider creates `wwwroot/uploads` at boot. URLs include an unguessable GUID and are only emitted in order-detail responses (which already require auth + ownership / admin role), so the lack of additional auth on the file URL itself is acceptable for V1.
+- **Admin endpoint authorization invariant** — `AdminRoleRoutingTests` (xUnit) resolves `EndpointDataSource` via `WebApplicationFactory<Program>`, walks every endpoint with route prefix `/api/admin/`, and asserts each carries `IAuthorizeData` requiring the `Admin` role. This meta-test catches any future admin endpoint that forgets `RequireRole(Admin)`.
+- **Admin API rate limiting** — `RateLimitPolicies.AdminApi` applies a fixed-window 120 req/min per user on the `/api/admin` group. Defense-in-depth for compromised admin accounts; applied at the group level in `MapAdminEndpoints`.
 
 ## [ORPHANS & PENDING]
 
@@ -195,3 +204,6 @@ Security
 - Real-time push when admin reviews a proof (SignalR or polling) — M5+
 - Inquiry slice (per-product + general) — M4
 - Production domain + Cloudinary credentials + real SMTP secrets — M9
+- Vitest setup + frontend smoke tests for role-based routing — M5 tooling (no test runner on frontend today; backend `AdminRoleRoutingTests` covers server-side invariant)
+- Buyer `/account` ShellPage rebuild into a proper buyer dashboard — M5 UX (current stub links to orders and addresses)
+- i18n-coverage build check script (fails CI on missing keys between ar/en) — M5 tooling

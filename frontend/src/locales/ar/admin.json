@@ -278,6 +278,28 @@
       "rejected": "مرفوض"
     }
   },
+  "shell": {
+    "nav": {
+      "orders": "الطلبات",
+      "products": "المنتجات",
+      "categories": "الفئات",
+      "paymentMethods": "طرق الدفع",
+      "inquiries": "الاستفسارات",
+      "users": "المستخدمون"
+    },
+    "accountMenu": {
+      "signOut": "تسجيل الخروج",
+      "signedInAs": "مسجّل الدخول كـ {{name}}"
+    },
+    "forbidden": {
+      "title": "ليس لديك صلاحية الوصول",
+      "description": "لا تملك الصلاحيات اللازمة لعرض هذه الصفحة."
+    },
+    "signOutConfirm": {
+      "title": "تسجيل الخروج؟",
+      "description": "سيتم تسجيل خروجك من لوحة الإدارة."
+    }
+  },
   "users": {
     "title": "المستخدمون",
     "subtitle": "إدارة الحسابات المسجلة وأدوارها.",

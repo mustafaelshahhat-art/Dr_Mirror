@@ -10,9 +10,11 @@ import { AdminPaymentMethodsPage } from '../features/admin/catalog/AdminPaymentM
 import { AdminProductCreatePage } from '../features/admin/catalog/AdminProductCreatePage';
 import { AdminProductEditPage } from '../features/admin/catalog/AdminProductEditPage';
 import { AdminProductsListPage } from '../features/admin/catalog/AdminProductsListPage';
+import { AdminLayout } from '../features/admin/components/AdminLayout';
 import { LoginPage } from '../features/auth/LoginPage';
 import {
   AdminRoute,
+  CustomerRoute,
   ProtectedRoute,
   PublicOnlyRoute,
 } from '../features/auth/ProtectedRoute';
@@ -27,22 +29,6 @@ import { OrdersListPage } from '../features/orders/OrdersListPage';
 import { Layout } from '../shared/components/Layout';
 import { ShellPage } from '../shared/components/ShellPage';
 
-/**
- * App route tree.
- *
- *   Auth pages (no shell, public-only):
- *     /login, /register
- *
- *   Public pages (shared shell, anonymous-friendly):
- *     /                  → catalog landing
- *     /products/:slug    → product detail
- *
- *   Protected pages (shared shell, requires sign-in):
- *     /account           → buyer account dashboard
- *
- * The auth gates render a centered spinner while AuthProvider's initial
- * /auth/refresh handshake is in flight, so reloads never flash the wrong page.
- */
 export function AppRoutes() {
   return (
     <Routes>
@@ -52,9 +38,11 @@ export function AppRoutes() {
       </Route>
 
       <Route element={<Layout />}>
-        <Route index element={<CatalogPage />} />
-        <Route path="products/:slug" element={<ProductDetailPage />} />
-        <Route path="cart" element={<CartPage />} />
+        <Route element={<CustomerRoute />}>
+          <Route index element={<CatalogPage />} />
+          <Route path="products/:slug" element={<ProductDetailPage />} />
+          <Route path="cart" element={<CartPage />} />
+        </Route>
 
         <Route element={<ProtectedRoute />}>
           <Route path="checkout" element={<CheckoutPage />} />
@@ -63,8 +51,10 @@ export function AppRoutes() {
           <Route path="account/orders/:orderNumber" element={<OrderDetailPage />} />
           <Route path="account/addresses" element={<AddressBookPage />} />
         </Route>
+      </Route>
 
-        <Route element={<AdminRoute />}>
+      <Route element={<AdminRoute />}>
+        <Route element={<AdminLayout />}>
           <Route path="admin" element={<AdminHubPage />} />
           <Route path="admin/orders" element={<AdminOrdersListPage />} />
           <Route path="admin/orders/:orderNumber" element={<AdminOrderDetailPage />} />
