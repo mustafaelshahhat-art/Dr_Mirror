@@ -54,3 +54,6 @@ tmp/
 temp/
 .windsurf/workflows/review.md
 backend/src/DrMirror.Api/wwwroot/uploads/
+backend/src/DrMirror.Api/appsettings.Development.json
+backend/src/DrMirror.Api/appsettings.json
+backend/src/DrMirror.Api/appsettings.Development.json

@@ -75,6 +75,9 @@ public sealed class OrderStateMachine
             case OrderStatus.Paid: order.PaidAt = now; break;
             case OrderStatus.Shipped: order.ShippedAt = now; break;
             case OrderStatus.Delivered: order.DeliveredAt = now; break;
+            case OrderStatus.Pending:
+                if (!string.IsNullOrWhiteSpace(reason)) order.CancellationReason = reason;
+                break;
             case OrderStatus.Cancelled:
                 order.CancelledAt = now;
                 if (!string.IsNullOrWhiteSpace(reason)) order.CancellationReason = reason;

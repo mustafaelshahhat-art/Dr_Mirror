@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
+import arAccount from '../../locales/ar/account.json';
 import arAddresses from '../../locales/ar/addresses.json';
 import arAdmin from '../../locales/ar/admin.json';
 import arAuth from '../../locales/ar/auth.json';
@@ -12,6 +13,7 @@ import arCommon from '../../locales/ar/common.json';
 import arGovernates from '../../locales/ar/governorates.json';
 import arInquiries from '../../locales/ar/inquiries.json';
 import arOrders from '../../locales/ar/orders.json';
+import enAccount from '../../locales/en/account.json';
 import enAddresses from '../../locales/en/addresses.json';
 import enAdmin from '../../locales/en/admin.json';
 import enAuth from '../../locales/en/auth.json';
@@ -35,6 +37,7 @@ void i18n
   .init({
     resources: {
       ar: {
+        account: arAccount,
         common: arCommon,
         auth: arAuth,
         catalog: arCatalog,
@@ -47,6 +50,7 @@ void i18n
         inquiries: arInquiries,
       },
       en: {
+        account: enAccount,
         common: enCommon,
         auth: enAuth,
         catalog: enCatalog,
@@ -64,7 +68,7 @@ void i18n
     // Flat key lookup: t('auth.signIn') reads from the 'auth' namespace.
     fallbackNS: 'common',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'catalog', 'cart', 'checkout', 'orders', 'admin', 'addresses', 'governorates', 'inquiries'],
+    ns: ['common', 'auth', 'catalog', 'cart', 'checkout', 'orders', 'admin', 'addresses', 'governorates', 'inquiries', 'account'],
     // Allow t('auth.signIn') to resolve via nsSeparator on the key.
     nsSeparator: '.',
     interpolation: { escapeValue: false },

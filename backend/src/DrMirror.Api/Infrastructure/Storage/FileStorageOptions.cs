@@ -5,7 +5,7 @@ namespace DrMirror.Api.Infrastructure.Storage;
 /// <summary>
 /// Storage-provider configuration. Bound from the <c>FileStorage</c> section.
 /// </summary>
-public sealed class FileStorageOptions
+public sealed class FileStorageOptions : IValidatableObject
 {
     public const string SectionName = "FileStorage";
 
@@ -48,4 +48,19 @@ public sealed class FileStorageOptions
     public string? CloudinaryCloudName { get; set; }
     public string? CloudinaryApiKey { get; set; }
     public string? CloudinaryApiSecret { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (Provider.Equals("cloudinary", StringComparison.OrdinalIgnoreCase))
+        {
+            if (string.IsNullOrWhiteSpace(CloudinaryCloudName) ||
+                string.IsNullOrWhiteSpace(CloudinaryApiKey) ||
+                string.IsNullOrWhiteSpace(CloudinaryApiSecret))
+            {
+                yield return new ValidationResult(
+                    "Cloudinary credentials are missing — set FileStorage:CloudinaryCloudName / ApiKey / ApiSecret " +
+                    "or switch FileStorage:Provider back to 'local'.");
+            }
+        }
+    }
 }

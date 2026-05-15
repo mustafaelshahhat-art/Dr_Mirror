@@ -105,10 +105,17 @@ function UserRow({
     setPending(true);
     try {
       await updateRoles.mutateAsync({ userId: user.id, body: { roles: next } });
+    } catch {
+      // error is surfaced via updateRoles.error below
     } finally {
       setPending(false);
     }
   }
+
+  const selfDemotionError =
+    updateRoles.error && (updateRoles.error as { response?: { status?: number } }).response?.status === 409
+      ? t('admin.users.selfDemotionError')
+      : null;
 
   return (
     <tr className="bg-content1 transition-colors hover:bg-content2">
@@ -128,7 +135,7 @@ function UserRow({
                 key={role}
                 type="button"
                 size="sm"
-                variant={active ? 'solid' : 'ghost'}
+                variant={active ? 'primary' : 'ghost'}
                 isDisabled={pending}
                 onPress={() => toggleRole(role)}
                 aria-label={
@@ -146,6 +153,9 @@ function UserRow({
               </Button>
             );
           })}
+          {selfDemotionError && (
+            <p className="mt-1 w-full text-xs text-danger">{selfDemotionError}</p>
+          )}
         </div>
       </td>
     </tr>

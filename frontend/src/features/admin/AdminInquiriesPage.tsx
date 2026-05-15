@@ -179,17 +179,17 @@ function InquiryRow({
       ) : null}
 
       <div className="flex flex-wrap gap-2">
-        <Button
-          as="a"
-          href={replyHref}
-          variant="primary"
-          size="sm"
-        >
-          <span className="inline-flex items-center gap-1.5">
-            <Mail className="size-4" aria-hidden />
-            {t('inquiries.admin.replyByEmail')}
-          </span>
-        </Button>
+        <a href={replyHref}>
+          <Button
+            variant="primary"
+            size="sm"
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <Mail className="size-4" aria-hidden />
+              {t('admin.inquiries.reply')}
+            </span>
+          </Button>
+        </a>
         {isNew ? (
           <Button
             type="button"

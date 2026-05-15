@@ -34,7 +34,7 @@ export function SearchInput({ value, onCommit, debounceMs = 350 }: SearchInputPr
     <div className="relative w-full">
       <Search
         aria-hidden
-        className="pointer-events-none absolute top-1/2 size-4 -translate-y-1/2 text-default-400 ltr:left-3 rtl:right-3"
+        className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-default-400"
       />
       <Input
         type="search"
@@ -52,7 +52,7 @@ export function SearchInput({ value, onCommit, debounceMs = 350 }: SearchInputPr
             setDraft('');
             onCommit('');
           }}
-          className="absolute top-1/2 inline-flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-default-500 hover:bg-default-100 hover:text-foreground ltr:right-2 rtl:left-2"
+          className="absolute end-2 top-1/2 inline-flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-default-500 hover:bg-default-100 hover:text-foreground"
         >
           <X className="size-3.5" />
         </button>
