@@ -1,0 +1,12 @@
+{
+  "account": {
+    "loading": "Loading your account…",
+    "memberSince": "Member since {{date}}",
+    "recentOrders": {
+      "title": "Recent orders",
+      "empty": "No orders yet. Start shopping!",
+      "viewAll": "View all orders",
+      "orderLabel": "Order #{{number}}"
+    }
+  }
+}

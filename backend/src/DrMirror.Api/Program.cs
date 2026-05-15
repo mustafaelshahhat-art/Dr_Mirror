@@ -71,7 +71,7 @@ try
                 outputTemplate:
                     "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}");
         }
-    });
+    }, preserveStaticLogger: true);
 
     // -----------------------------------------------------------------------
     // EF Core — SQL Server, scoped lifetime (the default for AddDbContext).

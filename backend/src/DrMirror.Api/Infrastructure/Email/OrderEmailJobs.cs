@@ -63,10 +63,27 @@ public sealed class SendOrderConfirmationJob : IInvocable, IInvocableWithPayload
             ? $"Order {order.OrderNumber} confirmed"
             : $"Order {order.OrderNumber} — awaiting payment";
 
-        await _email.SendAsync(new EmailMessage(
-            To: order.BuyerUser.Email,
-            Subject: subject,
-            TextBody: body));
+        int[] delays = { 0, 5000, 30000, 120000 };
+        for (int attempt = 1; attempt <= 4; attempt++)
+        {
+            if (attempt > 1) await Task.Delay(delays[attempt - 1]);
+            
+            try
+            {
+                await _email.SendAsync(new EmailMessage(
+                    To: order.BuyerUser.Email,
+                    Subject: subject,
+                    TextBody: body));
+                return;
+            }
+            catch (Exception ex)
+            {
+                if (attempt < 4)
+                    _logger.LogWarning(ex, "Failed to send SendOrderConfirmationJob to {Recipient}. Attempt {Attempt}/4.", order.BuyerUser.Email, attempt);
+                else
+                    _logger.LogError(ex, "Failed to send SendOrderConfirmationJob to {Recipient} after 4 attempts. OrderId: {OrderId}", order.BuyerUser.Email, Payload);
+            }
+        }
     }
 }
 
@@ -101,13 +118,30 @@ public sealed class SendPaymentReviewNeededJob : IInvocable, IInvocableWithPaylo
             return;
         }
 
-        await _email.SendAsync(new EmailMessage(
-            To: order.BuyerUser.Email,
-            Subject: $"Order {order.OrderNumber} — payment proof received",
-            TextBody:
-                $"Hi {order.BuyerUser.FullName},\n\n" +
-                $"We received your payment proof for order {order.OrderNumber} and it's now waiting on our team to review " +
-                $"(usually within a business day). You'll get another email the moment it's confirmed.\n\n— Dr. Mirror"));
+        int[] delays = { 0, 5000, 30000, 120000 };
+        for (int attempt = 1; attempt <= 4; attempt++)
+        {
+            if (attempt > 1) await Task.Delay(delays[attempt - 1]);
+            
+            try
+            {
+                await _email.SendAsync(new EmailMessage(
+                    To: order.BuyerUser.Email,
+                    Subject: $"Order {order.OrderNumber} — payment proof received",
+                    TextBody:
+                        $"Hi {order.BuyerUser.FullName},\n\n" +
+                        $"We received your payment proof for order {order.OrderNumber} and it's now waiting on our team to review " +
+                        $"(usually within a business day). You'll get another email the moment it's confirmed.\n\n— Dr. Mirror"));
+                return;
+            }
+            catch (Exception ex)
+            {
+                if (attempt < 4)
+                    _logger.LogWarning(ex, "Failed to send SendPaymentReviewNeededJob to {Recipient}. Attempt {Attempt}/4.", order.BuyerUser.Email, attempt);
+                else
+                    _logger.LogError(ex, "Failed to send SendPaymentReviewNeededJob to {Recipient} after 4 attempts. OrderId: {OrderId}", order.BuyerUser.Email, Payload);
+            }
+        }
     }
 }
 
@@ -174,10 +208,27 @@ public sealed class SendStatusChangedJob : IInvocable, IInvocableWithPayload<Ord
             _ => ($"Order {order.OrderNumber} — status update", $"Status: {Payload.EventStatus}"),
         };
 
-        await _email.SendAsync(new EmailMessage(
-            To: order.BuyerUser.Email,
-            Subject: subject,
-            TextBody: body));
+        int[] delays = { 0, 5000, 30000, 120000 };
+        for (int attempt = 1; attempt <= 4; attempt++)
+        {
+            if (attempt > 1) await Task.Delay(delays[attempt - 1]);
+            
+            try
+            {
+                await _email.SendAsync(new EmailMessage(
+                    To: order.BuyerUser.Email,
+                    Subject: subject,
+                    TextBody: body));
+                return;
+            }
+            catch (Exception ex)
+            {
+                if (attempt < 4)
+                    _logger.LogWarning(ex, "Failed to send SendStatusChangedJob to {Recipient}. Attempt {Attempt}/4.", order.BuyerUser.Email, attempt);
+                else
+                    _logger.LogError(ex, "Failed to send SendStatusChangedJob to {Recipient} after 4 attempts. OrderId: {OrderId}", order.BuyerUser.Email, Payload.OrderId);
+            }
+        }
     }
 }
 
@@ -235,9 +286,26 @@ public sealed class SendInquiryReceivedJob : IInvocable, IInvocableWithPayload<G
             $"View in admin: /admin/inquiries\n" +
             $"— Dr. Mirror System";
 
-        await _email.SendAsync(new EmailMessage(
-            To: adminEmail,
-            Subject: $"[Dr. Mirror] New inquiry: {inquiry.Subject}",
-            TextBody: body));
+        int[] delays = { 0, 5000, 30000, 120000 };
+        for (int attempt = 1; attempt <= 4; attempt++)
+        {
+            if (attempt > 1) await Task.Delay(delays[attempt - 1]);
+            
+            try
+            {
+                await _email.SendAsync(new EmailMessage(
+                    To: adminEmail,
+                    Subject: $"[Dr. Mirror] New inquiry: {inquiry.Subject}",
+                    TextBody: body));
+                return;
+            }
+            catch (Exception ex)
+            {
+                if (attempt < 4)
+                    _logger.LogWarning(ex, "Failed to send SendInquiryReceivedJob to {Recipient}. Attempt {Attempt}/4.", adminEmail, attempt);
+                else
+                    _logger.LogError(ex, "Failed to send SendInquiryReceivedJob to {Recipient} after 4 attempts. InquiryId: {InquiryId}", adminEmail, Payload);
+            }
+        }
     }
 }

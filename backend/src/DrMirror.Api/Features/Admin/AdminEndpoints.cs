@@ -29,6 +29,7 @@ public static class AdminEndpoints
 
         var orders = admin.MapGroup("/orders").WithTags("Admin: Orders");
         orders.MapListOrders();
+        orders.MapOrderStats();
         orders.MapAdminGetOrderByNumber();
         orders.MapTransitionOrder();
         orders.MapApprovePaymentProof();

@@ -46,10 +46,10 @@ public sealed class MailKitEmailSender : IEmailSender
             ? SecureSocketOptions.StartTls
             : SecureSocketOptions.Auto;
 
-        await client.ConnectAsync(_opts.SmtpHost, _opts.SmtpPort, secureOption, ct);
+        await client.ConnectAsync(_opts.SmtpHost!, _opts.SmtpPort, secureOption, ct);
         if (!string.IsNullOrWhiteSpace(_opts.SmtpUsername))
         {
-            await client.AuthenticateAsync(_opts.SmtpUsername, _opts.SmtpPassword, ct);
+            await client.AuthenticateAsync(_opts.SmtpUsername, _opts.SmtpPassword ?? "", ct);
         }
         await client.SendAsync(mime, ct);
         await client.DisconnectAsync(true, ct);

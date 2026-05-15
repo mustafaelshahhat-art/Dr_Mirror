@@ -57,6 +57,21 @@
   "hub": {
     "title": "Admin dashboard",
     "subtitle": "Catalog, orders, and payment methods — everything you need to run the store.",
+    "kpis": {
+      "total": "Total orders",
+      "pending": "Pending",
+      "pendingReview": "Pending review",
+      "paid": "Paid",
+      "preparing": "Preparing",
+      "shipped": "Shipped"
+    },
+    "recent": {
+      "heading": "Recent orders",
+      "loading": "Loading recent orders...",
+      "viewAll": "View all orders",
+      "empty": "No orders yet."
+    },
+    "quickLinks": "Quick links",
     "tiles": {
       "orders": {
         "title": "Orders",
@@ -251,7 +266,9 @@
     }
   },
   "shell": {
+    "navTitle": "Navigation",
     "nav": {
+      "dashboard": "Dashboard",
       "orders": "Orders",
       "products": "Products",
       "categories": "Categories",
@@ -282,6 +299,7 @@
     "colJoined": "Joined",
     "colRoles": "Roles",
     "addRole": "Add role {{role}}",
-    "removeRole": "Remove role {{role}}"
+    "removeRole": "Remove role {{role}}",
+    "selfDemotionError": "You cannot remove your own Admin role."
   }
 }

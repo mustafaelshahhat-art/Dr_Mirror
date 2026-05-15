@@ -57,7 +57,7 @@ export function AdminProductsListPage() {
         <select
           value={categoryId ?? ''}
           onChange={(e) => setCategoryId(e.target.value || undefined)}
-          className="rounded-medium border border-divider bg-content1 px-2 py-1.5 text-sm"
+          className="rounded-medium border border-divider bg-background px-2 py-1.5 text-sm"
         >
           <option value="">{t('admin.products.list.allCategories')}</option>
           {(categories.data ?? []).map((c) => (
@@ -71,7 +71,7 @@ export function AdminProductsListPage() {
           onChange={(e) =>
             setGender(e.target.value === '' ? undefined : (Number(e.target.value) as ProductGender))
           }
-          className="rounded-medium border border-divider bg-content1 px-2 py-1.5 text-sm"
+          className="rounded-medium border border-divider bg-background px-2 py-1.5 text-sm"
         >
           <option value="">{t('admin.products.list.allGenders')}</option>
           <option value={0}>{t(genderTranslationKey(0))}</option>
@@ -84,7 +84,7 @@ export function AdminProductsListPage() {
             const v = e.target.value;
             setPublished(v === '' ? undefined : v === 'pub');
           }}
-          className="rounded-medium border border-divider bg-content1 px-2 py-1.5 text-sm"
+          className="rounded-medium border border-divider bg-background px-2 py-1.5 text-sm"
         >
           <option value="">{t('admin.products.list.allStatuses')}</option>
           <option value="pub">{t('admin.products.list.published')}</option>

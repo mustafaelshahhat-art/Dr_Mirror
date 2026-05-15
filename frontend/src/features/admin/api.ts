@@ -5,12 +5,22 @@ import type {
   OrderSummaryDto,
 } from '../orders/types';
 
+export interface OrderStatsResponse {
+  totalOrders: number;
+  countsByStatus: Record<string, number>;
+}
+
 /**
  * Admin-only counterparts of the buyer order endpoints. Every call goes to
  * <c>/api/admin/orders/*</c> which the backend protects with
  * <c>RequireRole(Admin)</c>. The bearer-token interceptor handles auth.
  */
 export const adminOrdersApi = {
+  async stats(): Promise<OrderStatsResponse> {
+    const { data } = await api.get<OrderStatsResponse>('/admin/orders/stats');
+    return data;
+  },
+
   async list(params?: {
     status?: OrderStatus;
     page?: number;

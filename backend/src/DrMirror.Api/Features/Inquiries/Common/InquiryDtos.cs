@@ -1,6 +1,7 @@
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Orders;
 using FluentValidation;
+using FluentValidation.Validators;
 
 namespace DrMirror.Api.Features.Inquiries.Common;
 
@@ -58,7 +59,11 @@ public sealed class SubmitInquiryValidator : AbstractValidator<SubmitInquiryRequ
     public SubmitInquiryValidator()
     {
         RuleFor(r => r.FullName).NotEmpty().MaximumLength(100);
-        RuleFor(r => r.Email).NotEmpty().EmailAddress().MaximumLength(200);
+        RuleFor(r => r.Email).NotEmpty()
+            .EmailAddress(EmailValidationMode.AspNetCoreCompatible)
+            .Must(e => e != null && e.LastIndexOf('.') > e.IndexOf('@'))
+            .WithMessage("'{PropertyName}' must be a valid email address.")
+            .MaximumLength(200);
         RuleFor(r => r.Phone).MaximumLength(30);
         RuleFor(r => r.Subject).NotEmpty().MaximumLength(200);
         RuleFor(r => r.Message).NotEmpty().MaximumLength(2000);

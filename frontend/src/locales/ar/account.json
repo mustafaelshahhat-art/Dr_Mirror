@@ -1,0 +1,12 @@
+{
+  "account": {
+    "loading": "جاري تحميل حسابك…",
+    "memberSince": "عضو منذ {{date}}",
+    "recentOrders": {
+      "title": "آخر الطلبات",
+      "empty": "لا توجد طلبات بعد. ابدأ التسوق!",
+      "viewAll": "عرض كل الطلبات",
+      "orderLabel": "طلب رقم {{number}}"
+    }
+  }
+}
