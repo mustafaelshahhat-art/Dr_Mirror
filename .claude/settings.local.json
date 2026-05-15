@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "PowerShell(New-Item *)",
-      "PowerShell(.\\\\.specify\\\\scripts\\\\powershell\\\\setup-plan.ps1 -Json)",
-      "PowerShell(.\\\\.specify\\\\scripts\\\\powershell\\\\setup-tasks.ps1 -Json)"
-    ]
-  }
-}
