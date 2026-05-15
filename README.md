@@ -92,4 +92,4 @@ The store is functional end-to-end: customers can browse the catalog, manage a c
 
 ---
 
-Architecture decisions and constraints live in [PROJECT_MAP.md](docs\PROJECT_MAP.md). UI rules are in [docs\DESIGN_PRINCIPLES.md](DESIGN_PRINCIPLES.md) — read that before touching the frontend.
+Architecture decisions and constraints live in [PROJECT_MAP](PROJECT_MAP.md). UI rules are in [DESIGN_PRINCIPLES](DESIGN_PRINCIPLES.md) — read that before touching the frontend.
