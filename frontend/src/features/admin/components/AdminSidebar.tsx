@@ -9,7 +9,6 @@ import {
   CreditCard,
   MessageSquare,
   Users,
-  X,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -65,19 +64,11 @@ export function AdminSidebar({
           <span className="text-sm font-semibold tracking-tight text-foreground">
             {t('admin.shell.navTitle')}
           </span>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-medium p-1 transition-colors hover:bg-default-100"
-            aria-label="Close"
-          >
-            <X size={18} aria-hidden />
-          </button>
         </div>
 
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-4 pt-2">
           {NAV_ITEMS.map(({ to, icon: Icon, key }) => (
-            <NavItem key={to} to={to} icon={Icon} label={t(`admin.shell.nav.${key}`)} />
+            <NavItem key={to} to={to} icon={Icon} label={t(`admin.shell.nav.${key}`)} onClick={onClose} />
           ))}
         </nav>
       </aside>
@@ -89,14 +80,17 @@ function NavItem({
   to,
   icon: Icon,
   label,
+  onClick,
 }: {
   to: string;
   icon: typeof ClipboardList;
   label: string;
+  onClick?: () => void;
 }) {
   return (
     <NavLink
       to={to}
+      onClick={onClick}
       className={({ isActive }) =>
         [
           'flex items-center gap-2 rounded-medium px-3 py-2 text-sm transition-colors motion-reduce:transition-none',
