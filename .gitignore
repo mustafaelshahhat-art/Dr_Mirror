@@ -51,7 +51,6 @@ backend/src/DrMirror.Api/appsettings.Development.json
 # These are kept locally for reference but excluded from the repository
 AGENTS.md
 CLAUDE.md
-PROJECT_MAP.md
 specs/
 .agents/
 .claude/
