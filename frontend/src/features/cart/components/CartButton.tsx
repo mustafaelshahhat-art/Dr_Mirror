@@ -1,5 +1,6 @@
 import { Button, Drawer } from '@heroui/react';
 import { ShoppingBag } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -19,34 +20,39 @@ export function CartButton() {
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const placement = i18n.dir(lang) === 'rtl' ? 'left' : 'right';
   const { cart, updateQuantity, removeItem } = useCart();
+  const [isOpen, setIsOpen] = useState(false);
 
   const visibleItems = cart.items;
   const hasItems = visibleItems.length > 0;
 
   return (
-    <Drawer>
-      <Drawer.Trigger>
-        <Button
-          variant="ghost"
-          size="sm"
-          aria-label={t('cart.openLabel')}
-          className="relative"
-          isIconOnly
-        >
-          <ShoppingBag className="size-5" aria-hidden />
-          {cart.totalQuantity > 0 ? (
-            <span
-              className="absolute -end-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
-              aria-hidden
-            >
-              {cart.totalQuantity > 99 ? '99+' : cart.totalQuantity}
-            </span>
-          ) : null}
-          <span className="sr-only">
-            {t('cart.countSr', { count: cart.totalQuantity })}
+    <>
+      {/* Drawer.Trigger renders its own <button>, so we drive open state
+          manually to avoid the invalid nested-<button> markup it would create
+          around our Button component. */}
+      <Button
+        variant="ghost"
+        size="sm"
+        aria-label={t('cart.openLabel')}
+        className="relative"
+        isIconOnly
+        onPress={() => setIsOpen(true)}
+      >
+        <ShoppingBag className="size-5" aria-hidden />
+        {cart.totalQuantity > 0 ? (
+          <span
+            className="absolute -end-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
+            aria-hidden
+          >
+            {cart.totalQuantity > 99 ? '99+' : cart.totalQuantity}
           </span>
-        </Button>
-      </Drawer.Trigger>
+        ) : null}
+        <span className="sr-only">
+          {t('cart.countSr', { count: cart.totalQuantity })}
+        </span>
+      </Button>
+
+      <Drawer isOpen={isOpen} onOpenChange={setIsOpen}>
 
       <Drawer.Backdrop>
         <Drawer.Content placement={placement} className="w-full max-w-md">
@@ -111,6 +117,7 @@ export function CartButton() {
           </Drawer.Dialog>
         </Drawer.Content>
       </Drawer.Backdrop>
-    </Drawer>
+      </Drawer>
+    </>
   );
 }

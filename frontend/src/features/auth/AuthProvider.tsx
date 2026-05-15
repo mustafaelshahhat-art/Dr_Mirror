@@ -22,6 +22,8 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   /** True until the initial /auth/refresh attempt resolves. Block UI on this. */
   isBootstrapping: boolean;
+  /** Memoized — `user?.roles.includes('Admin') ?? false`. */
+  isAdmin: boolean;
   login: (input: LoginInput) => Promise<AuthUser>;
   register: (input: RegisterInput) => Promise<AuthUser>;
   logout: () => Promise<void>;
@@ -104,16 +106,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearSession();
   }, [clearSession]);
 
+  const isAdmin = useMemo(() => user?.roles.includes('Admin') ?? false, [user]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
       isAuthenticated: user !== null,
       isBootstrapping,
+      isAdmin,
       login,
       register,
       logout,
     }),
-    [user, isBootstrapping, login, register, logout],
+    [user, isBootstrapping, isAdmin, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

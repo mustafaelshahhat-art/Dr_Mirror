@@ -250,6 +250,28 @@
       "rejected": "Rejected"
     }
   },
+  "shell": {
+    "nav": {
+      "orders": "Orders",
+      "products": "Products",
+      "categories": "Categories",
+      "paymentMethods": "Payment methods",
+      "inquiries": "Inquiries",
+      "users": "Users"
+    },
+    "accountMenu": {
+      "signOut": "Sign out",
+      "signedInAs": "Signed in as {{name}}"
+    },
+    "forbidden": {
+      "title": "Access denied",
+      "description": "You don't have permission to view this page."
+    },
+    "signOutConfirm": {
+      "title": "Sign out?",
+      "description": "You'll be signed out of the admin dashboard."
+    }
+  },
   "users": {
     "title": "Users",
     "subtitle": "Manage registered accounts and their roles.",

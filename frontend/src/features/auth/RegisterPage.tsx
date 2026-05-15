@@ -11,6 +11,7 @@ import { FormField } from './components/FormField';
 import { registerSchema, type RegisterFormValues } from './schemas';
 import type { ProblemDetails } from './types';
 import { useAuth } from './useAuth';
+import { resolvePostAuthDestination } from './postAuthDestination';
 
 export function RegisterPage() {
   const { t } = useTranslation();
@@ -30,8 +31,9 @@ export function RegisterPage() {
   const onSubmit = handleSubmit(async (values) => {
     setServerError(null);
     try {
-      await registerAccount(values);
-      navigate('/', { replace: true });
+      const user = await registerAccount(values);
+      const dest = resolvePostAuthDestination(user, null);
+      navigate(dest, { replace: true });
     } catch (err) {
       const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
       setServerError(problem?.detail ?? problem?.title ?? t('auth.errors.unknown'));

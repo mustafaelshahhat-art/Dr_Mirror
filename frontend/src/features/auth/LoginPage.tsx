@@ -11,6 +11,7 @@ import { FormField } from './components/FormField';
 import { loginSchema, type LoginFormValues } from './schemas';
 import type { ProblemDetails } from './types';
 import { useAuth } from './useAuth';
+import { resolvePostAuthDestination } from './postAuthDestination';
 
 export function LoginPage() {
   const { t } = useTranslation();
@@ -28,14 +29,14 @@ export function LoginPage() {
     defaultValues: { email: '', password: '' },
   });
 
-  const from =
-    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ?? '/';
-
   const onSubmit = handleSubmit(async (values) => {
     setServerError(null);
     try {
-      await login(values);
-      navigate(from, { replace: true });
+      const user = await login(values);
+      const from =
+        (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ?? null;
+      const dest = resolvePostAuthDestination(user, from);
+      navigate(dest, { replace: true });
     } catch (err) {
       const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
       setServerError(problem?.detail ?? problem?.title ?? t('auth.errors.unknown'));

@@ -310,6 +310,15 @@ try
             o.AutoReplenishment = true;
         });
 
+        // Admin API — 120 req/60 s per user (fixed window, defense-in-depth).
+        options.AddFixedWindowLimiter(RateLimitPolicies.AdminApi, o =>
+        {
+            o.Window = TimeSpan.FromMinutes(1);
+            o.PermitLimit = 120;
+            o.QueueLimit = 0;
+            o.AutoReplenishment = true;
+        });
+
         // Key by remote IP (falls back to empty string for non-TCP transports).
         options.OnRejected = async (ctx, ct) =>
         {
