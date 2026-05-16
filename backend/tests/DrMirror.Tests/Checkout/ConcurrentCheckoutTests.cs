@@ -3,19 +3,20 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using DrMirror.Api.Domain.Entities;
+using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Tests.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using DrMirror.Api.Domain.Entities;
-using DrMirror.Api.Infrastructure.Persistence;
 
 namespace DrMirror.Tests.Checkout;
 
+[Collection(IntegrationTestCollection.Name)]
 public class ConcurrentCheckoutTests : IClassFixture<ConcurrentCheckoutTests.Factory>
 {
     private readonly Factory _factory;
@@ -36,23 +37,23 @@ public class ConcurrentCheckoutTests : IClassFixture<ConcurrentCheckoutTests.Fac
 
         var buyer1 = new User { Id = user1Id, FullName = "Buyer 1", Email = "buyer1@example.com", UserName = "buyer1@example.com" };
         var buyer2 = new User { Id = user2Id, FullName = "Buyer 2", Email = "buyer2@example.com", UserName = "buyer2@example.com" };
-        
+
         var paymentMethod = new PaymentMethod { Id = Guid.NewGuid(), NameEn = "Instapay", NameAr = "Instapay", Kind = DrMirror.Api.Domain.Orders.PaymentMethodKind.Instapay, IsActive = true };
 
         var category = new Category { Id = Guid.NewGuid(), NameEn = "Cat", NameAr = "Cat", Slug = "cat", IsActive = true };
         var product = new Product { Id = Guid.NewGuid(), CategoryId = category.Id, NameEn = "P1", NameAr = "P1", Slug = "p1", IsPublished = true, Price = 100 };
         var variant = new ProductVariant { Id = Guid.NewGuid(), ProductId = product.Id, Sku = "SKU-1", Size = "M", ColorName = "Blue", ColorNameAr = "Blue", ColorHex = "#000", Stock = 1, IsActive = true, RowVersion = new byte[] { 1 } };
-        
+
         db.Users.AddRange(buyer1, buyer2);
         db.Categories.Add(category);
         db.Products.Add(product);
         db.ProductVariants.Add(variant);
         db.PaymentMethods.Add(paymentMethod);
-        
+
         var cart1 = new DrMirror.Api.Domain.Entities.Cart { Id = Guid.NewGuid(), UserId = user1Id, Items = new List<CartItem>() };
         var cart1Item = new CartItem { Id = Guid.NewGuid(), CartId = cart1.Id, ProductVariantId = variant.Id, Quantity = 1 };
         cart1.Items.Add(cart1Item);
-        
+
         var cart2 = new DrMirror.Api.Domain.Entities.Cart { Id = Guid.NewGuid(), UserId = user2Id, Items = new List<CartItem>() };
         var cart2Item = new CartItem { Id = Guid.NewGuid(), CartId = cart2.Id, ProductVariantId = variant.Id, Quantity = 1 };
         cart2.Items.Add(cart2Item);
@@ -105,35 +106,16 @@ public class ConcurrentCheckoutTests : IClassFixture<ConcurrentCheckoutTests.Fac
         Assert.Equal(1, conflictCount);
     }
 
-    public class Factory : WebApplicationFactory<Program>
+    public class Factory : IntegrationWebAppFactory
     {
-        public string DbName { get; } = "ConcurrentCheckoutTest_" + Guid.NewGuid().ToString();
         private int _saveCount = 0;
 
-        public Factory()
+        public override string DbName { get; } = "ConcurrentCheckoutTest_" + Guid.NewGuid();
+
+        protected override void ConfigureDbContext(DbContextOptionsBuilder options)
         {
-            Environment.SetEnvironmentVariable("ConnectionStrings__Default", "Server=localhost;Database=DrMirrorTest;Trusted_Connection=True;TrustServerCertificate=True;");
-            Environment.SetEnvironmentVariable("Jwt__Secret", "test-signing-secret-minimum-32-chars-long!!");
-        }
-
-        protected override void ConfigureWebHost(Microsoft.AspNetCore.Hosting.IWebHostBuilder builder)
-        {
-            builder.UseEnvironment("Testing");
-            builder.ConfigureServices(services =>
-            {
-                var descriptors = services.Where(d => d.ServiceType.Name.Contains("DbContextOptions")).ToList();
-                foreach (var d in descriptors) services.Remove(d);
-
-                services.AddDbContext<AppDbContext>(opt => 
-                {
-                    opt.UseInMemoryDatabase(DbName);
-                    opt.AddInterceptors(new ConcurrencyInterceptor(this));
-                });
-
-                // Remove Coravel background host so it doesn't process queue on shutdown
-                var coravelHost = services.FirstOrDefault(d => d.ImplementationType?.FullName?.Contains("QueuingHost") == true);
-                if (coravelHost != null) services.Remove(coravelHost);
-            });
+            base.ConfigureDbContext(options);
+            options.AddInterceptors(new ConcurrencyInterceptor(this));
         }
 
         public int IncrementAndGetSaveCount() => Interlocked.Increment(ref _saveCount);
@@ -153,7 +135,7 @@ public class ConcurrentCheckoutTests : IClassFixture<ConcurrentCheckoutTests.Fac
                 if (variants.Any())
                 {
                     var count = _factory.IncrementAndGetSaveCount();
-                    if (count >= 2) 
+                    if (count >= 2)
                     {
                         throw new DbUpdateConcurrencyException("Simulated concurrency exception", new Exception());
                     }
@@ -170,10 +152,10 @@ public class TestAuthUser
     public TestAuthUser(Guid userId) => UserId = userId;
 }
 
-    public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     private readonly TestAuthUser _user;
-    public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, TestAuthUser user) 
+    public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, TestAuthUser user)
         : base(options, logger, encoder)
     {
         _user = user;

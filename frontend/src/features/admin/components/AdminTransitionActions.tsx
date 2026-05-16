@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ProblemDetails } from '../../auth/types';
-import { orderStatusTranslationKey } from '../../orders/components/OrderStatusBadge';
+import { orderStatusTranslationKey } from '../../orders/components/orderStatusTranslationKey';
 import { ORDER_STATUSES, type OrderDetailDto, type OrderStatus } from '../../orders/types';
 import { useAdminTransitionMutation } from '../hooks';
 

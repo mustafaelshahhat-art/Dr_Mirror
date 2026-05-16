@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { orderStatusTranslationKey } from '../../orders/components/OrderStatusBadge';
+import { orderStatusTranslationKey } from '../../orders/components/orderStatusTranslationKey';
 import { ORDER_STATUSES, type OrderStatus } from '../../orders/types';
 
 interface StatusFilterDropdownProps {

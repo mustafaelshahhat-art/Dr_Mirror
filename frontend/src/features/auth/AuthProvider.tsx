@@ -1,5 +1,4 @@
 import {
-  createContext,
   useCallback,
   useEffect,
   useMemo,
@@ -15,21 +14,8 @@ import {
 } from '../../shared/lib/auth-storage';
 
 import { authApi, type LoginInput, type RegisterInput } from './api';
+import { AuthContext, type AuthContextValue } from './AuthContext';
 import type { AuthUser } from './types';
-
-interface AuthContextValue {
-  user: AuthUser | null;
-  isAuthenticated: boolean;
-  /** True until the initial /auth/refresh attempt resolves. Block UI on this. */
-  isBootstrapping: boolean;
-  /** Memoized — `user?.roles.includes('Admin') ?? false`. */
-  isAdmin: boolean;
-  login: (input: LoginInput) => Promise<AuthUser>;
-  register: (input: RegisterInput) => Promise<AuthUser>;
-  logout: () => Promise<void>;
-}
-
-export const AuthContext = createContext<AuthContextValue | null>(null);
 
 /**
  * Sole owner of authenticated-user state. Runs the session-restore handshake

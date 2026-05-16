@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ORDER_STATUSES, type OrderDetailDto, type OrderStatus } from '../types';
 
-import { orderStatusTranslationKey } from './OrderStatusBadge';
+import { orderStatusTranslationKey } from './orderStatusTranslationKey';
 
 interface TimelinePoint {
   status: OrderStatus;

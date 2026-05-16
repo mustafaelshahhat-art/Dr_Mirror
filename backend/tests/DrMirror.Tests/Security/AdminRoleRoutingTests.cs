@@ -1,14 +1,11 @@
-using DrMirror.Api.Features.Admin;
+using DrMirror.Tests.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using DrMirror.Api.Infrastructure.Persistence;
 
 namespace DrMirror.Tests.Security;
 
+[Collection(IntegrationTestCollection.Name)]
 public class AdminRoleRoutingTests : IClassFixture<AdminRoleRoutingTests.Factory>
 {
     private readonly Factory _factory;
@@ -79,34 +76,7 @@ public class AdminRoleRoutingTests : IClassFixture<AdminRoleRoutingTests.Factory
         return dataSource.Endpoints.OfType<RouteEndpoint>().ToList();
     }
 
-    public class Factory : WebApplicationFactory<Program>
+    public class Factory : IntegrationWebAppFactory
     {
-        public Factory()
-        {
-            // Program.cs throws for these two values before builder.Build() is called,
-            // so ConfigureWebHost/ConfigureServices hooks arrive too late to prevent it.
-            // Setting them as process env vars ensures WebApplication.CreateBuilder(args)
-            // picks them up at construction time. The DbContext is replaced below with
-            // InMemory, so the dummy connection string is never actually opened.
-            Environment.SetEnvironmentVariable("ConnectionStrings__Default",
-                "Server=localhost;Database=DrMirrorTest;Trusted_Connection=True;TrustServerCertificate=True;");
-            Environment.SetEnvironmentVariable("Jwt__Secret",
-                "test-signing-secret-minimum-32-chars-long!!");
-        }
-
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            builder.UseEnvironment("Testing");
-
-            builder.ConfigureServices(services =>
-            {
-                var dbDescriptor = services.FirstOrDefault(
-                    d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-                if (dbDescriptor is not null) services.Remove(dbDescriptor);
-
-                services.AddDbContext<AppDbContext>(opt =>
-                    opt.UseInMemoryDatabase("AdminRoleRoutingTest"));
-            });
-        }
     }
 }

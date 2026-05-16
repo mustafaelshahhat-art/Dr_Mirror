@@ -30,16 +30,23 @@ export default defineConfig([
         'warn',
         {
           mode: 'jsx-only',
-          // Allow single-char strings (punctuation, separators) and known safe patterns.
-          ignore: ['·', '—', ':', ',', '.', '/', ' ', '•', '(', ')'],
-          // Allow route paths, aria values, and data attributes to stay as literals.
-          ignoreAttribute: [
-            'className', 'style', 'href', 'to', 'path', 'type', 'dir', 'role',
-            'aria-label', 'aria-labelledby', 'aria-describedby', 'aria-hidden',
-            'data-testid', 'htmlFor', 'name', 'id', 'autoComplete', 'inputMode',
-            'variant', 'size', 'tone', 'as', 'key', 'target', 'rel',
-            'rows', 'maxLength', 'placeholder', 'defaultValue',
-          ],
+          words: {
+            exclude: [
+              '[0-9!-/:-@[-`{-~]+',
+              '[A-Z_-]+',
+              '·', '—', ' ', '•',
+            ],
+          },
+          'jsx-attributes': {
+            exclude: [
+              'className', 'style', 'styleName', 'href', 'to', 'path', 'type', 'dir', 'role',
+              'aria-label', 'aria-labelledby', 'aria-describedby', 'aria-hidden',
+              'aria-controls', 'aria-expanded',
+              'data-testid', 'htmlFor', 'name', 'id', 'autoComplete', 'inputMode',
+              'variant', 'size', 'tone', 'as', 'key', 'target', 'rel',
+              'rows', 'maxLength', 'placeholder', 'defaultValue',
+            ],
+          },
         },
       ],
     },
