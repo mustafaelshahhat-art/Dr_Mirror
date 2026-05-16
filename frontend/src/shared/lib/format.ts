@@ -24,7 +24,7 @@ export function formatNumber(n: number): string {
  *
  * Both use US-style grouping (comma thousands, period decimal) so prices
  * render correctly under `font-variant-numeric: tabular-nums`. Override
- * `currency` only for non-EGP futures (multi-currency is M5+).
+ * `currency` only for non-EGP futures.
  */
 export function formatCurrency(
   amount: number,

@@ -69,9 +69,7 @@ public sealed class DatabaseSeeder
     }
 
     /// <summary>
-    /// Idempotently seed the buyer-selectable payment methods. Phase 2a ships
-    /// only Cash-on-Delivery; Instapay + Wallet land in Phase 2b alongside the
-    /// payment-proof upload pipeline.
+    /// Idempotently seed the buyer-selectable payment methods.
     /// </summary>
     private async Task EnsurePaymentMethodsAsync(CancellationToken ct)
     {

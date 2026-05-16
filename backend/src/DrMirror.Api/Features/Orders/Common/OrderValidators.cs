@@ -14,8 +14,7 @@ internal sealed class ShippingAddressValidator : AbstractValidator<ShippingAddre
 {
     /// <summary>
     /// Egyptian phone: optional <c>+20</c>, then 10–11 digits. Permissive in V1
-    /// so we don't reject legitimate land-line numbers; tighten in M4 once we
-    /// know the buyer mix.
+    /// so we don't reject legitimate land-line numbers.
     /// </summary>
     private static readonly System.Text.RegularExpressions.Regex PhoneRegex =
         new(@"^\+?\d[\d\s\-]{8,18}\d$", System.Text.RegularExpressions.RegexOptions.Compiled);

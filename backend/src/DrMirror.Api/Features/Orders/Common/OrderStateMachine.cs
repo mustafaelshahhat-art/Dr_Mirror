@@ -23,7 +23,7 @@ public sealed class OrderStateMachine
 {
     private static readonly Dictionary<(OrderStatus From, OrderActor Actor), OrderStatus[]> _allowed = new()
     {
-        // -- Pending (initial for Instapay/Wallet in Phase 2b; COD skips this). ---
+        // -- Pending (initial for Instapay/Wallet; COD skips this). ---
         { (OrderStatus.Pending, OrderActor.Buyer), new[] { OrderStatus.Cancelled } },
         { (OrderStatus.Pending, OrderActor.Admin), new[] { OrderStatus.Cancelled } },
         { (OrderStatus.Pending, OrderActor.System), new[] { OrderStatus.PendingPaymentReview, OrderStatus.Confirmed } },

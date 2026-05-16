@@ -15,7 +15,7 @@ namespace DrMirror.Api.Features.Orders.UploadPaymentProof;
 /// Buyer uploads a payment-proof screenshot for an Instapay / Wallet order.
 /// Validates MIME + size, stores via <see cref="IFileStorageService"/>, then
 /// moves the order to <see cref="OrderStatus.PendingPaymentReview"/> via the
-/// FSM (System actor) and notifies the buyer + (M4) admin queue.
+/// FSM (System actor) and notifies the buyer + admin queue.
 /// </summary>
 public static class UploadPaymentProofEndpoint
 {

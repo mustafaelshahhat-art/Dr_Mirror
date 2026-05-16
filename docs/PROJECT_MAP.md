@@ -26,7 +26,6 @@ Backend
 - FluentValidation 11, Mapster
 - Serilog (Async + File + Console + CorrelationId)
 - MailKit 4 (SMTP)
-- Coravel 6 (scheduled + queued jobs)
 - CloudinaryDotNet
 
 Data
@@ -73,19 +72,19 @@ Admin
     Orders: queue filtered by status; transitions via OrderStateMachine; proof Approve / Reject
     Payments: seeded COD + Instapay + Wallet (admin CRUD)
     Inquiries: inbox
-    Users: role management
+    Users: read-only list with role badges
 
 Async
-  Email sending → Coravel queue (`IQueue` + `IInvocable` jobs)
+  Email sending → Durable Outbox pattern (`EmailOutboxProcessor` polling `EmailOutboxMessages`)
   Provider env-switched: `Email:Provider=logonly` (dev) | `mailkit` (prod)
-  Order-status emails: `SendOrderConfirmationJob`, `SendPaymentReviewNeededJob`,
-    `SendStatusChangedJob` — fired after every commit; carry the *event-time* status
-    in the payload so a later transition doesn't overwrite the subject line.
+  Order-status emails: triggered by `OutboxMessageDispatcher` after every commit; carry
+  the *event-time* status in the payload so a later transition doesn't overwrite the subject line.
 
 File storage (payment proofs)
   Provider env-switched: `FileStorage:Provider=local` (dev) | `cloudinary` (prod)
   Local writes to `wwwroot/uploads/payment-proofs/<orderNumber>/<guid>.<ext>`;
   Cloudinary streams the upload and returns a CDN URL + public id.
+  **Payment proofs are served via an authenticated streaming endpoint** (`/api/orders/{orderNumber}/proof/{proofId}/file`), not as public static files.
   Extension is *always* derived from the validated content-type, never from
   the user-supplied filename.
 
@@ -149,8 +148,8 @@ Security
 - **Stock decrement on checkout** — variant stock is decremented in the same `SaveChangesAsync` that creates the order and clears the cart, so they're atomic. Cancel (buyer or admin) restocks. No row-level lock yet — two concurrent checkouts on the same variant can pass the stock check together; load-tested protection (`UPDLOCK`/rowversion + retry) is in the M4 backlog.
 - **Snapshots vs. live joins on `Order`** — Item name / colour / SKU / size / unit price are **snapshotted** onto `OrderItem` so historical orders survive upstream catalog edits. Payment-method name + kind are snapshotted on `Order`; instructions + receiving account number are read **live** from the `PaymentMethod` navigation. Admin can therefore rotate an Instapay handle without rewriting history (trade-off documented; M4 may snapshot all fields if the buyer mix demands it).
 - **File storage abstraction** — `IFileStorageService` with `LocalFileStorageService` (dev, writes to `wwwroot/uploads`) and `CloudinaryFileStorageService` (prod). Env-switched via `FileStorage:Provider`. The endpoint validates MIME against an image-only allow-list and enforces `MaxFileSizeBytes`; the storage layer **always** derives the on-disk extension from the validated content-type, never from `originalFileName`, to prevent footguns like `evil.php` being persisted with its original extension.
-- **Email abstraction** — `IEmailSender` with `LogOnlyEmailSender` (dev) and `MailKitEmailSender` (prod). Env-switched via `Email:Provider`. Coravel `IQueue` queues `IInvocable` jobs that own their own scoped `AppDbContext`. The status-changed job carries an `OrderStatusChangedPayload(OrderId, EventStatus)` — never reads "current" status — so rapid transitions don't collapse multiple emails into the final-state subject.
-- **Egyptian shipping address (M3 minimum)** — owned value object inlined on `Order` with columns `ShipRecipientName`, `ShipPhone`, `ShipGovernorate`, `ShipCity`, `ShipStreetAddress`, optional `ShipFloor`/`ShipApartment`/`ShipLandmark`/`ShipNotes`. Phone validated by a permissive regex (`^\+?\d[\d\s\-]{8,18}\d$`); governorate is free-text in M3 and will tighten to the 27-governorate enum in M4 once the admin UX lands. No multi-address book in V1.
+- **Email abstraction** — `IEmailSender` with `LogOnlyEmailSender` (dev) and `MailKitEmailSender` (prod). Env-switched via `Email:Provider`. Durable outbox background service polls and dispatches messages with their own scoped `AppDbContext`. The status-changed job carries an `OrderStatusChangedPayload(OrderId, EventStatus)` — never reads "current" status — so rapid transitions don't collapse multiple emails into the final-state subject.
+- **Egyptian shipping address** — owned value object inlined on `Order` with columns `ShipRecipientName`, `ShipPhone`, `ShipGovernorate`, `ShipCity`, `ShipStreetAddress`, optional `ShipFloor`/`ShipApartment`/`ShipLandmark`/`ShipNotes`. Phone validated by a permissive regex (`^\+?\d[\d\s\-]{8,18}\d$`); governorate is validated against a 27-governorate enum. Multiple saved addresses are available via the address book.
 - **Admin authorization on the SPA** — Route tree is split into customer shell (`<Layout />` + `<Header />` with `<CustomerRoute />` gate for storefront, `<ProtectedRoute />` for checkout/account) and admin shell (`<AdminLayout />` + `<AdminSidebar />` + `<AdminHeader />` under `<AdminRoute />`). `isAdmin` is derived once on the auth context (`user?.roles.includes('Admin') ?? false`). `resolvePostAuthDestination(user, from)` governs every post-login/register redirect: admin → `/admin`, buyer → recorded `from` (non-admin URL) or `/`. Admins cannot reach `/`, `/products/*`, `/cart`, `/checkout`, `/account/*`; buyers cannot reach `/admin/*`. All gates block on `isBootstrapping` (spinner) to prevent flash of unauthorized content. Customer `Header` short-circuits to `null` when `isAdmin` is true as a defensive guard.
 - **Multipart upload from Axios** — Axios v1 auto-emits `multipart/form-data; boundary=…` when a `FormData` body is detected, BUT only if no explicit `Content-Type` header is set. Setting it manually drops the boundary and breaks the server-side parser. Every multipart caller in this repo (currently `ordersApi.uploadPaymentProof`) lets Axios pick the header.
 - **Static files for /uploads** — `app.UseStaticFiles()` mounted before auth middleware; the `LocalFileStorageService` provider creates `wwwroot/uploads` at boot. URLs include an unguessable GUID and are only emitted in order-detail responses (which already require auth + ownership / admin role), so the lack of additional auth on the file URL itself is acceptable for V1.
@@ -188,22 +187,24 @@ Security
 - **Cart persistence** → hybrid. Guest cart in `localStorage` (`dr_mirror.guest_cart.v1`), server cart on `Cart`/`CartItem` keyed by `UserId`. `CartProvider` auto-merges on sign-in via `/api/cart/merge`. Dedup on `(CartId, ProductVariantId)`.
 - **Order number scheme** → `DM-{YYYY}-{NNNNNN}` (6-digit yearly counter, semaphore-serialised within process).
 - **Order state machine** → 8 statuses (`Pending`, `Confirmed`, `PendingPaymentReview`, `Paid`, `Preparing`, `Shipped`, `Delivered`, `Cancelled`); transitions gated by `(from, actor)` matrix; `OrderStateMachine.Transition` is the only legal writer to `Order.Status`.
-- **Address field set (M3 minimum)** → owned value object on `Order`. `RecipientName`, `Phone` (Egyptian regex), `Governorate` (free string in M3, enum in M4), `City`, `StreetAddress`, optional `Floor`/`Apartment`/`Landmark`/`Notes`. No multi-address book in V1.
-- **Payment methods (seeded)** → COD, Instapay (`drmirror@instapay`), Wallet (`01001234567`). Admin CRUD UI lands M4; numbers are placeholders to be edited via the M4 admin tool.
+- **Address field set (M3 minimum)** → owned value object on `Order`. `RecipientName`, `Phone` (Egyptian regex), `Governorate` (validated against 27-governorate enum), `City`, `StreetAddress`, optional `Floor`/`Apartment`/`Landmark`/`Notes`.
+- **Payment methods (seeded)** → COD, Instapay (`drmirror@instapay`), Wallet (`01001234567`). Admin CRUD UI allows editing these.
 - **Payment proof storage abstraction** → `IFileStorageService` with `LocalFileStorageService` (dev) + `CloudinaryFileStorageService` (prod). Env-switched via `FileStorage:Provider`. Image-only MIME allow-list. Extension *always* derived from content-type, never from filename.
-- **Email abstraction + queue** → `IEmailSender` with `LogOnlyEmailSender` (dev) + `MailKitEmailSender` (prod). Env-switched via `Email:Provider`. Coravel `IQueue` + 3 `IInvocable` jobs (`SendOrderConfirmationJob`, `SendPaymentReviewNeededJob`, `SendStatusChangedJob`). Status job carries event-time status to avoid subject drift on rapid transitions.
-- **Stock semantics** → decrement on order creation, restock on cancel (buyer- or admin-initiated). No row lock yet — see M4 backlog.
+- **Email abstraction + queue** → `IEmailSender` with `LogOnlyEmailSender` (dev) + `MailKitEmailSender` (prod). Env-switched via `Email:Provider`. Durable outbox background service (`EmailOutboxProcessor`). Status job carries event-time status to avoid subject drift on rapid transitions.
+- **Stock semantics** → decrement on order creation, restock on cancel (buyer- or admin-initiated). No row lock yet — see backlog.
 - **Admin role gate** → frontend `AdminRoute` (bounces unauthorised buyers to `/`), backend `RequireRole(Admin)` on every `/api/admin/*` endpoint.
 
+### Resolved at M4
+- Address book (multiple saved addresses per buyer + default-address picker)
+- Admin payment-method CRUD + product upload UI
+- Lock `Governorate` to the 27-Egyptian-governorate enum
+- Inquiry slice (per-product + general)
+- Vitest setup + frontend smoke tests for role-based routing
+- i18n-coverage build check script (fails CI on missing keys between ar/en)
+
 ### Still open (will be resolved per milestone)
-- Concurrent-checkout stock-decrement race protection (`UPDLOCK` or rowversion retry) — M4 load-test follow-up
-- Address book (multiple saved addresses per buyer + default-address picker) — M4
-- Admin payment-method CRUD + product upload UI — M4
-- Admin orders bulk operations + CSV export — M4
-- Lock `Governorate` to the 27-Egyptian-governorate enum — M4
-- Real-time push when admin reviews a proof (SignalR or polling) — M5+
-- Inquiry slice (per-product + general) — M4
-- Production domain + Cloudinary credentials + real SMTP secrets — M9
-- Vitest setup + frontend smoke tests for role-based routing — M5 tooling (no test runner on frontend today; backend `AdminRoleRoutingTests` covers server-side invariant)
-- Buyer `/account` ShellPage rebuild into a proper buyer dashboard — M5 UX (current stub links to orders and addresses)
-- i18n-coverage build check script (fails CI on missing keys between ar/en) — M5 tooling
+- Concurrent-checkout stock-decrement race protection (`UPDLOCK` or rowversion retry) — load-test follow-up
+- Admin orders bulk operations + CSV export
+- Real-time push when admin reviews a proof (SignalR or polling)
+- Production domain + Cloudinary credentials + real SMTP secrets
+- Buyer `/account` ShellPage rebuild into a proper buyer dashboard (current stub links to orders and addresses)

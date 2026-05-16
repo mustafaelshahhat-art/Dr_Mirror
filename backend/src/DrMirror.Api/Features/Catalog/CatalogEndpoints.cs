@@ -8,8 +8,8 @@ public static class CatalogEndpoints
 {
     /// <summary>
     /// Mounts the public read-side catalog endpoints under <c>/api/catalog</c>.
-    /// Everything is anonymous-readable; the admin write-side lands in M4
-    /// under a separate auth-gated group (likely <c>/api/admin/catalog</c>).
+    /// Everything is anonymous-readable; the admin write-side lands
+    /// under a separate auth-gated group.
     /// </summary>
     public static IEndpointRouteBuilder MapCatalogEndpoints(this IEndpointRouteBuilder app)
     {

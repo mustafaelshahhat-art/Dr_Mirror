@@ -4,7 +4,7 @@ An online store for medical scrubs and uniforms, built for the Egyptian market. 
 
 ## Stack
 
-- **Backend** — .NET 10, ASP.NET Core (Minimal APIs, vertical slices), EF Core, SQL Server, ASP.NET Identity + JWT, Serilog, Coravel, MailKit, Cloudinary. Hosted on MonsterASP.NET.
+- **Backend** — .NET 10, ASP.NET Core (Minimal APIs, vertical slices), EF Core, SQL Server, ASP.NET Identity + JWT, Serilog, MailKit, Cloudinary. Hosted on MonsterASP.NET.
 - **Frontend** — React 19, TypeScript, Vite, HeroUI, Tailwind CSS v4, i18next, React Query. Hosted on Vercel.
 - **Fonts** — Satoshi (Latin) and Alexandria (Arabic), self-hosted variable WOFF2, preloaded.
 - **Theming** — Dark-first; light and dark both ship; user choice persisted; full RTL parity.
@@ -41,6 +41,23 @@ npm run dev
 
 Opens at `http://localhost:5173` in Arabic + dark mode.
 
+## Testing & Quality
+
+**Backend Tests**
+```powershell
+cd backend
+dotnet test
+```
+*Tests run entirely in-memory by default. To opt-in to SQL Server integration tests (isolates per test run), set the `DRMIRROR_TEST_SQL_CONNECTION` environment variable.*
+
+**Frontend Tests & Checks**
+```powershell
+cd frontend
+npm test           # Run Vitest suite
+npm run build      # Verify TypeScript compilation and Vite build
+npm run i18n:check # Verify Arabic/English localization key parity
+```
+
 ## Environment
 
 Secrets are never committed. Configure via environment variables:
@@ -50,7 +67,7 @@ Secrets are never committed. Configure via environment variables:
 | `ConnectionStrings__Default` | MSSQL connection string |
 | `Jwt__Issuer`, `Jwt__Audience`, `Jwt__Secret` | JWT config |
 | `Admin__SeedEmail`, `Admin__SeedPassword` | Seeded admin account (first boot only) |
-| `Cors__AllowedOrigins` | Allowed CORS origins |
+| `Cors__AllowedOrigins__0` | Allowed CORS origins (array format required) |
 | `Auth__UseCrossSiteCookies` | Set `true` in prod when SPA and API are on different origins |
 | `Catalog__SeedSamples` | `true` in Development — seeds 5 categories, 10 products, ~133 variants on first boot |
 | `FileStorage__Provider` | `local` (dev) or `cloudinary` (prod) |
@@ -88,7 +105,21 @@ dotnet ef database update `
 
 ## Status
 
-The store is functional end-to-end: customers can browse the catalog, manage a cart, check out, upload payment proof, and track orders through an eight-state lifecycle. Admins have a dashboard, order queue with proof approve/reject, product and category CRUD, and an inquiry inbox. Current focus is M4 — polishing admin workflows and advanced order operations.
+The store is functional end-to-end: customers can browse the catalog, manage a cart, check out, upload payment proof, and track orders through an eight-state lifecycle. Payment proofs are stored privately and streamed via an authenticated endpoint. Cash on Delivery requires no proof upload; online flows (Instapay/Wallet) do.
+
+Admins have a dashboard, order queue with proof approve/reject, product and category CRUD, an inquiry inbox, and a read-only list of users with role badges.
+
+Email delivery utilizes a durable outbox pattern (polling) to guarantee status emails survive transient network faults.
+
+Current focus is Phase 5 — Documentation cleanup and final repository hygiene.
+
+## Production Deployment
+
+1. **Database:** Create an empty SQL Server database.
+2. **Migrations:** Ensure `.NET SDK` is installed, then run `dotnet ef database update --project backend/src/DrMirror.Api`.
+3. **Backend App:** Deploy the compiled .NET outputs. Set `ASPNETCORE_ENVIRONMENT=Production` and configure all required environment variables listed above (particularly `ConnectionStrings__Default`, `Jwt__*`, and `FileStorage__*`). Ensure the app can write to its current directory if using local file storage or SQLite.
+4. **Frontend App:** Run `npm run build`. Set `VITE_API_BASE_URL` to your backend's production root (e.g. `https://api.drmirror.com`). Deploy the `dist` folder to a static host like Vercel or IIS.
+5. **Verify:** Check `<backend_url>/api/health` and attempt to log in with the seeded admin credentials.
 
 ---
 

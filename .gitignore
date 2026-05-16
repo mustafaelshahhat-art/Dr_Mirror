@@ -27,6 +27,7 @@ dist-ssr/
 out/
 .vite/
 *.local
+frontend/eslint-out.json
 
 # --- Logs ---
 logs/

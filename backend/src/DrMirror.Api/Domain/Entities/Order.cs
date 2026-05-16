@@ -76,7 +76,7 @@ public class Order
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
 
     /// <summary>
-    /// Payment-proof uploads (Phase 2b — Instapay / Wallet flow). Empty for
+    /// Payment-proof uploads (Instapay / Wallet flow). Empty for
     /// COD orders. The latest <c>Pending</c> proof is the authoritative one
     /// for admin review.
     /// </summary>

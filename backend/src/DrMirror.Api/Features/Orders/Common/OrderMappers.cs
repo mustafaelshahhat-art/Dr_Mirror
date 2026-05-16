@@ -72,7 +72,7 @@ internal static class OrderMappers
         PaymentMethodNameEn: order.PaymentMethodNameEn,
         PaymentMethodNameAr: order.PaymentMethodNameAr,
         // The instructions / receiving-account live on the current PaymentMethod
-        // row (kept live so admin can edit Instapay numbers in M4 without
+        // row (kept live so admin can edit Instapay numbers without
         // re-issuing emails). Falls back to null if the nav wasn't loaded.
         PaymentInstructionsEn: order.PaymentMethod?.InstructionsEn,
         PaymentInstructionsAr: order.PaymentMethod?.InstructionsAr,

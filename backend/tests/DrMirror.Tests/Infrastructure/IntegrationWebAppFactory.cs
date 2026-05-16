@@ -12,7 +12,7 @@ namespace DrMirror.Tests.Infrastructure;
 /// Base for integration tests that need a real <see cref="WebApplicationFactory{TEntryPoint}"/>.
 /// Centralizes the four env vars Program.cs needs before <c>WebApplication.CreateBuilder</c>
 /// can succeed, swaps <c>AppDbContext</c> to an isolated in-memory database, and strips
-/// Coravel's <c>QueuingHost</c> background service so its scheduler timer can't race with
+/// <c>EmailOutboxProcessor</c> background service so its scheduler timer can't race with
 /// test teardown.
 ///
 /// <para>
@@ -102,11 +102,5 @@ public abstract class IntegrationWebAppFactory : WebApplicationFactory<Program>
             d => d.ImplementationType == typeof(EmailOutboxProcessor));
         if (outboxProcessor is not null)
             services.Remove(outboxProcessor);
-
-        // Also remove any lingering Coravel QueuingHost if present.
-        var queuingHost = services.FirstOrDefault(
-            d => d.ImplementationType?.FullName?.Contains("QueuingHost") == true);
-        if (queuingHost is not null)
-            services.Remove(queuingHost);
     }
 }

@@ -4,7 +4,7 @@ namespace DrMirror.Api.Domain.Orders;
 /// The kind of payment a <c>PaymentMethod</c> represents. Drives both UX
 /// (proof upload required? account number shown?) and the order's initial
 /// status at checkout (<see cref="Cod"/> → Confirmed, others → Pending until
-/// proof reviewed in Phase 2b).
+/// proof reviewed).
 /// </summary>
 public enum PaymentMethodKind
 {

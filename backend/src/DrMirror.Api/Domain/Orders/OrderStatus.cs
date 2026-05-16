@@ -8,7 +8,7 @@ namespace DrMirror.Api.Domain.Orders;
 public enum OrderStatus
 {
     /// <summary>
-    /// Initial state for Instapay/Wallet flows (Phase 2b). COD orders skip
+    /// Initial state for Instapay/Wallet flows. COD orders skip
     /// straight to <see cref="Confirmed"/> at creation time.
     /// </summary>
     Pending = 0,
@@ -16,7 +16,7 @@ public enum OrderStatus
     /// <summary>Buyer's contract is locked in. For COD this is the on-creation state.</summary>
     Confirmed = 1,
 
-    /// <summary>Buyer uploaded a payment proof — awaiting admin review (Phase 2b).</summary>
+    /// <summary>Buyer uploaded a payment proof — awaiting admin review.</summary>
     PendingPaymentReview = 2,
 
     /// <summary>Admin approved the payment proof.</summary>

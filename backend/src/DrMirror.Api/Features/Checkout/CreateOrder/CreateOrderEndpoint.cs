@@ -72,7 +72,7 @@ public static class CreateOrderEndpoint
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        // Phase 2b: COD and the two online flows (Instapay/Wallet) are accepted.
+        // COD and the two online flows (Instapay/Wallet) are accepted.
         // The initial order status differs — see the FSM call below.
 
         // ---- Resolve shipping address from saved book or inline payload. -------
