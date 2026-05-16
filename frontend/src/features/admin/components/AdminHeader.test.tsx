@@ -32,4 +32,23 @@ describe('AdminHeader', () => {
     expect(screen.getByRole('banner')).toBeInTheDocument();
     expect(screen.getByText('Admin dashboard')).toBeInTheDocument();
   });
+
+  it('uses the active admin route as the header title', () => {
+    renderWithProviders(<AdminHeader onMenuPress={vi.fn()} />, {
+      route: '/admin/orders',
+      authValue: makeAuthValue({ user: makeAdminUser(), isAuthenticated: true, isAdmin: true }),
+    });
+
+    expect(screen.getByText('Orders')).toBeInTheDocument();
+    expect(screen.queryByText('Admin dashboard')).not.toBeInTheDocument();
+  });
+
+  it('shows product create breadcrumb context', () => {
+    renderWithProviders(<AdminHeader onMenuPress={vi.fn()} />, {
+      route: '/admin/products/new',
+      authValue: makeAuthValue({ user: makeAdminUser(), isAuthenticated: true, isAdmin: true }),
+    });
+
+    expect(screen.getByText('Products / New product')).toBeInTheDocument();
+  });
 });

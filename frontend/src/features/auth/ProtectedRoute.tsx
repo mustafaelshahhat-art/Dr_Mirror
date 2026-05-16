@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Spinner } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from './useAuth';
 import { resolvePostAuthDestination } from './postAuthDestination';
+import { setForbiddenMessage } from '../../shared/lib/forbidden-store';
 
 export function ProtectedRoute() {
   const { t } = useTranslation();
@@ -23,7 +25,12 @@ export function ProtectedRoute() {
   }
 
   if (isAdmin) {
-    return <Navigate to="/admin" replace />;
+    return (
+      <ForbiddenRedirect
+        to="/admin"
+        message={t('admin.shell.forbidden.buyerOnly')}
+      />
+    );
   }
 
   return <Outlet />;
@@ -42,7 +49,12 @@ export function CustomerRoute() {
   }
 
   if (isAdmin) {
-    return <Navigate to="/admin" replace />;
+    return (
+      <ForbiddenRedirect
+        to="/admin"
+        message={t('admin.shell.forbidden.buyerOnly')}
+      />
+    );
   }
 
   return <Outlet />;
@@ -66,7 +78,12 @@ export function AdminRoute() {
   }
 
   if (!user.roles.includes('Admin')) {
-    return <Navigate to="/" replace />;
+    return (
+      <ForbiddenRedirect
+        to="/"
+        message={t('admin.shell.forbidden.adminOnly')}
+      />
+    );
   }
 
   return <Outlet />;
@@ -99,4 +116,12 @@ function getSafeNextPath(search: string): string | null {
   if (next === null || !next.startsWith('/') || next.startsWith('//')) return null;
 
   return next;
+}
+
+function ForbiddenRedirect({ to, message }: { to: string; message: string }) {
+  useEffect(() => {
+    setForbiddenMessage(message);
+  }, [message]);
+
+  return <Navigate to={to} replace />;
 }

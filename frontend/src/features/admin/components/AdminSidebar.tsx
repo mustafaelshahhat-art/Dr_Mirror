@@ -12,6 +12,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
+import { ADMIN_DRAWER_HEIGHT_CLASS, ADMIN_HEADER_OFFSET_CLASS } from './adminShellTokens';
+
 const NAV_GROUPS = [
   {
     groupKey: 'operations',
@@ -49,18 +51,22 @@ export function AdminSidebar({
 
   return (
     <>
-      <aside
-        aria-label={t('admin.shell.navTitle')}
-        className="hidden w-56 flex-col border-e border-divider/60 bg-content1 md:flex"
-      >
-        <SidebarNav onClose={onClose} />
-      </aside>
+      <div className="hidden w-56 flex-col border-e border-divider/60 bg-content1 md:flex">
+        <SidebarNav label={t('admin.shell.navTitle')} onClose={onClose} />
+      </div>
 
       <Drawer isOpen={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
-        <Drawer.Backdrop variant="transparent" className="bg-background/70">
+        <Drawer.Backdrop
+          variant="transparent"
+          className={['bg-background/70', ADMIN_HEADER_OFFSET_CLASS, ADMIN_DRAWER_HEIGHT_CLASS].join(' ')}
+        >
           <Drawer.Content
             placement={placement}
-            className="w-56 max-w-xs rounded-none border-divider/60 bg-background p-0 data-[placement=left]:border-e data-[placement=right]:border-s"
+            className={[
+              'w-56 max-w-xs rounded-none border-divider/60 bg-background p-0 data-[placement=left]:border-e data-[placement=right]:border-s',
+              ADMIN_HEADER_OFFSET_CLASS,
+              ADMIN_DRAWER_HEIGHT_CLASS,
+            ].join(' ')}
           >
             <Drawer.Dialog aria-label={t('admin.shell.navTitle')} className="flex h-full flex-col outline-none">
               <Drawer.Header className="flex items-center justify-between border-b border-divider/60 px-3 py-3">
@@ -70,7 +76,7 @@ export function AdminSidebar({
                 <Drawer.CloseTrigger />
               </Drawer.Header>
               <Drawer.Body className="p-0">
-                <SidebarNav onClose={onClose} />
+                <SidebarNav label={t('admin.shell.navTitle')} onClose={onClose} />
               </Drawer.Body>
             </Drawer.Dialog>
           </Drawer.Content>
@@ -80,11 +86,11 @@ export function AdminSidebar({
   );
 }
 
-function SidebarNav({ onClose }: { onClose?: () => void }) {
+function SidebarNav({ label, onClose }: { label: string; onClose?: () => void }) {
   const { t } = useTranslation();
 
   return (
-    <nav className="flex flex-1 flex-col overflow-y-auto px-2 pb-4 pt-2">
+    <nav aria-label={label} className="flex flex-1 flex-col overflow-y-auto px-2 pb-4 pt-2">
       {NAV_GROUPS.map((group) => (
         <div key={group.groupKey}>
           <p className="px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-wide text-default-400">

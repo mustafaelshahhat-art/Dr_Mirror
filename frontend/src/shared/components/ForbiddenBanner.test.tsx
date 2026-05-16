@@ -20,7 +20,7 @@ describe('ForbiddenBanner', () => {
     setForbiddenMessage('Access denied');
     renderWithProviders(<ForbiddenBanner />);
 
-    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('Access denied');
   });
 
   it('dismiss button clears the message', async () => {

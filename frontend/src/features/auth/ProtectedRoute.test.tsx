@@ -2,9 +2,11 @@
 import { screen } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeAdminUser, makeAuthValue, makeBuyerUser, renderWithProviders } from '../../test/utils';
+import { ForbiddenBanner } from '../../shared/components/ForbiddenBanner';
+import { setForbiddenMessage } from '../../shared/lib/forbidden-store';
 import type { AuthContextValue } from './AuthContext';
 import { AdminRoute, CustomerRoute, ProtectedRoute, PublicOnlyRoute } from './ProtectedRoute';
 
@@ -23,6 +25,10 @@ const buyerAuth = makeAuthValue({ user: makeBuyerUser(), isAuthenticated: true, 
 const adminAuth = makeAuthValue({ user: makeAdminUser(), isAuthenticated: true, isAdmin: true });
 
 describe('route gates', () => {
+  beforeEach(() => {
+    setForbiddenMessage(null);
+  });
+
   describe('ProtectedRoute', () => {
     it('shows the session bootstrap state', async () => {
       renderGate(<ProtectedRoute />, '/checkout', makeAuthValue({ isBootstrapping: true }), 'checkout', 'Protected target');
@@ -47,6 +53,9 @@ describe('route gates', () => {
       renderGate(<ProtectedRoute />, '/checkout', adminAuth, 'checkout', 'Protected target');
 
       expect(await screen.findByRole('heading', { name: 'Admin target' })).toBeInTheDocument();
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Buyer pages are not available while you are signed in as an admin. You have been returned to the admin dashboard.',
+      );
     });
   });
 
@@ -74,6 +83,9 @@ describe('route gates', () => {
       renderGate(<CustomerRoute />, '/cart', adminAuth, 'cart', 'Customer target');
 
       expect(await screen.findByRole('heading', { name: 'Admin target' })).toBeInTheDocument();
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Buyer pages are not available while you are signed in as an admin. You have been returned to the admin dashboard.',
+      );
     });
   });
 
@@ -95,6 +107,9 @@ describe('route gates', () => {
       renderGate(<AdminRoute />, '/admin/users', buyerAuth, 'admin/users', 'Admin users target');
 
       expect(await screen.findByRole('heading', { name: 'Storefront target' })).toBeInTheDocument();
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'The admin dashboard is for operators only. You have been returned to the storefront.',
+      );
     });
 
     it('allows admins through', async () => {
@@ -140,16 +155,19 @@ function renderGate(
   guardedHeading: string,
 ) {
   return renderWithProviders(
-    <Routes>
-      <Route element={gate}>
-        <Route path={guardedPath} element={<h1>{guardedHeading}</h1>} />
-      </Route>
-      <Route path="/" element={<h1>Storefront target</h1>} />
-      <Route path="/login" element={<h1>Login target</h1>} />
-      <Route path="/checkout" element={<h1>Checkout target</h1>} />
-      <Route path="/admin" element={<h1>Admin target</h1>} />
-      <Route path="/admin/orders" element={<h1>Admin orders target</h1>} />
-    </Routes>,
+    <>
+      <ForbiddenBanner />
+      <Routes>
+        <Route element={gate}>
+          <Route path={guardedPath} element={<h1>{guardedHeading}</h1>} />
+        </Route>
+        <Route path="/" element={<h1>Storefront target</h1>} />
+        <Route path="/login" element={<h1>Login target</h1>} />
+        <Route path="/checkout" element={<h1>Checkout target</h1>} />
+        <Route path="/admin" element={<h1>Admin target</h1>} />
+        <Route path="/admin/orders" element={<h1>Admin orders target</h1>} />
+      </Routes>
+    </>,
     { route, authValue },
   );
 }

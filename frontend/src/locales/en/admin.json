@@ -299,7 +299,9 @@
     },
     "forbidden": {
       "title": "Access denied",
-      "description": "You don't have permission to view this page."
+      "description": "You don't have permission to view this page.",
+      "adminOnly": "The admin dashboard is for operators only. You have been returned to the storefront.",
+      "buyerOnly": "Buyer pages are not available while you are signed in as an admin. You have been returned to the admin dashboard."
     },
     "signOutConfirm": {
       "title": "Sign out?",

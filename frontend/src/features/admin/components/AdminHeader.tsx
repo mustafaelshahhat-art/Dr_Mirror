@@ -1,20 +1,24 @@
 import { Button } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Menu } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 import { useAuth } from '../../auth/useAuth';
 import { LangSwitcher } from '../../../shared/components/LangSwitcher';
 import { ThemeToggle } from '../../../shared/components/ThemeToggle';
+import { ADMIN_HEADER_HEIGHT_CLASS } from './adminShellTokens';
 
 export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
   const { t } = useTranslation();
   const { user, logout, isAdmin } = useAuth();
+  const location = useLocation();
+  const titleKeys = getAdminHeaderTitleKeys(location.pathname);
 
   if (!isAdmin) return null;
 
   return (
     <header className="sticky top-0 z-40 border-b border-divider/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-14 items-center justify-between gap-3 px-4 md:px-6">
+      <div className={['flex items-center justify-between gap-3 px-4 md:px-6', ADMIN_HEADER_HEIGHT_CLASS].join(' ')}>
         <div className="flex items-center gap-2">
           <Button
             isIconOnly
@@ -27,7 +31,7 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
             <Menu size={18} aria-hidden />
           </Button>
           <span className="text-sm font-semibold tracking-tight text-default-700 dark:text-default-300">
-            {t('admin.hub.title')}
+            {titleKeys.map((key) => t(key)).join(' / ')}
           </span>
         </div>
 
@@ -51,4 +55,19 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
       </div>
     </header>
   );
+}
+
+function getAdminHeaderTitleKeys(pathname: string): string[] {
+  if (pathname === '/admin') return ['admin.hub.title'];
+  if (pathname.startsWith('/admin/orders')) return ['admin.shell.nav.orders'];
+  if (pathname.startsWith('/admin/inquiries')) return ['admin.shell.nav.inquiries'];
+  if (pathname === '/admin/products/new') {
+    return ['admin.shell.nav.products', 'admin.products.create.title'];
+  }
+  if (pathname.startsWith('/admin/products')) return ['admin.shell.nav.products'];
+  if (pathname.startsWith('/admin/categories')) return ['admin.shell.nav.categories'];
+  if (pathname.startsWith('/admin/payment-methods')) return ['admin.shell.nav.paymentMethods'];
+  if (pathname.startsWith('/admin/users')) return ['admin.shell.nav.users'];
+
+  return ['admin.hub.title'];
 }
