@@ -35,7 +35,7 @@ export function StatusFilterDropdown({ value, onChange }: StatusFilterDropdownPr
           const v = e.target.value;
           onChange(v === '' ? undefined : (Number(v) as OrderStatus));
         }}
-        className="rounded-medium border border-divider bg-background px-2 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+        className="rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
       >
         <option value="">{t('admin.filters.all')}</option>
         {ALL_STATUSES.map((s) => (

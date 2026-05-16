@@ -16,7 +16,7 @@ export function NotFoundPage() {
       </p>
       <Link
         to="/"
-        className="mt-2 rounded-medium bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+        className="mt-2 rounded-medium bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
       >
         {t('common.notFound.cta')}
       </Link>

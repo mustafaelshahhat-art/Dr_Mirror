@@ -18,9 +18,9 @@ export function PaginationControls({ page, totalPages, onPageChange }: Props) {
         onClick={() => onPageChange(page - 1)}
         disabled={page <= 1}
         aria-label={t('common.pagination.prev')}
-        className="inline-flex items-center gap-1 rounded-medium border border-divider px-3 py-1.5 text-xs font-medium text-default-600 transition-colors hover:bg-content2 disabled:pointer-events-none disabled:opacity-40"
+        className="inline-flex items-center gap-1 rounded-medium border border-divider/60 px-3 py-1.5 text-xs font-medium text-default-600 transition-colors hover:bg-content2 disabled:pointer-events-none disabled:opacity-40"
       >
-        <ChevronLeft className="size-3.5" aria-hidden />
+        <ChevronLeft className="size-3.5 rtl:rotate-180" aria-hidden />
         {t('common.pagination.prev')}
       </button>
       <span className="tabular-nums text-default-500">
@@ -31,10 +31,10 @@ export function PaginationControls({ page, totalPages, onPageChange }: Props) {
         onClick={() => onPageChange(page + 1)}
         disabled={page >= totalPages}
         aria-label={t('common.pagination.next')}
-        className="inline-flex items-center gap-1 rounded-medium border border-divider px-3 py-1.5 text-xs font-medium text-default-600 transition-colors hover:bg-content2 disabled:pointer-events-none disabled:opacity-40"
+        className="inline-flex items-center gap-1 rounded-medium border border-divider/60 px-3 py-1.5 text-xs font-medium text-default-600 transition-colors hover:bg-content2 disabled:pointer-events-none disabled:opacity-40"
       >
         {t('common.pagination.next')}
-        <ChevronRight className="size-3.5" aria-hidden />
+        <ChevronRight className="size-3.5 rtl:rotate-180" aria-hidden />
       </button>
     </div>
   );

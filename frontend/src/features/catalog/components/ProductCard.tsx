@@ -29,7 +29,7 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
   return (
     <Link
       to={`/products/${product.slug}`}
-      className="group flex flex-col overflow-hidden rounded-large border border-divider/60 bg-content1 transition-shadow hover:shadow-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="group flex flex-col overflow-hidden rounded-large border border-divider/60 bg-content1 transition-shadow hover:shadow-medium dark:hover:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-bone">
         {product.primaryImageUrl ? (
@@ -58,7 +58,7 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
           <GenderChip gender={product.gender} />
         </div>
 
-        <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
+        <h3 className="line-clamp-2 text-base font-medium leading-snug text-foreground">
           {name}
         </h3>
 

@@ -139,7 +139,7 @@ export function ProductMasterForm({ product }: { product: AdminProductDetailDto 
           <select
             value={gender}
             onChange={(e) => setGender(Number(e.target.value) as ProductGender)}
-            className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm"
+            className="w-full rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
             <option value={0}>{t('catalog.gender.men')}</option>
             <option value={1}>{t('catalog.gender.women')}</option>
@@ -157,7 +157,7 @@ export function ProductMasterForm({ product }: { product: AdminProductDetailDto 
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
             required
-            className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm"
+            className="w-full rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
             {(categories.data ?? []).map((c) => (
               <option key={c.id} value={c.id}>

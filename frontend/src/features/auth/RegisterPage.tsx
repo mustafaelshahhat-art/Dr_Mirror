@@ -79,6 +79,7 @@ export function RegisterPage() {
           label={t('auth.fullName')}
           autoComplete="name"
           isRequired
+          variant="underlined"
         />
 
         <FormField
@@ -88,6 +89,7 @@ export function RegisterPage() {
           type="email"
           autoComplete="email"
           isRequired
+          variant="underlined"
         />
 
         <FormField
@@ -98,6 +100,7 @@ export function RegisterPage() {
           autoComplete="new-password"
           description={t('auth.passwordHint')}
           isRequired
+          variant="underlined"
         />
 
         <Button

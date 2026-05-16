@@ -93,7 +93,7 @@ export function ShellPage() {
           to="/account/addresses"
           className="group flex items-center gap-3 rounded-large border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
         >
-          <span className="grid size-10 place-items-center rounded-medium bg-success/10 text-success">
+          <span className="grid size-10 place-items-center rounded-medium bg-default-200 text-default-600 dark:bg-default-100/10 dark:text-default-400">
             <MapPin className="size-5" aria-hidden />
           </span>
           <span className="min-w-0">
@@ -111,7 +111,7 @@ export function ShellPage() {
             to="/admin"
             className="group flex items-center gap-3 rounded-large border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
           >
-            <span className="grid size-10 place-items-center rounded-medium bg-secondary/10 text-secondary">
+            <span className="grid size-10 place-items-center rounded-medium bg-default-200 text-default-600 dark:bg-default-100/10 dark:text-default-400">
               <LayoutDashboard className="size-5" aria-hidden />
             </span>
             <span className="min-w-0">
@@ -167,7 +167,7 @@ export function ShellPage() {
           </ul>
         ) : (
           <div className="rounded-large border border-divider/60 bg-content1 p-8 text-center">
-            <ShoppingBag className="mx-auto mb-2 size-8 text-default-300" aria-hidden />
+            <ShoppingBag className="mx-auto mb-2 size-6 text-default-400" aria-hidden />
             <p className="text-sm text-default-500">{t('account.recentOrders.empty')}</p>
           </div>
         )}

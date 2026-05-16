@@ -116,7 +116,7 @@ export function CartPage() {
             </div>
             <Link
               to="/checkout"
-              className="block w-full rounded-medium bg-foreground px-4 py-2.5 text-center text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className="block w-full rounded-medium bg-primary px-4 py-2.5 text-center text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
             >
               {t('cart.proceedToCheckout')}
             </Link>
@@ -132,7 +132,7 @@ export function CartPage() {
           <p className="mt-1 text-sm text-default-500">{t('cart.empty.subtitle')}</p>
           <Link
             to="/"
-            className="mt-4 inline-flex items-center justify-center rounded-medium bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+            className="mt-4 inline-flex items-center justify-center rounded-medium bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
           >
             {t('cart.empty.cta')}
           </Link>

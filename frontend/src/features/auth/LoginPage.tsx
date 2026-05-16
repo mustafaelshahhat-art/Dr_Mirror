@@ -83,6 +83,7 @@ export function LoginPage() {
           type="email"
           autoComplete="email"
           isRequired
+          variant="underlined"
         />
 
         <FormField
@@ -92,6 +93,7 @@ export function LoginPage() {
           type="password"
           autoComplete="current-password"
           isRequired
+          variant="underlined"
         />
 
         <Button

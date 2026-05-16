@@ -115,7 +115,7 @@ function FilterPill({
       onClick={onSelect}
       className={
         active
-          ? 'rounded-full bg-foreground px-4 py-1.5 text-xs font-medium text-background'
+          ? 'rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground'
           : 'rounded-full border border-divider px-4 py-1.5 text-xs font-medium text-default-700 transition-colors hover:bg-content2 dark:text-default-300'
       }
     >

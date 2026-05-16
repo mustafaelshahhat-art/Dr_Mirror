@@ -1,5 +1,6 @@
 import { ImageOff } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ProductImage {
   id: string;
@@ -18,12 +19,14 @@ interface Props {
  * track which image is showing.
  */
 export function ProductImageGallery({ images, productName }: Props) {
+  const { i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
   const [activeImage, setActiveImage] = useState(0);
   const currentImage = images[activeImage] ?? images[0];
 
   return (
     <section className="space-y-3">
-      <div className="aspect-[4/3] w-full overflow-hidden rounded-large border border-divider/60 bg-default-100">
+      <div className="aspect-[4/5] w-full overflow-hidden rounded-large border border-divider/60 bg-bone max-h-[clamp(240px,52svh,480px)] lg:max-h-none">
         {currentImage ? (
           <img
             src={currentImage.url}
@@ -49,10 +52,14 @@ export function ProductImageGallery({ images, productName }: Props) {
               onKeyDown={(e) => {
                 if (e.key === 'ArrowRight') {
                   e.preventDefault();
-                  setActiveImage((activeImage + 1) % images.length);
+                  setActiveImage((i) => isRtl
+                    ? (i - 1 + images.length) % images.length
+                    : (i + 1) % images.length);
                 } else if (e.key === 'ArrowLeft') {
                   e.preventDefault();
-                  setActiveImage((activeImage - 1 + images.length) % images.length);
+                  setActiveImage((i) => isRtl
+                    ? (i + 1) % images.length
+                    : (i - 1 + images.length) % images.length);
                 }
               }}
               className={

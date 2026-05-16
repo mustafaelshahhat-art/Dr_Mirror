@@ -51,8 +51,8 @@ export function CartLineRow({
       <Link
         to={`/products/${line.productSlug}`}
         className={[
-          isCompact ? 'size-16' : 'size-20',
-          'shrink-0 overflow-hidden rounded-medium bg-default-100',
+          isCompact ? 'size-16' : 'h-24 w-20',
+          'shrink-0 overflow-hidden rounded-medium bg-bone',
         ].join(' ')}
       >
         {line.primaryImageUrl ? (

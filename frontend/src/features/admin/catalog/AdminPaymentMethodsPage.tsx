@@ -289,7 +289,7 @@ function PaymentMethodCreateForm({ onCancel, onSubmit, isPending }: CreateProps)
           <select
             value={kind}
             onChange={(e) => setKind(Number(e.target.value) as PaymentMethodKind)}
-            className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm"
+            className="w-full rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
             <option value={PAYMENT_METHOD_KIND.Cod}>{t('admin.payments.kind.cod')}</option>
             <option value={PAYMENT_METHOD_KIND.Instapay}>{t('admin.payments.kind.instapay')}</option>

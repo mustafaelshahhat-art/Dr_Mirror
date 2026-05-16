@@ -117,7 +117,7 @@ export function CheckoutPage() {
         <p className="text-sm text-default-500">{t('checkout.empty.subtitle')}</p>
         <Link
           to="/"
-          className="inline-flex items-center justify-center rounded-medium bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+          className="inline-flex items-center justify-center rounded-medium bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
         >
           {t('checkout.empty.cta')}
         </Link>

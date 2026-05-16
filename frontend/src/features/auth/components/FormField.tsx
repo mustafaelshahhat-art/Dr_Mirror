@@ -24,6 +24,7 @@ interface FormFieldProps<T extends FieldValues> {
   description?: ReactNode;
   isRequired?: boolean;
   isDisabled?: boolean;
+  variant?: 'bordered' | 'underlined';
 }
 
 /**
@@ -41,6 +42,7 @@ export function FormField<T extends FieldValues>({
   description,
   isRequired,
   isDisabled,
+  variant = 'bordered',
 }: FormFieldProps<T>) {
   const { t } = useTranslation();
   return (
@@ -64,6 +66,7 @@ export function FormField<T extends FieldValues>({
             type={type}
             autoComplete={autoComplete}
             placeholder={placeholder}
+            className={variant === 'underlined' ? 'rounded-none border-0 border-b bg-transparent' : undefined}
           />
           {description ? (
             <Description className="text-xs text-default-500">{description}</Description>

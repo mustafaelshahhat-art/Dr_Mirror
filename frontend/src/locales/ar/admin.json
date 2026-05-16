@@ -16,6 +16,10 @@
     "totalCount_few": "{{count}} طلبات",
     "totalCount_many": "{{count}} طلبًا",
     "totalCount_other": "{{count}} طلب",
+    "date": "التاريخ",
+    "items": "المنتجات",
+    "status": "الحالة",
+    "total": "الإجمالي",
     "empty": {
       "title": "لا توجد طلبات بعد",
       "subtitle": "بمجرد ما يبدأ المشترين بطلب المنتجات، ستظهر هنا.",

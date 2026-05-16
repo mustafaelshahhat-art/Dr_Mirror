@@ -108,7 +108,7 @@ export function CartButton() {
                 </Drawer.CloseTrigger>
                 <Link
                   to="/cart"
-                  className="inline-flex flex-1 items-center justify-center rounded-medium bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+                  className="inline-flex flex-1 items-center justify-center rounded-medium bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
                 >
                   {t('cart.viewCart')}
                 </Link>

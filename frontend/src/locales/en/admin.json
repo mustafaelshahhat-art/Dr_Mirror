@@ -8,6 +8,10 @@
     "itemCount_other": "{{count}} items",
     "totalCount_one": "1 order",
     "totalCount_other": "{{count}} orders",
+    "date": "Date",
+    "items": "Items",
+    "status": "Status",
+    "total": "Total",
     "empty": {
       "title": "No orders yet",
       "subtitle": "Once buyers place orders they'll show up here.",

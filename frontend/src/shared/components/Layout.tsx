@@ -16,6 +16,9 @@ export function Layout() {
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 md:px-6 lg:px-8">
         <Outlet />
       </main>
+      <footer className="border-t border-divider/40 py-6 text-center text-xs text-muted">
+        Dr. Mirror &copy; {new Date().getFullYear()}
+      </footer>
     </div>
   );
 }

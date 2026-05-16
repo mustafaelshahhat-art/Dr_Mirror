@@ -1,8 +1,8 @@
 import { Spinner } from '@heroui/react';
-import { Search } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { SearchInput } from '../catalog/components/SearchInput';
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import type { AdminUserDto } from './users/types';
 import { useAdminUsersQuery } from './users/hooks';
@@ -11,20 +11,8 @@ import { QueryErrorState } from './components/QueryErrorState';
 export function AdminUsersPage() {
   const { t } = useTranslation();
   const [q, setQ] = useState('');
-  const [debouncedQ, setDebouncedQ] = useState('');
   const [page, setPage] = useState(1);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const query = useAdminUsersQuery(debouncedQ || undefined, page);
-
-  function handleSearch(value: string) {
-    setQ(value);
-    const trimmed = value.trim();
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = window.setTimeout(() => {
-      setDebouncedQ(trimmed);
-      setPage(1);
-    }, 300);
-  }
+  const query = useAdminUsersQuery(q.trim() || undefined, page);
 
   const dateFmt = new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',
@@ -38,14 +26,10 @@ export function AdminUsersPage() {
         <p className="text-sm text-default-500">{t('admin.users.subtitle')}</p>
       </header>
 
-      <div className="relative max-w-sm">
-        <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-default-400" aria-hidden />
-        <input
-          type="search"
+      <div className="max-w-sm">
+        <SearchInput
           value={q}
-          onChange={(e) => handleSearch(e.target.value)}
-          placeholder={t('admin.users.searchPlaceholder')}
-          className="w-full rounded-medium border border-divider bg-content1 py-2 ps-9 pe-3 text-sm text-foreground transition-colors placeholder:text-default-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+          onCommit={(val) => { setQ(val); setPage(1); }}
         />
       </div>
 

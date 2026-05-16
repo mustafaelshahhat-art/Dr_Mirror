@@ -11,7 +11,7 @@ export function ProductGridSkeleton() {
           key={i}
           className="overflow-hidden rounded-large border border-divider/60 bg-content1"
         >
-          <div className="aspect-[4/3] w-full bg-default-200/60 motion-safe:animate-pulse" />
+          <div className="aspect-[4/5] w-full bg-default-200/60 motion-safe:animate-pulse" />
           <div className="space-y-2 p-4">
             <div className="h-3 w-1/3 rounded bg-default-200/60 motion-safe:animate-pulse" />
             <div className="h-4 w-3/4 rounded bg-default-200/60 motion-safe:animate-pulse" />

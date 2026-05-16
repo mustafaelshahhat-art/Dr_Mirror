@@ -52,12 +52,12 @@ export function OrdersListPage() {
 
       {orders.length === 0 ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Package className="mx-auto mb-3 size-10 text-default-400" aria-hidden />
+          <Package className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
           <h2 className="text-base font-semibold">{t('orders.list.empty.title')}</h2>
           <p className="mt-1 text-sm text-default-500">{t('orders.list.empty.subtitle')}</p>
           <Link
             to="/"
-            className="mt-4 inline-flex items-center justify-center rounded-medium bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+            className="mt-4 inline-flex items-center justify-center rounded-medium bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
           >
             {t('orders.list.empty.cta')}
           </Link>

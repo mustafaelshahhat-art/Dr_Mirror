@@ -61,7 +61,7 @@ export function ProductDetailPage() {
         </p>
         <Link
           to="/"
-          className="inline-flex items-center justify-center rounded-medium bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:opacity-90"
+          className="inline-flex items-center justify-center rounded-medium bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:opacity-90"
         >
           {t('catalog.detail.backToCatalog')}
         </Link>
@@ -155,64 +155,98 @@ export function ProductDetailPage() {
             {description}
           </p>
 
-          <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center">
-            <Button
-              variant="primary"
-              fullWidth
-              isDisabled={
-                addState === 'adding' ||
-                !variantSelection.selectedVariant ||
-                variantSelection.selectedVariant.stock <= 0
-              }
-              onPress={() => {
-                const v = variantSelection.selectedVariant;
-                if (!v) return;
-                void handleAddToCart({
-                  productVariantId: v.id,
-                  quantity: 1,
-                  productId: product.id,
-                  productSlug: product.slug,
-                  nameAr: product.nameAr,
-                  nameEn: product.nameEn,
-                  size: v.size,
-                  colorName: v.colorName,
-                  colorNameAr: v.colorNameAr,
-                  colorHex: v.colorHex,
-                  sku: v.sku,
-                  unitPrice: product.price,
-                  primaryImageUrl: product.images[0]?.url ?? null,
-                  variantStock: v.stock,
-                });
-              }}
-            >
-              <span className="inline-flex items-center gap-2">
-                {addState === 'added' ? (
-                  <Check className="size-4" aria-hidden />
-                ) : (
-                  <ShoppingBag className="size-4" aria-hidden />
-                )}
-                {addState === 'adding'
-                  ? t('cart.adding')
-                  : addState === 'added'
-                    ? t('cart.addedToCart')
-                    : !variantSelection.selectedVariant
-                      ? t('cart.selectVariantFirst')
-                      : variantSelection.selectedVariant.stock <= 0
-                        ? t('cart.outOfStockShort')
-                        : t('cart.addToCart')}
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              fullWidth
-              onPress={() => setShowInquiry((v) => !v)}
-            >
-              <span className="inline-flex items-center gap-2">
-                <MessageSquare className="size-4" aria-hidden />
-                {t('catalog.detail.inquireCta')}
-              </span>
-            </Button>
-          </div>
+          {(() => {
+            const v = variantSelection.selectedVariant;
+            const addDisabled =
+              addState === 'adding' || !v || v.stock <= 0;
+            const onAdd = () => {
+              if (!v) return;
+              void handleAddToCart({
+                productVariantId: v.id,
+                quantity: 1,
+                productId: product.id,
+                productSlug: product.slug,
+                nameAr: product.nameAr,
+                nameEn: product.nameEn,
+                size: v.size,
+                colorName: v.colorName,
+                colorNameAr: v.colorNameAr,
+                colorHex: v.colorHex,
+                sku: v.sku,
+                unitPrice: product.price,
+                primaryImageUrl: product.images[0]?.url ?? null,
+                variantStock: v.stock,
+              });
+            };
+            const addLabel =
+              addState === 'adding'
+                ? t('cart.adding')
+                : addState === 'added'
+                  ? t('cart.addedToCart')
+                  : !v
+                    ? t('cart.selectVariantFirst')
+                    : v.stock <= 0
+                      ? t('cart.outOfStockShort')
+                      : t('cart.addToCart');
+            return (
+              <>
+                <div className="hidden flex-col gap-2 pt-2 lg:flex lg:flex-row lg:items-center">
+                  <Button
+                    variant="primary"
+                    fullWidth
+                    isDisabled={addDisabled}
+                    onPress={onAdd}
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      {addState === 'added' ? (
+                        <Check className="size-4" aria-hidden />
+                      ) : (
+                        <ShoppingBag className="size-4" aria-hidden />
+                      )}
+                      {addLabel}
+                    </span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    fullWidth
+                    onPress={() => setShowInquiry((s) => !s)}
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <MessageSquare className="size-4" aria-hidden />
+                      {t('catalog.detail.inquireCta')}
+                    </span>
+                  </Button>
+                </div>
+                <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-divider/60 bg-background/90 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+                  <Button
+                    variant="outline"
+                    fullWidth
+                    onPress={() => setShowInquiry((s) => !s)}
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <MessageSquare className="size-4" aria-hidden />
+                      {t('catalog.detail.inquireCta')}
+                    </span>
+                  </Button>
+                  <Button
+                    variant="primary"
+                    fullWidth
+                    isDisabled={addDisabled}
+                    onPress={onAdd}
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      {addState === 'added' ? (
+                        <Check className="size-4" aria-hidden />
+                      ) : (
+                        <ShoppingBag className="size-4" aria-hidden />
+                      )}
+                      {addLabel}
+                    </span>
+                  </Button>
+                </div>
+              </>
+            );
+          })()}
           {showInquiry ? (
             <InquiryForm
               productId={product.id}
@@ -232,6 +266,7 @@ export function ProductDetailPage() {
           )}
         </section>
       </div>
+      <div className="h-20 lg:hidden" aria-hidden />
     </article>
   );
 }
