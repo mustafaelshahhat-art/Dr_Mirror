@@ -42,6 +42,7 @@ public sealed class FileStorageOptions : IValidatableObject
         "image/webp",
         "image/heic",
         "image/heif",
+        "application/pdf",
     };
 
     // -- Cloudinary-specific. --
@@ -49,8 +50,18 @@ public sealed class FileStorageOptions : IValidatableObject
     public string? CloudinaryApiKey { get; set; }
     public string? CloudinaryApiSecret { get; set; }
 
+    private static readonly HashSet<string> KnownProviders =
+        new(StringComparer.OrdinalIgnoreCase) { "local", "cloudinary" };
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
+        if (!KnownProviders.Contains(Provider))
+        {
+            yield return new ValidationResult(
+                $"Unknown FileStorage:Provider '{Provider}'. Valid values: local, cloudinary.");
+            yield break;
+        }
+
         if (Provider.Equals("cloudinary", StringComparison.OrdinalIgnoreCase))
         {
             if (string.IsNullOrWhiteSpace(CloudinaryCloudName) ||

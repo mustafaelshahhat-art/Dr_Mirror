@@ -17,7 +17,7 @@ import { useCart } from './useCart';
 export function CartPage() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
-  const { cart, updateQuantity, removeItem, clear } = useCart();
+  const { cart, updateQuantity, removeItem, clear, mergeError, retryMerge } = useCart();
 
   const hasItems = cart.items.length > 0;
   const errorMessage = cart.error?.message;
@@ -38,6 +38,22 @@ export function CartPage() {
           {t('cart.subtitle', { count: cart.totalQuantity })}
         </p>
       </header>
+
+      {mergeError ? (
+        <div
+          role="alert"
+          className="flex items-start justify-between gap-3 rounded-medium border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
+        >
+          <span>{mergeError}</span>
+          <button
+            type="button"
+            onClick={() => void retryMerge()}
+            className="shrink-0 font-medium underline underline-offset-2 hover:no-underline"
+          >
+            {t('cart.retryMerge')}
+          </button>
+        </div>
+      ) : null}
 
       {errorMessage ? (
         <div className="rounded-medium border border-danger/40 bg-danger/10 p-3 text-sm text-danger">

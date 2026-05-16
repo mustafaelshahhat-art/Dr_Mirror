@@ -25,6 +25,13 @@ public interface IFileStorageService
 
     /// <summary>Best-effort delete; never throws if the file is already gone.</summary>
     Task DeleteAsync(string fileKey, CancellationToken ct);
+
+    /// <summary>
+    /// Returns a readable stream for the file identified by <paramref name="fileKey"/>.
+    /// Caller is responsible for disposing the stream.
+    /// Used by the authenticated proof-streaming endpoint.
+    /// </summary>
+    Task<Stream> OpenReadAsync(string fileKey, CancellationToken ct);
 }
 
 /// <summary>The result of a successful upload.</summary>

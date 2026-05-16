@@ -118,7 +118,18 @@ public static class AddressEndpoints
         entity.Id = Guid.NewGuid();
         entity.IsDefault = makeDefault;
         db.BuyerAddresses.Add(entity);
-        await db.SaveChangesAsync(ct);
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException)
+        {
+            // Concurrent request won the unique-default race; caller should retry.
+            return Results.Problem(
+                title: "Concurrent update conflict",
+                detail: "Another request updated your default address at the same time. Please retry.",
+                statusCode: StatusCodes.Status409Conflict);
+        }
 
         return Results.Created($"/api/addresses/{entity.Id}", ToDto(entity));
     }
@@ -149,7 +160,18 @@ public static class AddressEndpoints
         if (becomingDefault) entity.IsDefault = true;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
 
-        await db.SaveChangesAsync(ct);
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException)
+        {
+            return Results.Problem(
+                title: "Concurrent update conflict",
+                detail: "Another request updated your default address at the same time. Please retry.",
+                statusCode: StatusCodes.Status409Conflict);
+        }
+
         return Results.Ok(ToDto(entity));
     }
 
@@ -207,7 +229,17 @@ public static class AddressEndpoints
             await ClearOtherDefaults(db, userId, exceptId: entity.Id, ct);
             entity.IsDefault = true;
             entity.UpdatedAt = DateTimeOffset.UtcNow;
-            await db.SaveChangesAsync(ct);
+            try
+            {
+                await db.SaveChangesAsync(ct);
+            }
+            catch (DbUpdateException)
+            {
+                return Results.Problem(
+                    title: "Concurrent update conflict",
+                    detail: "Another request updated your default address at the same time. Please retry.",
+                    statusCode: StatusCodes.Status409Conflict);
+            }
         }
         return Results.Ok(ToDto(entity));
     }

@@ -20,6 +20,33 @@ namespace DrMirror.Api.Features.Orders.UploadPaymentProof;
 /// </summary>
 public static class UploadPaymentProofEndpoint
 {
+    private static readonly Dictionary<string, byte[]> MagicBytes =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "image/jpeg",       new byte[] { 0xFF, 0xD8, 0xFF } },
+            { "image/png",        new byte[] { 0x89, 0x50, 0x4E, 0x47 } },
+            { "image/webp",       new byte[] { 0x52, 0x49, 0x46, 0x46 } }, // RIFF header
+            { "application/pdf",  new byte[] { 0x25, 0x50, 0x44, 0x46 } }, // %PDF
+        };
+
+    private static bool HasValidMagicBytes(Stream stream, string contentType)
+    {
+        // HEIC/HEIF use a complex container format; skip magic-byte check for those.
+        if (contentType.Equals("image/heic", StringComparison.OrdinalIgnoreCase) ||
+            contentType.Equals("image/heif", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (!MagicBytes.TryGetValue(contentType, out var magic)) return false;
+
+        Span<byte> header = stackalloc byte[magic.Length];
+        int read = stream.Read(header);
+        stream.Position = 0;
+
+        return read == magic.Length && header.SequenceEqual(magic);
+    }
+
     public static RouteGroupBuilder MapUploadPaymentProof(this RouteGroupBuilder group)
     {
         group.MapPost("/{orderNumber}/proof", HandleAsync)
@@ -74,9 +101,25 @@ public static class UploadPaymentProofEndpoint
         {
             return Results.Problem(
                 title: "Unsupported file type",
-                detail: $"Upload a JPEG, PNG, WebP, or HEIC image (received {file.ContentType}).",
+                detail: $"Upload a JPEG, PNG, WebP, HEIC image or PDF (received {file.ContentType}).",
                 statusCode: StatusCodes.Status415UnsupportedMediaType);
         }
+
+        // Read file into memory so we can (a) inspect magic bytes and (b) pass to storage.
+        using var ms = new MemoryStream();
+        await file.OpenReadStream().CopyToAsync(ms, ct);
+        ms.Position = 0;
+
+        // Validate file signature to prevent content-type spoofing.
+        if (!HasValidMagicBytes(ms, file.ContentType))
+        {
+            return Results.Problem(
+                title: "File content does not match declared type",
+                detail: "The uploaded file's content does not match its declared content-type.",
+                statusCode: StatusCodes.Status415UnsupportedMediaType);
+        }
+
+        ms.Position = 0;
 
         // Load the order with the bits needed for FSM + the detail projection.
         var order = await db.Orders
@@ -114,16 +157,12 @@ public static class UploadPaymentProofEndpoint
         }
 
         // Upload to storage. Folder is keyed by order number for tidy listings.
-        StoredFile stored;
-        await using (var stream = file.OpenReadStream())
-        {
-            stored = await storage.UploadAsync(
-                stream,
-                folder: $"payment-proofs/{order.OrderNumber}",
-                originalFileName: file.FileName,
-                contentType: file.ContentType,
-                ct);
-        }
+        var stored = await storage.UploadAsync(
+            ms,
+            folder: $"payment-proofs/{order.OrderNumber}",
+            originalFileName: file.FileName,
+            contentType: file.ContentType,
+            ct);
 
         var proof = new PaymentProof
         {

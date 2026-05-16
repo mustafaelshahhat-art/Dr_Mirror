@@ -76,6 +76,20 @@ public static class RejectPaymentProofEndpoint
                 statusCode: StatusCodes.Status409Conflict);
         }
 
+        var latestPendingId = order.PaymentProofs
+            .Where(p => p.Status == PaymentProofStatus.Pending)
+            .OrderByDescending(p => p.UploadedAt)
+            .Select(p => p.Id)
+            .FirstOrDefault();
+
+        if (latestPendingId != proof.Id)
+        {
+            return Results.Problem(
+                title: "Stale proof",
+                detail: "This proof has been superseded by a more recent upload. Reject the latest pending proof.",
+                statusCode: StatusCodes.Status409Conflict);
+        }
+
         if (!fsm.CanTransition(order.Status, OrderStatus.Pending, OrderActor.Admin))
         {
             return Results.Problem(
@@ -90,7 +104,7 @@ public static class RejectPaymentProofEndpoint
         proof.ReviewedAt = now;
         proof.ReviewNote = request.ReviewNote;
 
-        fsm.Transition(order, OrderStatus.Pending, OrderActor.Admin, request.ReviewNote);
+        fsm.Transition(order, OrderStatus.Pending, OrderActor.Admin);
 
         await db.SaveChangesAsync(ct);
 

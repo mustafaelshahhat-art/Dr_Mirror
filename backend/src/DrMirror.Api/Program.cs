@@ -186,6 +186,8 @@ try
     // -----------------------------------------------------------------------
     // File storage — env-switched between local filesystem and Cloudinary.
     // -----------------------------------------------------------------------
+    builder.Services.AddHttpClient();
+
     builder.Services.AddOptions<FileStorageOptions>()
         .Bind(builder.Configuration.GetSection(FileStorageOptions.SectionName))
         .ValidateDataAnnotations()
@@ -330,6 +332,18 @@ try
 
     var app = builder.Build();
 
+    // Production safety: CORS origins must be explicitly configured.
+    // An empty allowlist silently blocks all cross-origin requests with no error.
+    if (app.Environment.IsProduction())
+    {
+        var corsOrigins = app.Configuration
+            .GetSection("Cors:AllowedOrigins").Get<string[]>();
+        if (corsOrigins is null || corsOrigins.Length == 0)
+            throw new InvalidOperationException(
+                "Cors:AllowedOrigins must contain at least one origin in production. " +
+                "Set it via the Cors__AllowedOrigins__0 environment variable.");
+    }
+
     // -----------------------------------------------------------------------
     // Apply migrations (Dev only) and run idempotent seeding.
     // -----------------------------------------------------------------------
@@ -355,12 +369,23 @@ try
     app.UseStatusCodePages();
     app.UseCors(CorsPolicy);
 
-    // Static files for the local upload provider — serves payment-proof images
+    // Static files for the local upload provider — serves product images
     // under /uploads/* directly from wwwroot/uploads. The Cloudinary provider
     // doesn't need this middleware (it serves from its own CDN).
+    // Payment-proof files are blocked here and served only via the authenticated
+    // /api/orders/{orderNumber}/proof/{proofId}/file endpoint.
     var webRoot = app.Environment.WebRootPath ??
                   Path.Combine(app.Environment.ContentRootPath, "wwwroot");
     Directory.CreateDirectory(Path.Combine(webRoot, "uploads"));
+    app.Use(async (ctx, next) =>
+    {
+        if (ctx.Request.Path.StartsWithSegments("/uploads/payment-proofs"))
+        {
+            ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return;
+        }
+        await next(ctx);
+    });
     app.UseStaticFiles();
 
     app.UseAuthentication();

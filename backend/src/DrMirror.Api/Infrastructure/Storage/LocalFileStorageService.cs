@@ -81,6 +81,14 @@ public sealed class LocalFileStorageService : IFileStorageService
         return Task.CompletedTask;
     }
 
+    public Task<Stream> OpenReadAsync(string fileKey, CancellationToken ct)
+    {
+        var webRoot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+        var full = Path.Combine(webRoot, _opts.LocalDirectory, fileKey.Replace('/', Path.DirectorySeparatorChar));
+        Stream stream = new FileStream(full, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true);
+        return Task.FromResult(stream);
+    }
+
     private static string SanitiseFolder(string folder)
     {
         // Strip any path-walking attempts and collapse to ASCII-safe slug parts.
@@ -92,11 +100,12 @@ public sealed class LocalFileStorageService : IFileStorageService
 
     private static string ExtensionFromContentType(string contentType) => contentType.ToLowerInvariant() switch
     {
-        "image/jpeg" => ".jpg",
-        "image/png" => ".png",
-        "image/webp" => ".webp",
-        "image/heic" => ".heic",
-        "image/heif" => ".heif",
-        _ => ".bin",
+        "image/jpeg"       => ".jpg",
+        "image/png"        => ".png",
+        "image/webp"       => ".webp",
+        "image/heic"       => ".heic",
+        "image/heif"       => ".heif",
+        "application/pdf"  => ".pdf",
+        _                  => ".bin",
     };
 }

@@ -12,12 +12,15 @@ namespace DrMirror.Api.Infrastructure.Storage;
 public sealed class CloudinaryFileStorageService : IFileStorageService
 {
     private readonly Cloudinary _cloudinary;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<CloudinaryFileStorageService> _logger;
 
     public CloudinaryFileStorageService(
         IOptions<FileStorageOptions> opts,
+        IHttpClientFactory httpClientFactory,
         ILogger<CloudinaryFileStorageService> logger)
     {
+        _httpClientFactory = httpClientFactory;
         var o = opts.Value;
         if (string.IsNullOrWhiteSpace(o.CloudinaryCloudName)
             || string.IsNullOrWhiteSpace(o.CloudinaryApiKey)
@@ -78,5 +81,13 @@ public sealed class CloudinaryFileStorageService : IFileStorageService
         {
             _logger.LogWarning(ex, "Cloudinary destroy failed for {Key}", fileKey);
         }
+    }
+
+    public async Task<Stream> OpenReadAsync(string fileKey, CancellationToken ct)
+    {
+        var url = _cloudinary.Api.UrlImgUp.Secure(true).BuildUrl(fileKey);
+        var http = _httpClientFactory.CreateClient();
+        var bytes = await http.GetByteArrayAsync(url, ct);
+        return new MemoryStream(bytes);
     }
 }

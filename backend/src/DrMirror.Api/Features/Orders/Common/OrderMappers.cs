@@ -46,9 +46,9 @@ internal static class OrderMappers
         order.Currency,
         order.CreatedAt);
 
-    public static PaymentProofDto ToDto(this PaymentProof proof) => new(
+    public static PaymentProofDto ToDto(this PaymentProof proof, string orderNumber) => new(
         Id: proof.Id,
-        FileUrl: proof.FileUrl,
+        FileUrl: $"/api/orders/{orderNumber}/proof/{proof.Id}/file",
         ContentType: proof.ContentType,
         SizeBytes: proof.SizeBytes,
         Status: proof.Status,
@@ -90,7 +90,7 @@ internal static class OrderMappers
         AllowedNextStatesForBuyer: fsm.NextStates(order.Status, OrderActor.Buyer),
         AllowedNextStatesForAdmin: fsm.NextStates(order.Status, OrderActor.Admin),
         Items: order.Items.OrderBy(i => i.CreatedAt).Select(i => i.ToDto()).ToList(),
-        PaymentProofs: order.PaymentProofs.OrderByDescending(p => p.UploadedAt).Select(p => p.ToDto()).ToList(),
+        PaymentProofs: order.PaymentProofs.OrderByDescending(p => p.UploadedAt).Select(p => p.ToDto(order.OrderNumber)).ToList(),
         Buyer: new BuyerSummaryDto(
             order.BuyerUserId,
             order.BuyerUser?.FullName ?? string.Empty,

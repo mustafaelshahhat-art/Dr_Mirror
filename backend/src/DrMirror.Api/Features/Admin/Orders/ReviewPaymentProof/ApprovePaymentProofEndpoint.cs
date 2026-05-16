@@ -74,6 +74,20 @@ public static class ApprovePaymentProofEndpoint
                 statusCode: StatusCodes.Status409Conflict);
         }
 
+        var latestPendingId = order.PaymentProofs
+            .Where(p => p.Status == PaymentProofStatus.Pending)
+            .OrderByDescending(p => p.UploadedAt)
+            .Select(p => p.Id)
+            .FirstOrDefault();
+
+        if (latestPendingId != proof.Id)
+        {
+            return Results.Problem(
+                title: "Stale proof",
+                detail: "This proof has been superseded by a more recent upload. Approve the latest pending proof.",
+                statusCode: StatusCodes.Status409Conflict);
+        }
+
         if (!fsm.CanTransition(order.Status, OrderStatus.Paid, OrderActor.Admin))
         {
             return Results.Problem(

@@ -47,6 +47,10 @@ export interface CartContextValue {
   removeItem: (line: CartItemDto) => Promise<void>;
   /** Empty the cart. */
   clear: () => Promise<void>;
+  /** Non-null when the post-login guest-cart merge failed. */
+  mergeError: string | null;
+  /** Re-attempt the guest-cart merge after a failure. */
+  retryMerge: () => void;
 }
 
 export const CartContext = createContext<CartContextValue | null>(null);

@@ -63,6 +63,18 @@ public static class UpdateUserRolesEndpoint
         var toAdd = desired.Except(currentRoles, StringComparer.OrdinalIgnoreCase).ToList();
         var toRemove = currentRoles.Except(desired, StringComparer.OrdinalIgnoreCase).ToList();
 
+        // Safety: cannot orphan admin access by removing the last admin account.
+        if (toRemove.Contains(UserRoles.Admin, StringComparer.OrdinalIgnoreCase))
+        {
+            var admins = await userManager.GetUsersInRoleAsync(UserRoles.Admin);
+            if (admins.Count == 1 && admins[0].Id == userId)
+                return Results.Problem(
+                    title: "Cannot remove the last admin",
+                    detail: "At least one admin account must remain. " +
+                            "Assign the Admin role to another user first.",
+                    statusCode: StatusCodes.Status409Conflict);
+        }
+
         if (toRemove.Count > 0)
             await userManager.RemoveFromRolesAsync(user, toRemove);
 

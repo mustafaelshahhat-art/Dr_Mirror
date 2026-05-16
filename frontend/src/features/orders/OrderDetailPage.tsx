@@ -182,7 +182,11 @@ export function OrderDetailPage() {
                   : ''}
               </p>
               <p className="text-default-700 dark:text-default-300">
-                {order.shippingAddress.city}, {order.shippingAddress.governorate}
+                {order.shippingAddress.city},{' '}
+                {t(
+                  `governorates.${order.shippingAddress.governorate}`,
+                  order.shippingAddress.governorate,
+                )}
               </p>
               {order.shippingAddress.landmark ? (
                 <p className="mt-1 text-xs text-default-500">

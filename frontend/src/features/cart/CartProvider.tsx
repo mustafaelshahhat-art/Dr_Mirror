@@ -74,39 +74,62 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // ------- Merge guest → server on login ------------------------------------
   // Track whether the current authed-session's merge has already run so a
-  // re-render doesn't re-fire it.
+  // re-render doesn't re-fire it. Only set on confirmed success so a failed
+  // merge can be retried.
   const mergedForUserId = useRef<string | null>(null);
+  const [mergeError, setMergeError] = useState<string | null>(null);
+
+  const mergeMutation = useMutation<
+    import('./types').CartDto,
+    Error,
+    { items: { productVariantId: string; quantity: number }[] }
+  >({
+    mutationFn: (payload) => cartApi.merge(payload),
+  });
+
+  const performMerge = useCallback(async () => {
+    if (!user) return;
+    setMergeError(null);
+    const stash = readGuestCart();
+    if (stash.length === 0) {
+      mergedForUserId.current = user.id;
+      return;
+    }
+    try {
+      const merged = await mergeMutation.mutateAsync({
+        items: stash.map((l) => ({
+          productVariantId: l.productVariantId,
+          quantity: l.quantity,
+        })),
+      });
+      clearGuestCart();
+      // Hand the merged cart directly to React Query so consumers see it
+      // immediately without an extra GET round-trip.
+      queryClient.setQueryData(['cart'], merged);
+      mergedForUserId.current = user.id;
+    } catch (err) {
+      // Leave the guest cart in place — buyer can retry via the cart page.
+      setMergeError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to sync your cart. Please try again.',
+      );
+    }
+  }, [user, mergeMutation, queryClient]);
+
   useEffect(() => {
     if (!isAuthed || !user || isBootstrapping) return;
     if (mergedForUserId.current === user.id) return;
-    mergedForUserId.current = user.id;
-
-    const stash = readGuestCart();
-    if (stash.length === 0) return;
-
-    void (async () => {
-      try {
-        const merged = await cartApi.merge({
-          items: stash.map((l) => ({
-            productVariantId: l.productVariantId,
-            quantity: l.quantity,
-          })),
-        });
-        clearGuestCart();
-        // The merge response IS the post-merge cart. Hand it to React Query
-        // directly so consumers see the merged cart immediately without an
-        // extra GET round-trip.
-        queryClient.setQueryData(['cart'], merged);
-      } catch {
-        // Leave the guest cart in place — buyer can retry on the cart page.
-      }
-    })();
-  }, [isAuthed, user, isBootstrapping, queryClient]);
+    void performMerge();
+  }, [isAuthed, user, isBootstrapping, performMerge]);
 
   // Drop the in-memory user id when the user signs out so the next sign-in
   // re-runs the merge.
   useEffect(() => {
-    if (!user) mergedForUserId.current = null;
+    if (!user) {
+      mergedForUserId.current = null;
+      setMergeError(null);
+    }
   }, [user]);
 
   // ------- Mutations (authed-only) ------------------------------------------
@@ -268,8 +291,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [isAuthed, clearMutation]);
 
   const value = useMemo<CartContextValue>(
-    () => ({ cart, addItem, updateQuantity, removeItem, clear }),
-    [cart, addItem, updateQuantity, removeItem, clear],
+    () => ({
+      cart,
+      addItem,
+      updateQuantity,
+      removeItem,
+      clear,
+      mergeError,
+      retryMerge: performMerge,
+    }),
+    [cart, addItem, updateQuantity, removeItem, clear, mergeError, performMerge],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

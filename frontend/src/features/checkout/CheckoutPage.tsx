@@ -121,6 +121,15 @@ export function CheckoutPage() {
   const address = watch('address');
   const selectedMethod = paymentMethodsQuery.data?.find((m) => m.id === paymentMethodId);
 
+  // When a saved address is selected the inline form is hidden, so `address`
+  // (watch result) holds empty defaults. Resolve the actual saved address for
+  // the review step so it shows real data instead of blank fields.
+  const savedAddresses = addressesQuery.data ?? [];
+  const selectedSavedAddress = savedAddressId
+    ? (savedAddresses.find((a) => a.id === savedAddressId) ?? null)
+    : null;
+  const reviewAddress = selectedSavedAddress ?? address;
+
   async function next() {
     if (step === 'address') {
       // If the buyer picked a saved address, skip inline form validation.
@@ -420,19 +429,23 @@ export function CheckoutPage() {
               <article className="rounded-medium border border-divider/60 bg-content1 p-3 text-sm">
                 <h3 className="font-semibold">{t('checkout.review.shippingTo')}</h3>
                 <p className="mt-1 leading-relaxed">
-                  {address.recipientName}
+                  {reviewAddress?.recipientName}
                   <br />
-                  <span dir="ltr">{address.phone}</span>
+                  <span dir="ltr">{reviewAddress?.phone}</span>
                   <br />
-                  {address.streetAddress}
-                  {address.apartment
-                    ? `, ${t('checkout.address.apartmentShort')} ${address.apartment}`
+                  {reviewAddress?.streetAddress}
+                  {reviewAddress?.apartment
+                    ? `, ${t('checkout.address.apartmentShort')} ${reviewAddress.apartment}`
                     : ''}
-                  {address.floor
-                    ? `, ${t('checkout.address.floorShort')} ${address.floor}`
+                  {reviewAddress?.floor
+                    ? `, ${t('checkout.address.floorShort')} ${reviewAddress.floor}`
                     : ''}
                   <br />
-                  {address.city}, {address.governorate}
+                  {reviewAddress?.city},{' '}
+                  {t(
+                    `governorates.${reviewAddress?.governorate}`,
+                    reviewAddress?.governorate ?? '',
+                  )}
                 </p>
               </article>
               <article className="rounded-medium border border-divider/60 bg-content1 p-3 text-sm">

@@ -36,6 +36,11 @@ export function AdminProofReview({ orderNumber, proofs }: AdminProofReviewProps)
     );
   }
 
+  const latestPendingId = [...proofs]
+    .filter((p) => p.status === PAYMENT_PROOF_STATUS.Pending)
+    .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())[0]
+    ?.id;
+
   return (
     <ul className="space-y-3">
       {proofs.map((proof) => (
@@ -44,6 +49,7 @@ export function AdminProofReview({ orderNumber, proofs }: AdminProofReviewProps)
             proof={proof}
             orderNumber={orderNumber}
             dateFmt={dateFmt}
+            isLatestPending={proof.id === latestPendingId}
           />
         </li>
       ))}
@@ -55,10 +61,12 @@ function ProofRow({
   proof,
   orderNumber,
   dateFmt,
+  isLatestPending,
 }: {
   proof: PaymentProofDto;
   orderNumber: string;
   dateFmt: Intl.DateTimeFormat;
+  isLatestPending: boolean;
 }) {
   const { t } = useTranslation();
   const [mode, setMode] = useState<'idle' | 'approve' | 'reject'>('idle');
@@ -68,6 +76,7 @@ function ProofRow({
   const reject = useRejectProofMutation({ orderNumber });
 
   const isPending = proof.status === PAYMENT_PROOF_STATUS.Pending;
+  const isSuperseded = isPending && !isLatestPending;
 
   async function submit() {
     setError(null);
@@ -113,6 +122,11 @@ function ProofRow({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <ProofStatusBadge status={proof.status} />
+            {isSuperseded ? (
+              <span className="inline-flex items-center rounded-full border border-default-300 bg-default-100 px-2 py-0.5 text-xs font-medium text-default-500">
+                {t('admin.proofs.superseded')}
+              </span>
+            ) : null}
             <span className="text-xs text-default-500 tabular-nums">
               {dateFmt.format(new Date(proof.uploadedAt))}
             </span>
@@ -133,7 +147,7 @@ function ProofRow({
         </div>
       </div>
 
-      {isPending ? (
+      {isPending && !isSuperseded ? (
         mode === 'idle' ? (
           <div className="flex gap-2">
             <Button

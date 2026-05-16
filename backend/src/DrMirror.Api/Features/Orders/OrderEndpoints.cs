@@ -1,6 +1,7 @@
 using DrMirror.Api.Features.Orders.CancelMyOrder;
 using DrMirror.Api.Features.Orders.GetMyOrderByNumber;
 using DrMirror.Api.Features.Orders.GetMyOrders;
+using DrMirror.Api.Features.Orders.GetPaymentProofFile;
 using DrMirror.Api.Features.Orders.UploadPaymentProof;
 
 namespace DrMirror.Api.Features.Orders;
@@ -19,6 +20,7 @@ public static class OrderEndpoints
         group.MapGetMyOrderByNumber();
         group.MapCancelMyOrder();
         group.MapUploadPaymentProof();
+        group.MapGetPaymentProofFile();
 
         return app;
     }

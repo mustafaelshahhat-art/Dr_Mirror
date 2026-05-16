@@ -102,7 +102,9 @@ public sealed class DatabaseSeeder
                 InstructionsAr = "حوّل المبلغ إلى حساب إنستاباي التالي، ثم ارفع لقطة شاشة من إيصال التحويل.",
                 AccountNumber = "drmirror@instapay",
                 AccountHolder = "Dr. Mirror Sales",
-                IsActive = true,
+                // Seeded inactive — placeholder account numbers must be updated in the
+                // admin panel before activating in production.
+                IsActive = false,
                 DisplayOrder = 1,
             },
             new PaymentMethod
@@ -116,7 +118,9 @@ public sealed class DatabaseSeeder
                 InstructionsAr = "حوّل المبلغ إلى رقم المحفظة التالي (فودافون كاش / اتصالات كاش / أورنج موني / وي باي) وارفع لقطة شاشة من التأكيد.",
                 AccountNumber = "01001234567",
                 AccountHolder = "Dr. Mirror Sales",
-                IsActive = true,
+                // Seeded inactive — placeholder account numbers must be updated in the
+                // admin panel before activating in production.
+                IsActive = false,
                 DisplayOrder = 2,
             },
         };
@@ -186,6 +190,14 @@ public sealed class DatabaseSeeder
 
         var configuredPassword = _config["Admin:SeedPassword"];
         var generated = string.IsNullOrEmpty(configuredPassword);
+
+        // Production must never auto-generate a password — the plaintext would be
+        // emitted to the log file. Require the operator to supply one explicitly.
+        if (generated && _env.IsProduction())
+            throw new InvalidOperationException(
+                "Admin:SeedPassword is required in production. " +
+                "Set the Admin__SeedPassword environment variable before first boot.");
+
         var password = generated ? GenerateStrongPassword() : configuredPassword!;
 
         var admin = new User

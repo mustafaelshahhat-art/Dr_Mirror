@@ -35,5 +35,12 @@ internal sealed class BuyerAddressConfiguration : IEntityTypeConfiguration<Buyer
 
         // Most queries pull "my addresses" — index by user, sort by default-first.
         builder.HasIndex(a => new { a.UserId, a.IsDefault });
+
+        // DB-level guarantee: at most one IsDefault=true row per user.
+        // Complements the application-layer ClearOtherDefaults() guard against races.
+        builder.HasIndex(a => a.UserId)
+            .HasFilter("[IsDefault] = 1")
+            .IsUnique()
+            .HasDatabaseName("IX_BuyerAddresses_UserId_UniqueDefault");
     }
 }
