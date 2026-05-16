@@ -74,6 +74,14 @@
       "preparing": "Preparing",
       "shipped": "Shipped"
     },
+    "queue": {
+      "proofsLabel": "Proofs awaiting review",
+      "proofsHelp": "Start here. These orders are blocked until an operator approves or rejects the uploaded payment proof.",
+      "reviewProofs": "Review payment proofs",
+      "statusHeading": "Queue by status",
+      "totalOrders_one": "1 total",
+      "totalOrders_other": "{{count}} total"
+    },
     "recent": {
       "heading": "Recent orders",
       "loading": "Loading recent orders...",

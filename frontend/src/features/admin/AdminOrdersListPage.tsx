@@ -2,10 +2,10 @@ import { Spinner } from '@heroui/react';
 import { Package } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { OrderStatusBadge } from '../orders/components/OrderStatusBadge';
-import type { OrderStatus } from '../orders/types';
+import { ORDER_STATUSES, type OrderStatus } from '../orders/types';
 
 import { StatusFilterDropdown } from './components/StatusFilterDropdown';
 import { useAdminOrdersQuery } from './hooks';
@@ -25,7 +25,8 @@ export function AdminOrdersListPage() {
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const isAr = lang === 'ar';
   const navigate = useNavigate();
-  const [statusFilter, setStatusFilter] = useState<OrderStatus | undefined>(undefined);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | undefined>(() => parseStatusFilter(searchParams.get('status')));
   const [page, setPage] = useState(1);
   const query = useAdminOrdersQuery({ status: statusFilter, page, pageSize: 25 });
   const dateFmt = new Intl.DateTimeFormat(isAr ? 'ar-EG' : 'en-US', {
@@ -43,7 +44,14 @@ export function AdminOrdersListPage() {
           </h1>
           <p className="text-sm text-default-500">{t('admin.list.subtitle')}</p>
         </div>
-        <StatusFilterDropdown value={statusFilter} onChange={(next) => { setStatusFilter(next); setPage(1); }} />
+        <StatusFilterDropdown
+          value={statusFilter}
+          onChange={(next) => {
+            setStatusFilter(next);
+            setPage(1);
+            setSearchParams(next === undefined ? {} : { status: String(next) });
+          }}
+        />
       </header>
 
       {query.isLoading ? (
@@ -106,4 +114,15 @@ export function AdminOrdersListPage() {
       )}
     </section>
   );
+}
+
+function parseStatusFilter(value: string | null): OrderStatus | undefined {
+  if (value === null || value === '') return undefined;
+
+  const numericValue = Number(value);
+  const validStatuses = Object.values(ORDER_STATUSES) as OrderStatus[];
+
+  return validStatuses.includes(numericValue as OrderStatus)
+    ? (numericValue as OrderStatus)
+    : undefined;
 }

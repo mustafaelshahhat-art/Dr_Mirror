@@ -15,7 +15,6 @@ import { adminOrdersApi } from './api';
 
 const KPI_STATUSES: { key: string; status: OrderStatus }[] = [
   { key: 'pending', status: ORDER_STATUSES.Pending as OrderStatus },
-  { key: 'pendingReview', status: ORDER_STATUSES.PendingPaymentReview as OrderStatus },
   { key: 'paid', status: ORDER_STATUSES.Paid as OrderStatus },
   { key: 'preparing', status: ORDER_STATUSES.Preparing as OrderStatus },
   { key: 'shipped', status: ORDER_STATUSES.Shipped as OrderStatus },
@@ -37,6 +36,7 @@ export function AdminHubPage() {
 
   const stats = statsQuery.data;
   const recentOrders = recentQuery.data?.items ?? [];
+  const proofQueueCount = stats?.countsByStatus[ORDER_STATUSES.PendingPaymentReview] ?? 0;
 
   return (
     <section className="space-y-6">
@@ -46,30 +46,49 @@ export function AdminHubPage() {
       </header>
 
       {statsQuery.isLoading ? (
-        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-divider/60 bg-divider/40 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-24 animate-pulse bg-content1 p-4"
-            />
-          ))}
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+          <div className="h-40 animate-pulse rounded-large border border-divider/60 bg-content1" />
+          <div className="h-40 animate-pulse rounded-large border border-divider/60 bg-content1" />
         </div>
       ) : stats ? (
         <>
-          <div className="grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-divider/60 bg-divider/40 sm:grid-cols-2 lg:grid-cols-3">
-            <KpiCard
-              label={t('admin.hub.kpis.total')}
-              value={stats.totalOrders}
-              tone="primary"
-            />
-            {KPI_STATUSES.map(({ key, status }) => (
-              <KpiCard
-                key={key}
-                label={t(`admin.hub.kpis.${key}`)}
-                value={stats.countsByStatus[status] ?? 0}
-                tone="default"
-              />
-            ))}
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <Link
+              to={`/admin/orders?status=${ORDER_STATUSES.PendingPaymentReview}`}
+              className="group rounded-large border border-divider/60 bg-content1 p-5 transition-colors hover:bg-content2"
+            >
+              <p className="text-xs font-medium uppercase tracking-wide text-default-400">
+                {t('admin.hub.queue.proofsLabel')}
+              </p>
+              <p className="mt-3 text-5xl font-bold leading-none tracking-tight text-primary tabular-nums">
+                {proofQueueCount}
+              </p>
+              <p className="mt-3 max-w-prose text-sm text-default-500">
+                {t('admin.hub.queue.proofsHelp')}
+              </p>
+              <span className="mt-5 inline-flex text-sm font-medium text-primary group-hover:underline">
+                {t('admin.hub.queue.reviewProofs')}
+              </span>
+            </Link>
+
+            <div className="rounded-large border border-divider/60 bg-content1 p-4">
+              <div className="flex items-center justify-between gap-3 border-b border-divider/60 pb-3">
+                <p className="text-sm font-semibold">{t('admin.hub.queue.statusHeading')}</p>
+                <span className="text-xs text-default-500 tabular-nums">
+                  {t('admin.hub.queue.totalOrders', { count: stats.totalOrders })}
+                </span>
+              </div>
+              <dl className="divide-y divide-divider/60">
+                <StatusRow label={t('admin.hub.kpis.pendingReview')} value={proofQueueCount} emphasis />
+                {KPI_STATUSES.map(({ key, status }) => (
+                  <StatusRow
+                    key={key}
+                    label={t(`admin.hub.kpis.${key}`)}
+                    value={stats.countsByStatus[status] ?? 0}
+                  />
+                ))}
+              </dl>
+            </div>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
@@ -107,14 +126,14 @@ export function AdminHubPage() {
               </Link>
             </div>
 
-            <aside className="space-y-3">
+            <div className="space-y-3">
               <h2 className="text-base font-semibold">{t('admin.hub.quickLinks')}</h2>
               <div className="space-y-2">
                 <QuickLink to="/admin/orders" icon={ClipboardList} label={t('admin.shell.nav.orders')} />
                 <QuickLink to="/admin/products" icon={Package} label={t('admin.shell.nav.products')} />
                 <QuickLink to="/admin/users" icon={Users} label={t('admin.shell.nav.users')} />
               </div>
-            </aside>
+            </div>
           </div>
         </>
       ) : null}
@@ -128,25 +147,29 @@ export function AdminHubPage() {
   );
 }
 
-function KpiCard({
+function StatusRow({
   label,
   value,
-  tone,
+  emphasis = false,
 }: {
   label: string;
   value: number;
-  tone: 'primary' | 'default';
+  emphasis?: boolean;
 }) {
   return (
-    <div className="bg-content1 p-4">
-      <p className="text-xs font-medium uppercase tracking-wide text-default-400">{label}</p>
-      <p
-        className={`mt-1 text-3xl font-bold leading-none tabular-nums ${
-          tone === 'primary' ? 'text-primary' : 'text-foreground'
-        }`}
+    <div className="flex items-center justify-between gap-4 py-3">
+      <dt className={emphasis ? 'text-sm font-medium text-foreground' : 'text-sm text-default-500'}>
+        {label}
+      </dt>
+      <dd
+        className={
+          emphasis
+            ? 'text-base font-semibold text-primary tabular-nums'
+            : 'text-sm font-medium text-foreground tabular-nums'
+        }
       >
         {value}
-      </p>
+      </dd>
     </div>
   );
 }

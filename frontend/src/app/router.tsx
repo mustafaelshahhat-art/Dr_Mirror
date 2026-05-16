@@ -12,6 +12,7 @@ import {
 } from '../features/auth/ProtectedRoute';
 import { Layout } from '../shared/components/Layout';
 import { NotFoundPage } from '../shared/pages/NotFoundPage';
+import { useAuth } from '../features/auth/useAuth';
 
 // Auth guards are kept eager — they are tiny and must resolve synchronously.
 // All page-level components are lazy so they only load when navigated to.
@@ -52,6 +53,10 @@ function PageFallback() {
 }
 
 export function AppRoutes() {
+  const { isBootstrapping } = useAuth();
+
+  if (isBootstrapping) return <SessionFallback />;
+
   return (
     <Suspense fallback={<PageFallback />}>
       <Routes>
@@ -95,5 +100,15 @@ export function AppRoutes() {
         </Route>
       </Routes>
     </Suspense>
+  );
+}
+
+function SessionFallback() {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex min-h-svh items-center justify-center bg-background">
+      <Spinner aria-label={t('loading.session')} />
+    </div>
   );
 }
