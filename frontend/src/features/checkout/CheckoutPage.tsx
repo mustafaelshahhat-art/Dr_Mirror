@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Spinner } from '@heroui/react';
+import { Button, Form, Spinner } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isAxiosError } from 'axios';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
@@ -9,17 +9,18 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 
 import type { ProblemDetails } from '../auth/types';
 import { useAuth } from '../auth/useAuth';
-import { FormField } from '../auth/components/FormField';
-import { GovernorateSelect } from '../addresses/components/GovernorateSelect';
 import { useAddressesQuery } from '../addresses/hooks';
 import { useCart } from '../cart/useCart';
 import { useCreateOrderMutation, usePaymentMethodsQuery } from '../orders/hooks';
 
+import { AddressStep } from './components/AddressStep';
 import { CheckoutSteps, type CheckoutStep } from './components/CheckoutSteps';
+import { CheckoutSummary } from './components/CheckoutSummary';
 import { PaymentMethodPicker } from './components/PaymentMethodPicker';
+import { ReviewStep } from './components/ReviewStep';
 import { checkoutSchema, type CheckoutForm } from './schemas';
 
-import { formatCurrency } from '../../shared/lib/format';
+import { FormField } from '../auth/components/FormField';
 import type { AppLang } from '../../shared/lib/theme-storage';
 
 /**
@@ -222,171 +223,18 @@ export function CheckoutPage() {
           ) : null}
 
           {step === 'address' ? (
-            <fieldset className="space-y-4">
-              <legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
-                {t('checkout.address.heading')}
-              </legend>
-
-              {(addressesQuery.data ?? []).length > 0 ? (
-                <div className="space-y-2">
-                  <p className="text-xs uppercase tracking-wide text-default-500">
-                    {t('checkout.address.savedHeading')}
-                  </p>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {(addressesQuery.data ?? []).map((a) => {
-                      const localizedGov = t(`governorates.${a.governorate}`, a.governorate);
-                      const isSelected = savedAddressId === a.id;
-                      return (
-                        <button
-                          key={a.id}
-                          type="button"
-                          role="radio"
-                          aria-checked={isSelected}
-                          onClick={() => setSavedAddressId(a.id)}
-                          className={[
-                            'rounded-medium border p-3 text-start transition-colors',
-                            isSelected
-                              ? 'border-primary bg-primary/5 ring-1 ring-primary'
-                              : 'border-divider bg-content1 hover:bg-content2',
-                          ].join(' ')}
-                        >
-                          <p className="text-sm font-semibold">
-                            {a.label}
-                            {a.isDefault ? (
-                              <span className="ms-2 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2 py-0 text-xs font-medium text-primary">
-                                {t('addresses.defaultBadge')}
-                              </span>
-                            ) : null}
-                          </p>
-                          <p className="text-xs text-default-500" dir="ltr">
-                            {a.phone}
-                          </p>
-                          <p className="text-xs text-default-700 dark:text-default-300">
-                            {a.streetAddress}
-                          </p>
-                          <p className="text-xs text-default-700 dark:text-default-300">
-                            {a.city}, {localizedGov}
-                          </p>
-                        </button>
-                      );
-                    })}
-                    <button
-                      type="button"
-                      role="radio"
-                      aria-checked={savedAddressId === null}
-                      onClick={() => setSavedAddressId(null)}
-                      className={[
-                        'rounded-medium border p-3 text-start text-sm transition-colors',
-                        savedAddressId === null
-                          ? 'border-primary bg-primary/5 ring-1 ring-primary'
-                          : 'border-divider bg-content1 hover:bg-content2',
-                      ].join(' ')}
-                    >
-                      <p className="font-semibold">{t('checkout.address.useNew.title')}</p>
-                      <p className="text-xs text-default-500">
-                        {t('checkout.address.useNew.subtitle')}
-                      </p>
-                    </button>
-                  </div>
-                </div>
-              ) : null}
-
-              {savedAddressId === null ? (
-                <>
-                  <FormField
-                    name="address.recipientName"
-                    control={control}
-                    label={t('checkout.address.recipientName')}
-                    autoComplete="name"
-                    isRequired
-                  />
-                  <FormField
-                    name="address.phone"
-                    control={control}
-                    label={t('checkout.address.phone')}
-                    type="tel"
-                    autoComplete="tel"
-                    isRequired
-                  />
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="flex flex-col gap-1.5 text-sm">
-                      <span className="text-sm font-medium">
-                        {t('checkout.address.governorate')}
-                      </span>
-                      <GovernorateSelect
-                        value={watch('address.governorate')}
-                        onChange={(slug) =>
-                          setValue('address.governorate', slug, {
-                            shouldValidate: true,
-                            shouldDirty: true,
-                          })
-                        }
-                        required
-                      />
-                    </label>
-                    <FormField
-                      name="address.city"
-                      control={control}
-                      label={t('checkout.address.city')}
-                      autoComplete="address-level2"
-                      isRequired
-                    />
-                  </div>
-                  <FormField
-                    name="address.streetAddress"
-                    control={control}
-                    label={t('checkout.address.streetAddress')}
-                    autoComplete="street-address"
-                    isRequired
-                  />
-                  <div className="grid gap-4 sm:grid-cols-3">
-                    <FormField
-                      name="address.floor"
-                      control={control}
-                      label={t('checkout.address.floor')}
-                    />
-                    <FormField
-                      name="address.apartment"
-                      control={control}
-                      label={t('checkout.address.apartment')}
-                    />
-                    <FormField
-                      name="address.landmark"
-                      control={control}
-                      label={t('checkout.address.landmark')}
-                    />
-                  </div>
-                  <FormField
-                    name="address.notes"
-                    control={control}
-                    label={t('checkout.address.notes')}
-                    description={t('checkout.address.notesHint')}
-                  />
-
-                  <Checkbox
-                    isSelected={saveAsNewAddress}
-                    onValueChange={setSaveAsNewAddress}
-                    size="sm"
-                  >
-                    <span className="text-sm">{t('checkout.address.saveAsNew')}</span>
-                  </Checkbox>
-                  {saveAsNewAddress ? (
-                    <label className="flex flex-col gap-1.5 text-sm">
-                      <span className="text-xs uppercase tracking-wide text-default-500">
-                        {t('checkout.address.newLabel')}
-                      </span>
-                      <input
-                        value={newAddressLabel}
-                        onChange={(e) => setNewAddressLabel(e.target.value)}
-                        maxLength={64}
-                        placeholder={t('checkout.address.newLabelPlaceholder')}
-                        className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm"
-                      />
-                    </label>
-                  ) : null}
-                </>
-              ) : null}
-            </fieldset>
+            <AddressStep
+              control={control}
+              watch={watch}
+              setValue={setValue}
+              savedAddresses={savedAddresses}
+              savedAddressId={savedAddressId}
+              setSavedAddressId={setSavedAddressId}
+              saveAsNewAddress={saveAsNewAddress}
+              setSaveAsNewAddress={setSaveAsNewAddress}
+              newAddressLabel={newAddressLabel}
+              setNewAddressLabel={setNewAddressLabel}
+            />
           ) : null}
 
           {step === 'payment' ? (
@@ -420,48 +268,12 @@ export function CheckoutPage() {
           ) : null}
 
           {step === 'review' ? (
-            <fieldset className="space-y-4">
-              <legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
-                {t('checkout.review.heading')}
-              </legend>
-              <article className="rounded-medium border border-divider/60 bg-content1 p-3 text-sm">
-                <h3 className="font-semibold">{t('checkout.review.shippingTo')}</h3>
-                <p className="mt-1 leading-relaxed">
-                  {reviewAddress?.recipientName}
-                  <br />
-                  <span dir="ltr">{reviewAddress?.phone}</span>
-                  <br />
-                  {reviewAddress?.streetAddress}
-                  {reviewAddress?.apartment
-                    ? `, ${t('checkout.address.apartmentShort')} ${reviewAddress.apartment}`
-                    : ''}
-                  {reviewAddress?.floor
-                    ? `, ${t('checkout.address.floorShort')} ${reviewAddress.floor}`
-                    : ''}
-                  <br />
-                  {reviewAddress?.city},{' '}
-                  {t(
-                    `governorates.${reviewAddress?.governorate}`,
-                    reviewAddress?.governorate ?? '',
-                  )}
-                </p>
-              </article>
-              <article className="rounded-medium border border-divider/60 bg-content1 p-3 text-sm">
-                <h3 className="font-semibold">{t('checkout.review.payingWith')}</h3>
-                <p className="mt-1">
-                  {selectedMethod
-                    ? isAr
-                      ? selectedMethod.nameAr
-                      : selectedMethod.nameEn
-                    : t('checkout.review.noMethod')}
-                </p>
-              </article>
-              {buyerNote?.trim() ? (
-                <article className="rounded-medium border border-divider/60 bg-content1 p-3 text-sm italic text-default-700 dark:text-default-300">
-                  &ldquo;{buyerNote}&rdquo;
-                </article>
-              ) : null}
-            </fieldset>
+            <ReviewStep
+              reviewAddress={reviewAddress}
+              selectedMethod={selectedMethod}
+              buyerNote={buyerNote}
+              isAr={isAr}
+            />
           ) : null}
 
           <div className="flex items-center justify-between gap-2 pt-2">
@@ -492,43 +304,7 @@ export function CheckoutPage() {
           </div>
         </div>
 
-        <aside className="h-fit space-y-4 rounded-large border border-divider/60 bg-content1 p-4 lg:sticky lg:top-20">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
-            {t('checkout.summary.heading')}
-          </h2>
-          <ul className="space-y-2 text-sm">
-            {cart.items.map((line) => {
-              const name = isAr ? line.nameAr : line.nameEn;
-              return (
-                <li key={line.id} className="flex justify-between gap-3">
-                  <span className="line-clamp-2 min-w-0 flex-1">
-                    {name}{' '}
-                    <span className="text-xs text-default-500">
-                      × {line.quantity}
-                    </span>
-                  </span>
-                  <span className="shrink-0 tabular-nums">
-                    {formatCurrency(line.lineTotal, lang)}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-          <dl className="space-y-1 border-t border-divider/60 pt-3 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-default-500">{t('checkout.summary.subTotal')}</dt>
-              <dd className="tabular-nums">{formatCurrency(cart.subTotal, lang)}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-default-500">{t('checkout.summary.shipping')}</dt>
-              <dd className="tabular-nums">{t('checkout.summary.shippingFreeM3')}</dd>
-            </div>
-            <div className="mt-2 flex justify-between border-t border-divider/60 pt-2 text-base font-semibold">
-              <dt>{t('checkout.summary.total')}</dt>
-              <dd className="tabular-nums">{formatCurrency(cart.subTotal, lang)}</dd>
-            </div>
-          </dl>
-        </aside>
+        <CheckoutSummary items={cart.items} subTotal={cart.subTotal} lang={lang} />
       </Form>
     </section>
   );

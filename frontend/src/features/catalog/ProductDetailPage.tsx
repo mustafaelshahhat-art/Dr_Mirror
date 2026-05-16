@@ -1,6 +1,6 @@
 import { Button, Spinner } from '@heroui/react';
-import { ArrowLeft, Check, ImageOff, MessageSquare, ShoppingBag } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ArrowLeft, Check, MessageSquare, ShoppingBag } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
@@ -13,6 +13,7 @@ import { InquiryForm } from '../inquiries/components/InquiryForm';
 
 import { ColorPicker } from './components/ColorPicker';
 import { GenderChip } from './components/GenderChip';
+import { ProductImageGallery } from './components/ProductImageGallery';
 import { SizePicker } from './components/SizePicker';
 import {
   useLocalizedDescription,
@@ -20,6 +21,7 @@ import {
   useProductDetailQuery,
   useVariantSelection,
 } from './hooks';
+import { useAddToCart } from './hooks/useAddToCart';
 
 export function ProductDetailPage() {
   const { t, i18n } = useTranslation();
@@ -31,21 +33,10 @@ export function ProductDetailPage() {
   const name = useLocalizedField(product);
   const description = useLocalizedDescription(product);
   const categoryName = useLocalizedField(product?.category);
-  const [activeImage, setActiveImage] = useState(0);
   const variantSelection = useVariantSelection(product);
-  const { addItem, cart } = useCart();
-  const [addState, setAddState] = useState<'idle' | 'adding' | 'added' | 'error'>(
-    'idle',
-  );
-  const [addError, setAddError] = useState<string | null>(null);
+  const { cart } = useCart();
+  const { addState, addError, handleAddToCart } = useAddToCart();
   const [showInquiry, setShowInquiry] = useState(false);
-
-  // Auto-clear the "added" badge so the user can add the same item again.
-  useEffect(() => {
-    if (addState !== 'added') return;
-    const t = window.setTimeout(() => setAddState('idle'), 2000);
-    return () => window.clearTimeout(t);
-  }, [addState]);
 
   if (query.isLoading) {
     return (
@@ -78,9 +69,6 @@ export function ProductDetailPage() {
     );
   }
 
-  const images = product.images;
-  const currentImage = images[activeImage] ?? images[0];
-
   return (
     <article className="space-y-6">
       <Link
@@ -92,47 +80,7 @@ export function ProductDetailPage() {
       </Link>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <section className="space-y-3">
-          <div className="aspect-[4/3] w-full overflow-hidden rounded-large border border-divider/60 bg-default-100">
-            {currentImage ? (
-              <img
-                src={currentImage.url}
-                alt={currentImage.alt ?? name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-default-300 dark:text-default-600">
-                <ImageOff className="size-16" aria-hidden />
-              </div>
-            )}
-          </div>
-
-          {images.length > 1 ? (
-            <div className="flex gap-2 overflow-x-auto" role="tablist">
-              {images.map((img, idx) => (
-                <button
-                  key={img.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={idx === activeImage}
-                  onClick={() => setActiveImage(idx)}
-                  className={
-                    idx === activeImage
-                      ? 'h-16 w-20 shrink-0 overflow-hidden rounded-medium ring-2 ring-primary'
-                      : 'h-16 w-20 shrink-0 overflow-hidden rounded-medium border border-divider/60 transition-shadow hover:ring-1 hover:ring-default-300'
-                  }
-                >
-                  <img
-                    src={img.url}
-                    alt={img.alt ?? name}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                </button>
-              ))}
-            </div>
-          ) : null}
-        </section>
+        <ProductImageGallery images={product.images} productName={name} />
 
         <section className="flex flex-col gap-4">
           <Link
@@ -216,35 +164,25 @@ export function ProductDetailPage() {
                 !variantSelection.selectedVariant ||
                 variantSelection.selectedVariant.stock <= 0
               }
-              onPress={async () => {
+              onPress={() => {
                 const v = variantSelection.selectedVariant;
-                if (!v || !product) return;
-                setAddState('adding');
-                setAddError(null);
-                try {
-                  await addItem({
-                    productVariantId: v.id,
-                    quantity: 1,
-                    productId: product.id,
-                    productSlug: product.slug,
-                    nameAr: product.nameAr,
-                    nameEn: product.nameEn,
-                    size: v.size,
-                    colorName: v.colorName,
-                    colorNameAr: v.colorNameAr,
-                    colorHex: v.colorHex,
-                    sku: v.sku,
-                    unitPrice: product.price,
-                    primaryImageUrl: product.images[0]?.url ?? null,
-                    variantStock: v.stock,
-                  });
-                  setAddState('added');
-                } catch (err) {
-                  setAddState('error');
-                  const message =
-                    err instanceof Error ? err.message : t('cart.addError');
-                  setAddError(message);
-                }
+                if (!v) return;
+                void handleAddToCart({
+                  productVariantId: v.id,
+                  quantity: 1,
+                  productId: product.id,
+                  productSlug: product.slug,
+                  nameAr: product.nameAr,
+                  nameEn: product.nameEn,
+                  size: v.size,
+                  colorName: v.colorName,
+                  colorNameAr: v.colorNameAr,
+                  colorHex: v.colorHex,
+                  sku: v.sku,
+                  unitPrice: product.price,
+                  primaryImageUrl: product.images[0]?.url ?? null,
+                  variantStock: v.stock,
+                });
               }}
             >
               <span className="inline-flex items-center gap-2">

@@ -76,49 +76,9 @@ public static class CreateOrderEndpoint
         // The initial order status differs — see the FSM call below.
 
         // ---- Resolve shipping address from saved book or inline payload. -------
-        ShippingAddress shippingAddress;
-        if (request.BuyerAddressId is { } addrId)
-        {
-            var saved = await db.BuyerAddresses
-                .AsNoTracking()
-                .FirstOrDefaultAsync(a => a.Id == addrId && a.UserId == userId, ct);
-            if (saved is null)
-            {
-                return Results.Problem(
-                    title: "Saved address not found",
-                    detail: "The selected address was not found in your address book.",
-                    statusCode: StatusCodes.Status404NotFound);
-            }
-            shippingAddress = new ShippingAddress
-            {
-                RecipientName = saved.RecipientName,
-                Phone = saved.Phone,
-                Governorate = saved.Governorate,
-                City = saved.City,
-                StreetAddress = saved.StreetAddress,
-                Floor = saved.Floor,
-                Apartment = saved.Apartment,
-                Landmark = saved.Landmark,
-                Notes = saved.Notes,
-            };
-        }
-        else
-        {
-            // Validator guarantees ShippingAddress is non-null in this branch.
-            var inline = request.ShippingAddress!;
-            shippingAddress = new ShippingAddress
-            {
-                RecipientName = inline.RecipientName.Trim(),
-                Phone = inline.Phone.Trim(),
-                Governorate = Governorates.Normalize(inline.Governorate),
-                City = inline.City.Trim(),
-                StreetAddress = inline.StreetAddress.Trim(),
-                Floor = inline.Floor?.Trim(),
-                Apartment = inline.Apartment?.Trim(),
-                Landmark = inline.Landmark?.Trim(),
-                Notes = inline.Notes?.Trim(),
-            };
-        }
+        var (shippingAddress, addressError) = await ShippingAddressResolver.ResolveAsync(
+            request.BuyerAddressId, request.ShippingAddress, userId, db, ct);
+        if (addressError is not null) return addressError;
 
         // ---- Initial availability check (pre-decrement). Saves a transaction
         //      round-trip in the common no-contention case. The same check is
@@ -138,62 +98,7 @@ public static class CreateOrderEndpoint
 
         // ---- Build the order entity (no DB writes yet). ------------------------
         var orderNumber = await numberGenerator.NextAsync(ct);
-
-        var order = new Order
-        {
-            Id = Guid.NewGuid(),
-            OrderNumber = orderNumber,
-            BuyerUserId = userId,
-            Status = OrderStatus.Pending, // bumped immediately by the FSM below
-            Currency = "EGP",
-            ShippingFee = 0m, // Free shipping in V1; M4+ may add a matrix.
-            PaymentMethodId = paymentMethod.Id,
-            PaymentMethodKind = paymentMethod.Kind,
-            PaymentMethodNameEn = paymentMethod.NameEn,
-            PaymentMethodNameAr = paymentMethod.NameAr,
-            BuyerNote = request.BuyerNote,
-            ShippingAddress = shippingAddress,
-        };
-
-        decimal subTotal = 0m;
-        foreach (var line in cart.Items)
-        {
-            var v = line.ProductVariant!;
-            var p = v.Product!;
-            var unit = p.Price;
-            var lineTotal = unit * line.Quantity;
-            subTotal += lineTotal;
-
-            order.Items.Add(new OrderItem
-            {
-                Id = Guid.NewGuid(),
-                ProductId = p.Id,
-                ProductVariantId = v.Id,
-                NameAr = p.NameAr,
-                NameEn = p.NameEn,
-                Sku = v.Sku,
-                Size = v.Size,
-                ColorName = v.ColorName,
-                ColorNameAr = v.ColorNameAr,
-                ColorHex = v.ColorHex,
-                PrimaryImageUrl = p.Images
-                    .OrderBy(im => im.DisplayOrder)
-                    .Select(im => im.Url)
-                    .FirstOrDefault(),
-                UnitPrice = unit,
-                Quantity = line.Quantity,
-                LineTotal = lineTotal,
-            });
-        }
-
-        order.SubTotal = subTotal;
-        order.Total = subTotal + order.ShippingFee;
-
-        if (paymentMethod.Kind == PaymentMethodKind.Cod)
-        {
-            fsm.Transition(order, OrderStatus.Confirmed, OrderActor.System);
-        }
-        // else: order stays at Pending until proof uploaded.
+        var order = OrderFactory.Build(orderNumber, userId, cart.Items, paymentMethod, shippingAddress!, request.BuyerNote, fsm);
 
         db.Orders.Add(order);
         db.CartItems.RemoveRange(cart.Items);
@@ -216,7 +121,7 @@ public static class CreateOrderEndpoint
                     Id = Guid.NewGuid(),
                     UserId = userId,
                     Label = request.Label!.Trim(),
-                    RecipientName = shippingAddress.RecipientName,
+                    RecipientName = shippingAddress!.RecipientName,
                     Phone = shippingAddress.Phone,
                     Governorate = shippingAddress.Governorate,
                     City = shippingAddress.City,

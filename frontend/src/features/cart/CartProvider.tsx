@@ -1,9 +1,6 @@
 import {
   useCallback,
-  useEffect,
   useMemo,
-  useRef,
-  useState,
   type ReactNode,
 } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -12,9 +9,7 @@ import { useAuth } from '../auth/useAuth';
 
 import { cartApi } from './api';
 import {
-  GUEST_CART_EVENT,
   clearGuestCart,
-  isGuestCartStorageKey,
   readGuestCart,
   writeGuestCart,
 } from './guest-cart-storage';
@@ -26,6 +21,8 @@ import {
   type CartContextValue,
   type CartView,
 } from './CartContext';
+import { useGuestCartSync } from './hooks/useGuestCartSync';
+import { useCartMerge } from './hooks/useCartMerge';
 
 /**
  * Owns cart state across the entire SPA. Two modes:
@@ -43,26 +40,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const isAuthed = Boolean(user);
 
   // ------- Guest cart (localStorage) ----------------------------------------
-  const [guestLines, setGuestLines] = useState<GuestCartLine[]>(() =>
-    readGuestCart(),
-  );
-
-  // Keep state in sync with localStorage on cross-tab updates AND on our own
-  // dispatches from writeGuestCart (so this component re-reads after mutation).
-  useEffect(() => {
-    function rehydrate() {
-      setGuestLines(readGuestCart());
-    }
-    function onStorage(e: StorageEvent) {
-      if (isGuestCartStorageKey(e.key)) rehydrate();
-    }
-    window.addEventListener(GUEST_CART_EVENT, rehydrate);
-    window.addEventListener('storage', onStorage);
-    return () => {
-      window.removeEventListener(GUEST_CART_EVENT, rehydrate);
-      window.removeEventListener('storage', onStorage);
-    };
-  }, []);
+  const [guestLines] = useGuestCartSync();
 
   // ------- Server cart (React Query) ----------------------------------------
   const serverCartQuery = useQuery<CartDto>({
@@ -73,64 +51,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   });
 
   // ------- Merge guest → server on login ------------------------------------
-  // Track whether the current authed-session's merge has already run so a
-  // re-render doesn't re-fire it. Only set on confirmed success so a failed
-  // merge can be retried.
-  const mergedForUserId = useRef<string | null>(null);
-  const [mergeError, setMergeError] = useState<string | null>(null);
-
-  const mergeMutation = useMutation<
-    import('./types').CartDto,
-    Error,
-    { items: { productVariantId: string; quantity: number }[] }
-  >({
-    mutationFn: (payload) => cartApi.merge(payload),
-  });
-
-  const performMerge = useCallback(async () => {
-    if (!user) return;
-    setMergeError(null);
-    const stash = readGuestCart();
-    if (stash.length === 0) {
-      mergedForUserId.current = user.id;
-      return;
-    }
-    try {
-      const merged = await mergeMutation.mutateAsync({
-        items: stash.map((l) => ({
-          productVariantId: l.productVariantId,
-          quantity: l.quantity,
-        })),
-      });
-      clearGuestCart();
-      // Hand the merged cart directly to React Query so consumers see it
-      // immediately without an extra GET round-trip.
-      queryClient.setQueryData(['cart'], merged);
-      mergedForUserId.current = user.id;
-    } catch (err) {
-      // Leave the guest cart in place — buyer can retry via the cart page.
-      setMergeError(
-        err instanceof Error
-          ? err.message
-          : 'Failed to sync your cart. Please try again.',
-      );
-    }
-  }, [user, mergeMutation, queryClient]);
-
-  useEffect(() => {
-    if (!isAuthed || !user || isBootstrapping) return;
-    if (mergedForUserId.current === user.id) return;
-    void performMerge();
-  }, [isAuthed, user, isBootstrapping, performMerge]);
-
-  // Drop the in-memory user id when the user signs out so the next sign-in
-  // re-runs the merge.
-  useEffect(() => {
-    if (!user) {
-      mergedForUserId.current = null;
-      setMergeError(null);
-    }
-  }, [user]);
+  const { mergeError, performMerge } = useCartMerge({ user, isBootstrapping, queryClient });
 
   // ------- Mutations (authed-only) ------------------------------------------
   const addMutation = useMutation<CartDto, Error, AddItemInput>({

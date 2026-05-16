@@ -1,4 +1,3 @@
-using Coravel.Queuing.Interfaces;
 using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Domain.Orders;
 using DrMirror.Api.Features.Orders.Common;
@@ -42,7 +41,6 @@ public static class RejectPaymentProofEndpoint
         ICurrentUser current,
         AppDbContext db,
         [FromServices] OrderStateMachine fsm,
-        [FromServices] IQueue queue,
         CancellationToken ct)
     {
         if (current.UserId is not { } adminId)
@@ -106,10 +104,8 @@ public static class RejectPaymentProofEndpoint
 
         fsm.Transition(order, OrderStatus.Pending, OrderActor.Admin);
 
+        db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
         await db.SaveChangesAsync(ct);
-
-        queue.QueueInvocableWithPayload<SendStatusChangedJob, OrderStatusChangedPayload>(
-            new OrderStatusChangedPayload(order.Id, order.Status));
 
         return Results.Ok(order.ToDetail(fsm));
     }

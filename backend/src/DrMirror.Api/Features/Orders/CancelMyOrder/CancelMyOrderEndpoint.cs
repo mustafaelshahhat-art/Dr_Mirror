@@ -1,4 +1,3 @@
-using Coravel.Queuing.Interfaces;
 using DrMirror.Api.Domain.Orders;
 using DrMirror.Api.Features.Orders.Common;
 using DrMirror.Api.Infrastructure.Email;
@@ -33,7 +32,6 @@ public static class CancelMyOrderEndpoint
         ICurrentUser current,
         AppDbContext db,
         [FromServices] OrderStateMachine fsm,
-        [FromServices] IQueue queue,
         CancellationToken ct)
     {
         if (!current.IsAuthenticated || current.UserId is not { } userId)
@@ -80,10 +78,8 @@ public static class CancelMyOrderEndpoint
 
         fsm.Transition(order, OrderStatus.Cancelled, OrderActor.Buyer, request.Reason);
 
+        db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
         await db.SaveChangesAsync(ct);
-
-        queue.QueueInvocableWithPayload<SendStatusChangedJob, OrderStatusChangedPayload>(
-            new OrderStatusChangedPayload(order.Id, order.Status));
 
         return Results.Ok(order.ToDetail(fsm));
     }

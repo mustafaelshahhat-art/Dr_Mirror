@@ -1,33 +1,17 @@
-using System.Text;
 using System.Text.Encodings.Web;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.RateLimiting;
-using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Features.Addresses;
 using DrMirror.Api.Features.Admin;
 using DrMirror.Api.Features.Auth;
-using DrMirror.Api.Features.Auth.Common;
 using DrMirror.Api.Features.Cart;
-using DrMirror.Api.Features.Cart.Common;
 using DrMirror.Api.Features.Catalog;
 using DrMirror.Api.Features.Checkout;
 using DrMirror.Api.Features.Inquiries;
 using DrMirror.Api.Features.Orders;
-using DrMirror.Api.Features.Orders.Common;
-using DrMirror.Api.Infrastructure.Email;
-using DrMirror.Api.Infrastructure.Identity;
+using DrMirror.Api.Infrastructure.Extensions;
 using DrMirror.Api.Infrastructure.Persistence;
-using DrMirror.Api.Infrastructure.Persistence.Seed;
-using DrMirror.Api.Infrastructure.Storage;
-using DrMirror.Api.Shared.RateLimiting;
 using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
 
@@ -103,127 +87,29 @@ try
     // non-existent /Account/Login page. JWT Bearer is the sole auth scheme.
     // No email confirmation in M1 per the locked decision (immediate signup).
     // -----------------------------------------------------------------------
-    builder.Services
-        .AddIdentityCore<User>(options =>
-        {
-            options.Password.RequireDigit = true;
-            options.Password.RequireLowercase = true;
-            options.Password.RequireUppercase = true;
-            options.Password.RequireNonAlphanumeric = false; // mirror frontend zod
-            options.Password.RequiredLength = 8;
-            options.Password.RequiredUniqueChars = 1;
-
-            options.User.RequireUniqueEmail = true;
-
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-            options.Lockout.MaxFailedAccessAttempts = 5;
-            options.Lockout.AllowedForNewUsers = true;
-
-            options.SignIn.RequireConfirmedEmail = false;
-            options.SignIn.RequireConfirmedAccount = false;
-        })
-        .AddRoles<IdentityRole<Guid>>()
-        .AddSignInManager()
-        .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();
+    builder.Services.AddIdentityServices();
 
     // -----------------------------------------------------------------------
     // JWT options + auth scheme. Validate the bound options at startup so a
     // missing secret crashes us early instead of producing unsigned tokens.
     // -----------------------------------------------------------------------
-    builder.Services.AddOptions<JwtOptions>()
-        .Bind(builder.Configuration.GetSection(JwtOptions.SectionName))
-        .ValidateDataAnnotations()
-        .ValidateOnStart();
-
-    // Convenience: inject JwtOptions directly without IOptions<>.
-    builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtOptions>>().Value);
-
-    var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
-    var jwtSecret = jwtSection["Secret"]
-        ?? throw new InvalidOperationException(
-            "Jwt:Secret is required. " +
-            "In dev: dotnet user-secrets set \"Jwt:Secret\" \"<base64-or-long-random>\".");
-    var jwtIssuer = jwtSection["Issuer"] ?? "drmirror.local";
-    var jwtAudience = jwtSection["Audience"] ?? "drmirror.local";
-
-    builder.Services
-        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtIssuer,
-                ValidAudience = jwtAudience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
-                ClockSkew = TimeSpan.FromSeconds(30),
-            };
-            options.MapInboundClaims = false; // don't auto-rename JWT claims
-        });
-
-    builder.Services.AddAuthorization();
+    builder.Services.AddJwtAuthentication(builder.Configuration);
 
     // -----------------------------------------------------------------------
-    // Auth services.
+    // Application services — auth helpers, seeding, cart, order machinery.
     // -----------------------------------------------------------------------
-    builder.Services.AddHttpContextAccessor();
-    builder.Services.AddScoped<ICurrentUser, CurrentUser>();
-    builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-    builder.Services.AddScoped<RefreshTokenIssuer>();
-    builder.Services.AddScoped<RefreshCookieWriter>();
-    builder.Services.AddScoped<DevCatalogSeeder>();
-    builder.Services.AddScoped<DatabaseSeeder>();
-    builder.Services.AddScoped<CartService>();
-    builder.Services.AddSingleton<OrderStateMachine>();
-    builder.Services.AddSingleton(TimeProvider.System);
-    builder.Services.AddScoped<OrderNumberGenerator>();
+    builder.Services.AddApplicationServices();
 
     // -----------------------------------------------------------------------
     // File storage — env-switched between local filesystem and Cloudinary.
     // -----------------------------------------------------------------------
-    builder.Services.AddHttpClient();
-
-    builder.Services.AddOptions<FileStorageOptions>()
-        .Bind(builder.Configuration.GetSection(FileStorageOptions.SectionName))
-        .ValidateDataAnnotations()
-        .ValidateOnStart();
-
-    var storageProvider = builder.Configuration[$"{FileStorageOptions.SectionName}:Provider"] ?? "local";
-    if (storageProvider.Equals("cloudinary", StringComparison.OrdinalIgnoreCase))
-    {
-        builder.Services.AddSingleton<IFileStorageService, CloudinaryFileStorageService>();
-    }
-    else
-    {
-        builder.Services.AddSingleton<IFileStorageService, LocalFileStorageService>();
-    }
+    builder.Services.AddStorageServices(builder.Configuration);
 
     // -----------------------------------------------------------------------
     // Email — dev defaults to log-only; mailkit kicks in when SMTP is configured.
+    // Includes durable outbox processor.
     // -----------------------------------------------------------------------
-    builder.Services.AddOptions<EmailOptions>()
-        .Bind(builder.Configuration.GetSection(EmailOptions.SectionName))
-        .ValidateDataAnnotations()
-        .ValidateOnStart();
-
-    var emailProvider = builder.Configuration[$"{EmailOptions.SectionName}:Provider"] ?? "logonly";
-    if (emailProvider.Equals("mailkit", StringComparison.OrdinalIgnoreCase))
-    {
-        builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
-    }
-    else
-    {
-        builder.Services.AddSingleton<IEmailSender, LogOnlyEmailSender>();
-    }
-
-    // -----------------------------------------------------------------------
-    // Durable email outbox — polls the EmailOutboxMessages table every 30 s.
-    // -----------------------------------------------------------------------
-    builder.Services.AddHostedService<EmailOutboxProcessor>();
+    builder.Services.AddEmailServices(builder.Configuration);
 
     // FluentValidation — discover validators in this assembly.
     builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -268,62 +154,13 @@ try
     {
         opts.SerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
         opts.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        opts.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
     // -----------------------------------------------------------------------
     // Rate limiting — IP-keyed sliding/fixed windows on sensitive endpoints.
-    // Returns 429 with Retry-After on breach; no queue — reject immediately.
     // -----------------------------------------------------------------------
-    builder.Services.AddRateLimiter(options =>
-    {
-        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-        // Login + register — 10 req/60 s per IP (sliding window).
-        options.AddSlidingWindowLimiter(RateLimitPolicies.AuthStrict, o =>
-        {
-            o.Window = TimeSpan.FromMinutes(1);
-            o.SegmentsPerWindow = 6;
-            o.PermitLimit = 10;
-            o.QueueLimit = 0;
-            o.AutoReplenishment = true;
-        });
-
-        // Token refresh — 30 req/60 s per IP (sliding window).
-        options.AddSlidingWindowLimiter(RateLimitPolicies.AuthRefresh, o =>
-        {
-            o.Window = TimeSpan.FromMinutes(1);
-            o.SegmentsPerWindow = 6;
-            o.PermitLimit = 30;
-            o.QueueLimit = 0;
-            o.AutoReplenishment = true;
-        });
-
-        // Inquiry submit — 5 req/60 s per IP (fixed window).
-        options.AddFixedWindowLimiter(RateLimitPolicies.InquirySubmit, o =>
-        {
-            o.Window = TimeSpan.FromMinutes(1);
-            o.PermitLimit = 5;
-            o.QueueLimit = 0;
-            o.AutoReplenishment = true;
-        });
-
-        // Admin API — 120 req/60 s per user (fixed window, defense-in-depth).
-        options.AddFixedWindowLimiter(RateLimitPolicies.AdminApi, o =>
-        {
-            o.Window = TimeSpan.FromMinutes(1);
-            o.PermitLimit = 120;
-            o.QueueLimit = 0;
-            o.AutoReplenishment = true;
-        });
-
-        // Key by remote IP (falls back to empty string for non-TCP transports).
-        options.OnRejected = async (ctx, ct) =>
-        {
-            ctx.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-            await ctx.HttpContext.Response.WriteAsync(
-                "Too many requests. Please slow down and try again later.", ct);
-        };
-    });
+    builder.Services.AddRateLimitingPolicies();
 
     var app = builder.Build();
 
