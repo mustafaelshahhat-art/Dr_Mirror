@@ -30,8 +30,21 @@ namespace DrMirror.Tests.Infrastructure;
 /// </summary>
 public abstract class IntegrationWebAppFactory : WebApplicationFactory<Program>
 {
+    private static bool _envVarsSet;
+
     static IntegrationWebAppFactory()
     {
+        EnsureTestEnvVars();
+    }
+
+    /// <summary>
+    /// Sets the four environment variables Program.cs needs before
+    /// <c>WebApplication.CreateBuilder</c> can succeed. Safe to call multiple times.
+    /// </summary>
+    public static void EnsureTestEnvVars()
+    {
+        if (_envVarsSet) return;
+        _envVarsSet = true;
         Environment.SetEnvironmentVariable(
             "ConnectionStrings__Default",
             "Server=localhost;Database=DrMirrorTest;Trusted_Connection=True;TrustServerCertificate=True;");
