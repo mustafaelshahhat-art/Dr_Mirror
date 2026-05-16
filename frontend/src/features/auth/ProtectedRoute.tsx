@@ -75,6 +75,7 @@ export function AdminRoute() {
 export function PublicOnlyRoute() {
   const { t } = useTranslation();
   const { user, isBootstrapping } = useAuth();
+  const location = useLocation();
 
   if (isBootstrapping) {
     return (
@@ -85,9 +86,17 @@ export function PublicOnlyRoute() {
   }
 
   if (user) {
-    const dest = resolvePostAuthDestination(user, null);
+    const dest = resolvePostAuthDestination(user, getSafeNextPath(location.search));
     return <Navigate to={dest} replace />;
   }
 
   return <Outlet />;
+}
+
+function getSafeNextPath(search: string): string | null {
+  const next = new URLSearchParams(search).get('next');
+
+  if (next === null || !next.startsWith('/') || next.startsWith('//')) return null;
+
+  return next;
 }

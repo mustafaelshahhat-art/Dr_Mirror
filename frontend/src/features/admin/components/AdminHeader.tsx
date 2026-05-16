@@ -8,7 +8,9 @@ import { ThemeToggle } from '../../../shared/components/ThemeToggle';
 
 export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
   const { t } = useTranslation();
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
+
+  if (!isAdmin) return null;
 
   return (
     <header className="sticky top-0 z-40 border-b border-divider/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">

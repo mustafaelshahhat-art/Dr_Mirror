@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { Drawer } from '@heroui/react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -9,6 +9,7 @@ import {
   CreditCard,
   MessageSquare,
   Users,
+  type LucideIcon,
 } from 'lucide-react';
 
 const NAV_GROUPS = [
@@ -43,67 +44,60 @@ export function AdminSidebar({
   open: boolean;
   onClose: () => void;
 }) {
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open, onClose]);
+  const { t, i18n } = useTranslation();
+  const placement = i18n.dir() === 'rtl' ? 'right' : 'left';
 
   return (
     <>
-      {open ? (
-        <div
-          className="fixed inset-0 top-14 z-40 bg-black/40 md:hidden"
-          onClick={onClose}
-          role="presentation"
-        />
-      ) : null}
-
       <aside
         aria-label={t('admin.shell.navTitle')}
-        className={[
-          'fixed inset-y-0 start-0 top-14 z-50 flex w-56 flex-col border-e border-divider/60 bg-background transition-transform duration-200 motion-reduce:transition-none md:static md:z-auto md:bg-content1 md:translate-x-0 md:rtl:translate-x-0',
-          open ? 'translate-x-0' : '-translate-x-full rtl:translate-x-full',
-        ].join(' ')}
+        className="hidden w-56 flex-col border-e border-divider/60 bg-content1 md:flex"
       >
-        <div className="flex items-center justify-between border-b border-divider/60 px-3 py-3 md:hidden">
-          <span className="text-sm font-semibold tracking-tight text-foreground">
-            {t('admin.shell.navTitle')}
-          </span>
-        </div>
-
-        <nav className="flex flex-1 flex-col overflow-y-auto px-2 pb-4 pt-2">
-          {NAV_GROUPS.map((group) => (
-            <div key={group.groupKey}>
-              <p className="px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-wide text-default-400">
-                {t(`admin.shell.nav.groups.${group.groupKey}`)}
-              </p>
-              <div className="flex flex-col gap-0.5">
-                {group.items.map(({ to, icon: Icon, key, end }) => (
-                  <NavItem key={to} to={to} icon={Icon} label={t(`admin.shell.nav.${key}`)} end={end} onClick={onClose} />
-                ))}
-              </div>
-            </div>
-          ))}
-        </nav>
+        <SidebarNav onClose={onClose} />
       </aside>
+
+      <Drawer isOpen={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
+        <Drawer.Backdrop variant="transparent" className="bg-background/70">
+          <Drawer.Content
+            placement={placement}
+            className="w-56 max-w-xs rounded-none border-divider/60 bg-background p-0 data-[placement=left]:border-e data-[placement=right]:border-s"
+          >
+            <Drawer.Dialog aria-label={t('admin.shell.navTitle')} className="flex h-full flex-col outline-none">
+              <Drawer.Header className="flex items-center justify-between border-b border-divider/60 px-3 py-3">
+                <Drawer.Heading className="text-sm font-semibold tracking-tight text-foreground">
+                  {t('admin.shell.navTitle')}
+                </Drawer.Heading>
+                <Drawer.CloseTrigger />
+              </Drawer.Header>
+              <Drawer.Body className="p-0">
+                <SidebarNav onClose={onClose} />
+              </Drawer.Body>
+            </Drawer.Dialog>
+          </Drawer.Content>
+        </Drawer.Backdrop>
+      </Drawer>
     </>
+  );
+}
+
+function SidebarNav({ onClose }: { onClose?: () => void }) {
+  const { t } = useTranslation();
+
+  return (
+    <nav className="flex flex-1 flex-col overflow-y-auto px-2 pb-4 pt-2">
+      {NAV_GROUPS.map((group) => (
+        <div key={group.groupKey}>
+          <p className="px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-wide text-default-400">
+            {t(`admin.shell.nav.groups.${group.groupKey}`)}
+          </p>
+          <div className="flex flex-col gap-0.5">
+            {group.items.map(({ to, icon: Icon, key, end }) => (
+              <NavItem key={to} to={to} icon={Icon} label={t(`admin.shell.nav.${key}`)} end={end} onClick={onClose} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </nav>
   );
 }
 
@@ -115,7 +109,7 @@ function NavItem({
   onClick,
 }: {
   to: string;
-  icon: typeof ClipboardList;
+  icon: LucideIcon;
   label: string;
   end?: boolean;
   onClick?: () => void;
