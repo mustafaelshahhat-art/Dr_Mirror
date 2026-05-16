@@ -53,7 +53,6 @@ public static class AdminEndpoints
 
         var users = admin.MapGroup("/users").WithTags("Admin: Users");
         users.MapListUsers();
-        users.MapUpdateUserRoles();
 
         return app;
     }

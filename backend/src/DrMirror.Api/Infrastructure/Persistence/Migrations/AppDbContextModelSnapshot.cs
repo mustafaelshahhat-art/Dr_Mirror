@@ -250,6 +250,13 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("LastAttemptAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<DateTimeOffset?>("LockedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("LockedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<DateTimeOffset>("NextRetryAt")
                         .HasColumnType("datetimeoffset");
 
@@ -268,6 +275,9 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Status", "NextRetryAt")
                         .HasFilter("[Status] = 0");
+
+                    b.HasIndex("Status", "LockedAt")
+                        .HasFilter("[Status] = 3");
 
                     b.ToTable("EmailOutboxMessages", (string)null);
                 });

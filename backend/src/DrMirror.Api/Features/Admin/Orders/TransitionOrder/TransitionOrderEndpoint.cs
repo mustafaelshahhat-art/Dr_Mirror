@@ -76,7 +76,17 @@ public static class TransitionOrderEndpoint
         fsm.Transition(order, request.ToStatus, OrderActor.Admin, request.Reason);
 
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
-        await db.SaveChangesAsync(ct);
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException) when (request.ToStatus == OrderStatus.Cancelled)
+        {
+            return Results.Problem(
+                title: "Couldn't cancel order",
+                detail: "Stock changed while the order was being cancelled. Refresh and try again.",
+                statusCode: StatusCodes.Status409Conflict);
+        }
 
         return Results.Ok(order.ToDetail(fsm));
     }

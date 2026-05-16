@@ -25,7 +25,7 @@ public sealed class OrderStateMachine
     {
         // -- Pending (initial for Instapay/Wallet in Phase 2b; COD skips this). ---
         { (OrderStatus.Pending, OrderActor.Buyer), new[] { OrderStatus.Cancelled } },
-        { (OrderStatus.Pending, OrderActor.Admin), new[] { OrderStatus.Confirmed, OrderStatus.Cancelled } },
+        { (OrderStatus.Pending, OrderActor.Admin), new[] { OrderStatus.Cancelled } },
         { (OrderStatus.Pending, OrderActor.System), new[] { OrderStatus.PendingPaymentReview, OrderStatus.Confirmed } },
 
         // -- PendingPaymentReview (proof uploaded, awaiting admin). ---------------

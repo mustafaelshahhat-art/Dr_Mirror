@@ -1,6 +1,6 @@
 namespace DrMirror.Api.Domain.Entities;
 
-public enum OutboxMessageStatus { Pending = 0, Sent = 1, Failed = 2 }
+public enum OutboxMessageStatus { Pending = 0, Sent = 1, Failed = 2, Processing = 3 }
 
 public sealed class EmailOutboxMessage
 {
@@ -13,6 +13,8 @@ public sealed class EmailOutboxMessage
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? LastAttemptAt { get; set; }
     public DateTimeOffset? DeliveredAt { get; set; }
+    public DateTimeOffset? LockedAt { get; set; }
+    public string? LockedBy { get; set; }
     public string? FailureReason { get; set; }
     public string IdempotencyKey { get; set; } = string.Empty;
 }

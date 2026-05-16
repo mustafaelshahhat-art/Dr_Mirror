@@ -44,6 +44,7 @@ public class JwtTokenServiceTests
     {
         var service = CreateService();
         var user = CreateUser();
+        user.SecurityStamp = "stamp-1";
 
         var result = service.CreateAccessToken(user, new[] { UserRoles.Admin });
 
@@ -51,6 +52,7 @@ public class JwtTokenServiceTests
         var jwt = new JwtSecurityTokenHandler().ReadJwtToken(result.Token);
         Assert.Equal(user.Id.ToString(), jwt.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Sub).Value);
         Assert.Equal(user.Email, jwt.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Email).Value);
+        Assert.Equal(user.SecurityStamp, jwt.Claims.Single(c => c.Type == JwtTokenService.SecurityStampClaimType).Value);
         Assert.Contains(jwt.Claims, c => c.Type == ClaimTypes.Role && c.Value == UserRoles.Admin);
     }
 

@@ -10,7 +10,3 @@ export interface AdminUserDto {
   createdAt: string;
   roles: UserRole[];
 }
-
-export interface UpdateUserRolesRequest {
-  roles: UserRole[];
-}

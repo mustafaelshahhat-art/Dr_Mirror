@@ -332,8 +332,6 @@
     "colName": "الاسم",
     "colJoined": "تاريخ الانضمام",
     "colRoles": "الأدوار",
-    "addRole": "إضافة دور {{role}}",
-    "removeRole": "إزالة دور {{role}}",
-    "selfDemotionError": "لا يمكنك إزالة دور المشرف الخاص بك."
+    "readOnlyRoles": "الأدوار للعرض فقط داخل لوحة التحكم."
   }
 }

@@ -28,6 +28,29 @@ public sealed class AdminProductImageUpdateValidator : AbstractValidator<AdminPr
 /// </summary>
 public static class AdminProductImagesEndpoints
 {
+    private static readonly Dictionary<string, byte[]> MagicBytes =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "image/jpeg", new byte[] { 0xFF, 0xD8, 0xFF } },
+            { "image/png", new byte[] { 0x89, 0x50, 0x4E, 0x47 } },
+            { "image/webp", new byte[] { 0x52, 0x49, 0x46, 0x46 } },
+        };
+
+    private static bool HasValidMagicBytes(Stream stream, string contentType)
+    {
+        if (contentType.Equals("image/heic", StringComparison.OrdinalIgnoreCase) ||
+            contentType.Equals("image/heif", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (!MagicBytes.TryGetValue(contentType, out var magic)) return false;
+        Span<byte> header = stackalloc byte[magic.Length];
+        int read = stream.Read(header);
+        stream.Position = 0;
+        return read == magic.Length && header.SequenceEqual(magic);
+    }
+
     public static RouteGroupBuilder MapAdminProductImages(this RouteGroupBuilder group)
     {
         group.MapPost("/{productId:guid}/images", Upload)
@@ -86,7 +109,7 @@ public static class AdminProductImagesEndpoints
                 detail: $"Maximum allowed size is {o.MaxFileSizeBytes / 1024 / 1024} MB.",
                 statusCode: StatusCodes.Status400BadRequest);
         }
-        if (!o.AllowedContentTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
+        if (!o.ProductImageContentTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
         {
             return Results.Problem(
                 title: "Unsupported file type",
@@ -95,10 +118,21 @@ public static class AdminProductImagesEndpoints
         }
 
         StoredFile stored;
-        await using (var stream = file.OpenReadStream())
+        await using (var ms = new MemoryStream())
         {
+            await file.OpenReadStream().CopyToAsync(ms, ct);
+            ms.Position = 0;
+            if (!HasValidMagicBytes(ms, file.ContentType))
+            {
+                return Results.Problem(
+                    title: "File content does not match declared type",
+                    detail: "The uploaded file's content does not match its declared content-type.",
+                    statusCode: StatusCodes.Status415UnsupportedMediaType);
+            }
+
+            ms.Position = 0;
             stored = await storage.UploadAsync(
-                stream,
+                ms,
                 folder: $"products/{productId}",
                 originalFileName: file.FileName,
                 contentType: file.ContentType,

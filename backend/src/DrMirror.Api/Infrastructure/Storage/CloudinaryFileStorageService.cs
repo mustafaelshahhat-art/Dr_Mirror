@@ -46,12 +46,14 @@ public sealed class CloudinaryFileStorageService : IFileStorageService
         string contentType,
         CancellationToken ct)
     {
+        var isPaymentProof = folder.StartsWith("payment-proofs/", StringComparison.OrdinalIgnoreCase);
         var publicId = $"{folder}/{Guid.NewGuid():n}";
         var upload = new ImageUploadParams
         {
             File = new FileDescription(originalFileName, content),
             PublicId = publicId,
             Folder = folder,
+            Type = isPaymentProof ? "authenticated" : "upload",
             UseFilename = false,
             UniqueFilename = false,
             Overwrite = false,
@@ -85,7 +87,12 @@ public sealed class CloudinaryFileStorageService : IFileStorageService
 
     public async Task<Stream> OpenReadAsync(string fileKey, CancellationToken ct)
     {
-        var url = _cloudinary.Api.UrlImgUp.Secure(true).BuildUrl(fileKey);
+        var urlBuilder = _cloudinary.Api.UrlImgUp.Secure(true);
+        if (fileKey.StartsWith("payment-proofs/", StringComparison.OrdinalIgnoreCase))
+        {
+            urlBuilder = urlBuilder.Type("authenticated").Signed(true);
+        }
+        var url = urlBuilder.BuildUrl(fileKey);
         var http = _httpClientFactory.CreateClient();
         var bytes = await http.GetByteArrayAsync(url, ct);
         return new MemoryStream(bytes);

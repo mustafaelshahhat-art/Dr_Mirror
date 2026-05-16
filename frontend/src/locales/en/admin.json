@@ -300,8 +300,6 @@
     "colName": "Name",
     "colJoined": "Joined",
     "colRoles": "Roles",
-    "addRole": "Add role {{role}}",
-    "removeRole": "Remove role {{role}}",
-    "selfDemotionError": "You cannot remove your own Admin role."
+    "readOnlyRoles": "Roles are read-only in the dashboard."
   }
 }

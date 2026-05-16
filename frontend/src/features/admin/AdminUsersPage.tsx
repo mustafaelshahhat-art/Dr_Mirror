@@ -1,11 +1,11 @@
-import { Button, Spinner } from '@heroui/react';
+import { Spinner } from '@heroui/react';
 import { Search } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PaginationControls } from '../../shared/components/PaginationControls';
-import { ALL_ROLES, type AdminUserDto, type UserRole } from './users/types';
-import { useAdminUsersQuery, useUpdateUserRolesMutation } from './users/hooks';
+import type { AdminUserDto } from './users/types';
+import { useAdminUsersQuery } from './users/hooks';
 
 export function AdminUsersPage() {
   const { t } = useTranslation();
@@ -98,29 +98,6 @@ function UserRow({
   user: AdminUserDto;
   dateFmt: Intl.DateTimeFormat;
 }) {
-  const { t } = useTranslation();
-  const updateRoles = useUpdateUserRolesMutation();
-  const [pending, setPending] = useState(false);
-
-  async function toggleRole(role: UserRole) {
-    if (pending) return;
-    const has = user.roles.includes(role);
-    const next = has ? user.roles.filter((r) => r !== role) : [...user.roles, role];
-    setPending(true);
-    try {
-      await updateRoles.mutateAsync({ userId: user.id, body: { roles: next } });
-    } catch {
-      // error is surfaced via updateRoles.error below
-    } finally {
-      setPending(false);
-    }
-  }
-
-  const selfDemotionError =
-    updateRoles.error && (updateRoles.error as { response?: { status?: number } }).response?.status === 409
-      ? t('admin.users.selfDemotionError')
-      : null;
-
   return (
     <tr className="bg-content1 transition-colors hover:bg-content2">
       <td className="px-4 py-3">
@@ -132,34 +109,14 @@ function UserRow({
       </td>
       <td className="px-4 py-3">
         <div className="flex flex-wrap gap-1.5">
-          {ALL_ROLES.map((role) => {
-            const active = user.roles.includes(role);
-            return (
-              <Button
-                key={role}
-                type="button"
-                size="sm"
-                variant={active ? 'primary' : 'ghost'}
-                isDisabled={pending}
-                onPress={() => toggleRole(role)}
-                aria-label={
-                  active
-                    ? t('admin.users.removeRole', { role })
-                    : t('admin.users.addRole', { role })
-                }
-                className={
-                  active
-                    ? 'h-6 min-w-0 rounded-full px-2.5 text-xs'
-                    : 'h-6 min-w-0 rounded-full border border-divider px-2.5 text-xs text-default-500'
-                }
-              >
-                {role}
-              </Button>
-            );
-          })}
-          {selfDemotionError && (
-            <p className="mt-1 w-full text-xs text-danger">{selfDemotionError}</p>
-          )}
+          {user.roles.map((role) => (
+            <span
+              key={role}
+              className="inline-flex h-6 items-center rounded-full border border-divider bg-content2 px-2.5 text-xs font-medium text-default-700 dark:text-default-300"
+            >
+              {role}
+            </span>
+          ))}
         </div>
       </td>
     </tr>

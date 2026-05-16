@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace DrMirror.Api.Infrastructure.Extensions;
 
@@ -58,6 +59,35 @@ internal static class ServiceCollectionExtensions
                     ClockSkew = TimeSpan.FromSeconds(30),
                 };
                 options.MapInboundClaims = false;
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var userManager = context.HttpContext.RequestServices
+                            .GetRequiredService<UserManager<User>>();
+
+                        var userId = context.Principal?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                        if (!Guid.TryParse(userId, out var id))
+                        {
+                            context.Fail("The access token does not identify a valid user.");
+                            return;
+                        }
+
+                        var user = await userManager.FindByIdAsync(id.ToString());
+                        if (user is null || user.IsDisabled)
+                        {
+                            context.Fail("The access token user is no longer active.");
+                            return;
+                        }
+
+                        var tokenStamp = context.Principal?.FindFirst(JwtTokenService.SecurityStampClaimType)?.Value;
+                        var currentStamp = user.SecurityStamp ?? string.Empty;
+                        if (!string.Equals(tokenStamp, currentStamp, StringComparison.Ordinal))
+                        {
+                            context.Fail("The access token has been invalidated.");
+                        }
+                    },
+                };
             });
 
         services.AddAuthorization();

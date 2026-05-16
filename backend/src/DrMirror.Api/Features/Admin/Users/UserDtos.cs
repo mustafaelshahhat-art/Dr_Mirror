@@ -1,5 +1,4 @@
 using DrMirror.Api.Domain.Entities;
-using FluentValidation;
 
 namespace DrMirror.Api.Features.Admin.Users;
 
@@ -14,10 +13,6 @@ public sealed record AdminUserDto(
     DateTimeOffset CreatedAt,
     string[] Roles);
 
-// ── Requests ───────────────────────────────────────────────────────────────
-
-public sealed record UpdateUserRolesRequest(string[] Roles);
-
 // ── Mapping ────────────────────────────────────────────────────────────────
 
 public static class UserMapping
@@ -30,23 +25,4 @@ public static class UserMapping
         IsDisabled: user.IsDisabled,
         CreatedAt: user.CreatedAt,
         Roles: [.. roles]);
-}
-
-// ── Validator ──────────────────────────────────────────────────────────────
-
-public sealed class UpdateUserRolesValidator : AbstractValidator<UpdateUserRolesRequest>
-{
-    private static readonly HashSet<string> ValidRoles =
-        new(DrMirror.Api.Domain.Identity.UserRoles.All, StringComparer.OrdinalIgnoreCase);
-
-    public UpdateUserRolesValidator()
-    {
-        RuleFor(r => r.Roles)
-            .NotNull()
-            .WithMessage("Roles array is required.");
-
-        RuleForEach(r => r.Roles)
-            .Must(role => ValidRoles.Contains(role))
-            .WithMessage($"Each role must be one of: {string.Join(", ", DrMirror.Api.Domain.Identity.UserRoles.All)}.");
-    }
 }

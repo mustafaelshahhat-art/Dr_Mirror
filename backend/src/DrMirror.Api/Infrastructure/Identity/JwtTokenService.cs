@@ -15,6 +15,8 @@ namespace DrMirror.Api.Infrastructure.Identity;
 /// </summary>
 public sealed class JwtTokenService : IJwtTokenService
 {
+    public const string SecurityStampClaimType = "sst";
+
     private readonly JwtOptions _options;
     private readonly SigningCredentials _signingCredentials;
     private readonly JwtSecurityTokenHandler _handler = new();
@@ -41,6 +43,7 @@ public sealed class JwtTokenService : IJwtTokenService
                 now.ToUnixTimeSeconds().ToString(),
                 ClaimValueTypes.Integer64),
             new("name", user.FullName),
+            new(SecurityStampClaimType, user.SecurityStamp ?? string.Empty),
         };
 
         foreach (var role in roles)

@@ -46,6 +46,43 @@ public static class MergeCartEndpoint
             .GroupBy(i => i.ProductVariantId)
             .ToDictionary(g => g.Key, g => g.Sum(i => i.Quantity));
 
+        await ApplyMergeAsync(db, cart, requestedByVariant, ct);
+
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException)
+        {
+            // A parallel merge can win the unique (CartId, ProductVariantId)
+            // insert race after we loaded existingLines. Rebuild from fresh DB
+            // state and apply the same capped merge once more.
+            db.ChangeTracker.Clear();
+            cart = await db.Carts.FirstAsync(c => c.Id == cart.Id, ct);
+            await ApplyMergeAsync(db, cart, requestedByVariant, ct);
+            try
+            {
+                await db.SaveChangesAsync(ct);
+            }
+            catch (DbUpdateException)
+            {
+                return Results.Problem(
+                    title: "Couldn't merge cart",
+                    detail: "Your cart changed while it was being synced. Please try again.",
+                    statusCode: StatusCodes.Status409Conflict);
+            }
+        }
+
+        var dto = await cartService.ToDtoAsync(cart.Id, ct);
+        return Results.Ok(dto);
+    }
+
+    private static async Task ApplyMergeAsync(
+        AppDbContext db,
+        Domain.Entities.Cart cart,
+        Dictionary<Guid, int> requestedByVariant,
+        CancellationToken ct)
+    {
         // Resolve all referenced variants in a single round-trip; silently
         // drop ones that aren't available anymore (deleted, unpublished,
         // disabled, out-of-stock category). The merge call is best-effort —
@@ -107,9 +144,5 @@ public static class MergeCartEndpoint
         }
 
         cart.UpdatedAt = DateTimeOffset.UtcNow;
-        await db.SaveChangesAsync(ct);
-
-        var dto = await cartService.ToDtoAsync(cart.Id, ct);
-        return Results.Ok(dto);
     }
 }

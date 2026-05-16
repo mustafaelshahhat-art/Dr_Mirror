@@ -32,8 +32,8 @@ public sealed class FileStorageOptions : IValidatableObject
     public long MaxFileSizeBytes { get; set; } = 10 * 1024 * 1024;
 
     /// <summary>
-    /// Whitelisted MIME prefixes. Anything not matching is rejected with 415.
-    /// Default: image-only.
+    /// Backwards-compatible proof upload allow-list. Product images use
+    /// <see cref="ProductImageContentTypes"/> and intentionally exclude PDFs.
     /// </summary>
     public string[] AllowedContentTypes { get; set; } = new[]
     {
@@ -43,6 +43,25 @@ public sealed class FileStorageOptions : IValidatableObject
         "image/heic",
         "image/heif",
         "application/pdf",
+    };
+
+    public string[] PaymentProofContentTypes { get; set; } = new[]
+    {
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/heic",
+        "image/heif",
+        "application/pdf",
+    };
+
+    public string[] ProductImageContentTypes { get; set; } = new[]
+    {
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/heic",
+        "image/heif",
     };
 
     // -- Cloudinary-specific. --

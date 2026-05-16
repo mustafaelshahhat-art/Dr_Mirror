@@ -95,7 +95,8 @@ public static class UploadPaymentProofEndpoint
                 statusCode: StatusCodes.Status400BadRequest);
         }
 
-        if (!o.AllowedContentTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
+        if (!o.PaymentProofContentTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase)
+            && !o.AllowedContentTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
         {
             return Results.Problem(
                 title: "Unsupported file type",

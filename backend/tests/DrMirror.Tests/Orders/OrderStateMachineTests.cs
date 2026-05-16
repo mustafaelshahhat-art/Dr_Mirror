@@ -82,6 +82,23 @@ public class OrderStateMachineTests
         Assert.False(fsm.CanTransition(from, to, OrderActor.Admin));
     }
 
+    [Fact]
+    public void Admin_cannot_confirm_pending_online_payment_order()
+    {
+        var fsm = new OrderStateMachine();
+
+        Assert.False(fsm.CanTransition(OrderStatus.Pending, OrderStatus.Confirmed, OrderActor.Admin));
+        Assert.DoesNotContain(OrderStatus.Confirmed, fsm.NextStates(OrderStatus.Pending, OrderActor.Admin));
+    }
+
+    [Fact]
+    public void System_can_still_confirm_cod_order_from_pending()
+    {
+        var fsm = new OrderStateMachine();
+
+        Assert.True(fsm.CanTransition(OrderStatus.Pending, OrderStatus.Confirmed, OrderActor.System));
+    }
+
     // ----- Terminal states -----------------------------------------------------
 
     [Theory]
