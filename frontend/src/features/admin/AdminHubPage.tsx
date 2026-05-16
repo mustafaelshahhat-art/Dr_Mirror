@@ -46,17 +46,17 @@ export function AdminHubPage() {
       </header>
 
       {statsQuery.isLoading ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-divider/60 bg-divider/40 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="h-24 animate-pulse rounded-large border border-divider/60 bg-content1 p-4"
+              className="h-24 animate-pulse bg-content1 p-4"
             />
           ))}
         </div>
       ) : stats ? (
         <>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-divider/60 bg-divider/40 sm:grid-cols-2 lg:grid-cols-3">
             <KpiCard
               label={t('admin.hub.kpis.total')}
               value={stats.totalOrders}
@@ -138,10 +138,10 @@ function KpiCard({
   tone: 'primary' | 'default';
 }) {
   return (
-    <div className="rounded-large border border-divider/60 bg-content1 p-4">
-      <p className="text-xs text-default-500">{label}</p>
+    <div className="bg-content1 p-4">
+      <p className="text-xs font-medium uppercase tracking-wide text-default-400">{label}</p>
       <p
-        className={`mt-1 text-2xl font-semibold tabular-nums ${
+        className={`mt-1 text-3xl font-bold leading-none tabular-nums ${
           tone === 'primary' ? 'text-primary' : 'text-foreground'
         }`}
       >

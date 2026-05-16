@@ -11,14 +11,29 @@ import {
   Users,
 } from 'lucide-react';
 
-const NAV_ITEMS = [
-  { to: '/admin', icon: LayoutDashboard, key: 'dashboard' },
-  { to: '/admin/orders', icon: ClipboardList, key: 'orders' },
-  { to: '/admin/products', icon: Package, key: 'products' },
-  { to: '/admin/categories', icon: FolderTree, key: 'categories' },
-  { to: '/admin/payment-methods', icon: CreditCard, key: 'paymentMethods' },
-  { to: '/admin/inquiries', icon: MessageSquare, key: 'inquiries' },
-  { to: '/admin/users', icon: Users, key: 'users' },
+const NAV_GROUPS = [
+  {
+    groupKey: 'operations',
+    items: [
+      { to: '/admin', icon: LayoutDashboard, key: 'dashboard', end: true },
+      { to: '/admin/orders', icon: ClipboardList, key: 'orders', end: false },
+      { to: '/admin/inquiries', icon: MessageSquare, key: 'inquiries', end: false },
+    ],
+  },
+  {
+    groupKey: 'catalog',
+    items: [
+      { to: '/admin/products', icon: Package, key: 'products', end: false },
+      { to: '/admin/categories', icon: FolderTree, key: 'categories', end: false },
+      { to: '/admin/payment-methods', icon: CreditCard, key: 'paymentMethods', end: false },
+    ],
+  },
+  {
+    groupKey: 'people',
+    items: [
+      { to: '/admin/users', icon: Users, key: 'users', end: false },
+    ],
+  },
 ] as const;
 
 export function AdminSidebar({
@@ -73,9 +88,18 @@ export function AdminSidebar({
           </span>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-4 pt-2">
-          {NAV_ITEMS.map(({ to, icon: Icon, key }) => (
-            <NavItem key={to} to={to} icon={Icon} label={t(`admin.shell.nav.${key}`)} onClick={onClose} />
+        <nav className="flex flex-1 flex-col overflow-y-auto px-2 pb-4 pt-2">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.groupKey}>
+              <p className="px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-wide text-default-400">
+                {t(`admin.shell.nav.groups.${group.groupKey}`)}
+              </p>
+              <div className="flex flex-col gap-0.5">
+                {group.items.map(({ to, icon: Icon, key, end }) => (
+                  <NavItem key={to} to={to} icon={Icon} label={t(`admin.shell.nav.${key}`)} end={end} onClick={onClose} />
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
       </aside>
@@ -87,16 +111,19 @@ function NavItem({
   to,
   icon: Icon,
   label,
+  end,
   onClick,
 }: {
   to: string;
   icon: typeof ClipboardList;
   label: string;
+  end?: boolean;
   onClick?: () => void;
 }) {
   return (
     <NavLink
       to={to}
+      end={end}
       onClick={onClick}
       className={({ isActive }) =>
         [

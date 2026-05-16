@@ -31,14 +31,14 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
       to={`/products/${product.slug}`}
       className="group flex flex-col overflow-hidden rounded-large border border-divider/60 bg-content1 transition-shadow hover:shadow-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-default-100">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-bone">
         {product.primaryImageUrl ? (
           <img
             src={product.primaryImageUrl}
             alt={name}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-default-300 dark:text-default-600">

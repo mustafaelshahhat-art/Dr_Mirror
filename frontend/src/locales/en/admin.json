@@ -282,7 +282,12 @@
       "categories": "Categories",
       "paymentMethods": "Payment methods",
       "inquiries": "Inquiries",
-      "users": "Users"
+      "users": "Users",
+      "groups": {
+        "operations": "Operations",
+        "catalog": "Catalog",
+        "people": "People"
+      }
     },
     "accountMenu": {
       "signOut": "Sign out",

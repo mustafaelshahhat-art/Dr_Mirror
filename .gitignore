@@ -64,3 +64,17 @@ specs/
 tmp/
 temp/
 backend/src/DrMirror.Api/wwwroot/uploads/
+dr-mirror/README.md
+dr-mirror/project/Admin Dashboard - Dark RTL.html
+dr-mirror/project/Admin Dashboard - Dark.html
+dr-mirror/project/Admin Dashboard - Light.html
+dr-mirror/project/Cart - Dark RTL.html
+dr-mirror/project/Cart - Dark.html
+dr-mirror/project/Cart - Light.html
+dr-mirror/project/Catalog - Dark LTR.html
+dr-mirror/project/Catalog - Dark RTL.html
+dr-mirror/project/Catalog - Light LTR.html
+dr-mirror/project/Product Detail - Dark LTR.html
+dr-mirror/project/Product Detail - Dark RTL.html
+dr-mirror/project/Product Detail - Light LTR.html
+design-system-migration-plan.md

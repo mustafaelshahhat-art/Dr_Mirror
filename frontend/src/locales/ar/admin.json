@@ -314,7 +314,12 @@
       "categories": "الفئات",
       "paymentMethods": "طرق الدفع",
       "inquiries": "الاستفسارات",
-      "users": "المستخدمون"
+      "users": "المستخدمون",
+      "groups": {
+        "operations": "العمليات",
+        "catalog": "الكتالوج",
+        "people": "المستخدمون"
+      }
     },
     "accountMenu": {
       "signOut": "تسجيل الخروج",
