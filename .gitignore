@@ -28,6 +28,8 @@ out/
 .vite/
 *.local
 frontend/eslint-out.json
+coverage/
+TestResults/
 
 # --- Logs ---
 logs/

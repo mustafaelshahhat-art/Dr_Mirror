@@ -117,8 +117,8 @@ Current focus is Phase 5 — Documentation cleanup and final repository hygiene.
 
 1. **Database:** Create an empty SQL Server database.
 2. **Migrations:** Ensure `.NET SDK` is installed, then run `dotnet ef database update --project backend/src/DrMirror.Api`.
-3. **Backend App:** Deploy the compiled .NET outputs. Set `ASPNETCORE_ENVIRONMENT=Production` and configure all required environment variables listed above (particularly `ConnectionStrings__Default`, `Jwt__*`, and `FileStorage__*`). Ensure the app can write to its current directory if using local file storage or SQLite.
-4. **Frontend App:** Run `npm run build`. Set `VITE_API_BASE_URL` to your backend's production root (e.g. `https://api.drmirror.com`). Deploy the `dist` folder to a static host like Vercel or IIS.
+3. **Backend App:** Deploy the compiled .NET outputs. Set `ASPNETCORE_ENVIRONMENT=Production` and configure all required environment variables listed above (particularly `ConnectionStrings__Default`, `Jwt__*`, and `FileStorage__*`). Ensure the app can write to its current directory if using local file storage.
+4. **Frontend App:** Run `npm run build`. Set `VITE_API_BASE_URL` to your backend's production root (e.g. `https://api.drmirror.com`); `/api` is appended automatically. Leave blank in development to use the Vite proxy. Deploy the `dist` folder to a static host like Vercel or IIS.
 5. **Verify:** Check `<backend_url>/api/health` and attempt to log in with the seeded admin credentials.
 
 ---
