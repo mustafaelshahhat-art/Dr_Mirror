@@ -1,4 +1,4 @@
-import { Button, Spinner } from '@heroui/react';
+import { Button, Description, Input, Label, Spinner, TextArea, TextField } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
@@ -10,10 +10,6 @@ import type { ProductGender } from '../../catalog/types';
 
 import { useAdminCategoriesQuery, useCreateProductMutation } from './hooks';
 
-/**
- * Bare-bones product create at <c>/admin/products/new</c>. Just the master
- * record — variants and images get added on the edit page after redirect.
- */
 export function AdminProductCreatePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -91,11 +87,11 @@ export function AdminProductCreatePage() {
         className="space-y-4 rounded-large border border-divider/60 bg-content1 p-4"
       >
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label={t('admin.products.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={200} />
-          <Field label={t('admin.products.fields.nameEn')} value={nameEn} onChange={setNameEn} required maxLength={200} description={t('admin.products.fields.nameEnHint')} />
-          <Textarea label={t('admin.products.fields.descriptionAr')} value={descriptionAr} onChange={setDescriptionAr} required maxLength={4000} />
-          <Textarea label={t('admin.products.fields.descriptionEn')} value={descriptionEn} onChange={setDescriptionEn} required maxLength={4000} />
-          <Field
+          <HeroField label={t('admin.products.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={200} />
+          <HeroField label={t('admin.products.fields.nameEn')} value={nameEn} onChange={setNameEn} required maxLength={200} description={t('admin.products.fields.nameEnHint')} />
+          <HeroTextarea label={t('admin.products.fields.descriptionAr')} value={descriptionAr} onChange={setDescriptionAr} required maxLength={4000} />
+          <HeroTextarea label={t('admin.products.fields.descriptionEn')} value={descriptionEn} onChange={setDescriptionEn} required maxLength={4000} />
+          <HeroField
             label={t('admin.products.fields.price')}
             value={price}
             onChange={setPrice}
@@ -116,9 +112,9 @@ export function AdminProductCreatePage() {
               <option value={2}>{t('catalog.gender.unisex')}</option>
             </select>
           </label>
-          <Field label={t('admin.products.fields.material')} value={material} onChange={setMaterial} maxLength={200} />
-          <Field label={t('admin.products.fields.brand')} value={brand} onChange={setBrand} maxLength={80} />
-          <Field label={t('admin.products.fields.sku')} value={sku} onChange={setSku} maxLength={64} dir="ltr" />
+          <HeroField label={t('admin.products.fields.material')} value={material} onChange={setMaterial} maxLength={200} />
+          <HeroField label={t('admin.products.fields.brand')} value={brand} onChange={setBrand} maxLength={80} />
+          <HeroField label={t('admin.products.fields.sku')} value={sku} onChange={setSku} maxLength={64} dir="ltr" />
           <label className="space-y-1 text-sm">
             <span className="text-xs uppercase tracking-wide text-default-500">
               {t('admin.products.fields.category')}
@@ -157,7 +153,7 @@ export function AdminProductCreatePage() {
   );
 }
 
-function Field({
+function HeroField({
   label,
   value,
   onChange,
@@ -177,25 +173,23 @@ function Field({
   dir?: 'ltr' | 'rtl';
 }) {
   return (
-    <label className="space-y-1 text-sm">
-      <span className="text-xs uppercase tracking-wide text-default-500">{label}</span>
-      <input
+    <TextField isRequired={required} className="flex flex-col gap-1">
+      <Label className="text-xs uppercase tracking-wide text-default-500">{label}</Label>
+      <Input
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange((e.target as HTMLInputElement).value)}
         type={type}
-        required={required}
         maxLength={maxLength}
         dir={dir}
-        className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm"
       />
       {description ? (
-        <span className="block text-[11px] text-default-500">{description}</span>
+        <Description className="text-[11px] text-default-500">{description}</Description>
       ) : null}
-    </label>
+    </TextField>
   );
 }
 
-function Textarea({
+function HeroTextarea({
   label,
   value,
   onChange,
@@ -209,16 +203,14 @@ function Textarea({
   maxLength?: number;
 }) {
   return (
-    <label className="space-y-1 text-sm sm:col-span-2">
-      <span className="text-xs uppercase tracking-wide text-default-500">{label}</span>
-      <textarea
+    <TextField isRequired={required} className="flex flex-col gap-1 sm:col-span-2">
+      <Label className="text-xs uppercase tracking-wide text-default-500">{label}</Label>
+      <TextArea
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        required={required}
+        onChange={(e) => onChange((e.target as HTMLTextAreaElement).value)}
         maxLength={maxLength}
         rows={3}
-        className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm"
       />
-    </label>
+    </TextField>
   );
 }

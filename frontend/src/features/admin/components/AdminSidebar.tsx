@@ -61,6 +61,7 @@ export function AdminSidebar({
       ) : null}
 
       <aside
+        aria-label={t('admin.shell.navTitle')}
         className={[
           'fixed inset-y-0 start-0 top-14 z-50 flex w-56 flex-col border-e border-divider/60 bg-background transition-transform duration-200 motion-reduce:transition-none md:static md:z-auto md:bg-content1 md:translate-x-0 md:rtl:translate-x-0',
           open ? 'translate-x-0' : '-translate-x-full rtl:translate-x-full',

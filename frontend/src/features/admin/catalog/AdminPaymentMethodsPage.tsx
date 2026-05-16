@@ -1,4 +1,4 @@
-import { Button, Spinner } from '@heroui/react';
+import { Button, Input, Label, Spinner, TextArea, TextField } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Pencil, Plus, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useState } from 'react';
@@ -23,11 +23,6 @@ const KIND_LABEL_KEY: Record<PaymentMethodKind, string> = {
   3: 'admin.payments.kind.bankTransfer',
 };
 
-/**
- * Admin payment methods at <c>/admin/payment-methods</c>. Same inline pattern
- * as <c>AdminCategoriesPage</c>. <c>Code</c> and <c>Kind</c> are immutable on
- * update — snapshotted into order history.
- */
 export function AdminPaymentMethodsPage() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
@@ -142,7 +137,7 @@ export function AdminPaymentMethodsPage() {
                 />
               ) : (
                 <div className="rounded-medium border border-divider/60 bg-content1 p-3">
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-sm font-semibold">
@@ -286,15 +281,7 @@ function PaymentMethodCreateForm({ onCancel, onSubmit, isPending }: CreateProps)
     >
       <h2 className="text-sm font-semibold">{t('admin.payments.create.heading')}</h2>
       <div className="grid gap-3 sm:grid-cols-2">
-        <LabeledInput
-          label={t('admin.payments.fields.code')}
-          value={code}
-          onChange={setCode}
-          placeholder="bank-transfer"
-          required
-          maxLength={32}
-          dir="ltr"
-        />
+        <HeroField label={t('admin.payments.fields.code')} value={code} onChange={setCode} placeholder="bank-transfer" required maxLength={32} dir="ltr" />
         <label className="space-y-1 text-sm">
           <span className="text-xs uppercase tracking-wide text-default-500">
             {t('admin.payments.fields.kind')}
@@ -310,25 +297,22 @@ function PaymentMethodCreateForm({ onCancel, onSubmit, isPending }: CreateProps)
             <option value={PAYMENT_METHOD_KIND.BankTransfer}>{t('admin.payments.kind.bankTransfer')}</option>
           </select>
         </label>
-        <LabeledInput label={t('admin.payments.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={64} />
-        <LabeledInput label={t('admin.payments.fields.nameEn')} value={nameEn} onChange={setNameEn} required maxLength={64} />
-        <LabeledTextarea label={t('admin.payments.fields.instructionsAr')} value={instructionsAr} onChange={setInstructionsAr} maxLength={500} />
-        <LabeledTextarea label={t('admin.payments.fields.instructionsEn')} value={instructionsEn} onChange={setInstructionsEn} maxLength={500} />
-        <LabeledInput label={t('admin.payments.fields.accountNumber')} value={accountNumber} onChange={setAccountNumber} maxLength={64} dir="ltr" />
-        <LabeledInput label={t('admin.payments.fields.accountHolder')} value={accountHolder} onChange={setAccountHolder} maxLength={100} />
-        <label className="space-y-1 text-sm">
-          <span className="text-xs uppercase tracking-wide text-default-500">
-            {t('admin.payments.fields.displayOrder')}
-          </span>
-          <input
+        <HeroField label={t('admin.payments.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={64} />
+        <HeroField label={t('admin.payments.fields.nameEn')} value={nameEn} onChange={setNameEn} required maxLength={64} />
+        <HeroTextarea label={t('admin.payments.fields.instructionsAr')} value={instructionsAr} onChange={setInstructionsAr} maxLength={500} />
+        <HeroTextarea label={t('admin.payments.fields.instructionsEn')} value={instructionsEn} onChange={setInstructionsEn} maxLength={500} />
+        <HeroField label={t('admin.payments.fields.accountNumber')} value={accountNumber} onChange={setAccountNumber} maxLength={64} dir="ltr" />
+        <HeroField label={t('admin.payments.fields.accountHolder')} value={accountHolder} onChange={setAccountHolder} maxLength={100} />
+        <TextField className="flex flex-col gap-1">
+          <Label className="sr-only">{t('admin.payments.fields.displayOrder')}</Label>
+          <Input
             type="number"
-            min={0}
-            max={999}
-            value={displayOrder}
-            onChange={(e) => setDisplayOrder(Number.parseInt(e.target.value, 10) || 0)}
-            className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary"
+            value={String(displayOrder)}
+            onChange={(e) => setDisplayOrder(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
+            aria-label={t('admin.payments.fields.displayOrder')}
+            className="tabular-nums"
           />
-        </label>
+        </TextField>
       </div>
       <div className="flex gap-2">
         <Button type="submit" variant="primary" size="sm" isDisabled={isPending}>
@@ -387,25 +371,22 @@ function PaymentMethodEditForm({ method, onCancel, onSubmit, isPending }: EditPr
         {t('admin.payments.editingNote', { code: method.code })}
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
-        <LabeledInput label={t('admin.payments.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={64} />
-        <LabeledInput label={t('admin.payments.fields.nameEn')} value={nameEn} onChange={setNameEn} required maxLength={64} />
-        <LabeledTextarea label={t('admin.payments.fields.instructionsAr')} value={instructionsAr} onChange={setInstructionsAr} maxLength={500} />
-        <LabeledTextarea label={t('admin.payments.fields.instructionsEn')} value={instructionsEn} onChange={setInstructionsEn} maxLength={500} />
-        <LabeledInput label={t('admin.payments.fields.accountNumber')} value={accountNumber} onChange={setAccountNumber} maxLength={64} dir="ltr" />
-        <LabeledInput label={t('admin.payments.fields.accountHolder')} value={accountHolder} onChange={setAccountHolder} maxLength={100} />
-        <label className="space-y-1 text-sm">
-          <span className="text-xs uppercase tracking-wide text-default-500">
-            {t('admin.payments.fields.displayOrder')}
-          </span>
-          <input
+        <HeroField label={t('admin.payments.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={64} />
+        <HeroField label={t('admin.payments.fields.nameEn')} value={nameEn} onChange={setNameEn} required maxLength={64} />
+        <HeroTextarea label={t('admin.payments.fields.instructionsAr')} value={instructionsAr} onChange={setInstructionsAr} maxLength={500} />
+        <HeroTextarea label={t('admin.payments.fields.instructionsEn')} value={instructionsEn} onChange={setInstructionsEn} maxLength={500} />
+        <HeroField label={t('admin.payments.fields.accountNumber')} value={accountNumber} onChange={setAccountNumber} maxLength={64} dir="ltr" />
+        <HeroField label={t('admin.payments.fields.accountHolder')} value={accountHolder} onChange={setAccountHolder} maxLength={100} />
+        <TextField className="flex flex-col gap-1">
+          <Label className="sr-only">{t('admin.payments.fields.displayOrder')}</Label>
+          <Input
             type="number"
-            min={0}
-            max={999}
-            value={displayOrder}
-            onChange={(e) => setDisplayOrder(Number.parseInt(e.target.value, 10) || 0)}
-            className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary"
+            value={String(displayOrder)}
+            onChange={(e) => setDisplayOrder(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
+            aria-label={t('admin.payments.fields.displayOrder')}
+            className="tabular-nums"
           />
-        </label>
+        </TextField>
       </div>
       <div className="flex gap-2">
         <Button type="submit" variant="primary" size="sm" isDisabled={isPending}>
@@ -419,7 +400,7 @@ function PaymentMethodEditForm({ method, onCancel, onSubmit, isPending }: EditPr
   );
 }
 
-function LabeledInput({
+function HeroField({
   label,
   value,
   onChange,
@@ -437,22 +418,20 @@ function LabeledInput({
   dir?: 'ltr' | 'rtl';
 }) {
   return (
-    <label className="space-y-1 text-sm">
-      <span className="text-xs uppercase tracking-wide text-default-500">{label}</span>
-      <input
+    <TextField isRequired={required} className="flex flex-col gap-1">
+      <Label className="text-xs uppercase tracking-wide text-default-500">{label}</Label>
+      <Input
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        required={required}
+        onChange={(e) => onChange((e.target as HTMLInputElement).value)}
         maxLength={maxLength}
         placeholder={placeholder}
         dir={dir}
-        className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
       />
-    </label>
+    </TextField>
   );
 }
 
-function LabeledTextarea({
+function HeroTextarea({
   label,
   value,
   onChange,
@@ -464,15 +443,14 @@ function LabeledTextarea({
   maxLength?: number;
 }) {
   return (
-    <label className="space-y-1 text-sm sm:col-span-2">
-      <span className="text-xs uppercase tracking-wide text-default-500">{label}</span>
-      <textarea
+    <TextField className="flex flex-col gap-1 sm:col-span-2">
+      <Label className="text-xs uppercase tracking-wide text-default-500">{label}</Label>
+      <TextArea
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange((e.target as HTMLTextAreaElement).value)}
         maxLength={maxLength}
         rows={2}
-        className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
       />
-    </label>
+    </TextField>
   );
 }

@@ -1,4 +1,4 @@
-import { Checkbox } from '@heroui/react';
+import { Checkbox, Input, Label, TextField } from '@heroui/react';
 import type { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -41,7 +41,7 @@ export function AddressStep({
       </legend>
 
       {savedAddresses.length > 0 ? (
-        <div className="space-y-2">
+        <div className="space-y-2" role="radiogroup" aria-label={t('checkout.address.savedHeading')}>
           <p className="text-xs uppercase tracking-wide text-default-500">
             {t('checkout.address.savedHeading')}
           </p>
@@ -183,18 +183,17 @@ export function AddressStep({
             <span className="text-sm">{t('checkout.address.saveAsNew')}</span>
           </Checkbox>
           {saveAsNewAddress ? (
-            <label className="flex flex-col gap-1.5 text-sm">
-              <span className="text-xs uppercase tracking-wide text-default-500">
+            <TextField className="flex flex-col gap-1.5">
+              <Label className="text-xs uppercase tracking-wide text-default-500">
                 {t('checkout.address.newLabel')}
-              </span>
-              <input
+              </Label>
+              <Input
                 value={newAddressLabel}
-                onChange={(e) => setNewAddressLabel(e.target.value)}
+                onChange={(e) => setNewAddressLabel((e.target as HTMLInputElement).value)}
                 maxLength={64}
                 placeholder={t('checkout.address.newLabelPlaceholder')}
-                className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm"
               />
-            </label>
+            </TextField>
           ) : null}
         </>
       ) : null}

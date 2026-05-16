@@ -38,14 +38,23 @@ export function ProductImageGallery({ images, productName }: Props) {
       </div>
 
       {images.length > 1 ? (
-        <div className="flex gap-2 overflow-x-auto" role="tablist">
+        <div className="flex gap-2 overflow-x-auto" role="group" aria-label={productName}>
           {images.map((img, idx) => (
             <button
               key={img.id}
               type="button"
-              role="tab"
-              aria-selected={idx === activeImage}
+              aria-current={idx === activeImage ? 'true' : undefined}
+              aria-label={`Image ${idx + 1} of ${images.length}`}
               onClick={() => setActiveImage(idx)}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowRight') {
+                  e.preventDefault();
+                  setActiveImage((activeImage + 1) % images.length);
+                } else if (e.key === 'ArrowLeft') {
+                  e.preventDefault();
+                  setActiveImage((activeImage - 1 + images.length) % images.length);
+                }
+              }}
               className={
                 idx === activeImage
                   ? 'h-16 w-20 shrink-0 overflow-hidden rounded-medium ring-2 ring-primary'
@@ -54,7 +63,7 @@ export function ProductImageGallery({ images, productName }: Props) {
             >
               <img
                 src={img.url}
-                alt={img.alt ?? productName}
+                alt=""
                 className="h-full w-full object-cover"
                 loading="lazy"
               />

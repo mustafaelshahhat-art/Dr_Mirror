@@ -61,7 +61,7 @@ export function AdminUsersPage() {
         />
       ) : query.data?.items?.length ? (
         <div className="space-y-4">
-          <div className="overflow-hidden rounded-large border border-divider/60">
+          <div className="overflow-x-auto rounded-large border border-divider/60">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-divider/60 bg-content2 text-start">

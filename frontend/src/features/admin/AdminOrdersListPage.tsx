@@ -74,7 +74,7 @@ export function AdminOrdersListPage() {
             <li key={order.id}>
               <Link
                 to={`/admin/orders/${encodeURIComponent(order.orderNumber)}`}
-                className="flex items-center justify-between gap-3 rounded-medium border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
+                className="flex flex-col gap-2 rounded-medium border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0 space-y-1">
                   <p className="text-sm font-semibold text-foreground">

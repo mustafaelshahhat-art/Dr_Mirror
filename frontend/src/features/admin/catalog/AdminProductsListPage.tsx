@@ -47,7 +47,7 @@ export function AdminProductsListPage() {
         </Link>
       </header>
 
-      <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto_auto]">
+      <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto_auto] max-sm:[&>select]:w-full">
         <SearchInput
           value={q}
           onCommit={(val) => { setQ(val); setPage(1); }}
@@ -114,7 +114,7 @@ export function AdminProductsListPage() {
               <li key={p.id}>
                 <Link
                   to={`/admin/products/${p.id}/edit`}
-                  className="flex items-center justify-between gap-3 rounded-medium border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
+                  className="flex flex-col gap-2 rounded-medium border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0 flex-1 space-y-1">
                     <p className="text-sm font-semibold">{isAr ? p.nameAr : p.nameEn}</p>

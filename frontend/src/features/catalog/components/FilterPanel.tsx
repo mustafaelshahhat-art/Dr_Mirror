@@ -78,7 +78,7 @@ export function FilterPanel({
             {/* Gender */}
             <div className="space-y-1.5">
               <p className="text-xs font-medium text-default-500">{t('catalog.filters.genderLabel')}</p>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={t('catalog.filters.genderLabel')}>
                 <GenderPill
                   label={t('catalog.filters.allGenders')}
                   selected={filter.gender === undefined}
@@ -167,6 +167,8 @@ function GenderPill({
   return (
     <button
       type="button"
+      role="radio"
+      aria-checked={selected}
       onClick={onClick}
       className={
         selected

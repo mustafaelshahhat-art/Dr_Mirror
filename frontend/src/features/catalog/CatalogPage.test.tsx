@@ -50,7 +50,7 @@ describe('CatalogPage — filter panel', () => {
     renderWithProviders(<CatalogPage />);
     const btn = await screen.findByRole('button', { name: /filters/i });
     await user.click(btn);
-    const menBtn = screen.getByRole('button', { name: 'Men' });
+    const menBtn = screen.getByRole('radio', { name: 'Men' });
     await user.click(menBtn);
     await waitFor(() => {
       const calls = vi.mocked(catalogApi.listProducts).mock.calls;

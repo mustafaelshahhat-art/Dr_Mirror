@@ -20,7 +20,7 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
             size="sm"
             className="md:hidden"
             onPress={onMenuPress}
-            aria-label={t('admin.shell.nav.orders')}
+            aria-label={t('admin.shell.navTitle')}
           >
             <Menu size={18} aria-hidden />
           </Button>

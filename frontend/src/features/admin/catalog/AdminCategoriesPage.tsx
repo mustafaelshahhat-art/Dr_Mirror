@@ -1,4 +1,4 @@
-import { Button, Spinner } from '@heroui/react';
+import { Button, Input, Label, Spinner, TextField } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Pencil, Plus, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useState } from 'react';
@@ -15,11 +15,6 @@ import {
 } from './hooks';
 import type { AdminCategoryDto } from './types';
 
-/**
- * Admin categories at <c>/admin/categories</c>. Inline create (top row) +
- * inline edit (clicking the pencil expands the row into a form). No modals —
- * staff blast through this list quickly.
- */
 export function AdminCategoriesPage() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
@@ -122,7 +117,7 @@ export function AdminCategoriesPage() {
                   isPending={updateMutation.isPending}
                 />
               ) : (
-                <div className="flex items-center justify-between gap-3 rounded-medium border border-divider/60 bg-content1 p-3">
+                <div className="flex flex-col gap-2 rounded-medium border border-divider/60 bg-content1 p-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0 space-y-0.5">
                     <p className="text-sm font-semibold text-foreground">
                       {isAr ? cat.nameAr : cat.nameEn}
@@ -224,31 +219,34 @@ function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
       }}
       className="grid gap-3 rounded-large border border-divider/60 bg-content1 p-3 sm:grid-cols-[1fr_1fr_100px_auto]"
     >
-      <input
-        value={nameAr}
-        onChange={(e) => setNameAr(e.target.value)}
-        placeholder={t('admin.catalog.categories.nameAr')}
-        className="rounded-medium border border-divider bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-        required
-        maxLength={120}
-      />
-      <input
-        value={nameEn}
-        onChange={(e) => setNameEn(e.target.value)}
-        placeholder={t('admin.catalog.categories.nameEn')}
-        className="rounded-medium border border-divider bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-        required
-        maxLength={120}
-      />
-      <input
-        type="number"
-        min={0}
-        max={9999}
-        value={displayOrder}
-        onChange={(e) => setDisplayOrder(Number.parseInt(e.target.value, 10) || 0)}
-        aria-label={t('admin.catalog.categories.displayOrder')}
-        className="rounded-medium border border-divider bg-background px-3 py-1.5 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary"
-      />
+      <TextField className="flex flex-col gap-1">
+        <Label className="sr-only">{t('admin.catalog.categories.nameAr')}</Label>
+        <Input
+          value={nameAr}
+          onChange={(e) => setNameAr((e.target as HTMLInputElement).value)}
+          placeholder={t('admin.catalog.categories.nameAr')}
+          maxLength={120}
+        />
+      </TextField>
+      <TextField className="flex flex-col gap-1">
+        <Label className="sr-only">{t('admin.catalog.categories.nameEn')}</Label>
+        <Input
+          value={nameEn}
+          onChange={(e) => setNameEn((e.target as HTMLInputElement).value)}
+          placeholder={t('admin.catalog.categories.nameEn')}
+          maxLength={120}
+        />
+      </TextField>
+      <TextField className="flex flex-col gap-1">
+        <Label className="sr-only">{t('admin.catalog.categories.displayOrder')}</Label>
+        <Input
+          type="number"
+          value={String(displayOrder)}
+          onChange={(e) => setDisplayOrder(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
+          aria-label={t('admin.catalog.categories.displayOrder')}
+          className="tabular-nums"
+        />
+      </TextField>
       <Button type="submit" variant="primary" size="sm" isDisabled={isPending}>
         <span className="inline-flex items-center gap-1.5">
           <Plus className="size-4" aria-hidden />
@@ -278,29 +276,32 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
       }}
       className="grid gap-3 rounded-medium border border-primary/40 bg-primary/5 p-3 sm:grid-cols-[1fr_1fr_100px_auto_auto]"
     >
-      <input
-        value={nameAr}
-        onChange={(e) => setNameAr(e.target.value)}
-        className="rounded-medium border border-divider bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-        required
-        maxLength={120}
-      />
-      <input
-        value={nameEn}
-        onChange={(e) => setNameEn(e.target.value)}
-        className="rounded-medium border border-divider bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-        required
-        maxLength={120}
-      />
-      <input
-        type="number"
-        min={0}
-        max={9999}
-        value={displayOrder}
-        onChange={(e) => setDisplayOrder(Number.parseInt(e.target.value, 10) || 0)}
-        aria-label={t('admin.catalog.categories.displayOrder')}
-        className="rounded-medium border border-divider bg-background px-3 py-1.5 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary"
-      />
+      <TextField isRequired className="flex flex-col gap-1">
+        <Label className="sr-only">{t('admin.catalog.categories.nameAr')}</Label>
+        <Input
+          value={nameAr}
+          onChange={(e) => setNameAr((e.target as HTMLInputElement).value)}
+          maxLength={120}
+        />
+      </TextField>
+      <TextField isRequired className="flex flex-col gap-1">
+        <Label className="sr-only">{t('admin.catalog.categories.nameEn')}</Label>
+        <Input
+          value={nameEn}
+          onChange={(e) => setNameEn((e.target as HTMLInputElement).value)}
+          maxLength={120}
+        />
+      </TextField>
+      <TextField className="flex flex-col gap-1">
+        <Label className="sr-only">{t('admin.catalog.categories.displayOrder')}</Label>
+        <Input
+          type="number"
+          value={String(displayOrder)}
+          onChange={(e) => setDisplayOrder(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
+          aria-label={t('admin.catalog.categories.displayOrder')}
+          className="tabular-nums"
+        />
+      </TextField>
       <Button type="submit" variant="primary" size="sm" isDisabled={isPending}>
         {isPending ? t('admin.catalog.actions.saving') : t('admin.catalog.actions.save')}
       </Button>
