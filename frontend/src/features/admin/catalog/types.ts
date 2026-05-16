@@ -122,6 +122,8 @@ export interface AdminProductsListParams {
   categoryId?: string;
   gender?: ProductGender;
   published?: boolean;
+  page?: number;
+  pageSize?: number;
 }
 
 // -----------------------------------------------------------------------------

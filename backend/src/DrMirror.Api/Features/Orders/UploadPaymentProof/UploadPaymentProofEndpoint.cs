@@ -1,4 +1,3 @@
-using Coravel.Queuing.Interfaces;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Orders;
 using DrMirror.Api.Features.Orders.Common;
@@ -72,7 +71,6 @@ public static class UploadPaymentProofEndpoint
         [FromServices] OrderStateMachine fsm,
         [FromServices] IFileStorageService storage,
         [FromServices] IOptions<FileStorageOptions> opts,
-        [FromServices] IQueue queue,
         CancellationToken ct)
     {
         if (!current.IsAuthenticated || current.UserId is not { } userId)
@@ -188,6 +186,7 @@ public static class UploadPaymentProofEndpoint
             order.UpdatedAt = DateTimeOffset.UtcNow;
         }
 
+        db.EmailOutboxMessages.Add(EmailOutboxHelper.ForPaymentReviewNeeded(order.Id));
         await db.SaveChangesAsync(ct);
 
         // Refresh PaymentProofs nav so the response includes the just-saved row.
@@ -195,8 +194,6 @@ public static class UploadPaymentProofEndpoint
             .Query()
             .Include(p => p.ReviewedByUser)
             .LoadAsync(ct);
-
-        queue.QueueInvocableWithPayload<SendPaymentReviewNeededJob, Guid>(order.Id);
 
         return Results.Ok(order.ToDetail(fsm));
     }

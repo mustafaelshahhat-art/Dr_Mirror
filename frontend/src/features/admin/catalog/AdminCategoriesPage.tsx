@@ -260,14 +260,14 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
       <input
         value={nameAr}
         onChange={(e) => setNameAr(e.target.value)}
-        className="rounded-medium border border-divider bg-background px-3 py-1.5 text-sm"
+        className="rounded-medium border border-divider bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
         required
         maxLength={120}
       />
       <input
         value={nameEn}
         onChange={(e) => setNameEn(e.target.value)}
-        className="rounded-medium border border-divider bg-background px-3 py-1.5 text-sm"
+        className="rounded-medium border border-divider bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
         required
         maxLength={120}
       />
@@ -278,7 +278,7 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
         value={displayOrder}
         onChange={(e) => setDisplayOrder(Number.parseInt(e.target.value, 10) || 0)}
         aria-label={t('admin.catalog.categories.displayOrder')}
-        className="rounded-medium border border-divider bg-background px-3 py-1.5 text-sm tabular-nums"
+        className="rounded-medium border border-divider bg-background px-3 py-1.5 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary"
       />
       <Button type="submit" variant="primary" size="sm" isDisabled={isPending}>
         {isPending ? t('admin.catalog.actions.saving') : t('admin.catalog.actions.save')}

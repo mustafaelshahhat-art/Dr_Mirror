@@ -1,5 +1,6 @@
 using DrMirror.Api.Features.Catalog.Common;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 

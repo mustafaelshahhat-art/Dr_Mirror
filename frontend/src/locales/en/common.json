@@ -43,5 +43,21 @@
   "language": {
     "ar": "Arabic",
     "en": "English"
+  },
+  "pagination": {
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{totalPages}}"
+  },
+  "dismiss": "Dismiss",
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "subtitle": "An unexpected error occurred. Try again or return home.",
+    "retry": "Try again"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "subtitle": "The page you're looking for doesn't exist or has been moved.",
+    "cta": "Back to catalog"
   }
 }

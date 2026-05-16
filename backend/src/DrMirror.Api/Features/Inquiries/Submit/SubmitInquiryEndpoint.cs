@@ -1,4 +1,3 @@
-using Coravel.Queuing.Interfaces;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Features.Inquiries.Common;
 using DrMirror.Api.Infrastructure.Email;
@@ -33,7 +32,6 @@ public static class SubmitInquiryEndpoint
     private static async Task<IResult> HandleAsync(
         SubmitInquiryRequest request,
         AppDbContext db,
-        IQueue queue,
         CancellationToken ct)
     {
         // If a productId is provided, verify the product exists and is published.
@@ -64,9 +62,8 @@ public static class SubmitInquiryEndpoint
         };
 
         db.Inquiries.Add(inquiry);
+        db.EmailOutboxMessages.Add(EmailOutboxHelper.ForInquiryReceived(inquiry.Id));
         await db.SaveChangesAsync(ct);
-
-        queue.QueueInvocableWithPayload<SendInquiryReceivedJob, Guid>(inquiry.Id);
 
         return Results.Created($"/api/inquiries/{inquiry.Id}", inquiry.ToDto());
     }

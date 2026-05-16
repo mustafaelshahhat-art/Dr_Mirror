@@ -21,7 +21,7 @@ export function ForbiddenBanner() {
         type="button"
         onClick={() => setForbiddenMessage(null)}
         className="shrink-0 rounded-sm p-0.5 transition-colors hover:bg-warning/20"
-        aria-label="Dismiss"
+        aria-label={t('common.dismiss')}
       >
         <X size={14} aria-hidden />
       </button>

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import type { PagedResult } from '../../shared/types/paged-result';
 import { ordersApi } from './api';
 import type {
   CancelOrderRequest,
@@ -25,7 +26,7 @@ export function usePaymentMethodsQuery() {
 }
 
 export function useMyOrdersQuery(page = 1, pageSize = 20) {
-  return useQuery<OrderSummaryDto[]>({
+  return useQuery<PagedResult<OrderSummaryDto>>({
     queryKey: KEYS.myOrders(page, pageSize),
     queryFn: () => ordersApi.listMyOrders({ page, pageSize }),
     staleTime: 30_000,

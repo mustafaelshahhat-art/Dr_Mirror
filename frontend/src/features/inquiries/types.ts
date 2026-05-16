@@ -20,6 +20,8 @@ export interface InquiryDto {
   createdAt: string;
   readAt: string | null;
   readByUserName: string | null;
+  respondedAt: string | null;
+  respondedByUserName: string | null;
 }
 
 export interface SubmitInquiryRequest {

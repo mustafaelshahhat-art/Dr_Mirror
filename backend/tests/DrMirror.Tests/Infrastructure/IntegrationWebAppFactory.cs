@@ -1,8 +1,10 @@
+using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace DrMirror.Tests.Infrastructure;
 
@@ -52,7 +54,7 @@ public abstract class IntegrationWebAppFactory : WebApplicationFactory<Program>
             RemoveDbContextRegistrations(services);
             services.AddDbContext<AppDbContext>(ConfigureDbContext);
 
-            RemoveCoravelQueuingHost(services);
+            RemoveBackgroundServices(services);
 
             ConfigureTestServices(services);
         });
@@ -80,13 +82,18 @@ public abstract class IntegrationWebAppFactory : WebApplicationFactory<Program>
         }
     }
 
-    private static void RemoveCoravelQueuingHost(IServiceCollection services)
+    private static void RemoveBackgroundServices(IServiceCollection services)
     {
+        // Remove EmailOutboxProcessor so it doesn't poll during tests.
+        var outboxProcessor = services.FirstOrDefault(
+            d => d.ImplementationType == typeof(EmailOutboxProcessor));
+        if (outboxProcessor is not null)
+            services.Remove(outboxProcessor);
+
+        // Also remove any lingering Coravel QueuingHost if present.
         var queuingHost = services.FirstOrDefault(
             d => d.ImplementationType?.FullName?.Contains("QueuingHost") == true);
         if (queuingHost is not null)
-        {
             services.Remove(queuingHost);
-        }
     }
 }

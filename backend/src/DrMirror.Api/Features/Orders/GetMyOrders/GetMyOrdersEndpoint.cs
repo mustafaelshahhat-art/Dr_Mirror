@@ -1,6 +1,7 @@
 using DrMirror.Api.Features.Orders.Common;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +15,7 @@ public static class GetMyOrdersEndpoint
             .WithName("Orders.GetMyOrders")
             .WithSummary("List the signed-in buyer's orders, most recent first.")
             .RequireAuthorization()
-            .Produces<IReadOnlyList<OrderSummaryDto>>(StatusCodes.Status200OK);
+            .Produces<PagedResult<OrderSummaryDto>>(StatusCodes.Status200OK);
 
         return group;
     }
@@ -34,15 +35,20 @@ public static class GetMyOrdersEndpoint
         var p = Math.Max(1, page ?? 1);
         var ps = Math.Clamp(pageSize ?? 20, 1, 50);
 
-        var orders = await db.Orders
+        var query = db.Orders
             .AsNoTracking()
             .Include(o => o.Items)
-            .Where(o => o.BuyerUserId == userId)
+            .Where(o => o.BuyerUserId == userId);
+
+        var total = await query.CountAsync(ct);
+        var orders = await query
             .OrderByDescending(o => o.CreatedAt)
             .Skip((p - 1) * ps)
             .Take(ps)
             .ToListAsync(ct);
 
-        return Results.Ok(orders.Select(o => o.ToSummary()).ToList());
+        var totalPages = total == 0 ? 0 : (int)Math.Ceiling(total / (double)ps);
+        return Results.Ok(new PagedResult<OrderSummaryDto>(
+            orders.Select(o => o.ToSummary()).ToList(), p, ps, total, totalPages));
     }
 }

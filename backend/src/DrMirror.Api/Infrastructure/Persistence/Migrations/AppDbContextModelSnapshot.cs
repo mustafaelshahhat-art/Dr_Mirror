@@ -218,6 +218,60 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("Categories", (string)null);
                 });
 
+            modelBuilder.Entity("DrMirror.Api.Domain.Entities.EmailOutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DeliveredAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(-1)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset?>("LastAttemptAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("NextRetryAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasMaxLength(-1)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
+
+                    b.HasIndex("Status", "NextRetryAt")
+                        .HasFilter("[Status] = 0");
+
+                    b.ToTable("EmailOutboxMessages", (string)null);
+                });
+
             modelBuilder.Entity("DrMirror.Api.Domain.Entities.Inquiry", b =>
                 {
                     b.Property<Guid>("Id")
@@ -255,6 +309,12 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("ReadByUserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset?>("RespondedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("RespondedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -270,6 +330,8 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.HasIndex("ProductId");
 
                     b.HasIndex("ReadByUserId");
+
+                    b.HasIndex("RespondedByUserId");
 
                     b.HasIndex("Status");
 
@@ -1104,9 +1166,16 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                         .HasForeignKey("ReadByUserId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("DrMirror.Api.Domain.Entities.User", "RespondedByUser")
+                        .WithMany()
+                        .HasForeignKey("RespondedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Product");
 
                     b.Navigation("ReadByUser");
+
+                    b.Navigation("RespondedByUser");
                 });
 
             modelBuilder.Entity("DrMirror.Api.Domain.Entities.Order", b =>

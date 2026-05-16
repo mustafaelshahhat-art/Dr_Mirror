@@ -10,6 +10,12 @@
     "itemCount_few": "{{count}} منتجات",
     "itemCount_many": "{{count}} منتجًا",
     "itemCount_other": "{{count}} منتج",
+    "totalCount_zero": "لا توجد طلبات",
+    "totalCount_one": "طلب واحد",
+    "totalCount_two": "طلبان",
+    "totalCount_few": "{{count}} طلبات",
+    "totalCount_many": "{{count}} طلبًا",
+    "totalCount_other": "{{count}} طلب",
     "empty": {
       "title": "لا توجد طلبات بعد",
       "subtitle": "بمجرد ما يبدأ المشترين بطلب المنتجات، ستظهر هنا.",

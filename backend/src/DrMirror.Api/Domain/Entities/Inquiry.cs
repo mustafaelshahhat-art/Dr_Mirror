@@ -22,5 +22,9 @@ public sealed class Inquiry
     public User? ReadByUser { get; set; }
     public DateTimeOffset? ReadAt { get; set; }
 
+    public Guid? RespondedByUserId { get; set; }
+    public User? RespondedByUser { get; set; }
+    public DateTimeOffset? RespondedAt { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

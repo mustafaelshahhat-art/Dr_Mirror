@@ -35,6 +35,7 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<OrderCounter> OrderCounters => Set<OrderCounter>();
     public DbSet<PaymentProof> PaymentProofs => Set<PaymentProof>();
     public DbSet<Inquiry> Inquiries => Set<Inquiry>();
+    public DbSet<EmailOutboxMessage> EmailOutboxMessages => Set<EmailOutboxMessage>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Spinner } from '@heroui/react';
 import { Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -5,6 +6,7 @@ import { Link } from 'react-router-dom';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
+import { PaginationControls } from '../../shared/components/PaginationControls';
 
 import { OrderStatusBadge } from './components/OrderStatusBadge';
 import { useMyOrdersQuery } from './hooks';
@@ -16,7 +18,8 @@ import { useMyOrdersQuery } from './hooks';
 export function OrdersListPage() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
-  const query = useMyOrdersQuery(1, 50);
+  const [page, setPage] = useState(1);
+  const query = useMyOrdersQuery(page, 20);
   const dateFmt = new Intl.DateTimeFormat(
     i18n.language?.startsWith('ar') ? 'ar-EG' : 'en-US',
     { dateStyle: 'medium', numberingSystem: 'latn' },
@@ -38,7 +41,7 @@ export function OrdersListPage() {
     );
   }
 
-  const orders = query.data ?? [];
+  const orders = query.data?.items ?? [];
 
   return (
     <section className="space-y-5">
@@ -87,6 +90,14 @@ export function OrdersListPage() {
           ))}
         </ul>
       )}
+
+      {query.data && query.data.totalPages > 1 ? (
+        <PaginationControls
+          page={page}
+          totalPages={query.data.totalPages}
+          onPageChange={setPage}
+        />
+      ) : null}
     </section>
   );
 }

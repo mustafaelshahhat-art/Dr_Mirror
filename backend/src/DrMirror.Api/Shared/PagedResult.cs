@@ -1,0 +1,8 @@
+namespace DrMirror.Api.Shared;
+
+public sealed record PagedResult<T>(
+    IReadOnlyList<T> Items,
+    int Page,
+    int PageSize,
+    int TotalCount,
+    int TotalPages);

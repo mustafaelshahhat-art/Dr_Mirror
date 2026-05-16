@@ -2,6 +2,7 @@ import { Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import type { ProductVariantDto } from '../types';
+import type { KeyboardEvent } from 'react';
 
 interface ColorPickerProps {
   /** One representative variant per distinct colour. */
@@ -25,14 +26,42 @@ export function ColorPicker({ colors, selected, onSelect }: ColorPickerProps) {
       : selectedColor.colorName
     : '';
 
+  const selectedIdx = colors.findIndex((c) => c.colorName === selected);
+
+  function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    const len = colors.length;
+    if (len === 0) return;
+    const current = selectedIdx === -1 ? 0 : selectedIdx;
+    let next = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      next = (current + 1) % len;
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      next = (current - 1 + len) % len;
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      next = 0;
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      next = len - 1;
+    }
+    if (next !== -1) onSelect(colors[next].colorName);
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex items-baseline justify-between text-sm">
         <span className="font-medium">{t('catalog.detail.colorLabel')}</span>
         <span className="text-default-500">{selectedLabel}</span>
       </div>
-      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t('catalog.detail.colorLabel')}>
-        {colors.map((c) => {
+      <div
+        className="flex flex-wrap gap-2"
+        role="radiogroup"
+        aria-label={t('catalog.detail.colorLabel')}
+        onKeyDown={handleKeyDown}
+      >
+        {colors.map((c, idx) => {
           const isSelected = c.colorName === selected;
           const onLight = isLightHex(c.colorHex);
           return (
@@ -43,11 +72,12 @@ export function ColorPicker({ colors, selected, onSelect }: ColorPickerProps) {
               aria-checked={isSelected}
               aria-label={isAr ? c.colorNameAr : c.colorName}
               title={isAr ? c.colorNameAr : c.colorName}
+              tabIndex={selectedIdx === -1 ? (idx === 0 ? 0 : -1) : isSelected ? 0 : -1}
               onClick={() => onSelect(c.colorName)}
               className={
                 isSelected
-                  ? 'relative size-9 rounded-full border-2 border-foreground transition-transform'
-                  : 'relative size-9 rounded-full border border-divider/60 transition-transform hover:scale-105 hover:border-default-400'
+                  ? 'relative size-9 rounded-full border-2 border-foreground transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+                  : 'relative size-9 rounded-full border border-divider/60 transition-transform hover:scale-105 hover:border-default-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
               }
               style={{ backgroundColor: c.colorHex }}
             >

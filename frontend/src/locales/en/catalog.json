@@ -15,7 +15,20 @@
   },
   "filters": {
     "all": "All categories",
-    "categoryLabel": "Filter by category"
+    "categoryLabel": "Filter by category",
+    "label": "Filters",
+    "hide": "Hide filters",
+    "clearAll": "Clear all",
+    "genderLabel": "Gender",
+    "allGenders": "All",
+    "sizeLabel": "Size",
+    "sizePlaceholder": "e.g. M, XL",
+    "colorLabel": "Color",
+    "colorPlaceholder": "e.g. blue",
+    "minPriceLabel": "Min (EGP)",
+    "maxPriceLabel": "Max (EGP)",
+    "active_one": "1 active",
+    "active_other": "{{count}} active"
   },
   "gender": {
     "men": "Men",

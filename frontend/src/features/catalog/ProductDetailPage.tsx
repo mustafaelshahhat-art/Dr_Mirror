@@ -1,5 +1,5 @@
 import { Button, Spinner } from '@heroui/react';
-import { ArrowLeft, Check, MessageSquare, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Check, ImageOff, MessageSquare, ShoppingBag } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
@@ -101,8 +101,8 @@ export function ProductDetailPage() {
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-default-400">
-                —
+              <div className="flex h-full w-full items-center justify-center text-default-300 dark:text-default-600">
+                <ImageOff className="size-16" aria-hidden />
               </div>
             )}
           </div>

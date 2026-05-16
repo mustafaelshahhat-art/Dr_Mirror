@@ -1,4 +1,3 @@
-using Coravel.Queuing.Interfaces;
 using DrMirror.Api.Domain.Catalog;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Orders;
@@ -36,7 +35,6 @@ public static class CreateOrderEndpoint
         AppDbContext db,
         [FromServices] OrderStateMachine fsm,
         [FromServices] OrderNumberGenerator numberGenerator,
-        [FromServices] IQueue queue,
         CancellationToken ct)
     {
         if (!current.IsAuthenticated || current.UserId is not { } userId)
@@ -200,6 +198,7 @@ public static class CreateOrderEndpoint
         db.Orders.Add(order);
         db.CartItems.RemoveRange(cart.Items);
         cart.UpdatedAt = DateTimeOffset.UtcNow;
+        db.EmailOutboxMessages.Add(EmailOutboxHelper.ForOrderConfirmation(order.Id));
 
         // ---- Optional: save the inline address to the buyer's address book. ----
         if (request.SaveAsNewAddress && request.ShippingAddress is not null)
@@ -294,11 +293,6 @@ public static class CreateOrderEndpoint
             .Include(o => o.PaymentMethod)
             .Include(o => o.Items).ThenInclude(i => i.Product)
             .FirstAsync(o => o.Id == order.Id, ct);
-
-        // Fire-and-forget confirmation email. Coravel runs it in its own scope,
-        // so the response is not held up by SMTP latency (and dev's log-only
-        // sender never blocks).
-        queue.QueueInvocableWithPayload<SendOrderConfirmationJob, Guid>(detail.Id);
 
         return Results.Created(
             uri: $"/api/orders/{detail.OrderNumber}",

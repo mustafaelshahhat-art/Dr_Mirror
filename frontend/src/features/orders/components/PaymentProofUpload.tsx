@@ -2,9 +2,7 @@ import { Button } from '@heroui/react';
 import { UploadCloud } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isAxiosError } from 'axios';
 
-import type { ProblemDetails } from '../../auth/types';
 import { useUploadPaymentProofMutation } from '../hooks';
 
 interface PaymentProofUploadProps {
@@ -67,11 +65,8 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
       setPreviewUrl(null);
       setSelected(null);
       if (inputRef.current) inputRef.current.value = '';
-    } catch (err) {
-      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-      setClientError(
-        problem?.detail ?? problem?.title ?? t('orders.upload.errors.unknown'),
-      );
+    } catch {
+      setClientError(t('orders.upload.errors.unknown'));
     }
   }
 

@@ -1,5 +1,6 @@
 using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,14 +18,13 @@ public static class ListUsersEndpoint
             .WithName("Admin.Users.List")
             .WithSummary("List all users with roles (admin).")
             .RequireAuthorization(p => p.RequireRole(UserRoles.Admin))
-            .Produces<AdminUserDto[]>(StatusCodes.Status200OK);
+            .Produces<PagedResult<AdminUserDto>>(StatusCodes.Status200OK);
 
         return group;
     }
 
     private static async Task<IResult> HandleAsync(
         AppDbContext db,
-        UserManager<Domain.Entities.User> userManager,
         string? q,
         int page = 1,
         int pageSize = 25,
@@ -43,19 +43,32 @@ public static class ListUsersEndpoint
                 (u.Email != null && u.Email.ToLower().Contains(lower)));
         }
 
+        var total = await query.CountAsync(ct);
+
         var users = await query
             .OrderBy(u => u.FullName)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(ct);
 
-        var result = new List<AdminUserDto>(users.Count);
-        foreach (var user in users)
-        {
-            var roles = await userManager.GetRolesAsync(user);
-            result.Add(user.ToAdminDto(roles));
-        }
+        var userIds = users.Select(u => u.Id).ToList();
 
-        return Results.Ok(result.ToArray());
+        var roleMap = await (
+            from ur in db.Set<IdentityUserRole<Guid>>()
+            join r in db.Set<IdentityRole<Guid>>() on ur.RoleId equals r.Id
+            where userIds.Contains(ur.UserId)
+            select new { ur.UserId, r.Name }
+        ).ToListAsync(ct);
+
+        var rolesById = roleMap
+            .GroupBy(x => x.UserId)
+            .ToDictionary(g => g.Key, g => g.Select(x => x.Name!).ToArray());
+
+        var result = users
+            .Select(u => u.ToAdminDto(rolesById.GetValueOrDefault(u.Id) ?? []))
+            .ToList();
+
+        var totalPages = total == 0 ? 0 : (int)Math.Ceiling(total / (double)pageSize);
+        return Results.Ok(new PagedResult<AdminUserDto>(result, page, pageSize, total, totalPages));
     }
 }

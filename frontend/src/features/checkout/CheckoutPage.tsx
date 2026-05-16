@@ -1,4 +1,4 @@
-import { Button, Form, Spinner } from '@heroui/react';
+import { Button, Checkbox, Form, Spinner } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isAxiosError } from 'axios';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
@@ -363,15 +363,13 @@ export function CheckoutPage() {
                     description={t('checkout.address.notesHint')}
                   />
 
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={saveAsNewAddress}
-                      onChange={(e) => setSaveAsNewAddress(e.target.checked)}
-                      className="h-4 w-4 rounded border-divider"
-                    />
-                    <span>{t('checkout.address.saveAsNew')}</span>
-                  </label>
+                  <Checkbox
+                    isSelected={saveAsNewAddress}
+                    onValueChange={setSaveAsNewAddress}
+                    size="sm"
+                  >
+                    <span className="text-sm">{t('checkout.address.saveAsNew')}</span>
+                  </Checkbox>
                   {saveAsNewAddress ? (
                     <label className="flex flex-col gap-1.5 text-sm">
                       <span className="text-xs uppercase tracking-wide text-default-500">

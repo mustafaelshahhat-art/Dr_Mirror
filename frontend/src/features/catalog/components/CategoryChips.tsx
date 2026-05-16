@@ -1,3 +1,4 @@
+import type { KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { CategoryDto } from '../types';
@@ -16,19 +17,46 @@ export function CategoryChips({ categories, selectedId, onSelect }: CategoryChip
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
 
+  // Build flat list: "all" at index 0, then categories.
+  const allIds: (string | undefined)[] = [undefined, ...categories.map((c) => c.id)];
+  const selectedTabIdx = selectedId ? allIds.indexOf(selectedId) : 0;
+
+  function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    const len = allIds.length;
+    if (len === 0) return;
+    const current = selectedTabIdx === -1 ? 0 : selectedTabIdx;
+    let next = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      next = (current + 1) % len;
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      next = (current - 1 + len) % len;
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      next = 0;
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      next = len - 1;
+    }
+    if (next !== -1) onSelect(allIds[next]);
+  }
+
   return (
     <div
       className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       role="tablist"
       aria-label={t('catalog.filters.categoryLabel')}
+      onKeyDown={handleKeyDown}
     >
-      <Pill selected={!selectedId} onClick={() => onSelect(undefined)}>
+      <Pill selected={!selectedId} tabIndex={!selectedId ? 0 : -1} onClick={() => onSelect(undefined)}>
         {t('catalog.filters.all')}
       </Pill>
       {categories.map((c) => (
         <Pill
           key={c.id}
           selected={c.id === selectedId}
+          tabIndex={c.id === selectedId ? 0 : -1}
           onClick={() => onSelect(c.id === selectedId ? undefined : c.id)}
         >
           {isAr ? c.nameAr : c.nameEn}
@@ -41,10 +69,12 @@ export function CategoryChips({ categories, selectedId, onSelect }: CategoryChip
 function Pill({
   selected,
   onClick,
+  tabIndex,
   children,
 }: {
   selected: boolean;
   onClick: () => void;
+  tabIndex: number;
   children: React.ReactNode;
 }) {
   return (
@@ -52,11 +82,12 @@ function Pill({
       type="button"
       role="tab"
       aria-selected={selected}
+      tabIndex={tabIndex}
       onClick={onClick}
       className={
         selected
-          ? 'shrink-0 rounded-full bg-foreground px-3 py-1.5 text-xs font-medium text-background transition-colors'
-          : 'shrink-0 rounded-full border border-divider/60 bg-content1 px-3 py-1.5 text-xs font-medium text-default-700 transition-colors hover:border-default-400 hover:text-foreground dark:text-default-300'
+          ? 'shrink-0 rounded-full bg-foreground px-3 py-1.5 text-xs font-medium text-background transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+          : 'shrink-0 rounded-full border border-divider/60 bg-content1 px-3 py-1.5 text-xs font-medium text-default-700 transition-colors hover:border-default-400 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-default-300'
       }
     >
       {children}

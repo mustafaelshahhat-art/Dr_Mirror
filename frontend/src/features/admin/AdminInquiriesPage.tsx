@@ -11,20 +11,21 @@ import {
 import {
   useAdminInquiriesQuery,
   useMarkInquiryReadMutation,
+  useMarkInquiryRespondedMutation,
 } from '../inquiries/hooks';
+import { PaginationControls } from '../../shared/components/PaginationControls';
 
-/**
- * Admin inquiries inbox at <c>/admin/inquiries</c>.
- *   - Filter pills: All / New / Read
- *   - Each row: subject, sender, product link, message preview, status badge
- *   - "Mark as read" inline action for New inquiries
- *   - "Reply by email" mailto link with the original subject prefixed Re:
- */
 export function AdminInquiriesPage() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
   const [filter, setFilter] = useState<InquiryStatus | undefined>(undefined);
-  const query = useAdminInquiriesQuery(filter);
+  const [page, setPage] = useState(1);
+  const query = useAdminInquiriesQuery(filter, page);
+
+  function changeFilter(next: InquiryStatus | undefined) {
+    setFilter(next);
+    setPage(1);
+  }
 
   const dateFmt = new Intl.DateTimeFormat(isAr ? 'ar-EG' : 'en-US', {
     dateStyle: 'medium',
@@ -43,17 +44,22 @@ export function AdminInquiriesPage() {
         <FilterPill
           label={t('inquiries.admin.filterAll')}
           active={filter === undefined}
-          onSelect={() => setFilter(undefined)}
+          onSelect={() => changeFilter(undefined)}
         />
         <FilterPill
           label={t('inquiries.admin.filterNew')}
           active={filter === INQUIRY_STATUS.New}
-          onSelect={() => setFilter(INQUIRY_STATUS.New)}
+          onSelect={() => changeFilter(INQUIRY_STATUS.New)}
         />
         <FilterPill
           label={t('inquiries.admin.filterRead')}
           active={filter === INQUIRY_STATUS.Read}
-          onSelect={() => setFilter(INQUIRY_STATUS.Read)}
+          onSelect={() => changeFilter(INQUIRY_STATUS.Read)}
+        />
+        <FilterPill
+          label={t('inquiries.admin.filterResponded')}
+          active={filter === INQUIRY_STATUS.Responded}
+          onSelect={() => changeFilter(INQUIRY_STATUS.Responded)}
         />
       </div>
 
@@ -61,14 +67,21 @@ export function AdminInquiriesPage() {
         <div className="flex min-h-[20vh] items-center justify-center">
           <Spinner aria-label={t('inquiries.admin.loading')} />
         </div>
-      ) : query.data?.length ? (
-        <ul className="space-y-3">
-          {query.data.map((inquiry) => (
-            <li key={inquiry.id}>
-              <InquiryRow inquiry={inquiry} dateFmt={dateFmt} isAr={isAr ?? false} />
-            </li>
-          ))}
-        </ul>
+      ) : query.data?.items?.length ? (
+        <div className="space-y-4">
+          <ul className="space-y-3">
+            {query.data.items.map((inquiry) => (
+              <li key={inquiry.id}>
+                <InquiryRow inquiry={inquiry} dateFmt={dateFmt} isAr={isAr ?? false} />
+              </li>
+            ))}
+          </ul>
+          <PaginationControls
+            page={page}
+            totalPages={query.data.totalPages}
+            onPageChange={setPage}
+          />
+        </div>
       ) : (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center text-sm text-default-500">
           {t('inquiries.admin.empty')}
@@ -115,7 +128,9 @@ function InquiryRow({
 }) {
   const { t } = useTranslation();
   const markRead = useMarkInquiryReadMutation();
+  const markResponded = useMarkInquiryRespondedMutation();
   const isNew = inquiry.status === INQUIRY_STATUS.New;
+  const isRead = inquiry.status === INQUIRY_STATUS.Read;
   const productName = isAr ? inquiry.productNameAr : inquiry.productNameEn;
   const replyHref = `mailto:${inquiry.email}?subject=${encodeURIComponent(`Re: ${inquiry.subject}`)}`;
 
@@ -178,6 +193,15 @@ function InquiryRow({
         </p>
       ) : null}
 
+      {inquiry.respondedAt ? (
+        <p className="text-xs text-default-500">
+          {t('inquiries.admin.respondedAt', {
+            when: dateFmt.format(new Date(inquiry.respondedAt)),
+            by: inquiry.respondedByUserName ?? '',
+          })}
+        </p>
+      ) : null}
+
       <div className="flex flex-wrap gap-2">
         <a href={replyHref}>
           <Button
@@ -186,7 +210,7 @@ function InquiryRow({
           >
             <span className="inline-flex items-center gap-1.5">
               <Mail className="size-4" aria-hidden />
-              {t('admin.inquiries.reply')}
+              {t('inquiries.admin.replyByEmail')}
             </span>
           </Button>
         </a>
@@ -201,6 +225,19 @@ function InquiryRow({
             {markRead.isPending
               ? t('inquiries.admin.marking')
               : t('inquiries.admin.markRead')}
+          </Button>
+        ) : null}
+        {isRead ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            isDisabled={markResponded.isPending}
+            onPress={() => markResponded.mutate(inquiry.id)}
+          >
+            {markResponded.isPending
+              ? t('inquiries.admin.markingResponded')
+              : t('inquiries.admin.markResponded')}
           </Button>
         ) : null}
       </div>

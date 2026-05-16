@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
 import { CategoryChips } from './components/CategoryChips';
+import { FilterPanel } from './components/FilterPanel';
 import { PaginationBar } from './components/PaginationBar';
 import { ProductCard } from './components/ProductCard';
 import { ProductGridSkeleton } from './components/ProductGridSkeleton';
 import { SearchInput } from './components/SearchInput';
 import { SortSelect } from './components/SortSelect';
 import { useCategoriesQuery, useProductsQuery } from './hooks';
-import type { ProductFilter, ProductSort } from './types';
+import type { ProductFilter, ProductGender, ProductSort } from './types';
 
 const VALID_SORTS: ProductSort[] = ['Newest', 'PriceAsc', 'PriceDesc', 'NameAsc'];
 const PAGE_SIZE = 24;
@@ -18,16 +19,24 @@ export function CatalogPage() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // ---------------------------------------------------------------------------
-  // URL → filter object. Keep this single-source-of-truth so reload, share, and
-  // back/forward all behave correctly.
-  // ---------------------------------------------------------------------------
   const filter: ProductFilter = useMemo(() => {
     const sort = searchParams.get('sort') as ProductSort | null;
     const page = Number(searchParams.get('page') ?? '1');
+    const genderParam = searchParams.get('gender');
+    const gender =
+      genderParam !== null && ['0', '1', '2'].includes(genderParam)
+        ? (Number(genderParam) as ProductGender)
+        : undefined;
+    const minPriceParam = searchParams.get('minPrice');
+    const maxPriceParam = searchParams.get('maxPrice');
     return {
       categoryId: searchParams.get('categoryId') ?? undefined,
       q: searchParams.get('q') ?? undefined,
+      gender,
+      size: searchParams.get('size') ?? undefined,
+      color: searchParams.get('color') ?? undefined,
+      minPrice: minPriceParam !== null ? Number(minPriceParam) : undefined,
+      maxPrice: maxPriceParam !== null ? Number(maxPriceParam) : undefined,
       sort: sort && VALID_SORTS.includes(sort) ? sort : 'Newest',
       page: Number.isFinite(page) && page >= 1 ? page : 1,
       pageSize: PAGE_SIZE,
@@ -37,15 +46,11 @@ export function CatalogPage() {
   const categoriesQuery = useCategoriesQuery();
   const productsQuery = useProductsQuery(filter);
 
-  // ---------------------------------------------------------------------------
-  // Filter mutators — one helper, atomic URL updates.
-  // ---------------------------------------------------------------------------
   const updateParams = useCallback(
     (updates: Record<string, string | undefined>) => {
       setSearchParams(
         (prev) => {
           const next = new URLSearchParams(prev);
-          // Mutating filters always resets to page 1 unless the caller said otherwise.
           if (!('page' in updates)) {
             next.delete('page');
           }
@@ -77,6 +82,32 @@ export function CatalogPage() {
     (page: number) => updateParams({ page: page <= 1 ? undefined : String(page) }),
     [updateParams],
   );
+  const setGender = useCallback(
+    (g: ProductGender | undefined) =>
+      updateParams({ gender: g !== undefined ? String(g) : undefined }),
+    [updateParams],
+  );
+  const setSize = useCallback((s: string) => updateParams({ size: s }), [updateParams]);
+  const setColor = useCallback((c: string) => updateParams({ color: c }), [updateParams]);
+  const setMinPrice = useCallback(
+    (v: string) => updateParams({ minPrice: v.trim() || undefined }),
+    [updateParams],
+  );
+  const setMaxPrice = useCallback(
+    (v: string) => updateParams({ maxPrice: v.trim() || undefined }),
+    [updateParams],
+  );
+  const clearAdvancedFilters = useCallback(
+    () =>
+      updateParams({
+        gender: undefined,
+        size: undefined,
+        color: undefined,
+        minPrice: undefined,
+        maxPrice: undefined,
+      }),
+    [updateParams],
+  );
 
   const isInitialLoad = productsQuery.isLoading && productsQuery.data === undefined;
   const items = productsQuery.data?.items ?? [];
@@ -103,6 +134,16 @@ export function CatalogPage() {
             onSelect={setCategoryId}
           />
         ) : null}
+
+        <FilterPanel
+          filter={filter}
+          onGenderChange={setGender}
+          onSizeChange={setSize}
+          onColorChange={setColor}
+          onMinPriceChange={setMinPrice}
+          onMaxPriceChange={setMaxPrice}
+          onClearAll={clearAdvancedFilters}
+        />
       </section>
 
       {isInitialLoad ? (

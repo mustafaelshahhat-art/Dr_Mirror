@@ -3,21 +3,17 @@ import { Search } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { PaginationControls } from '../../shared/components/PaginationControls';
 import { ALL_ROLES, type AdminUserDto, type UserRole } from './users/types';
 import { useAdminUsersQuery, useUpdateUserRolesMutation } from './users/hooks';
 
-/**
- * Admin user management page at <c>/admin/users</c>.
- *   - Search by name or email
- *   - Role badge list per user
- *   - Inline role toggle: click a role button to add/remove it
- */
 export function AdminUsersPage() {
   const { t } = useTranslation();
   const [q, setQ] = useState('');
   const [debouncedQ, setDebouncedQ] = useState('');
+  const [page, setPage] = useState(1);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const query = useAdminUsersQuery(debouncedQ || undefined);
+  const query = useAdminUsersQuery(debouncedQ || undefined, page);
 
   function handleSearch(value: string) {
     setQ(value);
@@ -25,6 +21,7 @@ export function AdminUsersPage() {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = window.setTimeout(() => {
       setDebouncedQ(trimmed);
+      setPage(1);
     }, 300);
   }
 
@@ -55,28 +52,35 @@ export function AdminUsersPage() {
         <div className="flex min-h-[20vh] items-center justify-center">
           <Spinner aria-label={t('admin.users.loading')} />
         </div>
-      ) : query.data?.length ? (
-        <div className="overflow-hidden rounded-large border border-divider/60">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-divider/60 bg-content2 text-start">
-                <th className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-500">
-                  {t('admin.users.colName')}
-                </th>
-                <th className="hidden px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-500 sm:table-cell">
-                  {t('admin.users.colJoined')}
-                </th>
-                <th className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-500">
-                  {t('admin.users.colRoles')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-divider/40">
-              {query.data.map((user) => (
-                <UserRow key={user.id} user={user} dateFmt={dateFmt} />
-              ))}
-            </tbody>
-          </table>
+      ) : query.data?.items?.length ? (
+        <div className="space-y-4">
+          <div className="overflow-hidden rounded-large border border-divider/60">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-divider/60 bg-content2 text-start">
+                  <th scope="col" className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-500">
+                    {t('admin.users.colName')}
+                  </th>
+                  <th scope="col" className="hidden px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-500 sm:table-cell">
+                    {t('admin.users.colJoined')}
+                  </th>
+                  <th scope="col" className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-500">
+                    {t('admin.users.colRoles')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-divider/40">
+                {query.data.items.map((user) => (
+                  <UserRow key={user.id} user={user} dateFmt={dateFmt} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <PaginationControls
+            page={page}
+            totalPages={query.data.totalPages}
+            onPageChange={setPage}
+          />
         </div>
       ) : (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center text-sm text-default-500">

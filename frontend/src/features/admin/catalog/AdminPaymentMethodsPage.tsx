@@ -307,7 +307,7 @@ function PaymentMethodCreateForm({ onCancel, onSubmit, isPending }: CreateProps)
             max={999}
             value={displayOrder}
             onChange={(e) => setDisplayOrder(Number.parseInt(e.target.value, 10) || 0)}
-            className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm tabular-nums"
+            className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </label>
       </div>
@@ -384,7 +384,7 @@ function PaymentMethodEditForm({ method, onCancel, onSubmit, isPending }: EditPr
             max={999}
             value={displayOrder}
             onChange={(e) => setDisplayOrder(Number.parseInt(e.target.value, 10) || 0)}
-            className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm tabular-nums"
+            className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </label>
       </div>
@@ -427,7 +427,7 @@ function LabeledInput({
         maxLength={maxLength}
         placeholder={placeholder}
         dir={dir}
-        className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm"
+        className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
       />
     </label>
   );
@@ -452,7 +452,7 @@ function LabeledTextarea({
         onChange={(e) => onChange(e.target.value)}
         maxLength={maxLength}
         rows={2}
-        className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm"
+        className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
       />
     </label>
   );

@@ -2,6 +2,7 @@ using DrMirror.Api.Domain.Catalog;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared;
 using DrMirror.Api.Shared.Slugs;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ public static class AdminProductsEndpoints
             .WithName("Admin.Products.List")
             .WithSummary("Every product, including unpublished drafts. Filter by category, gender, or text.")
             .RequireAuthorization(p => p.RequireRole(UserRoles.Admin))
-            .Produces<IReadOnlyList<AdminProductSummaryDto>>(StatusCodes.Status200OK);
+            .Produces<PagedResult<AdminProductSummaryDto>>(StatusCodes.Status200OK);
 
         group.MapGet("/{id:guid}", Get)
             .WithName("Admin.Products.Get")
@@ -68,8 +69,13 @@ public static class AdminProductsEndpoints
         [FromQuery] Guid? categoryId,
         [FromQuery] ProductGender? gender,
         [FromQuery] bool? published,
-        CancellationToken ct)
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 24,
+        CancellationToken ct = default)
     {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
         var query = db.Products
             .AsNoTracking()
             .Include(p => p.Category)
@@ -91,8 +97,11 @@ public static class AdminProductsEndpoints
                 (p.Sku != null && EF.Functions.Like(p.Sku, needle)));
         }
 
+        var total = await query.CountAsync(ct);
         var rows = await query
             .OrderByDescending(p => p.UpdatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(p => new AdminProductSummaryDto(
                 p.Id,
                 p.NameAr,
@@ -111,7 +120,8 @@ public static class AdminProductsEndpoints
                 p.UpdatedAt))
             .ToListAsync(ct);
 
-        return Results.Ok(rows);
+        var totalPages = total == 0 ? 0 : (int)Math.Ceiling(total / (double)pageSize);
+        return Results.Ok(new PagedResult<AdminProductSummaryDto>(rows, page, pageSize, total, totalPages));
     }
 
     private static async Task<IResult> Get(Guid id, AppDbContext db, CancellationToken ct)
@@ -305,7 +315,7 @@ public static class AdminProductsEndpoints
         p.Images
             .Select(i => new AdminProductImageDto(
                 i.Id, i.Url, i.Alt, i.DisplayOrder,
-                null, null, null, // FileKey/ContentType/SizeBytes are populated after the migration lands
+                i.FileKey, i.ContentType, i.SizeBytes,
                 i.CreatedAt))
             .ToList(),
         p.CreatedAt,

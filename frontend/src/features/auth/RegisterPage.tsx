@@ -9,7 +9,6 @@ import { isAxiosError } from 'axios';
 import { AuthCard } from './components/AuthCard';
 import { FormField } from './components/FormField';
 import { registerSchema, type RegisterFormValues } from './schemas';
-import type { ProblemDetails } from './types';
 import { useAuth } from './useAuth';
 import { resolvePostAuthDestination } from './postAuthDestination';
 
@@ -35,8 +34,16 @@ export function RegisterPage() {
       const dest = resolvePostAuthDestination(user, null);
       navigate(dest, { replace: true });
     } catch (err) {
-      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-      setServerError(problem?.detail ?? problem?.title ?? t('auth.errors.unknown'));
+      if (isAxiosError(err)) {
+        const status = err.response?.status;
+        setServerError(
+          status === 409
+            ? t('auth.errors.emailTaken')
+            : t('auth.errors.unknown'),
+        );
+      } else {
+        setServerError(t('auth.errors.unknown'));
+      }
     }
   });
 

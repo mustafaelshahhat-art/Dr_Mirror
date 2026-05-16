@@ -30,7 +30,7 @@ export function ShellPage() {
   if (!user) return null;
 
   const createdAt = user.createdAt ? dateFmt.format(new Date(user.createdAt)) : null;
-  const orders = ordersQuery.data ?? [];
+  const orders = ordersQuery.data?.items ?? [];
 
   return (
     <div className="space-y-8">

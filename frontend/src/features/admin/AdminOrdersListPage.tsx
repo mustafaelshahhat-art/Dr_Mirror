@@ -12,6 +12,7 @@ import { useAdminOrdersQuery } from './hooks';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
+import { PaginationControls } from '../../shared/components/PaginationControls';
 
 /**
  * Admin's order queue at <c>/admin/orders</c>. Filterable by status; lists
@@ -23,7 +24,8 @@ export function AdminOrdersListPage() {
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const isAr = lang === 'ar';
   const [statusFilter, setStatusFilter] = useState<OrderStatus | undefined>(undefined);
-  const query = useAdminOrdersQuery({ status: statusFilter, page: 1, pageSize: 50 });
+  const [page, setPage] = useState(1);
+  const query = useAdminOrdersQuery({ status: statusFilter, page, pageSize: 25 });
   const dateFmt = new Intl.DateTimeFormat(isAr ? 'ar-EG' : 'en-US', {
     dateStyle: 'medium',
     timeStyle: 'short',
@@ -39,7 +41,7 @@ export function AdminOrdersListPage() {
           </h1>
           <p className="text-sm text-default-500">{t('admin.list.subtitle')}</p>
         </div>
-        <StatusFilterDropdown value={statusFilter} onChange={setStatusFilter} />
+        <StatusFilterDropdown value={statusFilter} onChange={(next) => { setStatusFilter(next); setPage(1); }} />
       </header>
 
       {query.isLoading ? (
@@ -50,7 +52,7 @@ export function AdminOrdersListPage() {
         <div className="rounded-large border border-danger/30 bg-danger/10 p-6 text-sm text-danger">
           {t('admin.list.errorLoad')}
         </div>
-      ) : !query.data || query.data.length === 0 ? (
+      ) : !query.data?.items || query.data.items.length === 0 ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
           <Package className="mx-auto mb-3 size-10 text-default-400" aria-hidden />
           <h2 className="text-base font-semibold">{t('admin.list.empty.title')}</h2>
@@ -61,8 +63,14 @@ export function AdminOrdersListPage() {
           </p>
         </div>
       ) : (
-        <ul className="space-y-2">
-          {query.data.map((order) => (
+        <>
+          {query.data && query.data.totalCount > 0 ? (
+            <p className="text-xs text-default-500 tabular-nums">
+              {t('admin.list.totalCount', { count: query.data.totalCount })}
+            </p>
+          ) : null}
+          <ul className="space-y-2">
+          {query.data.items.map((order) => (
             <li key={order.id}>
               <Link
                 to={`/admin/orders/${encodeURIComponent(order.orderNumber)}`}
@@ -86,7 +94,9 @@ export function AdminOrdersListPage() {
               </Link>
             </li>
           ))}
-        </ul>
+          </ul>
+          <PaginationControls page={page} totalPages={query.data?.totalPages ?? 1} onPageChange={setPage} />
+        </>
       )}
     </section>
   );

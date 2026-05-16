@@ -1,3 +1,4 @@
+import { Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -40,7 +41,9 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-default-400">—</div>
+          <div className="flex h-full w-full items-center justify-center text-default-300 dark:text-default-600">
+            <Package className="size-12" aria-hidden />
+          </div>
         )}
         {isSoldOut ? (
           <span className="absolute top-2 start-2 inline-flex items-center rounded-medium bg-foreground/85 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-background">
@@ -55,7 +58,7 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
           <GenderChip gender={product.gender} />
         </div>
 
-        <h3 className="line-clamp-2 text-sm font-medium leading-snug text-foreground">
+        <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
           {name}
         </h3>
 

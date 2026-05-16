@@ -19,7 +19,11 @@ vi.mock('../features/cart/api', () => ({
 vi.mock('../features/admin/api', () => ({
   adminOrdersApi: {
     stats: vi.fn().mockResolvedValue({ totalOrders: 0, countsByStatus: {} }),
-    list: vi.fn().mockResolvedValue([]),
+    list: vi.fn().mockResolvedValue({ items: [], page: 1, pageSize: 5, totalCount: 0, totalPages: 0 }),
+    get: vi.fn().mockResolvedValue(null),
+    transition: vi.fn().mockResolvedValue(null),
+    approveProof: vi.fn().mockResolvedValue(null),
+    rejectProof: vi.fn().mockResolvedValue(null),
   },
 }));
 

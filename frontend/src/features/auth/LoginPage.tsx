@@ -9,7 +9,6 @@ import { isAxiosError } from 'axios';
 import { AuthCard } from './components/AuthCard';
 import { FormField } from './components/FormField';
 import { loginSchema, type LoginFormValues } from './schemas';
-import type { ProblemDetails } from './types';
 import { useAuth } from './useAuth';
 import { resolvePostAuthDestination } from './postAuthDestination';
 
@@ -38,8 +37,16 @@ export function LoginPage() {
       const dest = resolvePostAuthDestination(user, from);
       navigate(dest, { replace: true });
     } catch (err) {
-      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-      setServerError(problem?.detail ?? problem?.title ?? t('auth.errors.unknown'));
+      if (isAxiosError(err)) {
+        const status = err.response?.status;
+        setServerError(
+          status === 401 || status === 400
+            ? t('auth.errors.invalidCredentials')
+            : t('auth.errors.unknown'),
+        );
+      } else {
+        setServerError(t('auth.errors.unknown'));
+      }
     }
   });
 

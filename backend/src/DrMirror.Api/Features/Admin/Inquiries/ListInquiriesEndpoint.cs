@@ -2,6 +2,7 @@ using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Domain.Orders;
 using DrMirror.Api.Features.Inquiries.Common;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace DrMirror.Api.Features.Admin.Inquiries;
@@ -17,7 +18,7 @@ public static class ListInquiriesEndpoint
             .WithName("Admin.Inquiries.List")
             .WithSummary("List all inquiries (admin).")
             .RequireAuthorization(p => p.RequireRole(UserRoles.Admin))
-            .Produces<InquiryDto[]>(StatusCodes.Status200OK);
+            .Produces<PagedResult<InquiryDto>>(StatusCodes.Status200OK);
 
         return group;
     }
@@ -36,18 +37,21 @@ public static class ListInquiriesEndpoint
             .AsNoTracking()
             .Include(i => i.Product)
             .Include(i => i.ReadByUser)
+            .Include(i => i.RespondedByUser)
             .AsQueryable();
 
         if (status.HasValue)
             query = query.Where(i => i.Status == status.Value);
 
+        var total = await query.CountAsync(ct);
         var items = await query
             .OrderByDescending(i => i.CreatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(i => i.ToDto())
-            .ToArrayAsync(ct);
+            .ToListAsync(ct);
 
-        return Results.Ok(items);
+        var totalPages = total == 0 ? 0 : (int)Math.Ceiling(total / (double)pageSize);
+        return Results.Ok(new PagedResult<InquiryDto>(items, page, pageSize, total, totalPages));
     }
 }

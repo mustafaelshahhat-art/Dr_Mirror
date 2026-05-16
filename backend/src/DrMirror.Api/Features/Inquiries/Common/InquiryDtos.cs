@@ -20,7 +20,9 @@ public sealed record InquiryDto(
     InquiryStatus Status,
     DateTimeOffset CreatedAt,
     DateTimeOffset? ReadAt,
-    string? ReadByUserName);
+    string? ReadByUserName,
+    DateTimeOffset? RespondedAt,
+    string? RespondedByUserName);
 
 // ── Request DTOs ───────────────────────────────────────────────────────────
 
@@ -49,7 +51,9 @@ public static class InquiryMapping
         Status: i.Status,
         CreatedAt: i.CreatedAt,
         ReadAt: i.ReadAt,
-        ReadByUserName: i.ReadByUser?.FullName);
+        ReadByUserName: i.ReadByUser?.FullName,
+        RespondedAt: i.RespondedAt,
+        RespondedByUserName: i.RespondedByUser?.FullName);
 }
 
 // ── Validators ─────────────────────────────────────────────────────────────

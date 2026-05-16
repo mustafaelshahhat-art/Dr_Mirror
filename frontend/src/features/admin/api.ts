@@ -1,4 +1,5 @@
 import { api } from '../../shared/lib/api-client';
+import type { PagedResult } from '../../shared/types/paged-result';
 import type {
   OrderDetailDto,
   OrderStatus,
@@ -25,8 +26,8 @@ export const adminOrdersApi = {
     status?: OrderStatus;
     page?: number;
     pageSize?: number;
-  }): Promise<OrderSummaryDto[]> {
-    const { data } = await api.get<OrderSummaryDto[]>('/admin/orders', { params });
+  }): Promise<PagedResult<OrderSummaryDto>> {
+    const { data } = await api.get<PagedResult<OrderSummaryDto>>('/admin/orders', { params });
     return data;
   },
 

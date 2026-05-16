@@ -1,5 +1,5 @@
 import { Banknote, CreditCard, Smartphone, Wallet } from 'lucide-react';
-import type { ComponentType, SVGProps } from 'react';
+import type { ComponentType, KeyboardEvent, SVGProps } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PAYMENT_METHOD_KIND, type PaymentMethodDto } from '../../orders/types';
@@ -23,6 +23,7 @@ export function PaymentMethodPicker({
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
   const sorted = [...methods].sort((a, b) => a.displayOrder - b.displayOrder);
+  const selectedMethodIdx = sorted.findIndex((m) => m.id === selectedId);
 
   if (sorted.length === 0) {
     return (
@@ -32,24 +33,38 @@ export function PaymentMethodPicker({
     );
   }
 
+  function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    const len = sorted.length;
+    if (len === 0) return;
+    const current = selectedMethodIdx === -1 ? 0 : selectedMethodIdx;
+    let next = -1;
+    if (e.key === 'ArrowDown') { e.preventDefault(); next = (current + 1) % len; }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); next = (current - 1 + len) % len; }
+    else if (e.key === 'Home') { e.preventDefault(); next = 0; }
+    else if (e.key === 'End') { e.preventDefault(); next = len - 1; }
+    if (next !== -1) onSelect(sorted[next].id);
+  }
+
   return (
     <fieldset className="space-y-2">
       <legend className="sr-only">{t('checkout.payment.heading')}</legend>
-      <div role="radiogroup" className="space-y-2">
-        {sorted.map((method) => {
+      <div role="radiogroup" className="space-y-2" onKeyDown={handleKeyDown}>
+        {sorted.map((method, idx) => {
           const isSelected = method.id === selectedId;
           const name = isAr ? method.nameAr : method.nameEn;
           const instructions = isAr ? method.instructionsAr : method.instructionsEn;
           const Icon = iconForKind(method.kind);
+          const tabIdx = selectedMethodIdx === -1 ? (idx === 0 ? 0 : -1) : isSelected ? 0 : -1;
           return (
             <button
               key={method.id}
               type="button"
               role="radio"
               aria-checked={isSelected}
+              tabIndex={tabIdx}
               onClick={() => onSelect(method.id)}
               className={[
-                'flex w-full items-start gap-3 rounded-medium border p-3 text-start transition-colors',
+                'flex w-full items-start gap-3 rounded-medium border p-3 text-start transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                 isSelected
                   ? 'border-primary bg-primary/5 ring-1 ring-primary'
                   : 'border-divider bg-content1 hover:bg-content2',

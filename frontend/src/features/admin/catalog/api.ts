@@ -1,4 +1,5 @@
 import { api } from '../../../shared/lib/api-client';
+import type { PagedResult } from '../../../shared/types/paged-result';
 
 import type {
   AdminCategoryDto,
@@ -51,8 +52,8 @@ export const adminCatalogApi = {
   },
 
   // -------- Products ------------------------------------------------------
-  async listProducts(params?: AdminProductsListParams): Promise<AdminProductSummaryDto[]> {
-    const { data } = await api.get<AdminProductSummaryDto[]>('/admin/products', { params });
+  async listProducts(params?: AdminProductsListParams): Promise<PagedResult<AdminProductSummaryDto>> {
+    const { data } = await api.get<PagedResult<AdminProductSummaryDto>>('/admin/products', { params });
     return data;
   },
   async getProduct(id: string): Promise<AdminProductDetailDto> {

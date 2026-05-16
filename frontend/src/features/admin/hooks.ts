@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import type { PagedResult } from '../../shared/types/paged-result';
 import type { OrderDetailDto, OrderStatus, OrderSummaryDto } from '../orders/types';
 
 import { adminOrdersApi } from './api';
@@ -17,7 +18,7 @@ export function useAdminOrdersQuery(args: {
   pageSize?: number;
 }) {
   const { status, page = 1, pageSize = 25 } = args;
-  return useQuery<OrderSummaryDto[]>({
+  return useQuery<PagedResult<OrderSummaryDto>>({
     queryKey: KEYS.list(status, page, pageSize),
     queryFn: () => adminOrdersApi.list({ status, page, pageSize }),
     staleTime: 15_000,

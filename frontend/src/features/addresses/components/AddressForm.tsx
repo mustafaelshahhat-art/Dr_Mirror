@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Button, Checkbox } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -116,15 +116,13 @@ export function AddressForm({
         <Field label={t('addresses.fields.notes')} value={notes} onChange={setNotes} maxLength={500} />
       </div>
 
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={setDefault}
-          disabled={setDefaultLocked}
-          onChange={(e) => setSetDefault(e.target.checked)}
-          className="h-4 w-4 rounded border-divider"
-        />
-        <span>
+      <Checkbox
+        isSelected={setDefault}
+        isDisabled={setDefaultLocked}
+        onValueChange={setSetDefault}
+        size="sm"
+      >
+        <span className="text-sm">
           {t('addresses.fields.setDefault')}
           {setDefaultLocked ? (
             <span className="ms-2 text-xs text-default-500">
@@ -132,7 +130,7 @@ export function AddressForm({
             </span>
           ) : null}
         </span>
-      </label>
+      </Checkbox>
 
       {error ? (
         <p role="alert" className="text-sm text-danger">

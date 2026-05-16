@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import type { PagedResult } from '../../../shared/types/paged-result';
 import { adminCatalogApi } from './api';
 import type {
   AdminCategoryDto,
@@ -67,7 +68,7 @@ export function useToggleCategoryActiveMutation() {
 // ----- Products --------------------------------------------------------------
 
 export function useAdminProductsQuery(params: AdminProductsListParams = {}) {
-  return useQuery<AdminProductSummaryDto[]>({
+  return useQuery<PagedResult<AdminProductSummaryDto>>({
     queryKey: KEYS.products(params),
     queryFn: () => adminCatalogApi.listProducts(params),
     staleTime: 15_000,

@@ -6,6 +6,8 @@
     "errorLoad": "Couldn't load the order queue. Please refresh.",
     "itemCount_one": "1 item",
     "itemCount_other": "{{count}} items",
+    "totalCount_one": "1 order",
+    "totalCount_other": "{{count}} orders",
     "empty": {
       "title": "No orders yet",
       "subtitle": "Once buyers place orders they'll show up here.",

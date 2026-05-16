@@ -1,4 +1,5 @@
 using DrMirror.Api.Domain.Catalog;
+using DrMirror.Api.Shared;
 
 namespace DrMirror.Api.Features.Catalog.Common;
 
@@ -81,13 +82,3 @@ public sealed record ProductDetailDto(
     IReadOnlyList<ProductImageDto> Images,
     IReadOnlyList<ProductVariantDto> Variants);
 
-// -----------------------------------------------------------------------------
-// List envelope
-// -----------------------------------------------------------------------------
-
-public sealed record PagedResult<T>(
-    IReadOnlyList<T> Items,
-    int Page,
-    int PageSize,
-    int TotalCount,
-    int TotalPages);

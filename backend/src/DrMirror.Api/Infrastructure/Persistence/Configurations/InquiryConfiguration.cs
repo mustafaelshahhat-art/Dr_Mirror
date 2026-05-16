@@ -29,5 +29,10 @@ public sealed class InquiryConfiguration : IEntityTypeConfiguration<Inquiry>
             .WithMany()
             .HasForeignKey(i => i.ReadByUserId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        b.HasOne(i => i.RespondedByUser)
+            .WithMany()
+            .HasForeignKey(i => i.RespondedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

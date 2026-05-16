@@ -41,15 +41,21 @@ export function AdminSidebar({
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [open, onClose]);
+
   return (
     <>
       {open ? (
         <div
           className="fixed inset-0 top-14 z-40 bg-black/40 md:hidden"
           onClick={onClose}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') onClose();
-          }}
           role="presentation"
         />
       ) : null}

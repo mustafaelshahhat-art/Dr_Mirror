@@ -3,7 +3,6 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
-using Coravel;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Features.Addresses;
 using DrMirror.Api.Features.Admin;
@@ -222,13 +221,9 @@ try
     }
 
     // -----------------------------------------------------------------------
-    // Coravel — fire-and-forget job queue. Each invocable runs in its own scope.
+    // Durable email outbox — polls the EmailOutboxMessages table every 30 s.
     // -----------------------------------------------------------------------
-    builder.Services.AddQueue();
-    builder.Services.AddTransient<SendOrderConfirmationJob>();
-    builder.Services.AddTransient<SendPaymentReviewNeededJob>();
-    builder.Services.AddTransient<SendStatusChangedJob>();
-    builder.Services.AddTransient<SendInquiryReceivedJob>();
+    builder.Services.AddHostedService<EmailOutboxProcessor>();
 
     // FluentValidation — discover validators in this assembly.
     builder.Services.AddValidatorsFromAssemblyContaining<Program>();

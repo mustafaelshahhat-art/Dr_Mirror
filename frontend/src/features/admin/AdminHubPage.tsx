@@ -36,7 +36,7 @@ export function AdminHubPage() {
   });
 
   const stats = statsQuery.data;
-  const recentOrders = recentQuery.data ?? [];
+  const recentOrders = recentQuery.data?.items ?? [];
 
   return (
     <section className="space-y-6">
@@ -93,7 +93,7 @@ export function AdminHubPage() {
                         {o.orderNumber}
                       </span>
                       <span className="tabular-nums text-default-500">
-                        {o.itemCount} item{o.itemCount !== 1 ? 's' : ''}
+                        {t('admin.list.itemCount', { count: o.itemCount })}
                       </span>
                     </Link>
                   ))}

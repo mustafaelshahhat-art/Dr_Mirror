@@ -1,4 +1,5 @@
 import { api } from '../../shared/lib/api-client';
+import type { PagedResult } from '../../shared/types/paged-result';
 
 import type {
   CancelOrderRequest,
@@ -24,8 +25,8 @@ export const ordersApi = {
     return data;
   },
 
-  async listMyOrders(params?: { page?: number; pageSize?: number }): Promise<OrderSummaryDto[]> {
-    const { data } = await api.get<OrderSummaryDto[]>('/orders', { params });
+  async listMyOrders(params?: { page?: number; pageSize?: number }): Promise<PagedResult<OrderSummaryDto>> {
+    const { data } = await api.get<PagedResult<OrderSummaryDto>>('/orders', { params });
     return data;
   },
 

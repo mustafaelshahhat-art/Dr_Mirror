@@ -46,6 +46,7 @@ public static class AdminEndpoints
         var inquiries = admin.MapGroup("/inquiries").WithTags("Admin: Inquiries");
         inquiries.MapListInquiries();
         inquiries.MapMarkInquiryRead();
+        inquiries.MapMarkInquiryResponded();
 
         var paymentMethods = admin.MapGroup("/payment-methods").WithTags("Admin: Payments");
         paymentMethods.MapAdminPaymentMethods();

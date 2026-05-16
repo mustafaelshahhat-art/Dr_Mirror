@@ -15,7 +15,22 @@
   },
   "filters": {
     "all": "كل الفئات",
-    "categoryLabel": "تصفية حسب الفئة"
+    "categoryLabel": "تصفية حسب الفئة",
+    "label": "تصفية",
+    "hide": "إخفاء التصفية",
+    "clearAll": "مسح الكل",
+    "genderLabel": "الجنس",
+    "allGenders": "الكل",
+    "sizeLabel": "المقاس",
+    "sizePlaceholder": "مثال: M أو XL",
+    "colorLabel": "اللون",
+    "colorPlaceholder": "مثال: أزرق",
+    "minPriceLabel": "الحد الأدنى (جنيه)",
+    "maxPriceLabel": "الحد الأقصى (جنيه)",
+    "active_one": "تصفية واحدة",
+    "active_few": "{{count}} تصفيات",
+    "active_many": "{{count}} تصفية",
+    "active_other": "{{count}} تصفيات"
   },
   "gender": {
     "men": "رجالي",
