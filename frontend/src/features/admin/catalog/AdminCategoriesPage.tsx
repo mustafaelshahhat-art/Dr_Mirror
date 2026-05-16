@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ProblemDetails } from '../../auth/types';
+import { QueryErrorState } from '../components/QueryErrorState';
 
 import {
   useAdminCategoriesQuery,
@@ -35,6 +36,26 @@ export function AdminCategoriesPage() {
       <div className="flex min-h-[30vh] items-center justify-center">
         <Spinner aria-label={t('admin.catalog.loading')} />
       </div>
+    );
+  }
+
+  if (query.isError) {
+    return (
+      <section className="space-y-5">
+        <header className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {t('admin.catalog.categories.title')}
+          </h1>
+          <p className="text-sm text-default-500">
+            {t('admin.catalog.categories.subtitle')}
+          </p>
+        </header>
+        <QueryErrorState
+          message={t('admin.catalog.categories.errorLoad')}
+          retryLabel={t('admin.query.retry')}
+          onRetry={() => void query.refetch()}
+        />
+      </section>
     );
   }
 

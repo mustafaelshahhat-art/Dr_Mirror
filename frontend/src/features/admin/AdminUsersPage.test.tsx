@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeAdminUser, makeAuthValue, renderWithProviders } from '../../test/utils';
 import { AdminUsersPage } from './AdminUsersPage';
@@ -29,6 +30,10 @@ const adminAuth = makeAuthValue({
 });
 
 describe('AdminUsersPage', () => {
+  beforeEach(() => {
+    vi.mocked(adminUsersApi.list).mockReset();
+  });
+
   it('renders user roles as read-only badges without role toggle controls', async () => {
     vi.mocked(adminUsersApi.list).mockResolvedValue({
       items: [
@@ -55,5 +60,26 @@ describe('AdminUsersPage', () => {
     expect(screen.getByText('Buyer')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /add role/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /remove role/i })).not.toBeInTheDocument();
+  });
+
+  it('shows a retryable error state when users fail to load', async () => {
+    const user = userEvent.setup();
+    vi.mocked(adminUsersApi.list)
+      .mockRejectedValueOnce(new Error('network'))
+      .mockResolvedValueOnce({
+        items: [],
+        page: 1,
+        pageSize: 25,
+        totalCount: 0,
+        totalPages: 0,
+      });
+
+    renderWithProviders(<AdminUsersPage />, { authValue: adminAuth });
+
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't load users");
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+
+    expect(await screen.findByText('No users found.')).toBeInTheDocument();
+    expect(adminUsersApi.list).toHaveBeenCalledTimes(2);
   });
 });

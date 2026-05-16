@@ -18,6 +18,9 @@
     "status": "Status",
     "all": "All statuses"
   },
+  "query": {
+    "retry": "Retry"
+  },
   "detail": {
     "loading": "Loading order...",
     "notFoundTitle": "Order not found",
@@ -97,13 +100,13 @@
       },
       "users": {
         "title": "Users",
-        "subtitle": "Manage registered buyers and staff. Assign or revoke roles."
+        "subtitle": "Review registered buyers and staff. Roles are read-only here."
       }
     }
   },
   "catalog": {
-    "loading": "Loading...",
-    "categories": {
+      "loading": "Loading...",
+      "categories": {
       "title": "Categories",
       "subtitle": "Taxonomy nodes used to organise products in the catalog.",
       "nameAr": "Arabic name",
@@ -111,7 +114,8 @@
       "displayOrder": "Order",
       "productCount_one": "1 product",
       "productCount_other": "{{count}} products",
-      "empty": "No categories yet. Create your first one above."
+      "empty": "No categories yet. Create your first one above.",
+      "errorLoad": "Couldn't load categories. Please try again."
     },
     "status": {
       "active": "Active",
@@ -137,6 +141,7 @@
       "subtitle": "Every product in the catalog, including drafts.",
       "new": "New product",
       "loading": "Loading products...",
+      "errorLoad": "Couldn't load products. Please try again.",
       "searchPlaceholder": "Search by name, brand, or SKU...",
       "allCategories": "All categories",
       "allGenders": "All genders",
@@ -215,6 +220,7 @@
     "title": "Payment methods",
     "subtitle": "Buyer-selectable payment methods. Code + kind are immutable on update.",
     "loading": "Loading payment methods...",
+    "errorLoad": "Couldn't load payment methods. Please try again.",
     "empty": "No payment methods yet. Add your first.",
     "orderCount_one": "1 order placed",
     "orderCount_other": "{{count}} orders placed",
@@ -295,6 +301,7 @@
     "title": "Users",
     "subtitle": "Manage registered accounts and their roles.",
     "loading": "Loading users...",
+    "errorLoad": "Couldn't load users. Please try again.",
     "empty": "No users found.",
     "searchPlaceholder": "Search by name or email",
     "colName": "Name",

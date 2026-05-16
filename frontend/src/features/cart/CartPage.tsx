@@ -56,7 +56,10 @@ export function CartPage() {
       ) : null}
 
       {errorMessage ? (
-        <div className="rounded-medium border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
+        <div
+          role="alert"
+          className="rounded-medium border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
+        >
           {errorMessage}
         </div>
       ) : null}

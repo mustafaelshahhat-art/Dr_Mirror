@@ -12,12 +12,23 @@ import { setForbiddenMessage } from './forbidden-store';
  * Single axios instance for the app.
  *
  * In dev, requests to `/api/*` are proxied to the .NET backend via vite.config.ts.
- * In prod, set VITE_API_BASE_URL to the deployed backend URL.
+ * In prod, set VITE_API_BASE_URL to the deployed backend origin or /api path.
  *
  * `withCredentials: true` is essential — the refresh cookie must ride along
  * with every request (Path=/api/auth on the cookie limits its surface).
  */
-const baseURL = import.meta.env.VITE_API_BASE_URL ?? '/api';
+export function normalizeApiBaseUrl(raw: string | null | undefined): string {
+  const value = raw?.trim();
+  if (!value) return '/api';
+
+  const withoutTrailingSlash = value.replace(/\/+$/, '');
+  if (!withoutTrailingSlash) return '/api';
+  if (/\/api$/i.test(withoutTrailingSlash)) return withoutTrailingSlash;
+
+  return `${withoutTrailingSlash}/api`;
+}
+
+const baseURL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 export const api = axios.create({
   baseURL,

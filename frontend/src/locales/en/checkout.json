@@ -38,6 +38,8 @@
   "payment": {
     "heading": "Payment method",
     "loading": "Loading payment methods...",
+    "errorLoad": "Couldn't load payment methods. Please try again.",
+    "retry": "Retry",
     "noMethods": "No payment methods are available right now. Please contact support."
   },
   "buyerNote": {

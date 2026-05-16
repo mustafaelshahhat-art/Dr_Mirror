@@ -5,6 +5,7 @@
     "switchTheme": "Switch theme",
     "switchLanguage": "Switch language",
     "marketplace": "Marketplace",
+    "contact": "Contact",
     "myAccount": "My account",
     "signIn": "Sign in"
   },
@@ -48,6 +49,10 @@
     "prev": "Previous",
     "next": "Next",
     "pageOf": "Page {{page}} of {{totalPages}}"
+  },
+  "loading": {
+    "page": "Loading page...",
+    "session": "Loading session..."
   },
   "dismiss": "Dismiss",
   "errorBoundary": {

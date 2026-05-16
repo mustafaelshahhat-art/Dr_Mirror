@@ -100,6 +100,14 @@ export function CheckoutPage() {
     return <Navigate to="/login" state={{ from: { pathname: '/checkout' } }} replace />;
   }
 
+  if (cart.isLoading) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <Spinner aria-label={t('checkout.loading')} />
+      </div>
+    );
+  }
+
   // Empty-cart guard — buyer reached /checkout with no cart (refreshed after
   // checkout consumed it, or arrived deep-linked). Send them back.
   if (cart.items.length === 0 && !createOrder.isPending && !createOrder.isSuccess) {
@@ -246,6 +254,20 @@ export function CheckoutPage() {
                 <div className="flex h-32 items-center justify-center">
                   <Spinner aria-label={t('checkout.payment.loading')} />
                 </div>
+              ) : paymentMethodsQuery.isError ? (
+                <div
+                  role="alert"
+                  className="flex items-start justify-between gap-3 rounded-medium border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
+                >
+                  <span>{t('checkout.payment.errorLoad')}</span>
+                  <button
+                    type="button"
+                    onClick={() => void paymentMethodsQuery.refetch()}
+                    className="shrink-0 font-medium underline underline-offset-2 hover:no-underline"
+                  >
+                    {t('checkout.payment.retry')}
+                  </button>
+                </div>
               ) : (
                 <PaymentMethodPicker
                   methods={paymentMethodsQuery.data ?? []}
@@ -290,7 +312,12 @@ export function CheckoutPage() {
             </Button>
 
             {step !== 'review' ? (
-              <Button type="button" variant="primary" onPress={() => void next()}>
+              <Button
+                type="button"
+                variant="primary"
+                isDisabled={step === 'payment' && (paymentMethodsQuery.isLoading || paymentMethodsQuery.isError)}
+                onPress={() => void next()}
+              >
                 <span className="inline-flex items-center gap-1.5">
                   {t('checkout.continue')}
                   <ArrowRight className="size-4 rtl:rotate-180" aria-hidden />

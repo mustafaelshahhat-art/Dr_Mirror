@@ -1,4 +1,8 @@
 {
+  "page": {
+    "title": "Contact us",
+    "subtitle": "Ask about sizing, availability, bulk orders, or anything else you need before buying."
+  },
   "form": {
     "heading": "Send an inquiry",
     "productHeading": "Ask about this product",
@@ -21,6 +25,7 @@
     "title": "Inquiries",
     "subtitle": "Pre-sale questions from customers.",
     "loading": "Loading inquiries...",
+    "errorLoad": "Couldn't load inquiries. Please try again.",
     "empty": "No inquiries yet.",
     "filterAll": "All",
     "filterNew": "New",

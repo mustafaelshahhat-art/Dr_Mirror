@@ -13,6 +13,7 @@ import { useAdminCategoriesQuery, useAdminProductsQuery } from './hooks';
 import { PaginationControls } from '../../../shared/components/PaginationControls';
 import { formatCurrency } from '../../../shared/lib/format';
 import type { AppLang } from '../../../shared/lib/theme-storage';
+import { QueryErrorState } from '../components/QueryErrorState';
 
 export function AdminProductsListPage() {
   const { t, i18n } = useTranslation();
@@ -95,6 +96,12 @@ export function AdminProductsListPage() {
         <div className="flex h-32 items-center justify-center">
           <Spinner aria-label={t('admin.products.list.loading')} />
         </div>
+      ) : products.isError ? (
+        <QueryErrorState
+          message={t('admin.products.list.errorLoad')}
+          retryLabel={t('admin.query.retry')}
+          onRetry={() => void products.refetch()}
+        />
       ) : (products.data?.items ?? []).length === 0 ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
           <Package className="mx-auto mb-3 size-10 text-default-400" aria-hidden />

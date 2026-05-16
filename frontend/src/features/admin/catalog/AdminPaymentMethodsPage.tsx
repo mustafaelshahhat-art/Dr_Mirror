@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { ProblemDetails } from '../../auth/types';
 import { PAYMENT_METHOD_KIND, type PaymentMethodKind } from '../../orders/types';
+import { QueryErrorState } from '../components/QueryErrorState';
 
 import {
   useAdminPaymentMethodsQuery,
@@ -44,6 +45,24 @@ export function AdminPaymentMethodsPage() {
       <div className="flex min-h-[30vh] items-center justify-center">
         <Spinner aria-label={t('admin.payments.loading')} />
       </div>
+    );
+  }
+
+  if (query.isError) {
+    return (
+      <section className="space-y-5">
+        <header className="flex items-center justify-between gap-3">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-semibold tracking-tight">{t('admin.payments.title')}</h1>
+            <p className="text-sm text-default-500">{t('admin.payments.subtitle')}</p>
+          </div>
+        </header>
+        <QueryErrorState
+          message={t('admin.payments.errorLoad')}
+          retryLabel={t('admin.query.retry')}
+          onRetry={() => void query.refetch()}
+        />
+      </section>
     );
   }
 

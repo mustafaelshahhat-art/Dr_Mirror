@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Spinner } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 
 import { AdminLayout } from '../features/admin/components/AdminLayout';
 import {
@@ -21,6 +22,7 @@ const RegisterPage = lazy(() => import('../features/auth/RegisterPage').then((m)
 const CatalogPage = lazy(() => import('../features/catalog/CatalogPage').then((m) => ({ default: m.CatalogPage })));
 const ProductDetailPage = lazy(() => import('../features/catalog/ProductDetailPage').then((m) => ({ default: m.ProductDetailPage })));
 const CartPage = lazy(() => import('../features/cart/CartPage').then((m) => ({ default: m.CartPage })));
+const InquiriesPage = lazy(() => import('../features/inquiries/InquiriesPage').then((m) => ({ default: m.InquiriesPage })));
 
 const CheckoutPage = lazy(() => import('../features/checkout/CheckoutPage').then((m) => ({ default: m.CheckoutPage })));
 const ShellPage = lazy(() => import('../shared/components/ShellPage').then((m) => ({ default: m.ShellPage })));
@@ -40,9 +42,11 @@ const AdminInquiriesPage = lazy(() => import('../features/admin/AdminInquiriesPa
 const AdminUsersPage = lazy(() => import('../features/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
 
 function PageFallback() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex min-h-svh items-center justify-center bg-background">
-      <Spinner aria-label="Loading page..." />
+      <Spinner aria-label={t('loading.page')} />
     </div>
   );
 }
@@ -61,6 +65,7 @@ export function AppRoutes() {
             <Route index element={<CatalogPage />} />
             <Route path="products/:slug" element={<ProductDetailPage />} />
             <Route path="cart" element={<CartPage />} />
+            <Route path="inquiries" element={<InquiriesPage />} />
           </Route>
 
           <Route element={<ProtectedRoute />}>

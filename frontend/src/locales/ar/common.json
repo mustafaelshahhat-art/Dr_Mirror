@@ -5,6 +5,7 @@
     "switchTheme": "تبديل السمة",
     "switchLanguage": "تبديل اللغة",
     "marketplace": "السوق",
+    "contact": "تواصل معنا",
     "myAccount": "حسابي",
     "signIn": "تسجيل الدخول"
   },
@@ -48,6 +49,10 @@
     "prev": "السابق",
     "next": "التالي",
     "pageOf": "صفحة {{page}} من {{totalPages}}"
+  },
+  "loading": {
+    "page": "جاري تحميل الصفحة...",
+    "session": "جاري تحميل الجلسة..."
   },
   "dismiss": "إغلاق",
   "errorBoundary": {

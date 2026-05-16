@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import type { AdminUserDto } from './users/types';
 import { useAdminUsersQuery } from './users/hooks';
+import { QueryErrorState } from './components/QueryErrorState';
 
 export function AdminUsersPage() {
   const { t } = useTranslation();
@@ -52,6 +53,12 @@ export function AdminUsersPage() {
         <div className="flex min-h-[20vh] items-center justify-center">
           <Spinner aria-label={t('admin.users.loading')} />
         </div>
+      ) : query.isError ? (
+        <QueryErrorState
+          message={t('admin.users.errorLoad')}
+          retryLabel={t('admin.query.retry')}
+          onRetry={() => void query.refetch()}
+        />
       ) : query.data?.items?.length ? (
         <div className="space-y-4">
           <div className="overflow-hidden rounded-large border border-divider/60">

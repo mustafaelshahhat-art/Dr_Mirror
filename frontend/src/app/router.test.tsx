@@ -82,6 +82,15 @@ describe('AppRoutes — role routing', () => {
     expect(await screen.findByRole('link', { name: 'Dr. Mirror' })).toBeInTheDocument();
   });
 
+  it('anonymous user at /inquiries can open the general inquiry page', async () => {
+    renderWithProviders(<AppRoutes />, {
+      route: '/inquiries',
+      authValue: makeAuthValue(),
+    });
+    expect(await screen.findByRole('heading', { name: 'Contact us' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Send an inquiry' })).toBeInTheDocument();
+  });
+
   it('bootstrapping state at /admin shows the loading spinner, not the admin hub', async () => {
     renderWithProviders(<AppRoutes />, {
       route: '/admin',

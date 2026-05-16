@@ -14,6 +14,7 @@ import {
   useMarkInquiryRespondedMutation,
 } from '../inquiries/hooks';
 import { PaginationControls } from '../../shared/components/PaginationControls';
+import { QueryErrorState } from './components/QueryErrorState';
 
 export function AdminInquiriesPage() {
   const { t, i18n } = useTranslation();
@@ -67,6 +68,12 @@ export function AdminInquiriesPage() {
         <div className="flex min-h-[20vh] items-center justify-center">
           <Spinner aria-label={t('inquiries.admin.loading')} />
         </div>
+      ) : query.isError ? (
+        <QueryErrorState
+          message={t('inquiries.admin.errorLoad')}
+          retryLabel={t('admin.query.retry')}
+          onRetry={() => void query.refetch()}
+        />
       ) : query.data?.items?.length ? (
         <div className="space-y-4">
           <ul className="space-y-3">

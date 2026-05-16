@@ -29,6 +29,13 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-1">
+          <Link
+            to="/inquiries"
+            className="me-1 hidden rounded-medium px-3 py-1.5 text-sm text-default-700 transition-colors hover:bg-default-100 dark:text-default-300 sm:inline-block"
+          >
+            {t('header.contact')}
+          </Link>
+
           {!isBootstrapping && user ? (
             <>
               <Link
