@@ -119,8 +119,7 @@ export function AddressForm({
       <Checkbox
         isSelected={setDefault}
         isDisabled={setDefaultLocked}
-        onValueChange={setSetDefault}
-        size="sm"
+        onChange={setSetDefault}
       >
         <span className="text-sm">
           {t('addresses.fields.setDefault')}

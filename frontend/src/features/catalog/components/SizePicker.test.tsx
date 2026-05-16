@@ -22,6 +22,7 @@ const makeVariants = (stockMap: Record<string, number>) =>
     colorNameAr: 'أحمر',
     colorHex: '#ff0000',
     sku: `R-${size}`,
+    isActive: true,
   }));
 
 describe('SizePicker', () => {

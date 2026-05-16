@@ -178,8 +178,7 @@ export function AddressStep({
 
           <Checkbox
             isSelected={saveAsNewAddress}
-            onValueChange={setSaveAsNewAddress}
-            size="sm"
+            onChange={setSaveAsNewAddress}
           >
             <span className="text-sm">{t('checkout.address.saveAsNew')}</span>
           </Checkbox>

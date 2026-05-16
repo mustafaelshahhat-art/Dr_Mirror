@@ -27,7 +27,6 @@ export function SizePicker({
   for (const v of variantsForColor) stockMap.set(v.size, v.stock);
 
   const availableSizes = sizes.filter((s) => (stockMap.get(s) ?? 0) > 0);
-  const selectedIdx = sizes.findIndex((s) => s === selected);
   const firstAvailableIdx = sizes.findIndex((s) => (stockMap.get(s) ?? 0) > 0);
 
   function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
