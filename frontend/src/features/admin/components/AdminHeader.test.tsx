@@ -51,4 +51,13 @@ describe('AdminHeader', () => {
 
     expect(screen.getByText('Products / New product')).toBeInTheDocument();
   });
+
+  it('shows product edit breadcrumb context', () => {
+    renderWithProviders(<AdminHeader onMenuPress={vi.fn()} />, {
+      route: '/admin/products/product-1/edit',
+      authValue: makeAuthValue({ user: makeAdminUser(), isAuthenticated: true, isAdmin: true }),
+    });
+
+    expect(screen.getByText('Products / Edit product')).toBeInTheDocument();
+  });
 });

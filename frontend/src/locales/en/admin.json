@@ -12,6 +12,7 @@
     "items": "Items",
     "status": "Status",
     "total": "Total",
+    "openOrder": "Open order {{orderNumber}}",
     "empty": {
       "title": "No orders yet",
       "subtitle": "Once buyers place orders they'll show up here.",
@@ -175,6 +176,7 @@
       "creating": "Creating..."
     },
     "edit": {
+      "title": "Edit product",
       "back": "Back to products",
       "loading": "Loading product...",
       "errorLoad": "Couldn't load this product.",
@@ -287,6 +289,7 @@
   },
   "shell": {
     "navTitle": "Navigation",
+    "navTitleMobile": "Mobile navigation",
     "nav": {
       "dashboard": "Dashboard",
       "orders": "Orders",
@@ -310,10 +313,6 @@
       "description": "You don't have permission to view this page.",
       "adminOnly": "The admin dashboard is for operators only. You have been returned to the storefront.",
       "buyerOnly": "Buyer pages are not available while you are signed in as an admin. You have been returned to the admin dashboard."
-    },
-    "signOutConfirm": {
-      "title": "Sign out?",
-      "description": "You'll be signed out of the admin dashboard."
     }
   },
   "users": {

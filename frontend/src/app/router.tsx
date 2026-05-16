@@ -96,6 +96,7 @@ export function AppRoutes() {
             <Route path="admin/payment-methods" element={<AdminPaymentMethodsPage />} />
             <Route path="admin/inquiries" element={<AdminInquiriesPage />} />
             <Route path="admin/users" element={<AdminUsersPage />} />
+            <Route path="admin/*" element={<NotFoundPage />} />
           </Route>
         </Route>
       </Routes>

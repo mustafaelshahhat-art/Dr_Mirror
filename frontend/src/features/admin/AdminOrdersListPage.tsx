@@ -2,7 +2,7 @@ import { Spinner } from '@heroui/react';
 import { Package } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import { OrderStatusBadge } from '../orders/components/OrderStatusBadge';
 import { ORDER_STATUSES, type OrderStatus } from '../orders/types';
@@ -24,7 +24,6 @@ export function AdminOrdersListPage() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const isAr = lang === 'ar';
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [statusFilter, setStatusFilter] = useState<OrderStatus | undefined>(() => parseStatusFilter(searchParams.get('status')));
   const [page, setPage] = useState(1);
@@ -94,12 +93,16 @@ export function AdminOrdersListPage() {
               </thead>
               <tbody className="divide-y divide-divider/40">
                 {query.data.items.map((order) => (
-                  <tr
-                    key={order.id}
-                    onClick={() => void navigate(`/admin/orders/${encodeURIComponent(order.orderNumber)}`)}
-                    className="cursor-pointer bg-content1 transition-colors hover:bg-content2"
-                  >
-                    <td className="px-4 py-3 font-medium">{order.orderNumber}</td>
+                  <tr key={order.id} className="bg-content1 transition-colors hover:bg-content2">
+                    <td className="px-4 py-3 font-medium">
+                      <Link
+                        to={`/admin/orders/${encodeURIComponent(order.orderNumber)}`}
+                        className="rounded-small text-primary underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                        aria-label={t('admin.list.openOrder', { orderNumber: order.orderNumber })}
+                      >
+                        {order.orderNumber}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3 tabular-nums text-default-500">{dateFmt.format(new Date(order.createdAt))}</td>
                     <td className="px-4 py-3 tabular-nums text-default-500">{t('admin.list.itemCount', { count: order.itemCount })}</td>
                     <td className="px-4 py-3"><OrderStatusBadge status={order.status} /></td>

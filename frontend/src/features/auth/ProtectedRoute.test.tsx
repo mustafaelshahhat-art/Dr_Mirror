@@ -144,6 +144,18 @@ describe('route gates', () => {
 
       expect(await screen.findByRole('heading', { name: 'Admin orders target' })).toBeInTheDocument();
     });
+
+    it('does not send authenticated buyers back to login or register from next', async () => {
+      renderGate(<PublicOnlyRoute />, '/login?next=/login', buyerAuth, 'login', 'Login target');
+
+      expect(await screen.findByRole('heading', { name: 'Storefront target' })).toBeInTheDocument();
+    });
+
+    it('does not send authenticated admins back to login or register from next', async () => {
+      renderGate(<PublicOnlyRoute />, '/login?next=/register', adminAuth, 'login', 'Login target');
+
+      expect(await screen.findByRole('heading', { name: 'Admin target' })).toBeInTheDocument();
+    });
   });
 });
 

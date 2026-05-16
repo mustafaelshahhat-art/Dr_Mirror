@@ -54,6 +54,17 @@ describe('AppRoutes — role routing', () => {
     expect(screen.queryByRole('link', { name: 'Dr. Mirror' })).not.toBeInTheDocument();
   });
 
+  it('admin at an unknown admin path sees the not found page inside admin chrome', async () => {
+    renderWithProviders(<AppRoutes />, {
+      route: '/admin/typo',
+      authValue: makeAuthValue({ user: makeAdminUser(), isAuthenticated: true, isAdmin: true }),
+    });
+
+    expect(await screen.findByRole('heading', { name: 'Page not found' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to admin dashboard' })).toHaveAttribute('href', '/admin');
+    expect(screen.queryByRole('link', { name: 'Dr. Mirror' })).not.toBeInTheDocument();
+  });
+
   it('admin at / is redirected to /admin by CustomerRoute', async () => {
     renderWithProviders(<AppRoutes />, {
       route: '/',

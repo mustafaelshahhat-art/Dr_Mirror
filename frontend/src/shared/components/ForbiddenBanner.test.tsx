@@ -1,5 +1,6 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Link } from 'react-router-dom';
 import { describe, expect, it, beforeEach } from 'vitest';
 
 import { renderWithProviders } from '../../test/utils';
@@ -32,5 +33,23 @@ describe('ForbiddenBanner', () => {
     await user.click(dismiss);
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('clears a stale message after the next navigation', async () => {
+    const user = userEvent.setup();
+    setForbiddenMessage('Access denied');
+    renderWithProviders(
+      <>
+        <ForbiddenBanner />
+        <Link to="/next">Next page</Link>
+      </>,
+      { route: '/admin' },
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Access denied');
+
+    await user.click(screen.getByRole('link', { name: 'Next page' }));
+
+    await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
   });
 });

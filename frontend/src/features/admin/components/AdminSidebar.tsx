@@ -1,43 +1,10 @@
 import { Drawer } from '@heroui/react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  LayoutDashboard,
-  ClipboardList,
-  Package,
-  FolderTree,
-  CreditCard,
-  MessageSquare,
-  Users,
-  type LucideIcon,
-} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 import { ADMIN_DRAWER_HEIGHT_CLASS, ADMIN_HEADER_OFFSET_CLASS } from './adminShellTokens';
-
-const NAV_GROUPS = [
-  {
-    groupKey: 'operations',
-    items: [
-      { to: '/admin', icon: LayoutDashboard, key: 'dashboard', end: true },
-      { to: '/admin/orders', icon: ClipboardList, key: 'orders', end: false },
-      { to: '/admin/inquiries', icon: MessageSquare, key: 'inquiries', end: false },
-    ],
-  },
-  {
-    groupKey: 'catalog',
-    items: [
-      { to: '/admin/products', icon: Package, key: 'products', end: false },
-      { to: '/admin/categories', icon: FolderTree, key: 'categories', end: false },
-      { to: '/admin/payment-methods', icon: CreditCard, key: 'paymentMethods', end: false },
-    ],
-  },
-  {
-    groupKey: 'people',
-    items: [
-      { to: '/admin/users', icon: Users, key: 'users', end: false },
-    ],
-  },
-] as const;
+import { ADMIN_NAV_GROUPS } from '../adminNav';
 
 export function AdminSidebar({
   open,
@@ -68,7 +35,7 @@ export function AdminSidebar({
               ADMIN_DRAWER_HEIGHT_CLASS,
             ].join(' ')}
           >
-            <Drawer.Dialog aria-label={t('admin.shell.navTitle')} className="flex h-full flex-col outline-none">
+            <Drawer.Dialog aria-label={t('admin.shell.navTitleMobile')} className="flex h-full flex-col outline-none">
               <Drawer.Header className="flex items-center justify-between border-b border-divider/60 px-3 py-3">
                 <Drawer.Heading className="text-sm font-semibold tracking-tight text-foreground">
                   {t('admin.shell.navTitle')}
@@ -76,7 +43,7 @@ export function AdminSidebar({
                 <Drawer.CloseTrigger />
               </Drawer.Header>
               <Drawer.Body className="p-0">
-                <SidebarNav label={t('admin.shell.navTitle')} onClose={onClose} />
+                <SidebarNav label={t('admin.shell.navTitleMobile')} onClose={onClose} />
               </Drawer.Body>
             </Drawer.Dialog>
           </Drawer.Content>
@@ -91,14 +58,14 @@ function SidebarNav({ label, onClose }: { label: string; onClose?: () => void })
 
   return (
     <nav aria-label={label} className="flex flex-1 flex-col overflow-y-auto px-2 pb-4 pt-2">
-      {NAV_GROUPS.map((group) => (
+      {ADMIN_NAV_GROUPS.map((group) => (
         <div key={group.groupKey}>
           <p className="px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-wide text-default-400">
             {t(`admin.shell.nav.groups.${group.groupKey}`)}
           </p>
           <div className="flex flex-col gap-0.5">
-            {group.items.map(({ to, icon: Icon, key, end }) => (
-              <NavItem key={to} to={to} icon={Icon} label={t(`admin.shell.nav.${key}`)} end={end} onClick={onClose} />
+            {group.items.map(({ to, icon: Icon, labelKey, end }) => (
+              <NavItem key={to} to={to} icon={Icon} label={t(labelKey)} end={end} onClick={onClose} />
             ))}
           </div>
         </div>

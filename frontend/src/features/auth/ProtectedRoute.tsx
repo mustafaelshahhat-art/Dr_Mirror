@@ -62,7 +62,7 @@ export function CustomerRoute() {
 
 export function AdminRoute() {
   const { t } = useTranslation();
-  const { user, isBootstrapping } = useAuth();
+  const { user, isBootstrapping, isAdmin } = useAuth();
   const location = useLocation();
 
   if (isBootstrapping) {
@@ -77,7 +77,7 @@ export function AdminRoute() {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  if (!user.roles.includes('Admin')) {
+  if (!isAdmin) {
     return (
       <ForbiddenRedirect
         to="/"
@@ -114,6 +114,7 @@ function getSafeNextPath(search: string): string | null {
   const next = new URLSearchParams(search).get('next');
 
   if (next === null || !next.startsWith('/') || next.startsWith('//')) return null;
+  if (next === '/login' || next === '/register') return null;
 
   return next;
 }

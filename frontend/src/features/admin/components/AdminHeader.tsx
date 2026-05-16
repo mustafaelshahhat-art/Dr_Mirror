@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../auth/useAuth';
 import { LangSwitcher } from '../../../shared/components/LangSwitcher';
 import { ThemeToggle } from '../../../shared/components/ThemeToggle';
+import { getAdminHeaderTitleKeys } from '../adminNav';
 import { ADMIN_HEADER_HEIGHT_CLASS } from './adminShellTokens';
 
 export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
@@ -55,19 +56,4 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
       </div>
     </header>
   );
-}
-
-function getAdminHeaderTitleKeys(pathname: string): string[] {
-  if (pathname === '/admin') return ['admin.hub.title'];
-  if (pathname.startsWith('/admin/orders')) return ['admin.shell.nav.orders'];
-  if (pathname.startsWith('/admin/inquiries')) return ['admin.shell.nav.inquiries'];
-  if (pathname === '/admin/products/new') {
-    return ['admin.shell.nav.products', 'admin.products.create.title'];
-  }
-  if (pathname.startsWith('/admin/products')) return ['admin.shell.nav.products'];
-  if (pathname.startsWith('/admin/categories')) return ['admin.shell.nav.categories'];
-  if (pathname.startsWith('/admin/payment-methods')) return ['admin.shell.nav.paymentMethods'];
-  if (pathname.startsWith('/admin/users')) return ['admin.shell.nav.users'];
-
-  return ['admin.hub.title'];
 }
