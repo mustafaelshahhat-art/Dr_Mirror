@@ -1,4 +1,4 @@
-import { Button, Description, Input, Label, Spinner, TextArea, TextField } from '@heroui/react';
+import { Button, Description, Form, Input, Label, Spinner, TextArea, TextField } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ import type { ProductGender } from '../../catalog/types';
 import { useAdminCategoriesQuery, useCreateProductMutation } from './hooks';
 
 import { SelectField } from '../../../shared/components/SelectField';
+import { LinkButton } from '../../../shared/components/LinkButton';
 
 export function AdminProductCreatePage() {
   const { t } = useTranslation();
@@ -61,7 +62,7 @@ export function AdminProductCreatePage() {
         </div>
       ) : null}
 
-      <form
+      <Form
         onSubmit={async (e) => {
           e.preventDefault();
           setServerError(null);
@@ -132,14 +133,14 @@ export function AdminProductCreatePage() {
               ? t('admin.products.create.creating')
               : t('admin.products.create.submit')}
           </Button>
-          <Link
+          <LinkButton
             to="/admin/products"
-            className="inline-flex items-center justify-center rounded-medium border border-divider/60 px-4 py-2 text-sm font-medium text-foreground hover:bg-content2"
+            tone="outline"
           >
             {t('admin.catalog.actions.cancel')}
-          </Link>
+          </LinkButton>
         </div>
-      </form>
+      </Form>
     </section>
   );
 }

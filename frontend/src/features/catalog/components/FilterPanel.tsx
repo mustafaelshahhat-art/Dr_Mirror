@@ -199,8 +199,11 @@ function DebouncedInput({
 }) {
   const [draft, setDraft] = useState(value);
 
-  // Sync external resets (e.g. clear-all sets filter.size to undefined → value='')
-  useEffect(() => { setDraft(value); }, [value]);
+  // Sync external resets (e.g. clear-all sets filter.size to undefined → value='').
+  useEffect(() => {
+    const h = window.setTimeout(() => setDraft(value), 0);
+    return () => window.clearTimeout(h);
+  }, [value]);
 
   useEffect(() => {
     if (draft === value) return;

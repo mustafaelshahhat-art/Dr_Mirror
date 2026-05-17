@@ -1,11 +1,11 @@
-import { Button, Input, Label, Spinner, TextField } from '@heroui/react';
+import { Button, Form, Input, Label, Spinner, TextField } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Pencil, Plus, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ProblemDetails } from '../../auth/types';
-import { QueryErrorState } from '../components/QueryErrorState';
+import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 
 import {
   useAdminCategoriesQuery,
@@ -147,7 +147,7 @@ export function AdminCategoriesPage() {
                     <Button
                       isIconOnly
                       variant="ghost"
-                      size="sm"
+                      size="md"
                       onPress={() => setEditingId(cat.id)}
                       aria-label={t('admin.catalog.actions.edit')}
                     >
@@ -156,7 +156,7 @@ export function AdminCategoriesPage() {
                     <Button
                       isIconOnly
                       variant="ghost"
-                      size="sm"
+                      size="md"
                       isDisabled={toggleMutation.isPending}
                       onPress={async () => {
                         setServerError(null);
@@ -207,7 +207,7 @@ function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
   const [displayOrder, setDisplayOrder] = useState(0);
 
   return (
-    <form
+    <Form
       onSubmit={async (e) => {
         e.preventDefault();
         const ok = await onSubmit({ nameAr: nameAr.trim(), nameEn: nameEn.trim(), displayOrder });
@@ -253,7 +253,7 @@ function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
           {isPending ? t('admin.catalog.actions.creating') : t('admin.catalog.actions.create')}
         </span>
       </Button>
-    </form>
+    </Form>
   );
 }
 
@@ -269,7 +269,7 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
   const [displayOrder, setDisplayOrder] = useState(category.displayOrder);
 
   return (
-    <form
+    <Form
       onSubmit={async (e) => {
         e.preventDefault();
         await onSubmit({ nameAr: nameAr.trim(), nameEn: nameEn.trim(), displayOrder });
@@ -308,6 +308,6 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
       <Button type="button" variant="ghost" size="sm" onPress={onCancel} isDisabled={isPending}>
         {t('admin.catalog.actions.cancel')}
       </Button>
-    </form>
+    </Form>
   );
 }

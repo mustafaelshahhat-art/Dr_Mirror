@@ -1,3 +1,4 @@
+import { Button } from '@heroui/react';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -11,6 +12,7 @@ import { SearchInput } from './components/SearchInput';
 import { SortSelect } from './components/SortSelect';
 import { useCategoriesQuery, useProductsQuery } from './hooks';
 import type { ProductFilter, ProductGender, ProductSort } from './types';
+import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 const VALID_SORTS: ProductSort[] = ['Newest', 'PriceAsc', 'PriceDesc', 'NameAsc'];
 const PAGE_SIZE = 24;
@@ -109,8 +111,23 @@ export function CatalogPage() {
     [updateParams],
   );
 
+  const clearAllFilters = useCallback(
+    () => setSearchParams(new URLSearchParams(), { replace: true }),
+    [setSearchParams],
+  );
+
   const isInitialLoad = productsQuery.isLoading && productsQuery.data === undefined;
   const items = productsQuery.data?.items ?? [];
+  const hasActiveFilters = Boolean(
+    filter.categoryId ||
+      filter.q ||
+      filter.gender !== undefined ||
+      filter.size ||
+      filter.color ||
+      filter.minPrice !== undefined ||
+      filter.maxPrice !== undefined ||
+      filter.sort !== 'Newest',
+  );
 
   return (
     <div className="space-y-6">
@@ -149,13 +166,20 @@ export function CatalogPage() {
       {isInitialLoad ? (
         <ProductGridSkeleton />
       ) : productsQuery.isError ? (
-        <div className="rounded-large border border-danger/30 bg-danger/10 p-6 text-center text-sm text-danger">
-          {t('catalog.errors.loadFailed')}
-        </div>
+        <QueryErrorState
+          message={t('catalog.errors.loadFailed')}
+          retryLabel={t('admin.query.retry')}
+          onRetry={() => void productsQuery.refetch()}
+        />
       ) : items.length === 0 ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
           <p className="text-base font-medium text-foreground">{t('catalog.empty.title')}</p>
           <p className="mt-1 text-sm text-default-500">{t('catalog.empty.subtitle')}</p>
+          {hasActiveFilters ? (
+            <Button variant="primary" size="sm" onPress={clearAllFilters} className="mt-4">
+              {t('catalog.empty.clearFilters')}
+            </Button>
+          ) : null}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">

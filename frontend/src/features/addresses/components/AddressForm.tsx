@@ -1,4 +1,4 @@
-import { Button, Checkbox } from '@heroui/react';
+import { Button, Checkbox, Form } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -52,7 +52,7 @@ export function AddressForm({
   const setDefaultLocked = Boolean(isFirstAddress);
 
   return (
-    <form
+    <Form
       onSubmit={async (e) => {
         e.preventDefault();
         setError(null);
@@ -145,7 +145,7 @@ export function AddressForm({
           {t('addresses.actions.cancel')}
         </Button>
       </div>
-    </form>
+    </Form>
   );
 }
 

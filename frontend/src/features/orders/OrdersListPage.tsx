@@ -7,6 +7,8 @@ import { Link } from 'react-router-dom';
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { PaginationControls } from '../../shared/components/PaginationControls';
+import { LinkButton } from '../../shared/components/LinkButton';
+import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 import { OrderStatusBadge } from './components/OrderStatusBadge';
 import { useMyOrdersQuery } from './hooks';
@@ -35,9 +37,11 @@ export function OrdersListPage() {
 
   if (query.isError) {
     return (
-      <div className="rounded-large border border-divider/60 bg-content1 p-8 text-center text-sm text-default-500">
-        {t('orders.list.errorLoad')}
-      </div>
+      <QueryErrorState
+        message={t('orders.list.errorLoad')}
+        retryLabel={t('admin.query.retry')}
+        onRetry={() => void query.refetch()}
+      />
     );
   }
 
@@ -55,12 +59,12 @@ export function OrdersListPage() {
           <Package className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
           <h2 className="text-base font-semibold">{t('orders.list.empty.title')}</h2>
           <p className="mt-1 text-sm text-default-500">{t('orders.list.empty.subtitle')}</p>
-          <Link
+          <LinkButton
             to="/"
-            className="mt-4 inline-flex items-center justify-center rounded-medium bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+            className="mt-4"
           >
             {t('orders.list.empty.cta')}
-          </Link>
+          </LinkButton>
         </div>
       ) : (
         <ul className="space-y-2">

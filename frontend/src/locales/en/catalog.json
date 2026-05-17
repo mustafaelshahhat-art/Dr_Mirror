@@ -42,7 +42,8 @@
   },
   "empty": {
     "title": "No products match your filters",
-    "subtitle": "Try clearing the search or picking a different category."
+    "subtitle": "Try clearing the search or picking a different category.",
+    "clearFilters": "Clear filters"
   },
   "errors": {
     "loadFailed": "Could not load the catalog. Please try again."

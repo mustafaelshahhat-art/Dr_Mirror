@@ -24,6 +24,9 @@
   "proceedToCheckout": "إتمام الشراء",
   "backToCatalog": "العودة إلى المنتجات",
   "clear": "تفريغ السلة",
+  "clearConfirm": "تفريغ السلة؟",
+  "clearConfirmYes": "تفريغها",
+  "clearConfirmNo": "إبقاء المنتجات",
   "empty": {
     "title": "سلتك فارغة",
     "subtitle": "أضف سكرابات أو معاطف أو أحذية لبدء التسوق.",

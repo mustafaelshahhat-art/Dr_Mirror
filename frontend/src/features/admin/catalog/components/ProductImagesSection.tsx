@@ -124,7 +124,7 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
                 <Button
                   isIconOnly
                   variant="ghost"
-                  size="sm"
+                  size="md"
                   isDisabled={deleteMutation.isPending}
                   onPress={async () => {
                     setError(null);

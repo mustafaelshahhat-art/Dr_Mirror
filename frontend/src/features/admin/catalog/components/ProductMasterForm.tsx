@@ -1,4 +1,4 @@
-import { Button, Description, Input, Label, TextArea, TextField } from '@heroui/react';
+import { Button, Description, Form, Input, Label, TextArea, TextField } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -98,7 +98,7 @@ export function ProductMasterForm({ product }: { product: AdminProductDetailDto 
         </div>
       ) : null}
 
-      <form
+      <Form
         onSubmit={async (e) => {
           e.preventDefault();
           setServerError(null);
@@ -163,7 +163,7 @@ export function ProductMasterForm({ product }: { product: AdminProductDetailDto 
               : t('admin.catalog.actions.save')}
           </Button>
         </div>
-      </form>
+      </Form>
     </article>
   );
 }

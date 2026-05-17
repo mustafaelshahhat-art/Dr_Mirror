@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import axios from 'axios';
 
 import { normalizeApiBaseUrl } from './api-client';
@@ -56,10 +56,19 @@ describe('api-client 401 interceptor', () => {
     const mockAxios = vi.spyOn(axios, 'post').mockRejectedValue(new Error('refresh failed'));
 
     const { api } = await import('./api-client');
+    const originalAdapter = api.defaults.adapter;
+    api.defaults.adapter = async (config) => Promise.reject({
+      config,
+      response: { status: 401, data: {} },
+      isAxiosError: true,
+      toJSON: () => ({}),
+    });
     try {
       await api.get('/test-endpoint');
     } catch {
       // Expected to reject
+    } finally {
+      api.defaults.adapter = originalAdapter;
     }
 
     expect(notifySpy).toHaveBeenCalled();

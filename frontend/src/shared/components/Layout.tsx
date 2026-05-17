@@ -22,7 +22,7 @@ export function Layout() {
       </a>
       <ForbiddenBanner />
       <Header />
-      <main id="main-content" className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 md:px-6 lg:px-8">
+      <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 md:px-6 lg:px-8">
         <Outlet />
       </main>
       <footer className="border-t border-divider/40 py-6 text-center text-xs text-muted">

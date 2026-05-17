@@ -1,9 +1,9 @@
 import { screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { makeAuthValue, makeBuyerUser, renderWithProviders } from '../../test/utils';
+import { renderWithProviders } from '../../test/utils';
 import { ORDER_STATUSES, PAYMENT_METHOD_KIND, type OrderDetailDto } from './types';
-import { OrderDetailPage } from './OrderDetailPage';
+import { CancelOrderButton } from './components/CancelOrderButton';
 
 vi.mock('./hooks', () => ({
   usePaymentMethodsQuery: () => ({ data: [], isLoading: false }),
@@ -89,8 +89,6 @@ describe('OrderDetailPage cancellation visibility', () => {
       status: ORDER_STATUSES.Confirmed,
       allowedNextStatesForBuyer: [],
     });
-    const { CancelOrderButton } = require('./components/CancelOrderButton');
-
     renderWithProviders(<CancelOrderButton order={order} />);
     expect(screen.queryByRole('button', { name: /cancel/i })).not.toBeInTheDocument();
   });
@@ -100,10 +98,8 @@ describe('OrderDetailPage cancellation visibility', () => {
       status: ORDER_STATUSES.Pending,
       allowedNextStatesForBuyer: [ORDER_STATUSES.Cancelled],
     });
-    const { CancelOrderButton } = require('./components/CancelOrderButton');
-
     renderWithProviders(<CancelOrderButton order={order} />);
-    expect(screen.getByRole('button', { name: /cancel order/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cancel this order/i })).toBeInTheDocument();
   });
 
   it('cancel button is hidden for Preparing order', () => {
@@ -111,8 +107,6 @@ describe('OrderDetailPage cancellation visibility', () => {
       status: ORDER_STATUSES.Preparing,
       allowedNextStatesForBuyer: [],
     });
-    const { CancelOrderButton } = require('./components/CancelOrderButton');
-
     renderWithProviders(<CancelOrderButton order={order} />);
     expect(screen.queryByRole('button', { name: /cancel/i })).not.toBeInTheDocument();
   });
@@ -122,8 +116,6 @@ describe('OrderDetailPage cancellation visibility', () => {
       status: ORDER_STATUSES.Shipped,
       allowedNextStatesForBuyer: [],
     });
-    const { CancelOrderButton } = require('./components/CancelOrderButton');
-
     renderWithProviders(<CancelOrderButton order={order} />);
     expect(screen.queryByRole('button', { name: /cancel/i })).not.toBeInTheDocument();
   });

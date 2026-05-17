@@ -28,6 +28,7 @@
     "errorLoad": "تعذّر تحميل الاستفسارات. حاول مرة أخرى.",
     "empty": "لا توجد استفسارات بعد.",
     "filterAll": "الكل",
+    "filterLabel": "تصفية حالة الاستفسار",
     "filterNew": "جديد",
     "filterRead": "مقروء",
     "filterResponded": "تم الرد",

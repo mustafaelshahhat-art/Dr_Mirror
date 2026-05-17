@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Button, Form } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -113,7 +113,7 @@ function VariantRow({
         <span className="text-sm tabular-nums">
           {t('admin.products.variants.stock', { count: variant.stock })}
         </span>
-        <Button isIconOnly variant="ghost" size="sm" onPress={onEdit} aria-label={t('admin.catalog.actions.edit')}>
+        <Button isIconOnly variant="ghost" size="md" onPress={onEdit} aria-label={t('admin.catalog.actions.edit')}>
           <Pencil className="size-4" aria-hidden />
         </Button>
         <Button
@@ -165,7 +165,7 @@ function VariantForm({
   const inFlight = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <form
+    <Form
       onSubmit={async (e) => {
         e.preventDefault();
         setError(null);
@@ -230,6 +230,6 @@ function VariantForm({
           {t('admin.catalog.actions.cancel')}
         </Button>
       </div>
-    </form>
+    </Form>
   );
 }

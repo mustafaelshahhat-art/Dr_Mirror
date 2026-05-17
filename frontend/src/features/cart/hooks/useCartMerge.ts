@@ -25,9 +25,12 @@ export function useCartMerge({
   const autoMergedForUserId = useRef<string | null>(null);
   const inFlightForUserId = useRef<string | null>(null);
   const latestUserIdRef = useRef<string | null>(null);
-  latestUserIdRef.current = user?.id ?? null;
 
   const [mergeError, setMergeError] = useState<string | null>(null);
+
+  useEffect(() => {
+    latestUserIdRef.current = user?.id ?? null;
+  }, [user?.id]);
 
   const mergeMutation = useMutation<
     CartDto,
@@ -90,7 +93,6 @@ export function useCartMerge({
     if (!user) {
       autoMergedForUserId.current = null;
       inFlightForUserId.current = null;
-      setMergeError(null);
     }
   }, [user]);
 

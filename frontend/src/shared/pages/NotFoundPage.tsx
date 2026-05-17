@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+
+import { LinkButton } from '../components/LinkButton';
 
 export function NotFoundPage() {
   const { t } = useTranslation();
@@ -17,12 +19,15 @@ export function NotFoundPage() {
       <p className="max-w-prose text-sm text-default-500">
         {t('common.notFound.subtitle')}
       </p>
-      <Link
+      <p className="rounded-medium bg-content2 px-3 py-1.5 text-xs text-default-500" dir="ltr">
+        {t('common.notFound.path', { path: location.pathname })}
+      </p>
+      <LinkButton
         to={isAdminPath ? '/admin' : '/'}
-        className="mt-2 rounded-medium bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+        className="mt-2"
       >
         {t(isAdminPath ? 'common.notFound.adminCta' : 'common.notFound.cta')}
-      </Link>
+      </LinkButton>
     </div>
   );
 }

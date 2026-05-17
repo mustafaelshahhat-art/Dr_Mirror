@@ -22,7 +22,7 @@ export function AdminLayout() {
       <AdminHeader onMenuPress={() => setSidebarOpen((prev) => !prev)} />
       <div className="flex flex-1">
         <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main id="admin-main" className="flex-1 px-4 py-6 md:px-6 lg:px-8">
+        <main id="admin-main" tabIndex={-1} className="flex-1 px-4 py-6 md:px-6 lg:px-8">
           <Outlet />
         </main>
       </div>

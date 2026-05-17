@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
+import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { AddressForm } from './components/AddressForm';
 import {
   useAddressesQuery,
@@ -35,6 +36,29 @@ export function AddressBookPage() {
       <div className="flex min-h-[30vh] items-center justify-center">
         <Spinner aria-label={t('addresses.loading')} />
       </div>
+    );
+  }
+
+  if (query.isError) {
+    return (
+      <section className="space-y-5">
+        <Link
+          to="/account"
+          className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
+          {t('addresses.backToAccount')}
+        </Link>
+        <header className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight">{t('addresses.title')}</h1>
+          <p className="text-sm text-default-500">{t('addresses.subtitle')}</p>
+        </header>
+        <QueryErrorState
+          message={t('addresses.errors.unknown')}
+          retryLabel={t('admin.query.retry')}
+          onRetry={() => void query.refetch()}
+        />
+      </section>
     );
   }
 
@@ -179,7 +203,7 @@ function Card({
           <Button
             isIconOnly
             variant="ghost"
-            size="sm"
+            size="md"
             onPress={onEdit}
             aria-label={t('addresses.actions.edit')}
           >
@@ -189,7 +213,7 @@ function Card({
             <Button
               isIconOnly
               variant="ghost"
-              size="sm"
+              size="md"
               onPress={onSetDefault}
               isDisabled={isMutating}
               aria-label={t('addresses.actions.setDefault')}
@@ -200,7 +224,7 @@ function Card({
           <Button
             isIconOnly
             variant="ghost"
-            size="sm"
+            size="md"
             onPress={onDelete}
             isDisabled={isMutating}
             aria-label={t('addresses.actions.delete')}

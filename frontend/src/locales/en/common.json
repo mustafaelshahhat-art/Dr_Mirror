@@ -66,6 +66,7 @@
   "notFound": {
     "title": "Page not found",
     "subtitle": "The page you're looking for doesn't exist or has been moved.",
+    "path": "Couldn't find {{path}}",
     "cta": "Back to catalog",
     "adminCta": "Back to admin dashboard"
   }

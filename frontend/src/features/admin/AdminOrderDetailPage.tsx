@@ -13,6 +13,8 @@ import { useAdminOrderQuery } from './hooks';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
+import { LinkButton } from '../../shared/components/LinkButton';
+import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 /**
  * Admin's view of a single order at <c>/admin/orders/:orderNumber</c>.
@@ -39,22 +41,28 @@ export function AdminOrderDetailPage() {
   if (query.isError || !query.data) {
     const status = (query.error as { response?: { status?: number } })?.response?.status;
     const isNotFound = status === 404;
+    if (!isNotFound) {
+      return (
+        <QueryErrorState
+          message={t('admin.detail.errorSubtitle')}
+          retryLabel={t('admin.query.retry')}
+          onRetry={() => void query.refetch()}
+        />
+      );
+    }
     return (
       <div className="space-y-3 rounded-large border border-divider/60 bg-content1 p-10 text-center">
         <h1 className="text-lg font-semibold">
-          {isNotFound ? t('admin.detail.notFoundTitle') : t('admin.detail.errorTitle')}
+          {t('admin.detail.notFoundTitle')}
         </h1>
         <p className="text-sm text-default-500">
-          {isNotFound
-            ? t('admin.detail.notFoundSubtitle')
-            : t('admin.detail.errorSubtitle')}
+          {t('admin.detail.notFoundSubtitle')}
         </p>
-        <Link
+        <LinkButton
           to="/admin/orders"
-          className="inline-flex items-center justify-center rounded-medium bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
         >
           {t('admin.detail.backToList')}
-        </Link>
+        </LinkButton>
       </div>
     );
   }

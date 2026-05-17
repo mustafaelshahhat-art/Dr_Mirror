@@ -18,6 +18,9 @@
   "proceedToCheckout": "Proceed to checkout",
   "backToCatalog": "Back to catalog",
   "clear": "Empty cart",
+  "clearConfirm": "Empty the cart?",
+  "clearConfirmYes": "Empty it",
+  "clearConfirmNo": "Keep items",
   "empty": {
     "title": "Your cart is empty",
     "subtitle": "Add scrubs, lab coats, or footwear to get started.",

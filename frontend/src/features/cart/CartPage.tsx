@@ -1,10 +1,12 @@
 import { Button } from '@heroui/react';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
+import { LinkButton } from '../../shared/components/LinkButton';
 
 import { CartLineRow } from './components/CartLineRow';
 import { useCart } from './useCart';
@@ -18,6 +20,7 @@ export function CartPage() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const { cart, updateQuantity, removeItem, clear, mergeError, retryMerge } = useCart();
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const hasItems = cart.items.length > 0;
   const errorMessage = cart.error?.message;
@@ -82,14 +85,40 @@ export function CartPage() {
               />
             ))}
             <div className="pt-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onPress={() => void clear()}
-                isDisabled={cart.isMutating}
-              >
-                {t('cart.clear')}
-              </Button>
+              {confirmClear ? (
+                <div className="inline-flex flex-wrap items-center gap-2 rounded-medium border border-danger/30 bg-danger/10 p-2">
+                  <span className="text-sm text-danger">{t('cart.clearConfirm')}</span>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onPress={() => {
+                      setConfirmClear(false);
+                      void clear();
+                    }}
+                    isDisabled={cart.isMutating}
+                    className="bg-danger text-danger-foreground"
+                  >
+                    {t('cart.clearConfirmYes')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onPress={() => setConfirmClear(false)}
+                    isDisabled={cart.isMutating}
+                  >
+                    {t('cart.clearConfirmNo')}
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onPress={() => setConfirmClear(true)}
+                  isDisabled={cart.isMutating}
+                >
+                  {t('cart.clear')}
+                </Button>
+              )}
             </div>
           </div>
 
@@ -115,12 +144,12 @@ export function CartPage() {
                 </span>
               </div>
             </div>
-            <Link
+            <LinkButton
               to="/checkout"
-              className="block w-full rounded-medium bg-primary px-4 py-2.5 text-center text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+              fullWidth
             >
               {t('cart.proceedToCheckout')}
-            </Link>
+            </LinkButton>
           </aside>
         </div>
       ) : (
@@ -128,12 +157,12 @@ export function CartPage() {
           <ShoppingBag className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
           <h2 className="text-base font-semibold">{t('cart.empty.title')}</h2>
           <p className="mt-1 text-sm text-default-500">{t('cart.empty.subtitle')}</p>
-          <Link
+          <LinkButton
             to="/"
-            className="mt-4 inline-flex items-center justify-center rounded-medium bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+            className="mt-4"
           >
             {t('cart.empty.cta')}
-          </Link>
+          </LinkButton>
         </div>
       )}
     </section>

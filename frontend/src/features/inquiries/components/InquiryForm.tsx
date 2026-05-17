@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Button, Form } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Check, Send } from 'lucide-react';
 import { useState } from 'react';
@@ -85,7 +85,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
   }
 
   return (
-    <form
+    <Form
       onSubmit={onSubmit}
       className="space-y-4 rounded-large border border-divider/60 bg-content1 p-4"
     >
@@ -163,7 +163,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
           {submit.isPending ? t('inquiries.form.submitting') : t('inquiries.form.submit')}
         </span>
       </Button>
-    </form>
+    </Form>
   );
 }
 

@@ -1,8 +1,7 @@
-import { screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
-import { makeAuthValue, makeBuyerUser, renderWithProviders } from '../../test/utils';
+import { renderWithProviders } from '../../test/utils';
 import type { CartContextValue, CartView } from './CartContext';
 import { CartContext } from './CartContext';
 import { CartPage } from './CartPage';

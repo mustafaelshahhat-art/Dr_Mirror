@@ -83,7 +83,7 @@ describe('CheckoutPage', () => {
       <CartContext.Provider value={loadingCtx}><CheckoutPage /></CartContext.Provider>,
       { authValue: makeAuthValue({ user: makeBuyerUser(), isAuthenticated: true }) },
     );
-    expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('Loading checkout...')).toBeInTheDocument();
   });
 
   it('shows address step heading when cart has items', () => {

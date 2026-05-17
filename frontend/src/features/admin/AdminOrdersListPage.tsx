@@ -9,7 +9,7 @@ import { ORDER_STATUSES, type OrderStatus } from '../orders/types';
 
 import { StatusFilterDropdown } from './components/StatusFilterDropdown';
 import { useAdminOrdersQuery } from './hooks';
-import { QueryErrorState } from './components/QueryErrorState';
+import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';

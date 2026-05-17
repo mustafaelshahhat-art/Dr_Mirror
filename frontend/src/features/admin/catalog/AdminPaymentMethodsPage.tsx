@@ -1,4 +1,4 @@
-import { Button, Input, Label, Spinner, TextArea, TextField } from '@heroui/react';
+import { Button, Form, Input, Label, Spinner, TextArea, TextField } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Pencil, Plus, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useState } from 'react';
@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import type { ProblemDetails } from '../../auth/types';
 import { PAYMENT_METHOD_KIND, type PaymentMethodKind } from '../../orders/types';
 import { SelectField } from '../../../shared/components/SelectField';
-import { QueryErrorState } from '../components/QueryErrorState';
+import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 
 import {
   useAdminPaymentMethodsQuery,
@@ -174,7 +174,7 @@ export function AdminPaymentMethodsPage() {
                       <Button
                         isIconOnly
                         variant="ghost"
-                        size="sm"
+                        size="md"
                         onPress={() => setEditingId(m.id)}
                         aria-label={t('admin.catalog.actions.edit')}
                       >
@@ -183,7 +183,7 @@ export function AdminPaymentMethodsPage() {
                       <Button
                         isIconOnly
                         variant="ghost"
-                        size="sm"
+                        size="md"
                         isDisabled={toggleMutation.isPending}
                         onPress={async () => {
                           setServerError(null);
@@ -252,7 +252,7 @@ function PaymentMethodCreateForm({ onCancel, onSubmit, isPending }: CreateProps)
   const [displayOrder, setDisplayOrder] = useState(0);
 
   return (
-    <form
+    <Form
       onSubmit={async (e) => {
         e.preventDefault();
         const ok = await onSubmit({
@@ -319,7 +319,7 @@ function PaymentMethodCreateForm({ onCancel, onSubmit, isPending }: CreateProps)
           {t('admin.catalog.actions.cancel')}
         </Button>
       </div>
-    </form>
+    </Form>
   );
 }
 
@@ -349,7 +349,7 @@ function PaymentMethodEditForm({ method, onCancel, onSubmit, isPending }: EditPr
   const [displayOrder, setDisplayOrder] = useState(method.displayOrder);
 
   return (
-    <form
+    <Form
       onSubmit={async (e) => {
         e.preventDefault();
         await onSubmit({
@@ -393,7 +393,7 @@ function PaymentMethodEditForm({ method, onCancel, onSubmit, isPending }: EditPr
           {t('admin.catalog.actions.cancel')}
         </Button>
       </div>
-    </form>
+    </Form>
   );
 }
 

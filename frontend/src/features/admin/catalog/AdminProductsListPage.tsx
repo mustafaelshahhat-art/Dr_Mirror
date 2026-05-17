@@ -14,7 +14,7 @@ import { PaginationControls } from '../../../shared/components/PaginationControl
 import { SelectField } from '../../../shared/components/SelectField';
 import { formatCurrency } from '../../../shared/lib/format';
 import type { AppLang } from '../../../shared/lib/theme-storage';
-import { QueryErrorState } from '../components/QueryErrorState';
+import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 
 export function AdminProductsListPage() {
   const { t, i18n } = useTranslation();

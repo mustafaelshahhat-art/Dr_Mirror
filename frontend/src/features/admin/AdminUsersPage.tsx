@@ -6,7 +6,7 @@ import { SearchInput } from '../catalog/components/SearchInput';
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import type { AdminUserDto } from './users/types';
 import { useAdminUsersQuery } from './users/hooks';
-import { QueryErrorState } from './components/QueryErrorState';
+import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 export function AdminUsersPage() {
   const { t } = useTranslation();
@@ -103,7 +103,12 @@ function UserRow({
           {user.roles.map((role) => (
             <span
               key={role}
-              className="inline-flex h-6 items-center rounded-full border border-divider bg-content2 px-2.5 text-xs font-medium text-default-700 dark:text-default-300"
+              className={[
+                'inline-flex h-6 items-center rounded-full border px-2.5 text-xs font-medium',
+                role === 'Admin'
+                  ? 'border-primary/30 bg-primary/10 text-primary'
+                  : 'border-divider bg-content2 text-default-700 dark:text-default-300',
+              ].join(' ')}
             >
               {role}
             </span>

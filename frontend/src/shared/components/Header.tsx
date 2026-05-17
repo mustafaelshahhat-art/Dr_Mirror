@@ -6,6 +6,7 @@ import { useAuth } from '../../features/auth/useAuth';
 import { CartButton } from '../../features/cart/components/CartButton';
 
 import { LangSwitcher } from './LangSwitcher';
+import { LinkButton } from './LinkButton';
 import { ThemeToggle } from './ThemeToggle';
 
 /**
@@ -68,12 +69,13 @@ export function Header() {
           ) : null}
 
           {!isBootstrapping && !user ? (
-            <Link
+            <LinkButton
               to="/login"
-              className="me-2 inline-flex items-center rounded-medium bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+              size="sm"
+              className="me-2"
             >
               {t('header.signIn')}
-            </Link>
+            </LinkButton>
           ) : null}
 
           <CartButton />

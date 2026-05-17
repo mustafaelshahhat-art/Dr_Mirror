@@ -8,6 +8,8 @@ import { useCart } from '../cart/useCart';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
+import { LinkButton } from '../../shared/components/LinkButton';
+import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 import { InquiryForm } from '../inquiries/components/InquiryForm';
 
@@ -49,22 +51,28 @@ export function ProductDetailPage() {
   if (query.isError || !product) {
     const status = (query.error as { response?: { status?: number } })?.response?.status;
     const isNotFound = status === 404;
+    if (!isNotFound) {
+      return (
+        <QueryErrorState
+          message={t('catalog.detail.errorSubtitle')}
+          retryLabel={t('admin.query.retry')}
+          onRetry={() => void query.refetch()}
+        />
+      );
+    }
     return (
       <div className="space-y-4 rounded-large border border-divider/60 bg-content1 p-10 text-center">
         <h1 className="text-lg font-semibold">
-          {isNotFound ? t('catalog.detail.notFoundTitle') : t('catalog.detail.errorTitle')}
+          {t('catalog.detail.notFoundTitle')}
         </h1>
         <p className="text-sm text-default-500">
-          {isNotFound
-            ? t('catalog.detail.notFoundSubtitle')
-            : t('catalog.detail.errorSubtitle')}
+          {t('catalog.detail.notFoundSubtitle')}
         </p>
-        <Link
+        <LinkButton
           to="/"
-          className="inline-flex items-center justify-center rounded-medium bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:opacity-90"
         >
           {t('catalog.detail.backToCatalog')}
-        </Link>
+        </LinkButton>
       </div>
     );
   }

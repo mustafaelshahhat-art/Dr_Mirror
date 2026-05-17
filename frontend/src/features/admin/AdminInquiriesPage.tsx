@@ -14,7 +14,8 @@ import {
   useMarkInquiryRespondedMutation,
 } from '../inquiries/hooks';
 import { PaginationControls } from '../../shared/components/PaginationControls';
-import { QueryErrorState } from './components/QueryErrorState';
+import { AnchorButton } from '../../shared/components/LinkButton';
+import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 export function AdminInquiriesPage() {
   const { t, i18n } = useTranslation();
@@ -41,7 +42,7 @@ export function AdminInquiriesPage() {
         <p className="text-sm text-default-500">{t('inquiries.admin.subtitle')}</p>
       </header>
 
-      <div className="flex flex-wrap gap-2" role="tablist">
+      <div className="flex flex-wrap gap-2" role="group" aria-label={t('inquiries.admin.filterLabel')}>
         <FilterPill
           label={t('inquiries.admin.filterAll')}
           active={filter === undefined}
@@ -108,19 +109,15 @@ function FilterPill({
   onSelect: () => void;
 }) {
   return (
-    <button
+    <Button
       type="button"
-      role="tab"
-      aria-selected={active}
-      onClick={onSelect}
-      className={
-        active
-          ? 'rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground'
-          : 'rounded-full border border-divider px-4 py-1.5 text-xs font-medium text-default-700 transition-colors hover:bg-content2 dark:text-default-300'
-      }
+      variant={active ? 'primary' : 'outline'}
+      size="sm"
+      onPress={onSelect}
+      className="rounded-full"
     >
       {label}
-    </button>
+    </Button>
   );
 }
 
@@ -210,13 +207,13 @@ function InquiryRow({
       ) : null}
 
       <div className="flex flex-wrap gap-2">
-        <a
+        <AnchorButton
           href={replyHref}
-          className="inline-flex h-8 items-center justify-center gap-1.5 rounded-medium bg-primary px-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          size="sm"
         >
           <Mail className="size-4" aria-hidden />
           {t('inquiries.admin.replyByEmail')}
-        </a>
+        </AnchorButton>
         {isNew ? (
           <Button
             type="button"
