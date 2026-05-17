@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Spinner } from '@heroui/react';
 import { Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -9,6 +8,7 @@ import type { AppLang } from '../../shared/lib/theme-storage';
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import { LinkButton } from '../../shared/components/LinkButton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
+import { OrderRowSkeleton, Skeleton } from '../../shared/components/Skeleton';
 
 import { OrderStatusBadge } from './components/OrderStatusBadge';
 import { useMyOrdersQuery } from './hooks';
@@ -29,9 +29,19 @@ export function OrdersListPage() {
 
   if (query.isLoading) {
     return (
-      <div className="flex min-h-[30vh] items-center justify-center">
-        <Spinner aria-label={t('orders.list.loading')} />
-      </div>
+      <section className="space-y-5" aria-busy="true" aria-label={t('orders.list.loading')}>
+        <header className="space-y-2">
+          <Skeleton className="h-7 w-1/3" />
+          <Skeleton className="h-4 w-2/3" />
+        </header>
+        <ul className="space-y-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <li key={i}>
+              <OrderRowSkeleton />
+            </li>
+          ))}
+        </ul>
+      </section>
     );
   }
 
@@ -39,7 +49,7 @@ export function OrdersListPage() {
     return (
       <QueryErrorState
         message={t('orders.list.errorLoad')}
-        retryLabel={t('admin.query.retry')}
+        retryLabel={t('common.query.retry')}
         onRetry={() => void query.refetch()}
       />
     );

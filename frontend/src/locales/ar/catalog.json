@@ -79,14 +79,17 @@
     "sizeAria": "مقاس {{size}}",
     "availableColors": "الألوان المتاحة",
     "pickVariant": "اختر اللون والمقاس",
-    "stockForVariant_one": "قطعة واحدة متوفرة — {{size}} / {{color}}",
-    "stockForVariant_few": "{{count}} قطع متوفرة — {{size}} / {{color}}",
-    "stockForVariant_many": "{{count}} قطعة متوفرة — {{size}} / {{color}}",
-    "stockForVariant_other": "{{count}} قطع متوفرة — {{size}} / {{color}}",
+    "stockForVariant_one": "قطعة واحدة متوفرة · {{size}} / {{color}}",
+    "stockForVariant_few": "{{count}} قطع متوفرة · {{size}} / {{color}}",
+    "stockForVariant_many": "{{count}} قطعة متوفرة · {{size}} / {{color}}",
+    "stockForVariant_other": "{{count}} قطع متوفرة · {{size}} / {{color}}",
     "stockOut": "هذا اللون والمقاس غير متوفر حاليًا",
     "addToCartSoon": "إضافة إلى السلة (قريبًا)",
     "inquireSoon": "طلب عرض سعر (قريبًا)",
     "inquireCta": "اسأل عن هذا المنتج",
-    "cartHint": "السلة وطلبات الأسعار في المرحلة القادمة."
+    "cartHint": "السلة وطلبات الأسعار في المرحلة القادمة.",
+    "galleryAria": "{{product}} · معرض الصور",
+    "galleryThumbAria": "صورة {{index}} من {{total}}",
+    "noImage": "لا توجد صورة"
   }
 }

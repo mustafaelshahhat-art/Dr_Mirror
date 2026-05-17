@@ -6,6 +6,8 @@ import { useAuth } from '../../features/auth/useAuth';
 import { useMyOrdersQuery } from '../../features/orders/hooks';
 import { ORDER_STATUSES, type OrderStatus } from '../../features/orders/types';
 
+import { OrderRowSkeleton } from './Skeleton';
+
 const dateFmt = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'long',
   numberingSystem: 'latn',
@@ -135,9 +137,17 @@ export function ShellPage() {
         </div>
 
         {ordersQuery.isLoading ? (
-          <div className="flex min-h-[10vh] items-center justify-center">
-            <span className="text-sm text-default-500">{t('account.loading')}</span>
-          </div>
+          <ul
+            className="space-y-2"
+            aria-busy="true"
+            aria-label={t('account.loading')}
+          >
+            {Array.from({ length: 3 }).map((_, i) => (
+              <li key={i}>
+                <OrderRowSkeleton variant="compact" />
+              </li>
+            ))}
+          </ul>
         ) : orders.length > 0 ? (
           <ul className="divide-y divide-divider/40 overflow-hidden rounded-large border border-divider/60">
             {orders.map((order) => (

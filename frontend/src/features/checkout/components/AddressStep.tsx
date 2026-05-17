@@ -1,4 +1,5 @@
 import { Checkbox, Input, Label, TextField } from '@heroui/react';
+import type { KeyboardEvent } from 'react';
 import type { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -32,7 +33,43 @@ export function AddressStep({
   newAddressLabel,
   setNewAddressLabel,
 }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  // Selectable options in DOM order: every saved address followed by the
+  // synthetic "use new address" entry. We feed this into arrow-key navigation
+  // so the radiogroup behaves correctly in both LTR and RTL.
+  type Option = { id: string | null };
+  const options: Option[] = [
+    ...savedAddresses.map((a) => ({ id: a.id })),
+    { id: null },
+  ];
+  const currentIdx = options.findIndex((o) => o.id === savedAddressId);
+  const isRtl = i18n.dir() === 'rtl';
+
+  function handleSavedKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    const len = options.length;
+    if (len === 0) return;
+    const current = currentIdx === -1 ? 0 : currentIdx;
+    // Cards are arranged in a 2-column grid (sm+) so both axes need to
+    // advance, with horizontal arrows direction-aware for RTL.
+    const forwardKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
+    const backwardKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
+    let next = -1;
+    if (e.key === 'ArrowDown' || e.key === forwardKey) {
+      e.preventDefault();
+      next = (current + 1) % len;
+    } else if (e.key === 'ArrowUp' || e.key === backwardKey) {
+      e.preventDefault();
+      next = (current - 1 + len) % len;
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      next = 0;
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      next = len - 1;
+    }
+    if (next !== -1) setSavedAddressId(options[next].id);
+  }
 
   return (
     <fieldset className="space-y-4">
@@ -41,20 +78,27 @@ export function AddressStep({
       </legend>
 
       {savedAddresses.length > 0 ? (
-        <div className="space-y-2" role="radiogroup" aria-label={t('checkout.address.savedHeading')}>
+        <div className="space-y-2">
           <p className="text-xs uppercase tracking-wide text-default-500">
             {t('checkout.address.savedHeading')}
           </p>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {savedAddresses.map((a) => {
+          <div
+            className="grid gap-2 sm:grid-cols-2"
+            role="radiogroup"
+            aria-label={t('checkout.address.savedHeading')}
+            onKeyDown={handleSavedKeyDown}
+          >
+            {savedAddresses.map((a, idx) => {
               const localizedGov = t(`governorates.${a.governorate}`, a.governorate);
               const isSelected = savedAddressId === a.id;
+              const tabIdx = currentIdx === -1 ? (idx === 0 ? 0 : -1) : isSelected ? 0 : -1;
               return (
                 <button
                   key={a.id}
                   type="button"
                   role="radio"
                   aria-checked={isSelected}
+                  tabIndex={tabIdx}
                   onClick={() => setSavedAddressId(a.id)}
                   className={[
                     'rounded-medium border p-3 text-start transition-colors',
@@ -87,6 +131,7 @@ export function AddressStep({
               type="button"
               role="radio"
               aria-checked={savedAddressId === null}
+              tabIndex={savedAddressId === null ? 0 : -1}
               onClick={() => setSavedAddressId(null)}
               className={[
                 'rounded-medium border p-3 text-start text-sm transition-colors',
@@ -122,21 +167,17 @@ export function AddressStep({
             isRequired
           />
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="flex flex-col gap-1.5 text-sm">
-              <span className="text-sm font-medium">
-                {t('checkout.address.governorate')}
-              </span>
-              <GovernorateSelect
-                value={watch('address.governorate')}
-                onChange={(slug) =>
-                  setValue('address.governorate', slug, {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                  })
-                }
-                required
-              />
-            </label>
+            <GovernorateSelect
+              label={t('checkout.address.governorate')}
+              value={watch('address.governorate')}
+              onChange={(slug) =>
+                setValue('address.governorate', slug, {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                })
+              }
+              required
+            />
             <FormField
               name="address.city"
               control={control}

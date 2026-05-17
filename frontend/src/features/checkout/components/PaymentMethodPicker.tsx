@@ -33,13 +33,20 @@ export function PaymentMethodPicker({
     );
   }
 
+  const isRtl = i18n.dir() === 'rtl';
+
   function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     const len = sorted.length;
     if (len === 0) return;
     const current = selectedMethodIdx === -1 ? 0 : selectedMethodIdx;
+    // The list is vertical, so Up/Down map directly. Horizontal arrows are
+    // also accepted as a courtesy and are direction-aware so RTL keyboards
+    // stay consistent with reading order.
+    const forwardKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
+    const backwardKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
     let next = -1;
-    if (e.key === 'ArrowDown') { e.preventDefault(); next = (current + 1) % len; }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); next = (current - 1 + len) % len; }
+    if (e.key === 'ArrowDown' || e.key === forwardKey) { e.preventDefault(); next = (current + 1) % len; }
+    else if (e.key === 'ArrowUp' || e.key === backwardKey) { e.preventDefault(); next = (current - 1 + len) % len; }
     else if (e.key === 'Home') { e.preventDefault(); next = 0; }
     else if (e.key === 'End') { e.preventDefault(); next = len - 1; }
     if (next !== -1) onSelect(sorted[next].id);

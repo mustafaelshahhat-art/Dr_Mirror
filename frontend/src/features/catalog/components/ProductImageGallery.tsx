@@ -19,7 +19,7 @@ interface Props {
  * track which image is showing.
  */
 export function ProductImageGallery({ images, productName }: Props) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() === 'rtl';
   const [activeImage, setActiveImage] = useState(0);
   const currentImage = images[activeImage] ?? images[0];
@@ -41,13 +41,20 @@ export function ProductImageGallery({ images, productName }: Props) {
       </div>
 
       {images.length > 1 ? (
-        <div className="flex gap-2 overflow-x-auto" role="group" aria-label={productName}>
+        <div
+          className="flex gap-2 overflow-x-auto"
+          role="group"
+          aria-label={t('catalog.detail.galleryAria', { product: productName })}
+        >
           {images.map((img, idx) => (
             <button
               key={img.id}
               type="button"
               aria-current={idx === activeImage ? 'true' : undefined}
-              aria-label={`Image ${idx + 1} of ${images.length}`}
+              aria-label={t('catalog.detail.galleryThumbAria', {
+                index: idx + 1,
+                total: images.length,
+              })}
               onClick={() => setActiveImage(idx)}
               onKeyDown={(e) => {
                 if (e.key === 'ArrowRight') {

@@ -55,7 +55,7 @@ export function ProductDetailPage() {
       return (
         <QueryErrorState
           message={t('catalog.detail.errorSubtitle')}
-          retryLabel={t('admin.query.retry')}
+          retryLabel={t('common.query.retry')}
           onRetry={() => void query.refetch()}
         />
       );

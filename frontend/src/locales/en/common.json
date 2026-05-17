@@ -7,7 +7,10 @@
     "marketplace": "Marketplace",
     "contact": "Contact",
     "myAccount": "My account",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "openMenu": "Open menu",
+    "menuLabel": "Site navigation",
+    "menuSubtitle": "Account, language, and theme controls"
   },
   "account": {
     "welcome": "Welcome, {{name}}",
@@ -53,6 +56,9 @@
   "loading": {
     "page": "Loading page...",
     "session": "Loading session..."
+  },
+  "query": {
+    "retry": "Retry"
   },
   "a11y": {
     "skipToContent": "Skip to content"

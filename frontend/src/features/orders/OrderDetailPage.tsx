@@ -1,5 +1,5 @@
 import { Spinner } from '@heroui/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ImageOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
@@ -39,7 +39,7 @@ export function OrderDetailPage() {
       return (
         <QueryErrorState
           message={t('orders.detail.errorSubtitle')}
-          retryLabel={t('admin.query.retry')}
+          retryLabel={t('common.query.retry')}
           onRetry={() => void query.refetch()}
         />
       );
@@ -130,8 +130,12 @@ export function OrderDetailPage() {
                           loading="lazy"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center text-default-400">
-                          —
+                        <div
+                          className="flex h-full w-full items-center justify-center text-default-400"
+                          role="img"
+                          aria-label={t('catalog.detail.noImage')}
+                        >
+                          <ImageOff className="size-5" aria-hidden />
                         </div>
                       )}
                     </Link>

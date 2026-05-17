@@ -27,16 +27,21 @@ export function ColorPicker({ colors, selected, onSelect }: ColorPickerProps) {
     : '';
 
   const selectedIdx = colors.findIndex((c) => c.colorName === selected);
+  const isRtl = i18n.dir() === 'rtl';
 
   function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     const len = colors.length;
     if (len === 0) return;
     const current = selectedIdx === -1 ? 0 : selectedIdx;
+    // Direction-aware horizontal arrows: in RTL the visual "next" swatch sits
+    // to the left, so ArrowLeft must advance.
+    const forwardKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
+    const backwardKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
     let next = -1;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    if (e.key === forwardKey || e.key === 'ArrowDown') {
       e.preventDefault();
       next = (current + 1) % len;
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    } else if (e.key === backwardKey || e.key === 'ArrowUp') {
       e.preventDefault();
       next = (current - 1 + len) % len;
     } else if (e.key === 'Home') {
@@ -83,7 +88,7 @@ export function ColorPicker({ colors, selected, onSelect }: ColorPickerProps) {
             >
               {isSelected ? (
                 <Check
-                  className={`absolute inset-0 m-auto size-4 ${onLight ? 'text-foreground' : 'text-white'}`}
+                  className={`absolute inset-0 m-auto size-4 ${onLight ? 'text-foreground' : 'text-background'}`}
                   aria-hidden
                 />
               ) : null}

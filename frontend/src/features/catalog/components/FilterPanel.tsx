@@ -1,3 +1,5 @@
+import { Button, Input, Label, TextField } from '@heroui/react';
+import type { KeyboardEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +28,8 @@ export function FilterPanel({
   onMaxPriceChange,
   onClearAll,
 }: FilterPanelProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
   const [open, setOpen] = useState(
     filter.gender !== undefined ||
     Boolean(filter.size) ||
@@ -43,32 +46,66 @@ export function FilterPanel({
     filter.maxPrice !== undefined,
   ].filter(Boolean).length;
 
+  // Gender radiogroup: "all" + the three concrete genders, in DOM order.
+  const genderOptions: (ProductGender | undefined)[] = [undefined, ...GENDERS];
+  const genderIdx = genderOptions.findIndex((g) => g === filter.gender);
+
+  function handleGenderKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    const len = genderOptions.length;
+    const current = genderIdx === -1 ? 0 : genderIdx;
+    const forwardKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
+    const backwardKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
+    let next = -1;
+    if (e.key === forwardKey || e.key === 'ArrowDown') {
+      e.preventDefault();
+      next = (current + 1) % len;
+    } else if (e.key === backwardKey || e.key === 'ArrowUp') {
+      e.preventDefault();
+      next = (current - 1 + len) % len;
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      next = 0;
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      next = len - 1;
+    }
+    if (next !== -1) onGenderChange(genderOptions[next]);
+  }
+
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <button
+        <Button
           type="button"
-          onClick={() => setOpen((v) => !v)}
-          className="inline-flex items-center gap-1.5 rounded-medium border border-divider/60 bg-content1 px-3 py-1.5 text-xs font-medium text-default-700 transition-colors hover:bg-content2 dark:text-default-300"
+          variant="ghost"
+          size="sm"
+          onPress={() => setOpen((v) => !v)}
           aria-expanded={open}
+          className="border border-divider/60 bg-content1 hover:bg-content2 text-default-700 dark:text-default-300 text-xs font-medium"
         >
-          <SlidersHorizontal className="size-3.5" aria-hidden />
-          {open ? t('catalog.filters.hide') : t('catalog.filters.label')}
-          {activeCount > 0 && !open ? (
-            <span className="ms-0.5 inline-flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground leading-none">
-              {activeCount}
-            </span>
-          ) : null}
-        </button>
+          <span className="inline-flex items-center gap-1.5">
+            <SlidersHorizontal className="size-3.5" aria-hidden />
+            {open ? t('catalog.filters.hide') : t('catalog.filters.label')}
+            {activeCount > 0 && !open ? (
+              <span className="ms-0.5 inline-flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground leading-none">
+                {activeCount}
+              </span>
+            ) : null}
+          </span>
+        </Button>
         {activeCount > 0 ? (
-          <button
+          <Button
             type="button"
-            onClick={onClearAll}
-            className="inline-flex items-center gap-1 text-xs text-default-500 hover:text-danger"
+            variant="ghost"
+            size="sm"
+            onPress={onClearAll}
+            className="text-xs text-default-500 hover:text-danger"
           >
-            <X className="size-3" aria-hidden />
-            {t('catalog.filters.clearAll')}
-          </button>
+            <span className="inline-flex items-center gap-1">
+              <X className="size-3" aria-hidden />
+              {t('catalog.filters.clearAll')}
+            </span>
+          </Button>
         ) : null}
       </div>
 
@@ -78,73 +115,75 @@ export function FilterPanel({
             {/* Gender */}
             <div className="space-y-1.5">
               <p className="text-xs font-medium text-default-500">{t('catalog.filters.genderLabel')}</p>
-              <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={t('catalog.filters.genderLabel')}>
+              <div
+                className="flex flex-wrap gap-1.5"
+                role="radiogroup"
+                aria-label={t('catalog.filters.genderLabel')}
+                onKeyDown={handleGenderKeyDown}
+              >
                 <GenderPill
                   label={t('catalog.filters.allGenders')}
                   selected={filter.gender === undefined}
+                  tabIndex={genderIdx === 0 ? 0 : (genderIdx === -1 ? 0 : -1)}
                   onClick={() => onGenderChange(undefined)}
                 />
-                {GENDERS.map((g) => (
-                  <GenderPill
-                    key={g}
-                    label={t(genderTranslationKey(g))}
-                    selected={filter.gender === g}
-                    onClick={() => onGenderChange(filter.gender === g ? undefined : g)}
-                  />
-                ))}
+                {GENDERS.map((g, i) => {
+                  const isSel = filter.gender === g;
+                  return (
+                    <GenderPill
+                      key={g}
+                      label={t(genderTranslationKey(g))}
+                      selected={isSel}
+                      tabIndex={genderIdx === i + 1 ? 0 : -1}
+                      onClick={() => onGenderChange(filter.gender === g ? undefined : g)}
+                    />
+                  );
+                })}
               </div>
             </div>
 
             {/* Size */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-default-500" htmlFor="filter-size">
-                {t('catalog.filters.sizeLabel')}
-              </label>
-              <DebouncedInput
-                id="filter-size"
-                value={filter.size ?? ''}
-                onCommit={onSizeChange}
-                placeholder={t('catalog.filters.sizePlaceholder')}
-              />
-            </div>
+            <DebouncedInput
+              label={t('catalog.filters.sizeLabel')}
+              value={filter.size ?? ''}
+              onCommit={onSizeChange}
+              placeholder={t('catalog.filters.sizePlaceholder')}
+            />
 
             {/* Color */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-default-500" htmlFor="filter-color">
-                {t('catalog.filters.colorLabel')}
-              </label>
-              <DebouncedInput
-                id="filter-color"
-                value={filter.color ?? ''}
-                onCommit={onColorChange}
-                placeholder={t('catalog.filters.colorPlaceholder')}
-              />
-            </div>
+            <DebouncedInput
+              label={t('catalog.filters.colorLabel')}
+              value={filter.color ?? ''}
+              onCommit={onColorChange}
+              placeholder={t('catalog.filters.colorPlaceholder')}
+            />
 
             {/* Price range */}
             <div className="space-y-1.5">
               <p className="text-xs font-medium text-default-500">
                 {t('catalog.filters.minPriceLabel')} / {t('catalog.filters.maxPriceLabel')}
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-end gap-2">
                 <DebouncedInput
-                  id="filter-min-price"
+                  hideLabel
+                  label={t('catalog.filters.minPriceLabel')}
                   value={filter.minPrice !== undefined ? String(filter.minPrice) : ''}
                   onCommit={onMinPriceChange}
                   placeholder={t('catalog.filters.minPriceLabel')}
                   type="number"
                   min="0"
-                  className="w-full"
+                  className="flex-1"
                 />
-                <span className="text-default-400">–</span>
+                <span className="pb-2 text-default-400" aria-hidden>–</span>
                 <DebouncedInput
-                  id="filter-max-price"
+                  hideLabel
+                  label={t('catalog.filters.maxPriceLabel')}
                   value={filter.maxPrice !== undefined ? String(filter.maxPrice) : ''}
                   onCommit={onMaxPriceChange}
                   placeholder={t('catalog.filters.maxPriceLabel')}
                   type="number"
                   min="0"
-                  className="w-full"
+                  className="flex-1"
                 />
               </div>
             </div>
@@ -159,21 +198,24 @@ function GenderPill({
   label,
   selected,
   onClick,
+  tabIndex,
 }: {
   label: string;
   selected: boolean;
   onClick: () => void;
+  tabIndex: number;
 }) {
   return (
     <button
       type="button"
       role="radio"
       aria-checked={selected}
+      tabIndex={tabIndex}
       onClick={onClick}
       className={
         selected
-          ? 'rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition-colors'
-          : 'rounded-full border border-divider/60 bg-content2 px-3 py-1 text-xs font-medium text-default-700 transition-colors hover:bg-content2 dark:text-default-300'
+          ? 'rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+          : 'rounded-full border border-divider/60 bg-content2 px-3 py-1 text-xs font-medium text-default-700 transition-colors hover:bg-content2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-default-300'
       }
     >
       {label}
@@ -181,22 +223,30 @@ function GenderPill({
   );
 }
 
-function DebouncedInput({
-  value,
-  onCommit,
-  debounceMs = 400,
-  className,
-  ...rest
-}: {
+interface DebouncedInputProps {
+  label: string;
   value: string;
   onCommit: (v: string) => void;
   debounceMs?: number;
   className?: string;
-  id?: string;
   placeholder?: string;
   type?: string;
   min?: string;
-}) {
+  /** Visually hide the label (still announced to assistive tech). */
+  hideLabel?: boolean;
+}
+
+function DebouncedInput({
+  label,
+  value,
+  onCommit,
+  debounceMs = 400,
+  className,
+  placeholder,
+  type,
+  min,
+  hideLabel,
+}: DebouncedInputProps) {
   const [draft, setDraft] = useState(value);
 
   // Sync external resets (e.g. clear-all sets filter.size to undefined → value='').
@@ -212,11 +262,17 @@ function DebouncedInput({
   }, [draft, value, onCommit, debounceMs]);
 
   return (
-    <input
-      value={draft}
-      onChange={(e) => setDraft(e.target.value)}
-      className={`rounded-medium border border-divider/60 bg-content1 px-3 py-1.5 text-sm text-foreground placeholder:text-default-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 ${className ?? 'w-full'}`}
-      {...rest}
-    />
+    <TextField className={`flex flex-col gap-1.5 ${className ?? ''}`}>
+      <Label className={hideLabel ? 'sr-only' : 'text-xs font-medium text-default-500'}>
+        {label}
+      </Label>
+      <Input
+        type={type}
+        value={draft}
+        onChange={(e) => setDraft((e.target as HTMLInputElement).value)}
+        placeholder={placeholder}
+        min={min}
+      />
+    </TextField>
   );
 }

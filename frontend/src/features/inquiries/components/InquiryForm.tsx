@@ -1,4 +1,4 @@
-import { Button, Form } from '@heroui/react';
+import { Button, Form, Input, Label, TextArea, TextField } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Check, Send } from 'lucide-react';
 import { useState } from 'react';
@@ -133,19 +133,17 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
         />
       </div>
 
-      <label className="block">
-        <span className="mb-1 block text-xs font-medium text-default-700 dark:text-default-300">
+      <TextField isRequired className="flex flex-col gap-1">
+        <Label className="text-xs font-medium text-default-700 dark:text-default-300">
           {t('inquiries.form.message')}
-        </span>
-        <textarea
-          required
+        </Label>
+        <TextArea
           rows={4}
           maxLength={2000}
           value={form.message}
-          onChange={(e) => update('message', e.target.value)}
-          className="block w-full rounded-medium border border-divider bg-content1 px-3 py-2 text-sm text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+          onChange={(e) => update('message', (e.target as HTMLTextAreaElement).value)}
         />
-      </label>
+      </TextField>
 
       {error ? (
         <p role="alert" className="text-sm text-danger">
@@ -180,20 +178,16 @@ interface FieldProps {
 
 function Field({ label, value, onChange, type = 'text', required, maxLength, autoComplete, dir }: FieldProps) {
   return (
-    <label className="block">
-      <span className="mb-1 block text-xs font-medium text-default-700 dark:text-default-300">
-        {label}
-      </span>
-      <input
+    <TextField isRequired={required} className="flex flex-col gap-1">
+      <Label className="text-xs font-medium text-default-700 dark:text-default-300">{label}</Label>
+      <Input
         type={type}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        required={required}
+        onChange={(e) => onChange((e.target as HTMLInputElement).value)}
         maxLength={maxLength}
         autoComplete={autoComplete}
         dir={dir}
-        className="block w-full rounded-medium border border-divider bg-content1 px-3 py-2 text-sm text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
       />
-    </label>
+    </TextField>
   );
 }

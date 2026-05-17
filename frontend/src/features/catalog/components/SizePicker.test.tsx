@@ -8,7 +8,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (k: string, opts?: Record<string, unknown>) =>
       opts?.size ? String(opts.size) : k,
-    i18n: { language: 'en' },
+    i18n: { language: 'en', dir: () => 'ltr' },
   }),
 }));
 

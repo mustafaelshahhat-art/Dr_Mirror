@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form } from '@heroui/react';
+import { Button, Checkbox, Description, Form, Input, Label, TextField } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -102,12 +102,12 @@ export function AddressForm({
           dir="ltr"
           description={t('addresses.fields.phoneHint')}
         />
-        <label className="space-y-1 text-sm">
-          <span className="text-xs uppercase tracking-wide text-default-500">
-            {t('addresses.fields.governorate')}
-          </span>
-          <GovernorateSelect value={governorate} onChange={setGovernorate} required />
-        </label>
+        <GovernorateSelect
+          label={t('addresses.fields.governorate')}
+          value={governorate}
+          onChange={setGovernorate}
+          required
+        />
         <Field label={t('addresses.fields.city')} value={city} onChange={setCity} required maxLength={100} />
         <Field label={t('addresses.fields.streetAddress')} value={streetAddress} onChange={setStreetAddress} required maxLength={200} />
         <Field label={t('addresses.fields.floor')} value={floor} onChange={setFloor} maxLength={50} />
@@ -167,19 +167,17 @@ function Field({
   dir?: 'ltr' | 'rtl';
 }) {
   return (
-    <label className="space-y-1 text-sm">
-      <span className="text-xs uppercase tracking-wide text-default-500">{label}</span>
-      <input
+    <TextField isRequired={required} className="flex flex-col gap-1">
+      <Label className="text-xs uppercase tracking-wide text-default-500">{label}</Label>
+      <Input
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        required={required}
+        onChange={(e) => onChange((e.target as HTMLInputElement).value)}
         maxLength={maxLength}
         dir={dir}
-        className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
       />
       {description ? (
-        <span className="block text-[11px] text-default-500">{description}</span>
+        <Description className="text-[11px] text-default-500">{description}</Description>
       ) : null}
-    </label>
+    </TextField>
   );
 }

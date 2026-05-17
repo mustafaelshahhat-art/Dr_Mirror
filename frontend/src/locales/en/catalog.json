@@ -73,12 +73,15 @@
     "sizeAria": "Size {{size}}",
     "availableColors": "Available colors",
     "pickVariant": "Pick a color and size",
-    "stockForVariant_one": "1 in stock — {{size}} / {{color}}",
-    "stockForVariant_other": "{{count}} in stock — {{size}} / {{color}}",
+    "stockForVariant_one": "1 in stock · {{size}} / {{color}}",
+    "stockForVariant_other": "{{count}} in stock · {{size}} / {{color}}",
     "stockOut": "This variant is out of stock",
     "addToCartSoon": "Add to cart (coming soon)",
     "inquireSoon": "Request a quote (coming soon)",
     "inquireCta": "Ask about this product",
-    "cartHint": "Cart and quotes ship in the next milestone."
+    "cartHint": "Cart and quotes ship in the next milestone.",
+    "galleryAria": "{{product}} · image gallery",
+    "galleryThumbAria": "Image {{index}} of {{total}}",
+    "noImage": "No image"
   }
 }

@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { LinkButton } from '../../shared/components/LinkButton';
+import { CartLineSkeleton } from '../../shared/components/Skeleton';
 
 import { CartLineRow } from './components/CartLineRow';
 import { useCart } from './useCart';
@@ -69,8 +70,17 @@ export function CartPage() {
       ) : null}
 
       {cart.isLoading ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center text-sm text-default-500">
-          {t('cart.loading')}
+        <div
+          className="grid gap-6 lg:grid-cols-[1fr_320px]"
+          aria-busy="true"
+          aria-label={t('cart.loading')}
+        >
+          <span className="sr-only">{t('cart.loading')}</span>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <CartLineSkeleton key={i} />
+            ))}
+          </div>
         </div>
       ) : hasItems ? (
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">

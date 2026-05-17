@@ -1,3 +1,4 @@
+import { Button } from '@heroui/react';
 import { Banknote, Copy } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -70,15 +71,19 @@ export function PaymentInstructionsCard({ order }: { order: OrderDetailDto }) {
               <span className="font-mono text-sm text-foreground" dir="ltr">
                 {accountNumber}
               </span>
-              <button
+              <Button
                 type="button"
-                onClick={() => void copyToClipboard(accountNumber)}
-                className="inline-flex items-center gap-1 rounded-medium border border-divider/60 bg-content2 px-2 py-0.5 text-xs text-default-700 transition-colors hover:bg-default-100"
+                size="sm"
+                variant="ghost"
+                onPress={() => void copyToClipboard(accountNumber)}
                 aria-label={t('orders.paymentInstructions.copy')}
+                className="border border-divider/60 bg-content2 text-xs text-default-700 hover:bg-default-100"
               >
-                <Copy className="size-3" aria-hidden />
-                {copied ? t('orders.paymentInstructions.copied') : t('orders.paymentInstructions.copy')}
-              </button>
+                <span className="inline-flex items-center gap-1">
+                  <Copy className="size-3" aria-hidden />
+                  {copied ? t('orders.paymentInstructions.copied') : t('orders.paymentInstructions.copy')}
+                </span>
+              </Button>
             </dd>
           </div>
         ) : null}

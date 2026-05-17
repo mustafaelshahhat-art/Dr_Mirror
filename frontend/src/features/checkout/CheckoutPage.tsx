@@ -23,6 +23,11 @@ import { checkoutSchema, type CheckoutForm } from './schemas';
 import { FormField } from '../auth/components/FormField';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { LinkButton } from '../../shared/components/LinkButton';
+import {
+  CartLineSkeleton,
+  CheckoutSummarySkeleton,
+  Skeleton,
+} from '../../shared/components/Skeleton';
 
 /**
  * Multi-step checkout. Behind <c>ProtectedRoute</c> — anonymous users land
@@ -103,9 +108,20 @@ export function CheckoutPage() {
 
   if (cart.isLoading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <Spinner aria-label={t('checkout.loading')} />
-      </div>
+      <section
+        className="grid gap-6 lg:grid-cols-[1fr_320px]"
+        aria-busy="true"
+        aria-label={t('checkout.loading')}
+      >
+        <div className="space-y-4">
+          <Skeleton className="h-7 w-1/3" />
+          <Skeleton className="h-4 w-2/3" />
+          {Array.from({ length: 3 }).map((_, i) => (
+            <CartLineSkeleton key={i} />
+          ))}
+        </div>
+        <CheckoutSummarySkeleton />
+      </section>
     );
   }
 

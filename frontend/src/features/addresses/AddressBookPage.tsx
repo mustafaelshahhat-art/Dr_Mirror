@@ -1,10 +1,11 @@
-import { Button, Spinner } from '@heroui/react';
+import { Button } from '@heroui/react';
 import { ArrowLeft, MapPin, Pencil, Plus, Star, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
+import { AddressCardSkeleton, Skeleton } from '../../shared/components/Skeleton';
 import { AddressForm } from './components/AddressForm';
 import {
   useAddressesQuery,
@@ -33,9 +34,19 @@ export function AddressBookPage() {
 
   if (query.isLoading) {
     return (
-      <div className="flex min-h-[30vh] items-center justify-center">
-        <Spinner aria-label={t('addresses.loading')} />
-      </div>
+      <section className="space-y-5" aria-busy="true" aria-label={t('addresses.loading')}>
+        <header className="space-y-2">
+          <Skeleton className="h-7 w-1/3" />
+          <Skeleton className="h-4 w-2/3" />
+        </header>
+        <ul className="space-y-2">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <li key={i}>
+              <AddressCardSkeleton />
+            </li>
+          ))}
+        </ul>
+      </section>
     );
   }
 
@@ -55,7 +66,7 @@ export function AddressBookPage() {
         </header>
         <QueryErrorState
           message={t('addresses.errors.unknown')}
-          retryLabel={t('admin.query.retry')}
+          retryLabel={t('common.query.retry')}
           onRetry={() => void query.refetch()}
         />
       </section>

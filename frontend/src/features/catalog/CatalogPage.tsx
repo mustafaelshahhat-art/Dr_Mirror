@@ -130,11 +130,23 @@ export function CatalogPage() {
   );
 
   return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('catalog.title')}</h1>
-        <p className="max-w-prose text-sm text-default-500">{t('catalog.subtitle')}</p>
-      </header>
+    <div className="space-y-8">
+      {/* Storefront hero — restrained: kicker pill (bone) + tagline as the
+          page's single display heading, no gradient or hero image. Sits at
+          most two screen rows so the catalog stays one scroll away. */}
+      <section className="relative -mx-4 border-b border-divider/60 px-4 py-10 md:-mx-6 md:px-6 md:py-12 lg:-mx-8 lg:px-8 lg:py-14">
+        <div className="space-y-3">
+          <span className="inline-flex items-center rounded-full bg-bone px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground/80">
+            {t('appName')}
+          </span>
+          <h1 className="max-w-2xl text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+            {t('tagline')}
+          </h1>
+          <p className="max-w-prose text-sm text-default-500 md:text-base">
+            {t('catalog.subtitle')}
+          </p>
+        </div>
+      </section>
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -168,7 +180,7 @@ export function CatalogPage() {
       ) : productsQuery.isError ? (
         <QueryErrorState
           message={t('catalog.errors.loadFailed')}
-          retryLabel={t('admin.query.retry')}
+          retryLabel={t('common.query.retry')}
           onRetry={() => void productsQuery.refetch()}
         />
       ) : items.length === 0 ? (

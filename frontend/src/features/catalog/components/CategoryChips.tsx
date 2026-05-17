@@ -20,16 +20,22 @@ export function CategoryChips({ categories, selectedId, onSelect }: CategoryChip
   // Build flat list: "all" at index 0, then categories.
   const allIds: (string | undefined)[] = [undefined, ...categories.map((c) => c.id)];
   const selectedTabIdx = selectedId ? allIds.indexOf(selectedId) : 0;
+  const isRtl = i18n.dir() === 'rtl';
 
   function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     const len = allIds.length;
     if (len === 0) return;
     const current = selectedTabIdx === -1 ? 0 : selectedTabIdx;
+    // In RTL the visual "next" pill sits to the LEFT of the current one, so
+    // ArrowLeft must advance and ArrowRight must retreat. ArrowDown/ArrowUp
+    // stay direction-agnostic (logical: next/previous in DOM order).
+    const forwardKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
+    const backwardKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
     let next = -1;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    if (e.key === forwardKey || e.key === 'ArrowDown') {
       e.preventDefault();
       next = (current + 1) % len;
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    } else if (e.key === backwardKey || e.key === 'ArrowUp') {
       e.preventDefault();
       next = (current - 1 + len) % len;
     } else if (e.key === 'Home') {
@@ -45,7 +51,7 @@ export function CategoryChips({ categories, selectedId, onSelect }: CategoryChip
   return (
     <div
       className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      role="tablist"
+      role="radiogroup"
       aria-label={t('catalog.filters.categoryLabel')}
       onKeyDown={handleKeyDown}
     >
@@ -80,8 +86,8 @@ function Pill({
   return (
     <button
       type="button"
-      role="tab"
-      aria-selected={selected}
+      role="radio"
+      aria-checked={selected}
       tabIndex={tabIndex}
       onClick={onClick}
       className={

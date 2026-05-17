@@ -1,5 +1,5 @@
 import { Button } from '@heroui/react';
-import { Minus, Plus, Trash2 } from 'lucide-react';
+import { ImageOff, Minus, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -63,8 +63,12 @@ export function CartLineRow({
             loading="lazy"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-default-400">
-            —
+          <div
+            className="flex h-full w-full items-center justify-center text-default-400"
+            role="img"
+            aria-label={t('catalog.detail.noImage')}
+          >
+            <ImageOff className="size-6" aria-hidden />
           </div>
         )}
       </Link>

@@ -22,7 +22,8 @@ export function SizePicker({
   selected,
   onSelect,
 }: SizePickerProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
   const stockMap = new Map<string, number>();
   for (const v of variantsForColor) stockMap.set(v.size, v.stock);
 
@@ -34,11 +35,15 @@ export function SizePicker({
     if (len === 0) return;
     const currentAvailIdx = availableSizes.findIndex((s) => s === selected);
     const current = currentAvailIdx === -1 ? 0 : currentAvailIdx;
+    // Direction-aware horizontal arrows: in RTL the visual "next" sizes sits
+    // to the left, so ArrowLeft must advance.
+    const forwardKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
+    const backwardKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
     let next = -1;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    if (e.key === forwardKey || e.key === 'ArrowDown') {
       e.preventDefault();
       next = (current + 1) % len;
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    } else if (e.key === backwardKey || e.key === 'ArrowUp') {
       e.preventDefault();
       next = (current - 1 + len) % len;
     } else if (e.key === 'Home') {

@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
+import { SelectField } from '../../../shared/components/SelectField';
 import type { ProductSort } from '../types';
 
 const OPTIONS: ProductSort[] = ['Newest', 'PriceAsc', 'PriceDesc', 'NameAsc'];
 
 /**
- * Native select for sort. Native renders correctly in RTL out of the box
- * (caret position, popup direction) and avoids portal/positioning bugs we'd
- * have to chase with custom dropdowns.
+ * HeroUI Select for product sorting. The HeroUI Select inherits direction from
+ * the I18nProvider so the popover and caret flip automatically in Arabic.
  */
 export function SortSelect({
   value,
@@ -18,20 +18,15 @@ export function SortSelect({
 }) {
   const { t } = useTranslation();
   return (
-    <label className="flex items-center gap-2 text-sm">
-      <span className="text-default-500">{t('catalog.sort.label')}</span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value as ProductSort)}
-        className="rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm text-foreground transition-colors hover:border-default-400 focus:border-primary focus:outline-none"
-        aria-label={t('catalog.sort.label')}
-      >
-        {OPTIONS.map((opt) => (
-          <option key={opt} value={opt}>
-            {t(`catalog.sort.${opt}`)}
-          </option>
-        ))}
-      </select>
-    </label>
+    <SelectField
+      label={t('catalog.sort.label')}
+      value={value}
+      onChange={(v) => {
+        if (!v) return;
+        onChange(v as ProductSort);
+      }}
+      options={OPTIONS.map((opt) => ({ value: opt, label: t(`catalog.sort.${opt}`) }))}
+      className="min-w-[12rem]"
+    />
   );
 }
