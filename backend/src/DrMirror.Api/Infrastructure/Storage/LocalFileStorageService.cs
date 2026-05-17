@@ -70,8 +70,7 @@ public sealed class LocalFileStorageService : IFileStorageService
     {
         try
         {
-            var webRoot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
-            var full = Path.Combine(webRoot, _opts.LocalDirectory, fileKey.Replace('/', Path.DirectorySeparatorChar));
+            var full = ResolveUploadPath(fileKey);
             if (File.Exists(full)) File.Delete(full);
         }
         catch (Exception ex)
@@ -83,10 +82,35 @@ public sealed class LocalFileStorageService : IFileStorageService
 
     public Task<Stream> OpenReadAsync(string fileKey, CancellationToken ct)
     {
-        var webRoot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
-        var full = Path.Combine(webRoot, _opts.LocalDirectory, fileKey.Replace('/', Path.DirectorySeparatorChar));
+        var full = ResolveUploadPath(fileKey);
         Stream stream = new FileStream(full, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true);
         return Task.FromResult(stream);
+    }
+
+    private string ResolveUploadPath(string fileKey)
+    {
+        var webRoot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+        var uploadRoot = Path.GetFullPath(Path.Combine(webRoot, _opts.LocalDirectory));
+        var relativeKey = fileKey
+            .Replace('/', Path.DirectorySeparatorChar)
+            .Replace('\\', Path.DirectorySeparatorChar);
+
+        if (Path.IsPathRooted(relativeKey))
+        {
+            throw new FileNotFoundException("Stored file key is outside the upload root.", fileKey);
+        }
+
+        var full = Path.GetFullPath(Path.Combine(uploadRoot, relativeKey));
+        var uploadRootWithSeparator = uploadRoot.EndsWith(Path.DirectorySeparatorChar)
+            ? uploadRoot
+            : uploadRoot + Path.DirectorySeparatorChar;
+
+        if (!full.StartsWith(uploadRootWithSeparator, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new FileNotFoundException("Stored file key is outside the upload root.", fileKey);
+        }
+
+        return full;
     }
 
     private static string SanitiseFolder(string folder)
@@ -105,7 +129,6 @@ public sealed class LocalFileStorageService : IFileStorageService
         "image/webp"       => ".webp",
         "image/heic"       => ".heic",
         "image/heif"       => ".heif",
-        "application/pdf"  => ".pdf",
         _                  => ".bin",
     };
 }

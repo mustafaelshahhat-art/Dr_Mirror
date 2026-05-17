@@ -15,7 +15,6 @@ public class MagicByteValidationTests
             { "image/jpeg",      new byte[] { 0xFF, 0xD8, 0xFF } },
             { "image/png",       new byte[] { 0x89, 0x50, 0x4E, 0x47 } },
             { "image/webp",      new byte[] { 0x52, 0x49, 0x46, 0x46 } },
-            { "application/pdf", new byte[] { 0x25, 0x50, 0x44, 0x46 } },
         };
 
     private static bool ValidateHeader(byte[] fileHeader, string contentType)
@@ -57,10 +56,10 @@ public class MagicByteValidationTests
     }
 
     [Fact]
-    public void PDF_magic_bytes_are_correct()
+    public void PDF_content_type_is_not_supported()
     {
         var header = new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D };  // %PDF-
-        Assert.True(ValidateHeader(header, "application/pdf"));
+        Assert.False(ValidateHeader(header, "application/pdf"));
     }
 
     [Fact]

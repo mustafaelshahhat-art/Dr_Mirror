@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Threading.RateLimiting;
 using DrMirror.Api.Domain.Entities;
@@ -11,8 +12,11 @@ using DrMirror.Api.Infrastructure.Persistence.Seed;
 using DrMirror.Api.Infrastructure.Storage;
 using DrMirror.Api.Shared.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -242,11 +246,42 @@ internal static class ServiceCollectionExtensions
                 o.AutoReplenishment = true;
             });
 
+            // Emit RFC 7807 ProblemDetails so the SPA's shared
+            // isAxiosError<ProblemDetails> path handles 429 like every other
+            // failure (rather than seeing an opaque text body).
             options.OnRejected = async (ctx, ct) =>
             {
-                ctx.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-                await ctx.HttpContext.Response.WriteAsync(
-                    "Too many requests. Please slow down and try again later.", ct);
+                var http = ctx.HttpContext;
+                http.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+
+                if (ctx.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retry))
+                {
+                    http.Response.Headers.RetryAfter = ((int)retry.TotalSeconds)
+                        .ToString(CultureInfo.InvariantCulture);
+                }
+
+                var problem = new ProblemDetails
+                {
+                    Type = "https://tools.ietf.org/html/rfc6585#section-4",
+                    Title = "Too Many Requests",
+                    Status = StatusCodes.Status429TooManyRequests,
+                    Detail = "Too many requests. Please slow down and try again later.",
+                    Instance = http.Request.Path,
+                };
+
+                var pds = http.RequestServices.GetService<IProblemDetailsService>();
+                if (pds is not null)
+                {
+                    await pds.WriteAsync(new ProblemDetailsContext
+                    {
+                        HttpContext = http,
+                        ProblemDetails = problem,
+                    });
+                    return;
+                }
+
+                http.Response.ContentType = "application/problem+json";
+                await http.Response.WriteAsJsonAsync(problem, cancellationToken: ct);
             };
         });
 

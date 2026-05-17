@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Button, TextArea } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -95,17 +95,18 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
               status: t(orderStatusTranslationKey(target)),
             })}
           </p>
-          <textarea
+          <TextArea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={2}
             maxLength={500}
+            fullWidth
             placeholder={
               isCancelling
                 ? t('admin.transition.reasonPlaceholderRequired')
                 : t('admin.transition.reasonPlaceholderOptional')
             }
-            className="w-full rounded-medium border border-divider bg-content1 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            className="text-sm text-start"
           />
           {error ? (
             <p role="alert" className="text-xs text-danger">

@@ -3,14 +3,13 @@ import { UploadCloud } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useUploadPaymentProofMutation } from '../hooks';
+import { usePaymentProofUploadConfigQuery, useUploadPaymentProofMutation } from '../hooks';
 
 interface PaymentProofUploadProps {
   orderNumber: string;
 }
 
-/** Max upload size in bytes (10 MB), mirrors FileStorageOptions defaults. */
-const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const BYTES_PER_MEGABYTE = 1024 * 1024;
 const ACCEPTED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
 
 /**
@@ -19,12 +18,18 @@ const ACCEPTED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'i
  * already refreshes the order detail cache.
  */
 export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [selected, setSelected] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [clientError, setClientError] = useState<string | null>(null);
+  const uploadConfig = usePaymentProofUploadConfigQuery();
   const upload = useUploadPaymentProofMutation(orderNumber);
+  const maxUploadBytes = uploadConfig.data?.maxFileSizeBytes ?? null;
+  const maxUploadMb = maxUploadBytes
+    ? formatUploadLimitMb(maxUploadBytes, i18n.language)
+    : null;
+  const canPickFile = Boolean(maxUploadBytes) && !uploadConfig.isError;
 
   // Revoke the blob URL when the component unmounts OR when previewUrl flips
   // to a new value. Without this the URL persists for the lifetime of the
@@ -43,8 +48,13 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
     setPreviewUrl(null);
     if (!file) return;
 
-    if (file.size > MAX_UPLOAD_BYTES) {
-      setClientError(t('orders.upload.errors.tooLarge', { mb: 10 }));
+    if (!maxUploadBytes || !maxUploadMb) {
+      setClientError(t('orders.upload.errors.configUnavailable'));
+      return;
+    }
+
+    if (file.size > maxUploadBytes) {
+      setClientError(t('orders.upload.errors.tooLarge', { mb: maxUploadMb }));
       return;
     }
     if (!ACCEPTED_MIME.includes(file.type)) {
@@ -79,11 +89,17 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
         <h2 id="proof-upload-heading" className="text-sm font-semibold text-foreground">
           {t('orders.upload.heading')}
         </h2>
-        <p className="text-xs text-default-500">{t('orders.upload.subtitle')}</p>
+        <p className="text-xs text-default-500">
+          {maxUploadMb
+            ? t('orders.upload.subtitle', { mb: maxUploadMb })
+            : uploadConfig.isError
+              ? t('orders.upload.requirementsUnavailable')
+              : t('orders.upload.loadingRequirements')}
+        </p>
       </header>
 
       <label
-        className="flex cursor-pointer items-center justify-center gap-2 rounded-medium border border-dashed border-divider px-4 py-6 text-sm text-default-700 transition-colors hover:bg-content2"
+        className={`flex items-center justify-center gap-2 rounded-medium border border-dashed border-divider px-4 py-6 text-sm text-default-700 transition-colors ${canPickFile ? 'cursor-pointer hover:bg-content2' : 'cursor-not-allowed opacity-60'}`}
         htmlFor={`proof-input-${orderNumber}`}
       >
         <UploadCloud className="size-5 text-default-500" aria-hidden />
@@ -93,6 +109,7 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
           ref={inputRef}
           type="file"
           accept={ACCEPTED_MIME.join(',')}
+          disabled={!canPickFile}
           className="sr-only"
           onChange={(e) => onPickFile(e.target.files?.[0] ?? null)}
         />
@@ -134,4 +151,12 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
       </div>
     </section>
   );
+}
+
+function formatUploadLimitMb(bytes: number, language: string | undefined) {
+  const value = bytes / BYTES_PER_MEGABYTE;
+  return new Intl.NumberFormat(language?.startsWith('ar') ? 'ar-EG' : 'en-US', {
+    maximumFractionDigits: Number.isInteger(value) ? 0 : 1,
+    numberingSystem: 'latn',
+  }).format(value);
 }

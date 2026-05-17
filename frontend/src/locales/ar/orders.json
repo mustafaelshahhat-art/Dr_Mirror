@@ -76,7 +76,9 @@
   },
   "upload": {
     "heading": "ارفع إثبات الدفع",
-    "subtitle": "JPEG أو PNG أو WebP أو HEIC. حتى 10 ميجابايت.",
+    "subtitle": "JPEG أو PNG أو WebP أو HEIC أو HEIF. حتى {{mb}} ميجابايت.",
+    "loadingRequirements": "جارٍ تحميل شروط الرفع...",
+    "requirementsUnavailable": "تعذّر تحميل شروط الرفع. حدّث الصفحة وحاول مرة أخرى.",
     "pickFile": "اختر ملف",
     "previewAlt": "معاينة الملف اللي هترفعه",
     "submit": "رفع",
@@ -84,7 +86,8 @@
     "clear": "إزالة",
     "errors": {
       "tooLarge": "حجم الملف أكبر من {{mb}} ميجابايت.",
-      "unsupportedType": "نقبل فقط صور JPEG وPNG وWebP وHEIC.",
+      "unsupportedType": "نقبل فقط صور JPEG وPNG وWebP وHEIC وHEIF.",
+      "configUnavailable": "تعذّر تحميل شروط الرفع. حدّث الصفحة وحاول مرة أخرى.",
       "unknown": "تعذّر رفع الملف. حاول مرة أخرى."
     }
   },

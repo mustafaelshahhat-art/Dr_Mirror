@@ -9,6 +9,7 @@ import { adminUsersApi } from './users/api';
 vi.mock('./users/api', () => ({
   adminUsersApi: {
     list: vi.fn(),
+    updateRoles: vi.fn(),
   },
 }));
 
@@ -32,9 +33,10 @@ const adminAuth = makeAuthValue({
 describe('AdminUsersPage', () => {
   beforeEach(() => {
     vi.mocked(adminUsersApi.list).mockReset();
+    vi.mocked(adminUsersApi.updateRoles).mockReset();
   });
 
-  it('renders user roles as read-only badges without role toggle controls', async () => {
+  it('updates user roles from the dashboard', async () => {
     vi.mocked(adminUsersApi.list).mockResolvedValue({
       items: [
         {
@@ -52,14 +54,60 @@ describe('AdminUsersPage', () => {
       totalCount: 1,
       totalPages: 1,
     });
+    vi.mocked(adminUsersApi.updateRoles).mockResolvedValue({
+      id: 'user-1',
+      fullName: 'Admin User',
+      email: 'admin@example.com',
+      phoneNumber: null,
+      isDisabled: false,
+      createdAt: '2024-01-01T00:00:00.000Z',
+      roles: ['Admin', 'Buyer', 'Vendor'],
+    });
 
     renderWithProviders(<AdminUsersPage />, { authValue: adminAuth });
 
     expect(await screen.findByText('Admin User')).toBeInTheDocument();
-    expect(screen.getByText('Admin')).toBeInTheDocument();
-    expect(screen.getByText('Buyer')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /add role/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /remove role/i })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('switch', { name: /toggle vendor role/i }));
+
+    expect(adminUsersApi.updateRoles).toHaveBeenCalledWith('user-1', ['Admin', 'Vendor', 'Buyer']);
+  });
+
+  it('shows backend role update errors including the last-admin guard', async () => {
+    vi.mocked(adminUsersApi.list).mockResolvedValue({
+      items: [
+        {
+          id: 'user-1',
+          fullName: 'Only Admin',
+          email: 'admin@example.com',
+          phoneNumber: null,
+          isDisabled: false,
+          createdAt: '2024-01-01T00:00:00.000Z',
+          roles: ['Admin'],
+        },
+      ],
+      page: 1,
+      pageSize: 25,
+      totalCount: 1,
+      totalPages: 1,
+    });
+    vi.mocked(adminUsersApi.updateRoles).mockRejectedValue({
+      isAxiosError: true,
+      response: {
+        data: {
+          title: 'Cannot remove the last admin',
+          detail: 'At least one admin account must remain active.',
+        },
+      },
+    });
+
+    renderWithProviders(<AdminUsersPage />, { authValue: adminAuth });
+
+    expect(await screen.findByText('Only Admin')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('switch', { name: /toggle admin role/i }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'At least one admin account must remain active.',
+    );
   });
 
   it('shows a retryable error state when users fail to load', async () => {

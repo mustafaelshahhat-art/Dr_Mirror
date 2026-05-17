@@ -1,10 +1,11 @@
-import { Button, Description, Form, Input, Label, TextArea, TextField } from '@heroui/react';
+import { Button, Form } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ProblemDetails } from '../../../auth/types';
 import type { ProductGender } from '../../../catalog/types';
+import { Field, TextAreaField } from '../../../../shared/components/Field';
 import { SelectField } from '../../../../shared/components/SelectField';
 import {
   useAdminCategoriesQuery,
@@ -128,11 +129,11 @@ export function ProductMasterForm({ product }: { product: AdminProductDetailDto 
         }}
         className="grid gap-3 sm:grid-cols-2"
       >
-        <HeroField label={t('admin.products.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={200} />
-        <HeroField label={t('admin.products.fields.nameEn')} value={nameEn} onChange={setNameEn} required maxLength={200} />
-        <HeroTextarea label={t('admin.products.fields.descriptionAr')} value={descriptionAr} onChange={setDescriptionAr} required maxLength={4000} />
-        <HeroTextarea label={t('admin.products.fields.descriptionEn')} value={descriptionEn} onChange={setDescriptionEn} required maxLength={4000} />
-        <HeroField label={t('admin.products.fields.price')} value={price} onChange={setPrice} type="number" required />
+        <Field label={t('admin.products.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={200} />
+        <Field label={t('admin.products.fields.nameEn')} value={nameEn} onChange={setNameEn} required maxLength={200} />
+        <TextAreaField label={t('admin.products.fields.descriptionAr')} value={descriptionAr} onChange={setDescriptionAr} required maxLength={4000} />
+        <TextAreaField label={t('admin.products.fields.descriptionEn')} value={descriptionEn} onChange={setDescriptionEn} required maxLength={4000} />
+        <Field label={t('admin.products.fields.price')} value={price} onChange={setPrice} type="number" required />
         <SelectField
           label={t('admin.products.fields.gender')}
           value={String(gender)}
@@ -143,9 +144,9 @@ export function ProductMasterForm({ product }: { product: AdminProductDetailDto 
             { value: '2', label: t('catalog.gender.unisex') },
           ]}
         />
-        <HeroField label={t('admin.products.fields.material')} value={material} onChange={setMaterial} maxLength={200} />
-        <HeroField label={t('admin.products.fields.brand')} value={brand} onChange={setBrand} maxLength={80} />
-        <HeroField label={t('admin.products.fields.sku')} value={sku} onChange={setSku} maxLength={64} dir="ltr" />
+        <Field label={t('admin.products.fields.material')} value={material} onChange={setMaterial} maxLength={200} />
+        <Field label={t('admin.products.fields.brand')} value={brand} onChange={setBrand} maxLength={80} />
+        <Field label={t('admin.products.fields.sku')} value={sku} onChange={setSku} maxLength={64} dir="ltr" />
         <SelectField
           label={t('admin.products.fields.category')}
           value={categoryId}
@@ -168,64 +169,3 @@ export function ProductMasterForm({ product }: { product: AdminProductDetailDto 
   );
 }
 
-export function HeroField({
-  label,
-  value,
-  onChange,
-  type = 'text',
-  required,
-  maxLength,
-  dir,
-  description,
-}: {
-  label: string;
-  value: string;
-  onChange: (next: string) => void;
-  type?: string;
-  required?: boolean;
-  maxLength?: number;
-  dir?: 'ltr' | 'rtl';
-  description?: string;
-}) {
-  return (
-    <TextField isRequired={required} className="flex flex-col gap-1">
-      <Label className="text-xs uppercase tracking-wide text-default-500">{label}</Label>
-      <Input
-        value={value}
-        onChange={(e) => onChange((e.target as HTMLInputElement).value)}
-        type={type}
-        maxLength={maxLength}
-        dir={dir}
-      />
-      {description ? (
-        <Description className="text-[11px] text-default-500">{description}</Description>
-      ) : null}
-    </TextField>
-  );
-}
-
-export function HeroTextarea({
-  label,
-  value,
-  onChange,
-  required,
-  maxLength,
-}: {
-  label: string;
-  value: string;
-  onChange: (next: string) => void;
-  required?: boolean;
-  maxLength?: number;
-}) {
-  return (
-    <TextField isRequired={required} className="flex flex-col gap-1 sm:col-span-2">
-      <Label className="text-xs uppercase tracking-wide text-default-500">{label}</Label>
-      <TextArea
-        value={value}
-        onChange={(e) => onChange((e.target as HTMLTextAreaElement).value)}
-        maxLength={maxLength}
-        rows={3}
-      />
-    </TextField>
-  );
-}

@@ -1,15 +1,16 @@
-import { Button } from '@heroui/react';
-import { Check, X } from 'lucide-react';
+import { Button, TextArea } from '@heroui/react';
+import { Check, Download, X } from 'lucide-react';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ProblemDetails } from '../../auth/types';
+import { ordersApi } from '../../orders/api';
 import { PaymentProofFilePreview } from '../../orders/components/PaymentProofFilePreview';
+import { ProofStatusBadge } from '../../orders/components/ProofStatusBadge';
 import {
   PAYMENT_PROOF_STATUS,
   type PaymentProofDto,
-  type PaymentProofStatus,
 } from '../../orders/types';
 import { useApproveProofMutation, useRejectProofMutation } from '../hooks';
 
@@ -73,11 +74,35 @@ function ProofRow({
   const [mode, setMode] = useState<'idle' | 'approve' | 'reject'>('idle');
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
   const approve = useApproveProofMutation({ orderNumber });
   const reject = useRejectProofMutation({ orderNumber });
 
   const isPending = proof.status === PAYMENT_PROOF_STATUS.Pending;
   const isSuperseded = isPending && !isLatestPending;
+
+  async function downloadProof() {
+    setDownloadError(null);
+    setIsDownloading(true);
+    let objectUrl: string | null = null;
+    try {
+      const blob = await ordersApi.getPaymentProofFile(orderNumber, proof.id);
+      objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = getProofDownloadFileName(orderNumber, proof);
+      link.rel = 'noreferrer noopener';
+      document.body.append(link);
+      link.click();
+      link.remove();
+    } catch {
+      setDownloadError(t('admin.proofs.downloadError'));
+    } finally {
+      setIsDownloading(false);
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    }
+  }
 
   async function submit() {
     setError(null);
@@ -121,7 +146,7 @@ function ProofRow({
         />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <ProofStatusBadge status={proof.status} />
+            <ProofStatusBadge status={proof.status} tone="admin" />
             {isSuperseded ? (
               <span className="inline-flex items-center rounded-full border border-default-300 bg-default-100 px-2 py-0.5 text-xs font-medium text-default-500">
                 {t('admin.proofs.superseded')}
@@ -144,6 +169,25 @@ function ProofRow({
               &ldquo;{proof.reviewNote}&rdquo;
             </p>
           ) : null}
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              isDisabled={isDownloading}
+              onPress={() => void downloadProof()}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <Download className="size-4" aria-hidden />
+                {isDownloading ? t('admin.proofs.downloadingFile') : t('admin.proofs.downloadFile')}
+              </span>
+            </Button>
+            {downloadError ? (
+              <p role="alert" className="text-xs text-danger">
+                {downloadError}
+              </p>
+            ) : null}
+          </div>
         </div>
       </div>
 
@@ -188,17 +232,18 @@ function ProofRow({
                 ? t('admin.proofs.approveConfirm')
                 : t('admin.proofs.rejectConfirm')}
             </p>
-            <textarea
+            <TextArea
               value={note}
               onChange={(e) => setNote(e.target.value)}
               rows={2}
               maxLength={500}
+              fullWidth
               placeholder={
                 mode === 'reject'
                   ? t('admin.proofs.notePlaceholderRequired')
                   : t('admin.proofs.notePlaceholderOptional')
               }
-              className="w-full rounded-medium border border-divider bg-content1 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              className="text-sm text-start"
             />
             {error ? (
               <p role="alert" className="text-xs text-danger">
@@ -238,28 +283,23 @@ function ProofRow({
   );
 }
 
-function ProofStatusBadge({ status }: { status: PaymentProofStatus }) {
-  const { t } = useTranslation();
-  const classes =
-    status === PAYMENT_PROOF_STATUS.Approved
-      ? 'bg-success/15 text-success border-success/30'
-      : status === PAYMENT_PROOF_STATUS.Rejected
-        ? 'bg-danger/15 text-danger border-danger/30'
-        : 'bg-warning/15 text-warning border-warning/30';
-  const label =
-    status === PAYMENT_PROOF_STATUS.Approved
-      ? t('admin.proofs.status.approved')
-      : status === PAYMENT_PROOF_STATUS.Rejected
-        ? t('admin.proofs.status.rejected')
-        : t('admin.proofs.status.pending');
-  return (
-    <span
-      className={[
-        'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
-        classes,
-      ].join(' ')}
-    >
-      {label}
-    </span>
-  );
+function getProofDownloadFileName(orderNumber: string, proof: PaymentProofDto) {
+  if (proof.originalFileName) return sanitiseDownloadFileName(proof.originalFileName);
+
+  const extensionByContentType: Record<string, string> = {
+    'image/heic': 'heic',
+    'image/heif': 'heif',
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+  };
+  const extension = extensionByContentType[proof.contentType.toLowerCase()] ?? 'jpg';
+
+  return `payment-proof-${orderNumber}-${proof.id}.${extension}`;
 }
+
+function sanitiseDownloadFileName(fileName: string) {
+  const cleaned = fileName.replace(/[\\/:*?"<>|]+/g, '-').trim();
+  return cleaned.length > 0 ? cleaned : 'payment-proof';
+}
+

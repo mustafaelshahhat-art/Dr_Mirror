@@ -1,11 +1,11 @@
-import { Button, Form, Spinner } from '@heroui/react';
+import { Button, Form } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isAxiosError } from 'axios';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import type { ProblemDetails } from '../auth/types';
 import { useAuth } from '../auth/useAuth';
@@ -14,15 +14,16 @@ import { useCart } from '../cart/useCart';
 import { useCreateOrderMutation, usePaymentMethodsQuery } from '../orders/hooks';
 
 import { AddressStep } from './components/AddressStep';
+import { CheckoutAuthGate } from './components/CheckoutAuthGate';
+import { CheckoutEmptyState } from './components/CheckoutEmptyState';
 import { CheckoutSteps, type CheckoutStep } from './components/CheckoutSteps';
 import { CheckoutSummary } from './components/CheckoutSummary';
-import { PaymentMethodPicker } from './components/PaymentMethodPicker';
+import { PaymentMethodSection } from './components/PaymentMethodSection';
 import { ReviewStep } from './components/ReviewStep';
 import { checkoutSchema, type CheckoutForm } from './schemas';
 
 import { FormField } from '../auth/components/FormField';
 import type { AppLang } from '../../shared/lib/theme-storage';
-import { LinkButton } from '../../shared/components/LinkButton';
 import {
   CartLineSkeleton,
   CheckoutSummarySkeleton,
@@ -40,10 +41,18 @@ import {
  *      the order detail page.
  */
 export function CheckoutPage() {
+  return (
+    <CheckoutAuthGate>
+      <CheckoutBody />
+    </CheckoutAuthGate>
+  );
+}
+
+function CheckoutBody() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const isAr = lang === 'ar';
-  const { user, isBootstrapping } = useAuth();
+  const { user } = useAuth();
   const { cart } = useCart();
   const paymentMethodsQuery = usePaymentMethodsQuery();
   const createOrder = useCreateOrderMutation();
@@ -51,6 +60,7 @@ export function CheckoutPage() {
 
   const [step, setStep] = useState<CheckoutStep>('address');
   const [serverError, setServerError] = useState<string | null>(null);
+  const [paymentAvailable, setPaymentAvailable] = useState(false);
   // Saved-address mode: when set, the inline form is hidden and we send
   // BuyerAddressId at submit time. null means inline form (which can
   // optionally be saved as a new address via the checkbox below).
@@ -92,20 +102,6 @@ export function CheckoutPage() {
     }
   }, [user, setValue]);
 
-  // Auth gating: while bootstrapping, show spinner; once we know they're not
-  // signed in, bounce to /login. (ProtectedRoute also covers this but the
-  // checkout link reaches us from the cart page which is public.)
-  if (isBootstrapping) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <Spinner aria-label={t('checkout.loading')} />
-      </div>
-    );
-  }
-  if (!user) {
-    return <Navigate to="/login" state={{ from: { pathname: '/checkout' } }} replace />;
-  }
-
   if (cart.isLoading) {
     return (
       <section
@@ -128,23 +124,12 @@ export function CheckoutPage() {
   // Empty-cart guard — buyer reached /checkout with no cart (refreshed after
   // checkout consumed it, or arrived deep-linked). Send them back.
   if (cart.items.length === 0 && !createOrder.isPending && !createOrder.isSuccess) {
-    return (
-      <div className="space-y-3 rounded-large border border-divider/60 bg-content1 p-10 text-center">
-        <h1 className="text-lg font-semibold">{t('checkout.empty.title')}</h1>
-        <p className="text-sm text-default-500">{t('checkout.empty.subtitle')}</p>
-        <LinkButton
-          to="/"
-        >
-          {t('checkout.empty.cta')}
-        </LinkButton>
-      </div>
-    );
+    return <CheckoutEmptyState />;
   }
 
   const paymentMethodId = watch('paymentMethodId');
   const buyerNote = watch('buyerNote');
   const address = watch('address');
-  const selectedMethod = paymentMethodsQuery.data?.find((m) => m.id === paymentMethodId);
 
   // When a saved address is selected the inline form is hidden, so `address`
   // (watch result) holds empty defaults. Resolve the actual saved address for
@@ -154,6 +139,7 @@ export function CheckoutPage() {
     ? (savedAddresses.find((a) => a.id === savedAddressId) ?? null)
     : null;
   const reviewAddress = selectedSavedAddress ?? address;
+  const selectedMethod = paymentMethodsQuery.data?.find((m) => m.id === paymentMethodId);
 
   async function next() {
     if (step === 'address') {
@@ -266,37 +252,16 @@ export function CheckoutPage() {
               <legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
                 {t('checkout.payment.heading')}
               </legend>
-              {paymentMethodsQuery.isLoading ? (
-                <div className="flex h-32 items-center justify-center">
-                  <Spinner aria-label={t('checkout.payment.loading')} />
-                </div>
-              ) : paymentMethodsQuery.isError ? (
-                <div
-                  role="alert"
-                  className="flex items-start justify-between gap-3 rounded-medium border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
-                >
-                  <span>{t('checkout.payment.errorLoad')}</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onPress={() => void paymentMethodsQuery.refetch()}
-                    className="shrink-0 text-danger"
-                  >
-                    {t('checkout.payment.retry')}
-                  </Button>
-                </div>
-              ) : (
-                <PaymentMethodPicker
-                  methods={paymentMethodsQuery.data ?? []}
-                  selectedId={paymentMethodId || null}
-                  onSelect={(id) =>
-                    setValue('paymentMethodId', id, {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                    })
-                  }
-                />
-              )}
+              <PaymentMethodSection
+                selectedId={paymentMethodId || null}
+                onSelect={(id) =>
+                  setValue('paymentMethodId', id, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                }
+                onAvailabilityChange={setPaymentAvailable}
+              />
               <FormField
                 name="buyerNote"
                 control={control}
@@ -332,7 +297,7 @@ export function CheckoutPage() {
               <Button
                 type="button"
                 variant="primary"
-                isDisabled={step === 'payment' && (paymentMethodsQuery.isLoading || paymentMethodsQuery.isError)}
+                isDisabled={step === 'payment' && !paymentAvailable}
                 onPress={() => void next()}
               >
                 <span className="inline-flex items-center gap-1.5">

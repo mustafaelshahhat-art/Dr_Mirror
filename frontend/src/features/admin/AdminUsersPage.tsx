@@ -1,11 +1,14 @@
-import { Spinner } from '@heroui/react';
+import { Switch } from '@heroui/react';
+import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { ProblemDetails } from '../auth/types';
 import { SearchInput } from '../catalog/components/SearchInput';
 import { PaginationControls } from '../../shared/components/PaginationControls';
-import type { AdminUserDto } from './users/types';
-import { useAdminUsersQuery } from './users/hooks';
+import { TableRowSkeleton } from '../../shared/components/Skeleton';
+import { ALL_ROLES, type AdminUserDto, type UserRole } from './users/types';
+import { useAdminUsersQuery, useUpdateUserRolesMutation } from './users/hooks';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 export function AdminUsersPage() {
@@ -34,8 +37,18 @@ export function AdminUsersPage() {
       </div>
 
       {query.isLoading ? (
-        <div className="flex min-h-[20vh] items-center justify-center">
-          <Spinner aria-label={t('admin.users.loading')} />
+        <div
+          className="overflow-hidden rounded-large border border-divider/60"
+          aria-busy="true"
+          aria-label={t('admin.users.loading')}
+        >
+          <table className="w-full text-sm">
+            <tbody>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <TableRowSkeleton key={i} cols={3} />
+              ))}
+            </tbody>
+          </table>
         </div>
       ) : query.isError ? (
         <QueryErrorState
@@ -49,13 +62,13 @@ export function AdminUsersPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-divider/60 bg-content2 text-start">
-                  <th scope="col" className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-500">
+                  <th scope="col" className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400">
                     {t('admin.users.colName')}
                   </th>
-                  <th scope="col" className="hidden px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-500 sm:table-cell">
+                  <th scope="col" className="hidden px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400 sm:table-cell">
                     {t('admin.users.colJoined')}
                   </th>
-                  <th scope="col" className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-500">
+                  <th scope="col" className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400">
                     {t('admin.users.colRoles')}
                   </th>
                 </tr>
@@ -89,6 +102,27 @@ function UserRow({
   user: AdminUserDto;
   dateFmt: Intl.DateTimeFormat;
 }) {
+  const { t } = useTranslation();
+  const updateRoles = useUpdateUserRolesMutation();
+  const [error, setError] = useState<string | null>(null);
+
+  async function toggleRole(role: UserRole, enabled: boolean) {
+    setError(null);
+    const nextRoles = enabled
+      ? [...user.roles, role]
+      : user.roles.filter((current) => current !== role);
+
+    try {
+      await updateRoles.mutateAsync({
+        userId: user.id,
+        roles: ALL_ROLES.filter((candidate) => nextRoles.includes(candidate)),
+      });
+    } catch (err) {
+      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
+      setError(problem?.detail ?? problem?.title ?? t('admin.users.roles.errorUnknown'));
+    }
+  }
+
   return (
     <tr className="bg-content1 transition-colors hover:bg-content2">
       <td className="px-4 py-3">
@@ -99,20 +133,35 @@ function UserRow({
         {dateFmt.format(new Date(user.createdAt))}
       </td>
       <td className="px-4 py-3">
-        <div className="flex flex-wrap gap-1.5">
-          {user.roles.map((role) => (
-            <span
-              key={role}
-              className={[
-                'inline-flex h-6 items-center rounded-full border px-2.5 text-xs font-medium',
-                role === 'Admin'
-                  ? 'border-primary/30 bg-primary/10 text-primary'
-                  : 'border-divider bg-content2 text-default-700 dark:text-default-300',
-              ].join(' ')}
-            >
-              {role}
-            </span>
-          ))}
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            {ALL_ROLES.map((role) => (
+              <Switch
+                key={role}
+                size="sm"
+                isSelected={user.roles.includes(role)}
+                isDisabled={updateRoles.isPending}
+                onChange={(enabled) => void toggleRole(role, enabled)}
+                className="items-center gap-1.5"
+                aria-label={t('admin.users.roles.toggle', {
+                  role: t(`admin.users.roles.names.${role}`),
+                  name: user.fullName,
+                })}
+              >
+                <Switch.Control>
+                  <Switch.Thumb />
+                </Switch.Control>
+                <Switch.Content className="text-xs font-medium">
+                  {t(`admin.users.roles.names.${role}`)}
+                </Switch.Content>
+              </Switch>
+            ))}
+          </div>
+          {error ? (
+            <p role="alert" className="max-w-md text-xs text-danger">
+              {error}
+            </p>
+          ) : null}
         </div>
       </td>
     </tr>

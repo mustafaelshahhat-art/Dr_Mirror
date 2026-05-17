@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import {
+  ChevronRight,
   ClipboardList,
   Package,
   Users,
@@ -10,6 +11,11 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import type { OrderStatus } from '../orders/types';
 import { ORDER_STATUSES } from '../orders/types';
+import {
+  KpiRowSkeleton,
+  RecentOrderRowSkeleton,
+  Skeleton,
+} from '../../shared/components/Skeleton';
 
 import { adminOrdersApi } from './api';
 
@@ -46,9 +52,41 @@ export function AdminHubPage() {
       </header>
 
       {statsQuery.isLoading ? (
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
-          <div className="h-40 animate-pulse rounded-large border border-divider/60 bg-content1" />
-          <div className="h-40 animate-pulse rounded-large border border-divider/60 bg-content1" />
+        <div className="space-y-6" aria-busy="true" aria-label={t('admin.hub.subtitle')}>
+          <div className="overflow-hidden rounded-large border border-divider/60 bg-content1">
+            <div className="flex items-center justify-between gap-3 border-b border-divider/60 px-4 py-3">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-20" />
+            </div>
+            <div className="divide-y divide-divider/60">
+              <div className="flex items-center justify-between gap-4 px-4 py-3">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-40" />
+                </div>
+                <Skeleton className="h-4 w-8" />
+              </div>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <KpiRowSkeleton key={i} />
+              ))}
+            </div>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+            <div className="space-y-3">
+              <Skeleton className="h-5 w-32" />
+              <div className="space-y-2 overflow-hidden rounded-large border border-divider/60 bg-content1 divide-y divide-divider/60">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <RecentOrderRowSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+            <div className="space-y-3">
+              <Skeleton className="h-5 w-24" />
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-9 w-full" />
+              ))}
+            </div>
+          </div>
         </div>
       ) : stats ? (
         <>
@@ -62,10 +100,11 @@ export function AdminHubPage() {
             <div className="divide-y divide-divider/60">
               <Link
                 to={`/admin/orders?status=${ORDER_STATUSES.PendingPaymentReview}`}
-                className="group flex items-center justify-between gap-4 px-4 py-3 text-sm transition-colors hover:bg-content2"
+                aria-label={t('admin.hub.queue.reviewProofs')}
+                className="group flex items-center justify-between gap-4 px-4 py-3 text-sm transition-colors hover:bg-content2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
               >
                 <span className="min-w-0">
-                  <span className="block font-medium text-foreground">
+                  <span className="block text-sm text-default-500">
                     {t('admin.hub.queue.proofsLabel')}
                   </span>
                   <span className="mt-0.5 block text-xs text-default-500">
@@ -73,12 +112,13 @@ export function AdminHubPage() {
                   </span>
                 </span>
                 <span className="flex shrink-0 items-center gap-3">
-                  <span className="rounded-md bg-primary/10 px-2 py-1 text-sm font-semibold text-primary tabular-nums">
+                  <span className="text-sm font-semibold text-foreground tabular-nums">
                     {proofQueueCount}
                   </span>
-                  <span className="text-xs font-medium text-primary group-hover:underline">
-                    {t('admin.hub.queue.reviewProofs')}
-                  </span>
+                  <ChevronRight
+                    className="size-4 text-default-400 rtl:rotate-180"
+                    aria-hidden
+                  />
                 </span>
               </Link>
               <dl className="divide-y divide-divider/60">

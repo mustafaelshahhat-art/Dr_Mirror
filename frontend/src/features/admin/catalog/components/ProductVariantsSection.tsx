@@ -12,7 +12,7 @@ import {
 } from '../hooks';
 import type { AdminProductDetailDto, AdminProductVariantDto } from '../types';
 
-import { HeroField as SimpleField } from './ProductMasterForm';
+import { Field as SimpleField } from '../../../../shared/components/Field';
 
 export function ProductVariantsSection({ product }: { product: AdminProductDetailDto }) {
   const { t } = useTranslation();

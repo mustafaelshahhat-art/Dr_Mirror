@@ -68,7 +68,9 @@
   },
   "upload": {
     "heading": "Upload payment proof",
-    "subtitle": "JPEG, PNG, WebP, or HEIC. Maximum 10 MB.",
+    "subtitle": "JPEG, PNG, WebP, HEIC, or HEIF. Maximum {{mb}} MB.",
+    "loadingRequirements": "Loading upload requirements...",
+    "requirementsUnavailable": "Couldn't load upload requirements. Refresh and try again.",
     "pickFile": "Choose a file",
     "previewAlt": "Preview of the file you're about to upload",
     "submit": "Upload",
@@ -76,7 +78,8 @@
     "clear": "Clear",
     "errors": {
       "tooLarge": "File is larger than {{mb}} MB.",
-      "unsupportedType": "Only JPEG, PNG, WebP, and HEIC images are allowed.",
+      "unsupportedType": "Only JPEG, PNG, WebP, HEIC, and HEIF images are allowed.",
+      "configUnavailable": "Couldn't load upload requirements. Refresh and try again.",
       "unknown": "Couldn't upload the file. Please try again."
     }
   },

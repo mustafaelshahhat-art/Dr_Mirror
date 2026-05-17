@@ -1,13 +1,15 @@
-import { Button, Form, Input, Label, Spinner, TextArea, TextField } from '@heroui/react';
+import { Button } from '@heroui/react';
 import { isAxiosError } from 'axios';
-import { Pencil, Plus, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ProblemDetails } from '../../auth/types';
-import { PAYMENT_METHOD_KIND, type PaymentMethodKind } from '../../orders/types';
-import { SelectField } from '../../../shared/components/SelectField';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
+import { PaymentMethodTileSkeleton } from '../../../shared/components/Skeleton';
+
+import { PaymentMethodForm } from './components/payment-methods/PaymentMethodForm';
+import { PaymentMethodRow } from './components/payment-methods/PaymentMethodRow';
 
 import {
   useAdminPaymentMethodsQuery,
@@ -15,18 +17,10 @@ import {
   useTogglePaymentMethodActiveMutation,
   useUpdatePaymentMethodMutation,
 } from './hooks';
-import type { AdminPaymentMethodDto } from './types';
-
-const KIND_LABEL_KEY: Record<PaymentMethodKind, string> = {
-  0: 'admin.payments.kind.cod',
-  1: 'admin.payments.kind.instapay',
-  2: 'admin.payments.kind.wallet',
-  3: 'admin.payments.kind.bankTransfer',
-};
 
 export function AdminPaymentMethodsPage() {
   const { t, i18n } = useTranslation();
-  const isAr = i18n.language?.startsWith('ar');
+  const isAr = i18n.language?.startsWith('ar') ?? false;
   const query = useAdminPaymentMethodsQuery();
   const createMutation = useCreatePaymentMethodMutation();
   const updateMutation = useUpdatePaymentMethodMutation();
@@ -38,9 +32,23 @@ export function AdminPaymentMethodsPage() {
 
   if (query.isLoading) {
     return (
-      <div className="flex min-h-[30vh] items-center justify-center">
-        <Spinner aria-label={t('admin.payments.loading')} />
-      </div>
+      <section
+        className="space-y-5"
+        aria-busy="true"
+        aria-label={t('admin.payments.loading')}
+      >
+        <header className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight">{t('admin.payments.title')}</h1>
+          <p className="text-sm text-default-500">{t('admin.payments.subtitle')}</p>
+        </header>
+        <ul className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <li key={i}>
+              <PaymentMethodTileSkeleton />
+            </li>
+          ))}
+        </ul>
+      </section>
     );
   }
 
@@ -63,6 +71,13 @@ export function AdminPaymentMethodsPage() {
   }
 
   const methods = query.data ?? [];
+
+  function handleError(err: unknown) {
+    const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
+    setServerError(
+      problem?.detail ?? problem?.title ?? t('admin.payments.errors.unknown'),
+    );
+  }
 
   return (
     <section className="space-y-5">
@@ -88,8 +103,10 @@ export function AdminPaymentMethodsPage() {
       ) : null}
 
       {creating ? (
-        <PaymentMethodCreateForm
+        <PaymentMethodForm
+          mode="create"
           onCancel={() => setCreating(false)}
+          isPending={createMutation.isPending}
           onSubmit={async (body) => {
             setServerError(null);
             try {
@@ -97,14 +114,10 @@ export function AdminPaymentMethodsPage() {
               setCreating(false);
               return true;
             } catch (err) {
-              const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-              setServerError(
-                problem?.detail ?? problem?.title ?? t('admin.payments.errors.unknown'),
-              );
+              handleError(err);
               return false;
             }
           }}
-          isPending={createMutation.isPending}
         />
       ) : null}
 
@@ -117,9 +130,11 @@ export function AdminPaymentMethodsPage() {
           {methods.map((m) => (
             <li key={m.id}>
               {editingId === m.id ? (
-                <PaymentMethodEditForm
-                  method={m}
+                <PaymentMethodForm
+                  mode="edit"
+                  initial={m}
                   onCancel={() => setEditingId(null)}
+                  isPending={updateMutation.isPending}
                   onSubmit={async (body) => {
                     setServerError(null);
                     try {
@@ -127,327 +142,34 @@ export function AdminPaymentMethodsPage() {
                       setEditingId(null);
                       return true;
                     } catch (err) {
-                      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                      setServerError(
-                        problem?.detail ?? problem?.title ?? t('admin.payments.errors.unknown'),
-                      );
+                      handleError(err);
                       return false;
                     }
                   }}
-                  isPending={updateMutation.isPending}
                 />
               ) : (
-                <div className="rounded-medium border border-divider/60 bg-content1 p-3">
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-semibold">
-                          {isAr ? m.nameAr : m.nameEn}
-                        </span>
-                        <span className="font-mono text-xs text-default-500">{m.code}</span>
-                        <span className="text-xs text-default-500">·</span>
-                        <span className="text-xs text-default-500">{t(KIND_LABEL_KEY[m.kind])}</span>
-                        <span
-                          className={[
-                            'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
-                            m.isActive
-                              ? 'border-success/30 bg-success/15 text-success'
-                              : 'border-default/30 bg-default/10 text-default-500',
-                          ].join(' ')}
-                        >
-                          {m.isActive
-                            ? t('admin.catalog.status.active')
-                            : t('admin.catalog.status.inactive')}
-                        </span>
-                      </div>
-                      {m.accountNumber ? (
-                        <p className="font-mono text-xs text-default-500" dir="ltr">
-                          {m.accountNumber}
-                          {m.accountHolder ? ` — ${m.accountHolder}` : ''}
-                        </p>
-                      ) : null}
-                      <p className="text-xs text-default-500">
-                        {t('admin.payments.orderCount', { count: m.orderCount })}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-2">
-                      <Button
-                        isIconOnly
-                        variant="ghost"
-                        size="md"
-                        onPress={() => setEditingId(m.id)}
-                        aria-label={t('admin.catalog.actions.edit')}
-                      >
-                        <Pencil className="size-4" aria-hidden />
-                      </Button>
-                      <Button
-                        isIconOnly
-                        variant="ghost"
-                        size="md"
-                        isDisabled={toggleMutation.isPending}
-                        onPress={async () => {
-                          setServerError(null);
-                          try {
-                            await toggleMutation.mutateAsync({
-                              id: m.id,
-                              activate: !m.isActive,
-                            });
-                          } catch (err) {
-                            const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                            setServerError(
-                              problem?.detail ?? problem?.title ?? t('admin.payments.errors.unknown'),
-                            );
-                          }
-                        }}
-                        aria-label={
-                          m.isActive
-                            ? t('admin.catalog.actions.deactivate')
-                            : t('admin.catalog.actions.activate')
-                        }
-                      >
-                        {m.isActive ? (
-                          <ToggleRight className="size-4 text-success" aria-hidden />
-                        ) : (
-                          <ToggleLeft className="size-4 text-default-400" aria-hidden />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                <PaymentMethodRow
+                  method={m}
+                  isAr={isAr}
+                  isToggling={toggleMutation.isPending}
+                  onEdit={() => setEditingId(m.id)}
+                  onToggleActive={async () => {
+                    setServerError(null);
+                    try {
+                      await toggleMutation.mutateAsync({
+                        id: m.id,
+                        activate: !m.isActive,
+                      });
+                    } catch (err) {
+                      handleError(err);
+                    }
+                  }}
+                />
               )}
             </li>
           ))}
         </ul>
       )}
     </section>
-  );
-}
-
-interface CreateProps {
-  onCancel: () => void;
-  onSubmit: (body: {
-    code: string;
-    kind: PaymentMethodKind;
-    nameAr: string;
-    nameEn: string;
-    instructionsAr: string | null;
-    instructionsEn: string | null;
-    accountNumber: string | null;
-    accountHolder: string | null;
-    displayOrder: number;
-  }) => Promise<boolean>;
-  isPending: boolean;
-}
-
-function PaymentMethodCreateForm({ onCancel, onSubmit, isPending }: CreateProps) {
-  const { t } = useTranslation();
-  const [code, setCode] = useState('');
-  const [kind, setKind] = useState<PaymentMethodKind>(PAYMENT_METHOD_KIND.Cod);
-  const [nameAr, setNameAr] = useState('');
-  const [nameEn, setNameEn] = useState('');
-  const [instructionsAr, setInstructionsAr] = useState('');
-  const [instructionsEn, setInstructionsEn] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
-  const [accountHolder, setAccountHolder] = useState('');
-  const [displayOrder, setDisplayOrder] = useState(0);
-
-  return (
-    <Form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        const ok = await onSubmit({
-          code: code.trim(),
-          kind,
-          nameAr: nameAr.trim(),
-          nameEn: nameEn.trim(),
-          instructionsAr: instructionsAr.trim() || null,
-          instructionsEn: instructionsEn.trim() || null,
-          accountNumber: accountNumber.trim() || null,
-          accountHolder: accountHolder.trim() || null,
-          displayOrder,
-        });
-        if (ok) {
-          setCode('');
-          setKind(PAYMENT_METHOD_KIND.Cod);
-          setNameAr('');
-          setNameEn('');
-          setInstructionsAr('');
-          setInstructionsEn('');
-          setAccountNumber('');
-          setAccountHolder('');
-          setDisplayOrder(0);
-        }
-      }}
-      className="space-y-3 rounded-large border border-primary/40 bg-primary/5 p-4"
-    >
-      <h2 className="text-sm font-semibold">{t('admin.payments.create.heading')}</h2>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <HeroField label={t('admin.payments.fields.code')} value={code} onChange={setCode} placeholder="bank-transfer" required maxLength={32} dir="ltr" />
-        <SelectField
-          label={t('admin.payments.fields.kind')}
-          value={String(kind)}
-          onChange={(next) => setKind(Number(next) as PaymentMethodKind)}
-          options={[
-            { value: String(PAYMENT_METHOD_KIND.Cod), label: t('admin.payments.kind.cod') },
-            { value: String(PAYMENT_METHOD_KIND.Instapay), label: t('admin.payments.kind.instapay') },
-            { value: String(PAYMENT_METHOD_KIND.Wallet), label: t('admin.payments.kind.wallet') },
-            { value: String(PAYMENT_METHOD_KIND.BankTransfer), label: t('admin.payments.kind.bankTransfer') },
-          ]}
-        />
-        <HeroField label={t('admin.payments.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={64} />
-        <HeroField label={t('admin.payments.fields.nameEn')} value={nameEn} onChange={setNameEn} required maxLength={64} />
-        <HeroTextarea label={t('admin.payments.fields.instructionsAr')} value={instructionsAr} onChange={setInstructionsAr} maxLength={500} />
-        <HeroTextarea label={t('admin.payments.fields.instructionsEn')} value={instructionsEn} onChange={setInstructionsEn} maxLength={500} />
-        <HeroField label={t('admin.payments.fields.accountNumber')} value={accountNumber} onChange={setAccountNumber} maxLength={64} dir="ltr" />
-        <HeroField label={t('admin.payments.fields.accountHolder')} value={accountHolder} onChange={setAccountHolder} maxLength={100} />
-        <TextField className="flex flex-col gap-1">
-          <Label className="sr-only">{t('admin.payments.fields.displayOrder')}</Label>
-          <Input
-            type="number"
-            value={String(displayOrder)}
-            onChange={(e) => setDisplayOrder(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
-            aria-label={t('admin.payments.fields.displayOrder')}
-            className="tabular-nums"
-          />
-        </TextField>
-      </div>
-      <div className="flex gap-2">
-        <Button type="submit" variant="primary" size="sm" isDisabled={isPending}>
-          {isPending ? t('admin.catalog.actions.creating') : t('admin.catalog.actions.create')}
-        </Button>
-        <Button type="button" variant="ghost" size="sm" onPress={onCancel} isDisabled={isPending}>
-          {t('admin.catalog.actions.cancel')}
-        </Button>
-      </div>
-    </Form>
-  );
-}
-
-interface EditProps {
-  method: AdminPaymentMethodDto;
-  onCancel: () => void;
-  onSubmit: (body: {
-    nameAr: string;
-    nameEn: string;
-    instructionsAr: string | null;
-    instructionsEn: string | null;
-    accountNumber: string | null;
-    accountHolder: string | null;
-    displayOrder: number;
-  }) => Promise<boolean>;
-  isPending: boolean;
-}
-
-function PaymentMethodEditForm({ method, onCancel, onSubmit, isPending }: EditProps) {
-  const { t } = useTranslation();
-  const [nameAr, setNameAr] = useState(method.nameAr);
-  const [nameEn, setNameEn] = useState(method.nameEn);
-  const [instructionsAr, setInstructionsAr] = useState(method.instructionsAr ?? '');
-  const [instructionsEn, setInstructionsEn] = useState(method.instructionsEn ?? '');
-  const [accountNumber, setAccountNumber] = useState(method.accountNumber ?? '');
-  const [accountHolder, setAccountHolder] = useState(method.accountHolder ?? '');
-  const [displayOrder, setDisplayOrder] = useState(method.displayOrder);
-
-  return (
-    <Form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        await onSubmit({
-          nameAr: nameAr.trim(),
-          nameEn: nameEn.trim(),
-          instructionsAr: instructionsAr.trim() || null,
-          instructionsEn: instructionsEn.trim() || null,
-          accountNumber: accountNumber.trim() || null,
-          accountHolder: accountHolder.trim() || null,
-          displayOrder,
-        });
-      }}
-      className="space-y-3 rounded-medium border border-primary/40 bg-primary/5 p-3"
-    >
-      <p className="text-xs text-default-500">
-        {t('admin.payments.editingNote', { code: method.code })}
-      </p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <HeroField label={t('admin.payments.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={64} />
-        <HeroField label={t('admin.payments.fields.nameEn')} value={nameEn} onChange={setNameEn} required maxLength={64} />
-        <HeroTextarea label={t('admin.payments.fields.instructionsAr')} value={instructionsAr} onChange={setInstructionsAr} maxLength={500} />
-        <HeroTextarea label={t('admin.payments.fields.instructionsEn')} value={instructionsEn} onChange={setInstructionsEn} maxLength={500} />
-        <HeroField label={t('admin.payments.fields.accountNumber')} value={accountNumber} onChange={setAccountNumber} maxLength={64} dir="ltr" />
-        <HeroField label={t('admin.payments.fields.accountHolder')} value={accountHolder} onChange={setAccountHolder} maxLength={100} />
-        <TextField className="flex flex-col gap-1">
-          <Label className="sr-only">{t('admin.payments.fields.displayOrder')}</Label>
-          <Input
-            type="number"
-            value={String(displayOrder)}
-            onChange={(e) => setDisplayOrder(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
-            aria-label={t('admin.payments.fields.displayOrder')}
-            className="tabular-nums"
-          />
-        </TextField>
-      </div>
-      <div className="flex gap-2">
-        <Button type="submit" variant="primary" size="sm" isDisabled={isPending}>
-          {isPending ? t('admin.catalog.actions.saving') : t('admin.catalog.actions.save')}
-        </Button>
-        <Button type="button" variant="ghost" size="sm" onPress={onCancel} isDisabled={isPending}>
-          {t('admin.catalog.actions.cancel')}
-        </Button>
-      </div>
-    </Form>
-  );
-}
-
-function HeroField({
-  label,
-  value,
-  onChange,
-  required,
-  maxLength,
-  placeholder,
-  dir,
-}: {
-  label: string;
-  value: string;
-  onChange: (next: string) => void;
-  required?: boolean;
-  maxLength?: number;
-  placeholder?: string;
-  dir?: 'ltr' | 'rtl';
-}) {
-  return (
-    <TextField isRequired={required} className="flex flex-col gap-1">
-      <Label className="text-xs uppercase tracking-wide text-default-500">{label}</Label>
-      <Input
-        value={value}
-        onChange={(e) => onChange((e.target as HTMLInputElement).value)}
-        maxLength={maxLength}
-        placeholder={placeholder}
-        dir={dir}
-      />
-    </TextField>
-  );
-}
-
-function HeroTextarea({
-  label,
-  value,
-  onChange,
-  maxLength,
-}: {
-  label: string;
-  value: string;
-  onChange: (next: string) => void;
-  maxLength?: number;
-}) {
-  return (
-    <TextField className="flex flex-col gap-1 sm:col-span-2">
-      <Label className="text-xs uppercase tracking-wide text-default-500">{label}</Label>
-      <TextArea
-        value={value}
-        onChange={(e) => onChange((e.target as HTMLTextAreaElement).value)}
-        maxLength={maxLength}
-        rows={2}
-      />
-    </TextField>
   );
 }

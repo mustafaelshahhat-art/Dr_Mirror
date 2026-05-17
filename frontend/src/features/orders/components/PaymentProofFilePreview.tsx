@@ -1,6 +1,5 @@
 import { ImageOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { ordersApi } from '../api';
 import type { PaymentProofDto } from '../types';
@@ -30,7 +29,6 @@ export function PaymentProofFilePreview({
   className,
   labels,
 }: PaymentProofFilePreviewProps) {
-  const { t } = useTranslation();
   const [file, setFile] = useState<ProofFileState>({
     status: 'loading',
     url: null,
@@ -119,7 +117,7 @@ export function PaymentProofFilePreview({
         <div
           className="flex h-full w-full items-center justify-center bg-default-100 text-default-400"
           role="img"
-          aria-label={previewLabel || t('orders.proofs.imageUnavailable')}
+          aria-label={previewLabel}
         >
           <ImageOff className="size-5" aria-hidden />
         </div>

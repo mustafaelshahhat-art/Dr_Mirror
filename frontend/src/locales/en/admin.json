@@ -273,6 +273,9 @@
     "imageUnavailable": "Payment proof preview is unavailable.",
     "imageLoadError": "Couldn't load this payment proof image.",
     "openFile": "Open payment proof file",
+    "downloadFile": "Download proof",
+    "downloadingFile": "Downloading...",
+    "downloadError": "Couldn't download this proof. Please try again.",
     "reviewedAt": "Reviewed on {{when}} by {{by}}",
     "approve": "Approve",
     "reject": "Reject",
@@ -292,6 +295,7 @@
     }
   },
   "shell": {
+    "breadcrumbs": "Breadcrumbs",
     "navTitle": "Navigation",
     "navTitleMobile": "Mobile navigation",
     "nav": {
@@ -329,6 +333,14 @@
     "colName": "Name",
     "colJoined": "Joined",
     "colRoles": "Roles",
-    "readOnlyRoles": "Roles are read-only in the dashboard."
+    "roles": {
+      "toggle": "Toggle {{role}} role for {{name}}",
+      "errorUnknown": "Couldn't update roles. Please try again.",
+      "names": {
+        "Admin": "Admin",
+        "Vendor": "Vendor",
+        "Buyer": "Buyer"
+      }
+    }
   }
 }

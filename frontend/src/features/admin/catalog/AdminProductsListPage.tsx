@@ -1,4 +1,3 @@
-import { Spinner } from '@heroui/react';
 import { Package, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +11,7 @@ import { useAdminCategoriesQuery, useAdminProductsQuery } from './hooks';
 
 import { PaginationControls } from '../../../shared/components/PaginationControls';
 import { SelectField } from '../../../shared/components/SelectField';
+import { TableRowSkeleton } from '../../../shared/components/Skeleton';
 import { formatCurrency } from '../../../shared/lib/format';
 import type { AppLang } from '../../../shared/lib/theme-storage';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
@@ -94,8 +94,18 @@ export function AdminProductsListPage() {
       </div>
 
       {products.isLoading ? (
-        <div className="flex h-32 items-center justify-center">
-          <Spinner aria-label={t('admin.products.list.loading')} />
+        <div
+          className="overflow-hidden rounded-large border border-divider/60"
+          aria-busy="true"
+          aria-label={t('admin.products.list.loading')}
+        >
+          <table className="w-full text-sm">
+            <tbody>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <TableRowSkeleton key={i} cols={6} />
+              ))}
+            </tbody>
+          </table>
         </div>
       ) : products.isError ? (
         <QueryErrorState

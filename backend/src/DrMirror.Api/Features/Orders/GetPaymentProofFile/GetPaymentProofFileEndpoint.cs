@@ -61,7 +61,14 @@ public static class GetPaymentProofFileEndpoint
             return Results.Problem(title: "Proof not found", statusCode: StatusCodes.Status404NotFound);
         }
 
-        var stream = await storage.OpenReadAsync(proof.FileKey, ct);
-        return Results.Stream(stream, proof.ContentType);
+        try
+        {
+            var stream = await storage.OpenReadAsync(proof.FileKey, ct);
+            return Results.Stream(stream, proof.ContentType);
+        }
+        catch (FileNotFoundException)
+        {
+            return Results.Problem(title: "Proof file not found", statusCode: StatusCodes.Status404NotFound);
+        }
     }
 }

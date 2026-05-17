@@ -64,6 +64,7 @@
     "skipToContent": "Skip to content"
   },
   "dismiss": "Dismiss",
+  "contactSupport": "Contact support",
   "errorBoundary": {
     "title": "Something went wrong",
     "subtitle": "An unexpected error occurred. Try again or return home.",

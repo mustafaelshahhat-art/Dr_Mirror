@@ -1,11 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-import {
-  PAYMENT_PROOF_STATUS,
-  type PaymentProofDto,
-  type PaymentProofStatus,
-} from '../types';
+import { type PaymentProofDto } from '../types';
 import { PaymentProofFilePreview } from './PaymentProofFilePreview';
+import { ProofStatusBadge } from './ProofStatusBadge';
 
 /**
  * Read-only list of payment-proof uploads on an order. Each row shows a
@@ -78,28 +75,3 @@ export function PaymentProofsList({
   );
 }
 
-function ProofStatusBadge({ status }: { status: PaymentProofStatus }) {
-  const { t } = useTranslation();
-  const classes =
-    status === PAYMENT_PROOF_STATUS.Approved
-      ? 'bg-success/15 text-success border-success/30'
-      : status === PAYMENT_PROOF_STATUS.Rejected
-        ? 'bg-danger/15 text-danger border-danger/30'
-        : 'bg-warning/15 text-warning border-warning/30';
-  const label =
-    status === PAYMENT_PROOF_STATUS.Approved
-      ? t('orders.proofs.status.approved')
-      : status === PAYMENT_PROOF_STATUS.Rejected
-        ? t('orders.proofs.status.rejected')
-        : t('orders.proofs.status.pending');
-  return (
-    <span
-      className={[
-        'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
-        classes,
-      ].join(' ')}
-    >
-      {label}
-    </span>
-  );
-}

@@ -32,8 +32,9 @@ public sealed class FileStorageOptions : IValidatableObject
     public long MaxFileSizeBytes { get; set; } = 10 * 1024 * 1024;
 
     /// <summary>
-    /// Backwards-compatible proof upload allow-list. Product images use
-    /// <see cref="ProductImageContentTypes"/> and intentionally exclude PDFs.
+    /// Backwards-compatible proof upload allow-list. Kept image-only to match
+    /// the buyer/admin proof preview UI which renders an <c>&lt;img&gt;</c>.
+    /// Product images use <see cref="ProductImageContentTypes"/>.
     /// </summary>
     public string[] AllowedContentTypes { get; set; } = new[]
     {
@@ -42,9 +43,13 @@ public sealed class FileStorageOptions : IValidatableObject
         "image/webp",
         "image/heic",
         "image/heif",
-        "application/pdf",
     };
 
+    /// <summary>
+    /// Payment-proof upload allow-list. Image-only by design: the buyer + admin
+    /// proof screens render previews via <c>&lt;img&gt;</c>, so anything that
+    /// can't be displayed as an image (e.g. PDFs) is intentionally excluded.
+    /// </summary>
     public string[] PaymentProofContentTypes { get; set; } = new[]
     {
         "image/jpeg",
@@ -52,7 +57,6 @@ public sealed class FileStorageOptions : IValidatableObject
         "image/webp",
         "image/heic",
         "image/heif",
-        "application/pdf",
     };
 
     public string[] ProductImageContentTypes { get; set; } = new[]

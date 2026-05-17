@@ -1,4 +1,4 @@
-import { Button, Spinner } from '@heroui/react';
+import { Button } from '@heroui/react';
 import { Mail } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ import {
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import { AnchorButton } from '../../shared/components/LinkButton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
+import { Skeleton } from '../../shared/components/Skeleton';
 
 export function AdminInquiriesPage() {
   const { t, i18n } = useTranslation();
@@ -66,9 +67,21 @@ export function AdminInquiriesPage() {
       </div>
 
       {query.isLoading ? (
-        <div className="flex min-h-[20vh] items-center justify-center">
-          <Spinner aria-label={t('inquiries.admin.loading')} />
-        </div>
+        <ul className="space-y-3" aria-busy="true" aria-label={t('inquiries.admin.loading')}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <li
+              key={i}
+              className="space-y-3 rounded-large border border-divider/60 bg-content1 p-4"
+            >
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-16 rounded-full" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-3 w-1/2" />
+            </li>
+          ))}
+        </ul>
       ) : query.isError ? (
         <QueryErrorState
           message={t('inquiries.admin.errorLoad')}
@@ -114,7 +127,6 @@ function FilterPill({
       variant={active ? 'primary' : 'outline'}
       size="sm"
       onPress={onSelect}
-      className="rounded-full"
     >
       {label}
     </Button>
@@ -252,7 +264,7 @@ function StatusBadge({ status }: { status: InquiryStatus }) {
       ? 'bg-warning/15 text-warning border-warning/30'
       : status === INQUIRY_STATUS.Responded
         ? 'bg-success/15 text-success border-success/30'
-        : 'bg-default-200/40 text-default-600 border-default-300/40 dark:bg-default-100/10 dark:text-default-300';
+        : 'bg-content2 text-default-500 border-divider/60';
 
   const label =
     status === INQUIRY_STATUS.New

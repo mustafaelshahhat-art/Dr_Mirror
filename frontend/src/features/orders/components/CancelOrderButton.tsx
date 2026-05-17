@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Button, TextArea } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isAxiosError } from 'axios';
@@ -57,13 +57,14 @@ export function CancelOrderButton({ order }: { order: OrderDetailDto }) {
       <p className="text-xs text-default-700 dark:text-default-300">
         {t('orders.cancel.confirmSubtitle')}
       </p>
-      <textarea
+      <TextArea
         value={reason}
         onChange={(e) => setReason(e.target.value)}
         rows={2}
         maxLength={500}
+        fullWidth
         placeholder={t('orders.cancel.reasonPlaceholder')}
-        className="w-full rounded-medium border border-divider bg-content1 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-danger"
+        className="text-sm text-start"
       />
       {error ? (
         <p role="alert" className="text-xs text-danger">

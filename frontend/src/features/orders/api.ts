@@ -7,6 +7,8 @@ import type {
   OrderDetailDto,
   OrderSummaryDto,
   PaymentMethodDto,
+  PaymentProofUploadConfigDto,
+  AppConfigDto,
 } from './types';
 
 /**
@@ -15,6 +17,16 @@ import type {
  * and refresh interceptor handle session restoration silently.
  */
 export const ordersApi = {
+  async getAppConfig(): Promise<AppConfigDto> {
+    const { data } = await api.get<AppConfigDto>('/app-config');
+    return data;
+  },
+
+  async getPaymentProofUploadConfig(): Promise<PaymentProofUploadConfigDto> {
+    const { data } = await api.get<AppConfigDto>('/app-config');
+    return data.paymentProofUpload;
+  },
+
   async getPaymentMethods(): Promise<PaymentMethodDto[]> {
     const { data } = await api.get<PaymentMethodDto[]>('/checkout/payment-methods');
     return data;

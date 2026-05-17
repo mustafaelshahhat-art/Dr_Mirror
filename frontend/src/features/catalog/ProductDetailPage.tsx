@@ -1,6 +1,6 @@
-import { Button, Spinner } from '@heroui/react';
+import { Button } from '@heroui/react';
 import { ArrowLeft, Check, MessageSquare, ShoppingBag } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
@@ -9,6 +9,7 @@ import { useCart } from '../cart/useCart';
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { LinkButton } from '../../shared/components/LinkButton';
+import { ProductDetailSkeleton } from '../../shared/components/Skeleton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 import { InquiryForm } from '../inquiries/components/InquiryForm';
@@ -39,11 +40,32 @@ export function ProductDetailPage() {
   const { cart } = useCart();
   const { addState, addError, handleAddToCart } = useAddToCart();
   const [showInquiry, setShowInquiry] = useState(false);
+  const mobileBarSentinelRef = useRef<HTMLDivElement | null>(null);
+  // Whether content is currently scrolled behind the mobile action bar. Used
+  // to gate the bar's top border — a hairline that shouldn't appear when the
+  // bar visually floats over an empty page bottom.
+  const [hasContentBehindBar, setHasContentBehindBar] = useState(false);
+
+  useEffect(() => {
+    const sentinel = mobileBarSentinelRef.current;
+    if (!sentinel || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // When the sentinel is visible at the bottom of the viewport, the
+        // page has scrolled to the natural end — nothing is hidden behind
+        // the bar, so the border can vanish.
+        setHasContentBehindBar(!entry.isIntersecting);
+      },
+      { threshold: 0 },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [product?.id]);
 
   if (query.isLoading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <Spinner aria-label={t('catalog.detail.loading')} />
+      <div aria-busy="true" aria-label={t('catalog.detail.loading')}>
+        <ProductDetailSkeleton />
       </div>
     );
   }
@@ -225,7 +247,12 @@ export function ProductDetailPage() {
                     </span>
                   </Button>
                 </div>
-                <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-divider/60 bg-background p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] lg:hidden">
+                <div
+                  className={[
+                    'fixed inset-x-0 bottom-0 z-30 flex gap-2 bg-background p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] lg:hidden',
+                    hasContentBehindBar ? 'border-t border-divider/60' : 'border-t border-transparent',
+                  ].join(' ')}
+                >
                   <Button
                     variant="outline"
                     fullWidth
@@ -274,7 +301,14 @@ export function ProductDetailPage() {
           )}
         </section>
       </div>
-      <div className="h-20 lg:hidden" aria-hidden />
+      {/* Sentinel sits right above the spacer; the IntersectionObserver above
+          watches it to decide whether the mobile bar's top border should show. */}
+      <div ref={mobileBarSentinelRef} className="h-px lg:hidden" aria-hidden />
+      <div
+        className="lg:hidden"
+        style={{ height: 'calc(5rem + env(safe-area-inset-bottom))' }}
+        aria-hidden
+      />
     </article>
   );
 }

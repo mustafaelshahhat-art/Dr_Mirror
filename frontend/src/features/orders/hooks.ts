@@ -3,19 +3,44 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { PagedResult } from '../../shared/types/paged-result';
 import { ordersApi } from './api';
 import type {
+  AppConfigDto,
   CancelOrderRequest,
   CreateOrderRequest,
   OrderDetailDto,
   OrderSummaryDto,
   PaymentMethodDto,
+  PaymentProofUploadConfigDto,
 } from './types';
 
 const KEYS = {
+  appConfig: () => ['app-config'] as const,
+  paymentProofUploadConfig: () => ['app-config', 'payment-proof-upload'] as const,
   paymentMethods: () => ['payment-methods'] as const,
   myOrders: (page: number, pageSize: number) =>
     ['orders', 'mine', { page, pageSize }] as const,
   myOrder: (orderNumber: string) => ['orders', 'mine', orderNumber] as const,
 };
+
+/**
+ * Whole app-config query — payment-proof upload limits AND the optional
+ * support contact email. Cached for 10 minutes since the values are runtime
+ * config that rarely changes mid-session.
+ */
+export function useAppConfigQuery() {
+  return useQuery<AppConfigDto>({
+    queryKey: KEYS.appConfig(),
+    queryFn: () => ordersApi.getAppConfig(),
+    staleTime: 10 * 60_000,
+  });
+}
+
+export function usePaymentProofUploadConfigQuery() {
+  return useQuery<PaymentProofUploadConfigDto>({
+    queryKey: KEYS.paymentProofUploadConfig(),
+    queryFn: () => ordersApi.getPaymentProofUploadConfig(),
+    staleTime: 10 * 60_000,
+  });
+}
 
 export function usePaymentMethodsQuery() {
   return useQuery<PaymentMethodDto[]>({

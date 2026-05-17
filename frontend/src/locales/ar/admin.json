@@ -305,6 +305,9 @@
     "imageUnavailable": "معاينة إثبات الدفع غير متاحة.",
     "imageLoadError": "تعذّر تحميل صورة إثبات الدفع.",
     "openFile": "فتح ملف إثبات الدفع",
+    "downloadFile": "تنزيل الإثبات",
+    "downloadingFile": "جارٍ التنزيل...",
+    "downloadError": "تعذّر تنزيل هذا الإثبات. حاول مرة أخرى.",
     "reviewedAt": "تمت المراجعة في {{when}} بواسطة {{by}}",
     "approve": "اعتماد",
     "reject": "رفض",
@@ -324,6 +327,7 @@
     }
   },
   "shell": {
+    "breadcrumbs": "مسار التنقل",
     "navTitle": "التنقل",
     "navTitleMobile": "التنقل على الهاتف",
     "nav": {
@@ -361,6 +365,14 @@
     "colName": "الاسم",
     "colJoined": "تاريخ الانضمام",
     "colRoles": "الأدوار",
-    "readOnlyRoles": "الأدوار للعرض فقط داخل لوحة التحكم."
+    "roles": {
+      "toggle": "تبديل دور {{role}} للمستخدم {{name}}",
+      "errorUnknown": "تعذّر تحديث الأدوار. حاول مرة أخرى.",
+      "names": {
+        "Admin": "مسؤول",
+        "Vendor": "مورد",
+        "Buyer": "مشتري"
+      }
+    }
   }
 }

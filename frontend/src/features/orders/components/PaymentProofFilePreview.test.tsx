@@ -68,6 +68,14 @@ describe('PaymentProofFilePreview', () => {
       expect.any(AbortSignal),
     );
     expect(image).toHaveAttribute('src', 'blob:proof-1');
+    expect(screen.getByRole('link', { name: 'Open payment proof file' })).toHaveAttribute(
+      'href',
+      'blob:proof-1',
+    );
+    expect(screen.getByRole('link', { name: 'Open payment proof file' })).not.toHaveAttribute(
+      'href',
+      proof.fileUrl,
+    );
 
     unmount();
 
@@ -93,5 +101,25 @@ describe('PaymentProofFilePreview', () => {
       await screen.findByRole('img', { name: "Couldn't load this payment proof image." }),
     ).toBeInTheDocument();
     expect(URL.createObjectURL).not.toHaveBeenCalled();
+  });
+
+  it('opens the Blob URL without forcing download', async () => {
+    vi.mocked(ordersApi.getPaymentProofFile).mockResolvedValue(
+      new Blob(['proof-bytes'], { type: 'image/jpeg' }),
+    );
+
+    renderWithProviders(
+      <PaymentProofFilePreview
+        orderNumber="DM-2026-TEST"
+        proof={proof}
+        alt="Payment proof image"
+        className="size-16"
+        labels={labels}
+      />,
+    );
+
+    await screen.findByRole('img', { name: 'Payment proof image' });
+
+    expect(screen.getByRole('link', { name: 'Open payment proof file' })).not.toHaveAttribute('download');
   });
 });

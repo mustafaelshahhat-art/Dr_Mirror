@@ -1,5 +1,5 @@
-import { Checkbox, Input, Label, TextField } from '@heroui/react';
-import type { KeyboardEvent } from 'react';
+import { Checkbox, Input, Label, Radio, RadioGroup, TextField } from '@heroui/react';
+import { Plus } from 'lucide-react';
 import type { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -21,6 +21,8 @@ interface Props {
   setNewAddressLabel: (v: string) => void;
 }
 
+const NEW_ADDRESS_VALUE = '__new-address__';
+
 export function AddressStep({
   control,
   watch,
@@ -33,43 +35,7 @@ export function AddressStep({
   newAddressLabel,
   setNewAddressLabel,
 }: Props) {
-  const { t, i18n } = useTranslation();
-
-  // Selectable options in DOM order: every saved address followed by the
-  // synthetic "use new address" entry. We feed this into arrow-key navigation
-  // so the radiogroup behaves correctly in both LTR and RTL.
-  type Option = { id: string | null };
-  const options: Option[] = [
-    ...savedAddresses.map((a) => ({ id: a.id })),
-    { id: null },
-  ];
-  const currentIdx = options.findIndex((o) => o.id === savedAddressId);
-  const isRtl = i18n.dir() === 'rtl';
-
-  function handleSavedKeyDown(e: KeyboardEvent<HTMLDivElement>) {
-    const len = options.length;
-    if (len === 0) return;
-    const current = currentIdx === -1 ? 0 : currentIdx;
-    // Cards are arranged in a 2-column grid (sm+) so both axes need to
-    // advance, with horizontal arrows direction-aware for RTL.
-    const forwardKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
-    const backwardKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
-    let next = -1;
-    if (e.key === 'ArrowDown' || e.key === forwardKey) {
-      e.preventDefault();
-      next = (current + 1) % len;
-    } else if (e.key === 'ArrowUp' || e.key === backwardKey) {
-      e.preventDefault();
-      next = (current - 1 + len) % len;
-    } else if (e.key === 'Home') {
-      e.preventDefault();
-      next = 0;
-    } else if (e.key === 'End') {
-      e.preventDefault();
-      next = len - 1;
-    }
-    if (next !== -1) setSavedAddressId(options[next].id);
-  }
+  const { t } = useTranslation();
 
   return (
     <fieldset className="space-y-4">
@@ -82,70 +48,74 @@ export function AddressStep({
           <p className="text-xs uppercase tracking-wide text-default-500">
             {t('checkout.address.savedHeading')}
           </p>
-          <div
-            className="grid gap-2 sm:grid-cols-2"
-            role="radiogroup"
+          <RadioGroup
+            className="space-y-3"
             aria-label={t('checkout.address.savedHeading')}
-            onKeyDown={handleSavedKeyDown}
+            value={savedAddressId ?? NEW_ADDRESS_VALUE}
+            onChange={(value) => setSavedAddressId(value === NEW_ADDRESS_VALUE ? null : value)}
           >
-            {savedAddresses.map((a, idx) => {
-              const localizedGov = t(`governorates.${a.governorate}`, a.governorate);
-              const isSelected = savedAddressId === a.id;
-              const tabIdx = currentIdx === -1 ? (idx === 0 ? 0 : -1) : isSelected ? 0 : -1;
-              return (
-                <button
-                  key={a.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  tabIndex={tabIdx}
-                  onClick={() => setSavedAddressId(a.id)}
-                  className={[
-                    'rounded-medium border p-3 text-start transition-colors',
-                    isSelected
-                      ? 'border-primary bg-primary/5 ring-1 ring-primary'
-                      : 'border-divider bg-content1 hover:bg-content2',
-                  ].join(' ')}
-                >
-                  <p className="text-sm font-semibold">
-                    {a.label}
-                    {a.isDefault ? (
-                      <span className="ms-2 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2 py-0 text-xs font-medium text-primary">
-                        {t('addresses.defaultBadge')}
-                      </span>
-                    ) : null}
-                  </p>
-                  <p className="text-xs text-default-500" dir="ltr">
-                    {a.phone}
-                  </p>
-                  <p className="text-xs text-default-700 dark:text-default-300">
-                    {a.streetAddress}
-                  </p>
-                  <p className="text-xs text-default-700 dark:text-default-300">
-                    {a.city}, {localizedGov}
-                  </p>
-                </button>
-              );
-            })}
-            <button
-              type="button"
-              role="radio"
-              aria-checked={savedAddressId === null}
-              tabIndex={savedAddressId === null ? 0 : -1}
-              onClick={() => setSavedAddressId(null)}
-              className={[
-                'rounded-medium border p-3 text-start text-sm transition-colors',
-                savedAddressId === null
+            <div className="grid gap-2 sm:grid-cols-2">
+              {savedAddresses.map((a) => {
+                const localizedGov = t(`governorates.${a.governorate}`, a.governorate);
+                return (
+                  <Radio
+                    key={a.id}
+                    value={a.id}
+                    className={({ isFocusVisible, isSelected }) => [
+                      'cursor-pointer rounded-medium border p-3 text-start transition-colors',
+                      isFocusVisible ? 'outline outline-2 outline-offset-2 outline-primary' : '',
+                      isSelected
+                        ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                        : 'border-divider bg-content1 hover:bg-content2',
+                    ].filter(Boolean).join(' ')}
+                  >
+                    <p className="text-sm font-semibold">
+                      {a.label}
+                      {a.isDefault ? (
+                        <span className="ms-2 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2 py-0 text-xs font-medium text-primary">
+                          {t('addresses.defaultBadge')}
+                        </span>
+                      ) : null}
+                    </p>
+                    <p className="text-xs text-default-500" dir="ltr">
+                      {a.phone}
+                    </p>
+                    <p className="text-xs text-default-700 dark:text-default-300">
+                      {a.streetAddress}
+                    </p>
+                    <p className="text-xs text-default-700 dark:text-default-300">
+                      {a.city}, {localizedGov}
+                    </p>
+                  </Radio>
+                );
+              })}
+            </div>
+            {/* The new-address tile lives on its own row below the saved grid
+                so it reads as an action (not a broken address card). It still
+                shares the RadioGroup value so selection and validation work. */}
+            <Radio
+              value={NEW_ADDRESS_VALUE}
+              className={({ isFocusVisible, isSelected }) => [
+                'block cursor-pointer rounded-medium border border-dashed p-3 text-start transition-colors',
+                isFocusVisible ? 'outline outline-2 outline-offset-2 outline-primary' : '',
+                isSelected
                   ? 'border-primary bg-primary/5 ring-1 ring-primary'
-                  : 'border-divider bg-content1 hover:bg-content2',
-              ].join(' ')}
+                  : 'border-divider/80 hover:bg-content2',
+              ].filter(Boolean).join(' ')}
             >
-              <p className="font-semibold">{t('checkout.address.useNew.title')}</p>
-              <p className="text-xs text-default-500">
-                {t('checkout.address.useNew.subtitle')}
-              </p>
-            </button>
-          </div>
+              <span className="flex items-center gap-3">
+                <Plus className="size-5 shrink-0 text-default-500" aria-hidden />
+                <span>
+                  <span className="block text-sm font-medium">
+                    {t('checkout.address.useNew.title')}
+                  </span>
+                  <span className="block text-xs text-default-500">
+                    {t('checkout.address.useNew.subtitle')}
+                  </span>
+                </span>
+              </span>
+            </Radio>
+          </RadioGroup>
         </div>
       ) : null}
 

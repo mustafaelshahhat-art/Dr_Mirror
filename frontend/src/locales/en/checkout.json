@@ -40,7 +40,11 @@
     "loading": "Loading payment methods...",
     "errorLoad": "Couldn't load payment methods. Please try again.",
     "retry": "Retry",
-    "noMethods": "No payment methods are available right now. Please contact support."
+    "noMethods": "No payment methods are available right now. Please contact support.",
+    "empty": {
+      "title": "No payment methods available",
+      "help": "An administrator has temporarily disabled every payment method. We can't complete checkout right now."
+    }
   },
   "buyerNote": {
     "label": "Note for the order (optional)",

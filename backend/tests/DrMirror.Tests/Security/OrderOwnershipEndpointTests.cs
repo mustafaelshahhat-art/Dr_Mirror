@@ -105,23 +105,20 @@ public class OrderOwnershipEndpointTests : IClassFixture<OrderOwnershipEndpointT
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
-    // ── Admin role update endpoint does not exist ────────────────────────
+    // ── Buyers cannot update admin user roles ────────────────────────────
 
     [Fact]
-    public async Task Admin_role_update_endpoint_is_not_available()
+    public async Task Buyer_gets_403_from_admin_role_update()
     {
-        var admin = await CreateUserAsync("ep-role-admin@example.com", UserRoles.Admin);
-        var adminToken = await IssueTokenAsync(admin.Id, UserRoles.Admin);
+        var buyer = await CreateUserAsync("ep-role-buyer@example.com", UserRoles.Buyer);
+        var buyerToken = await IssueTokenAsync(buyer.Id, UserRoles.Buyer);
         var client = _factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", buyerToken);
 
         var response = await client.PutAsJsonAsync($"/api/admin/users/{Guid.NewGuid()}/roles",
             new { Roles = new[] { "Admin" } });
 
-        Assert.True(
-            response.StatusCode == HttpStatusCode.NotFound ||
-            response.StatusCode == HttpStatusCode.MethodNotAllowed,
-            $"Expected 404 or 405 but got {response.StatusCode}");
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     // ── COD proof upload rejected ────────────────────────────────────────
@@ -146,6 +143,28 @@ public class OrderOwnershipEndpointTests : IClassFixture<OrderOwnershipEndpointT
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var body = await response.Content.ReadAsStringAsync();
         Assert.Contains("proof not required", body, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task PDF_proof_upload_returns_unsupported_file_type()
+    {
+        var buyer = await CreateUserAsync("ep-pdf-proof@example.com", UserRoles.Buyer);
+        var orderNumber = await SeedOrderAsync(buyer.Id, PaymentMethodKind.Instapay);
+
+        var token = await IssueTokenAsync(buyer.Id, UserRoles.Buyer);
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        using var content = new MultipartFormDataContent();
+        var pdfContent = new ByteArrayContent([0x25, 0x50, 0x44, 0x46, 0x2D]);
+        pdfContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+        content.Add(pdfContent, "file", "proof.pdf");
+
+        var response = await client.PostAsync($"/api/orders/{orderNumber}/proof", content);
+
+        Assert.Equal(HttpStatusCode.UnsupportedMediaType, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Upload a JPEG, PNG, WebP, HEIC, or HEIF image", body);
     }
 
     // ── Protected proof file streaming ────────────────────────────────────

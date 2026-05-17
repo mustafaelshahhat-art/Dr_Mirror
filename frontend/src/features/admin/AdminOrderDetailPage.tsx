@@ -1,4 +1,3 @@
-import { Spinner } from '@heroui/react';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
@@ -15,6 +14,7 @@ import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { LinkButton } from '../../shared/components/LinkButton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
+import { DetailFieldSkeleton, Skeleton } from '../../shared/components/Skeleton';
 
 /**
  * Admin's view of a single order at <c>/admin/orders/:orderNumber</c>.
@@ -32,8 +32,36 @@ export function AdminOrderDetailPage() {
 
   if (query.isLoading) {
     return (
-      <div className="flex min-h-[30vh] items-center justify-center">
-        <Spinner aria-label={t('admin.detail.loading')} />
+      <div
+        className="space-y-6"
+        aria-busy="true"
+        aria-label={t('admin.detail.loading')}
+      >
+        <Skeleton className="h-4 w-32" />
+        <header className="flex flex-wrap items-end justify-between gap-3">
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-40" />
+            <Skeleton className="h-3 w-56" />
+          </div>
+          <Skeleton className="h-6 w-24 rounded-full" />
+        </header>
+        <article className="rounded-large border border-divider/60 bg-content1 p-4 space-y-2">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-4 w-48" />
+          <Skeleton className="h-3 w-40" />
+        </article>
+        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <DetailFieldSkeleton key={i} />
+            ))}
+          </div>
+          <div className="space-y-3 rounded-large border border-divider/60 bg-content1 p-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <DetailFieldSkeleton key={i} valueClass="w-32" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -93,8 +121,8 @@ export function AdminOrderDetailPage() {
         <OrderStatusBadge status={order.status} />
       </header>
 
-      <article className="rounded-large border border-primary/30 bg-primary/5 p-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-primary">
+      <article className="rounded-large border border-divider/60 bg-content1 p-4">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-default-500">
           {t('admin.detail.buyerHeading')}
         </h2>
         <p className="mt-1 text-sm font-medium text-foreground">{order.buyer.fullName}</p>

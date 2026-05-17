@@ -95,6 +95,7 @@ export interface OrderItemDto {
 export interface PaymentProofDto {
   id: string;
   fileUrl: string;
+  originalFileName?: string | null;
   contentType: string;
   sizeBytes: number;
   status: PaymentProofStatus;
@@ -103,6 +104,19 @@ export interface PaymentProofDto {
   reviewedAt: string | null;
   reviewNote: string | null;
   uploadedAt: string;
+}
+
+export interface PaymentProofUploadConfigDto {
+  maxFileSizeBytes: number;
+}
+
+export interface SupportConfigDto {
+  contactEmail: string | null;
+}
+
+export interface AppConfigDto {
+  paymentProofUpload: PaymentProofUploadConfigDto;
+  support: SupportConfigDto;
 }
 
 export interface BuyerSummaryDto {

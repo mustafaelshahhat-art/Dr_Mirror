@@ -99,14 +99,13 @@ export function CartPage() {
                 <div className="inline-flex flex-wrap items-center gap-2 rounded-medium border border-danger/30 bg-danger/10 p-2">
                   <span className="text-sm text-danger">{t('cart.clearConfirm')}</span>
                   <Button
-                    variant="primary"
+                    variant="danger"
                     size="sm"
                     onPress={() => {
                       setConfirmClear(false);
                       void clear();
                     }}
                     isDisabled={cart.isMutating}
-                    className="bg-danger text-danger-foreground"
                   >
                     {t('cart.clearConfirmYes')}
                   </Button>

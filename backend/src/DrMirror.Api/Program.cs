@@ -2,6 +2,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json.Serialization;
 using DrMirror.Api.Features.Addresses;
 using DrMirror.Api.Features.Admin;
+using DrMirror.Api.Features.AppConfig;
 using DrMirror.Api.Features.Auth;
 using DrMirror.Api.Features.Cart;
 using DrMirror.Api.Features.Catalog;
@@ -133,6 +134,11 @@ try
         });
     });
 
+    // Public-runtime config exposed via /api/app-config. Optional section —
+    // missing/blank ContactEmail simply hides the SPA contact affordance.
+    builder.Services.Configure<DrMirror.Api.Features.AppConfig.SupportOptions>(
+        builder.Configuration.GetSection("Support"));
+
     // ProblemDetails — RFC 7807 contract for every error response.
     builder.Services.AddProblemDetails(options =>
     {
@@ -231,6 +237,7 @@ try
         .WithName("Health")
         .WithTags("Diagnostics");
 
+    app.MapAppConfigEndpoints();
     app.MapAuthEndpoints();
     app.MapCatalogEndpoints();
     app.MapCartEndpoints();

@@ -31,6 +31,11 @@ export function ProductImageGallery({ images, productName }: Props) {
           <img
             src={currentImage.url}
             alt={currentImage.alt ?? productName}
+            width={800}
+            height={1000}
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
             className="h-full w-full object-cover"
           />
         ) : (
@@ -78,8 +83,11 @@ export function ProductImageGallery({ images, productName }: Props) {
               <img
                 src={img.url}
                 alt=""
-                className="h-full w-full object-cover"
+                width={120}
+                height={150}
                 loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover"
               />
             </button>
           ))}

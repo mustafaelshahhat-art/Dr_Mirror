@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Breadcrumbs, BreadcrumbsItem, Button } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
@@ -18,7 +18,7 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
   if (!isAdmin) return null;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-divider/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 border-b border-divider/60 bg-content1">
       <div className={['flex items-center justify-between gap-3 px-4 md:px-6', ADMIN_HEADER_HEIGHT_CLASS].join(' ')}>
         <div className="flex items-center gap-2">
           <Button
@@ -31,9 +31,14 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
           >
             <Menu size={18} aria-hidden />
           </Button>
-          <span className="text-sm font-semibold tracking-tight text-default-700 dark:text-default-300">
-            {titleKeys.map((key) => t(key)).join(' / ')}
-          </span>
+          <Breadcrumbs
+            aria-label={t('admin.shell.breadcrumbs')}
+            className="text-sm font-semibold tracking-tight text-default-700 dark:text-default-300"
+          >
+            {titleKeys.map((key) => (
+              <BreadcrumbsItem key={key}>{t(key)}</BreadcrumbsItem>
+            ))}
+          </Breadcrumbs>
         </div>
 
         <div className="flex items-center gap-1">

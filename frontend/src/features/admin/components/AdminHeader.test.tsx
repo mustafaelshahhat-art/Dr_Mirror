@@ -29,7 +29,11 @@ describe('AdminHeader', () => {
       authValue: makeAuthValue({ user: makeAdminUser(), isAuthenticated: true, isAdmin: true }),
     });
 
-    expect(screen.getByRole('banner')).toBeInTheDocument();
+    const header = screen.getByRole('banner');
+    expect(header).toBeInTheDocument();
+    expect(header).toHaveClass('bg-content1');
+    expect(header).not.toHaveClass('backdrop-blur');
+    expect(header.className).not.toContain('bg-background/80');
     expect(screen.getByText('Admin dashboard')).toBeInTheDocument();
   });
 
@@ -49,7 +53,8 @@ describe('AdminHeader', () => {
       authValue: makeAuthValue({ user: makeAdminUser(), isAuthenticated: true, isAdmin: true }),
     });
 
-    expect(screen.getByText('Products / New product')).toBeInTheDocument();
+    expect(screen.getByText('Products')).toBeInTheDocument();
+    expect(screen.getByText('New product')).toBeInTheDocument();
   });
 
   it('shows product edit breadcrumb context', () => {
@@ -58,6 +63,7 @@ describe('AdminHeader', () => {
       authValue: makeAuthValue({ user: makeAdminUser(), isAuthenticated: true, isAdmin: true }),
     });
 
-    expect(screen.getByText('Products / Edit product')).toBeInTheDocument();
+    expect(screen.getByText('Products')).toBeInTheDocument();
+    expect(screen.getByText('Edit product')).toBeInTheDocument();
   });
 });

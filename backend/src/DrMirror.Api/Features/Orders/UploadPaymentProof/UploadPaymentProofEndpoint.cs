@@ -25,7 +25,6 @@ public static class UploadPaymentProofEndpoint
             { "image/jpeg",       new byte[] { 0xFF, 0xD8, 0xFF } },
             { "image/png",        new byte[] { 0x89, 0x50, 0x4E, 0x47 } },
             { "image/webp",       new byte[] { 0x52, 0x49, 0x46, 0x46 } }, // RIFF header
-            { "application/pdf",  new byte[] { 0x25, 0x50, 0x44, 0x46 } }, // %PDF
         };
 
     private static bool HasValidMagicBytes(Stream stream, string contentType)
@@ -100,7 +99,7 @@ public static class UploadPaymentProofEndpoint
         {
             return Results.Problem(
                 title: "Unsupported file type",
-                detail: $"Upload a JPEG, PNG, WebP, HEIC image or PDF (received {file.ContentType}).",
+                detail: $"Upload a JPEG, PNG, WebP, HEIC, or HEIF image (received {file.ContentType}).",
                 statusCode: StatusCodes.Status415UnsupportedMediaType);
         }
 
