@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ProblemDetails } from '../../auth/types';
+import { PaymentProofFilePreview } from '../../orders/components/PaymentProofFilePreview';
 import {
   PAYMENT_PROOF_STATUS,
   type PaymentProofDto,
@@ -106,19 +107,18 @@ function ProofRow({
   return (
     <div className="space-y-2 rounded-medium border border-divider/60 bg-content1 p-3">
       <div className="flex gap-3">
-        <a
-          href={proof.fileUrl}
-          target="_blank"
-          rel="noreferrer noopener"
+        <PaymentProofFilePreview
+          orderNumber={orderNumber}
+          proof={proof}
+          alt={t('admin.proofs.imageAlt')}
           className="size-20 shrink-0 overflow-hidden rounded-medium bg-default-100"
-        >
-          <img
-            src={proof.fileUrl}
-            alt={t('admin.proofs.imageAlt')}
-            className="h-full w-full object-cover"
-            loading="lazy"
-          />
-        </a>
+          labels={{
+            loading: t('admin.proofs.loadingImage'),
+            unavailable: t('admin.proofs.imageUnavailable'),
+            error: t('admin.proofs.imageLoadError'),
+            open: t('admin.proofs.openFile'),
+          }}
+        />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <ProofStatusBadge status={proof.status} />

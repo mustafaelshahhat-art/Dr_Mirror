@@ -55,6 +55,10 @@
   "proofs": {
     "heading": "Payment proofs",
     "imageAlt": "Payment proof image",
+    "loadingImage": "Loading payment proof image...",
+    "imageUnavailable": "Payment proof preview is unavailable.",
+    "imageLoadError": "Couldn't load this payment proof image.",
+    "openFile": "Open payment proof file",
     "reviewedAt": "Reviewed on {{when}} by {{by}}",
     "status": {
       "pending": "Awaiting review",

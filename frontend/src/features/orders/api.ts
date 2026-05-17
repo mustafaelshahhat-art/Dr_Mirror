@@ -61,4 +61,16 @@ export const ordersApi = {
     );
     return data;
   },
+
+  async getPaymentProofFile(
+    orderNumber: string,
+    proofId: string,
+    signal?: AbortSignal,
+  ): Promise<Blob> {
+    const { data } = await api.get<Blob>(
+      `/orders/${encodeURIComponent(orderNumber)}/proof/${encodeURIComponent(proofId)}/file`,
+      { responseType: 'blob', signal },
+    );
+    return data;
+  },
 };

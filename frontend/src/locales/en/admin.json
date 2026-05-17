@@ -269,6 +269,10 @@
   "proofs": {
     "noneYet": "The buyer hasn't uploaded a payment proof yet.",
     "imageAlt": "Payment proof image",
+    "loadingImage": "Loading payment proof image...",
+    "imageUnavailable": "Payment proof preview is unavailable.",
+    "imageLoadError": "Couldn't load this payment proof image.",
+    "openFile": "Open payment proof file",
     "reviewedAt": "Reviewed on {{when}} by {{by}}",
     "approve": "Approve",
     "reject": "Reject",

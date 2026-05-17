@@ -5,13 +5,20 @@ import {
   type PaymentProofDto,
   type PaymentProofStatus,
 } from '../types';
+import { PaymentProofFilePreview } from './PaymentProofFilePreview';
 
 /**
  * Read-only list of payment-proof uploads on an order. Each row shows a
  * thumbnail (image link opens full-size), the review status, the optional
  * admin note, and the upload timestamp.
  */
-export function PaymentProofsList({ proofs }: { proofs: PaymentProofDto[] }) {
+export function PaymentProofsList({
+  orderNumber,
+  proofs,
+}: {
+  orderNumber: string;
+  proofs: PaymentProofDto[];
+}) {
   const { t, i18n } = useTranslation();
   const dateFmt = new Intl.DateTimeFormat(
     i18n.language?.startsWith('ar') ? 'ar-EG' : 'en-US',
@@ -31,19 +38,18 @@ export function PaymentProofsList({ proofs }: { proofs: PaymentProofDto[] }) {
             key={proof.id}
             className="flex gap-3 rounded-medium border border-divider/60 bg-content1 p-3"
           >
-            <a
-              href={proof.fileUrl}
-              target="_blank"
-              rel="noreferrer noopener"
+            <PaymentProofFilePreview
+              orderNumber={orderNumber}
+              proof={proof}
+              alt={t('orders.proofs.imageAlt')}
               className="size-16 shrink-0 overflow-hidden rounded-medium bg-default-100"
-            >
-              <img
-                src={proof.fileUrl}
-                alt={t('orders.proofs.imageAlt')}
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-            </a>
+              labels={{
+                loading: t('orders.proofs.loadingImage'),
+                unavailable: t('orders.proofs.imageUnavailable'),
+                error: t('orders.proofs.imageLoadError'),
+                open: t('orders.proofs.openFile'),
+              }}
+            />
             <div className="min-w-0 flex-1 space-y-1">
               <div className="flex items-center gap-2">
                 <ProofStatusBadge status={proof.status} />

@@ -102,7 +102,7 @@ export function OrderDetailPage() {
           {canUploadProof ? <PaymentProofUpload orderNumber={order.orderNumber} /> : null}
 
           {order.paymentProofs.length > 0 ? (
-            <PaymentProofsList proofs={order.paymentProofs} />
+            <PaymentProofsList orderNumber={order.orderNumber} proofs={order.paymentProofs} />
           ) : null}
 
           <section aria-labelledby="items-heading" className="space-y-2">
