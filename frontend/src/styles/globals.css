@@ -72,7 +72,15 @@
     --bone: oklch(0.94 0.006 245);
     --muted-2: oklch(0.58 0 0);
 
-    /* Light mode brand palette (DESIGN.md §Color → Light mode). */
+    /* Light mode brand palette (DESIGN.md §Color → Light mode).
+     *
+     * Derivation pattern (mirrors the dark-mode block):
+     *   --brand-hover  : +0.05 lightness  → emerald reads slightly brighter on hover
+     *   --brand-active : -0.04 lightness  → emerald reads slightly pressed on click
+     *   --brand-subtle : high L (0.92), low chroma (0.04) → tinted background
+     *                    for badges, callouts, selected-row washes; keeps AA
+     *                    contrast against the dark `--brand` foreground.
+     */
     --brand: oklch(0.50 0.14 165);
     --brand-hover: oklch(0.55 0.14 165);
     --brand-active: oklch(0.46 0.14 165);

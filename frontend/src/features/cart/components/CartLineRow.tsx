@@ -102,7 +102,7 @@ export function CartLineRow({
           {!isCompact ? (
             <>
               <span aria-hidden>·</span>
-              <span className="font-mono text-[11px] uppercase tracking-wide">{line.sku}</span>
+              <span className="font-mono text-xs uppercase tracking-wide">{line.sku}</span>
             </>
           ) : null}
         </div>

@@ -1,6 +1,6 @@
 import { Button } from '@heroui/react';
 import { isAxiosError } from 'axios';
-import { Plus } from 'lucide-react';
+import { CreditCard, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -122,8 +122,9 @@ export function AdminPaymentMethodsPage() {
       ) : null}
 
       {methods.length === 0 ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center text-sm text-default-500">
-          {t('admin.payments.empty')}
+        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
+          <CreditCard className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="text-sm text-default-500">{t('admin.payments.empty')}</p>
         </div>
       ) : (
         <ul className="space-y-2">

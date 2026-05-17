@@ -24,7 +24,7 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
           <Button
             isIconOnly
             variant="ghost"
-            size="md"
+            size="sm"
             className="md:hidden"
             onPress={onMenuPress}
             aria-label={t('admin.shell.navTitle')}
@@ -49,7 +49,7 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
           ) : null}
           <Button
             variant="ghost"
-            size="md"
+            size="sm"
             onPress={() => void logout()}
             aria-label={t('admin.shell.accountMenu.signOut')}
           >

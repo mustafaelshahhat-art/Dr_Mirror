@@ -148,7 +148,7 @@ function ProofRow({
           <div className="flex flex-wrap items-center gap-2">
             <ProofStatusBadge status={proof.status} tone="admin" />
             {isSuperseded ? (
-              <span className="inline-flex items-center rounded-full border border-default-300 bg-default-100 px-2 py-0.5 text-xs font-medium text-default-500">
+              <span className="inline-flex items-center rounded-md border border-default-300 bg-default-100 px-2 py-0.5 text-xs font-medium text-default-500">
                 {t('admin.proofs.superseded')}
               </span>
             ) : null}

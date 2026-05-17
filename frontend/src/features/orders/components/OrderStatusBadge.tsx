@@ -30,7 +30,7 @@ export function OrderStatusBadge({ status }: { status: OrderStatus }) {
   return (
     <span
       className={[
-        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium leading-none',
+        'inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium leading-none',
         statusToneClasses(status),
       ].join(' ')}
     >

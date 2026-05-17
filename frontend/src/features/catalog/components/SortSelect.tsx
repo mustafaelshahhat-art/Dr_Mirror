@@ -26,7 +26,7 @@ export function SortSelect({
         onChange(v as ProductSort);
       }}
       options={OPTIONS.map((opt) => ({ value: opt, label: t(`catalog.sort.${opt}`) }))}
-      className="min-w-[12rem]"
+      className="min-w-48"
     />
   );
 }

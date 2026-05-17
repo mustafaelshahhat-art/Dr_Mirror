@@ -87,7 +87,7 @@ export function FilterPanel({
             <SlidersHorizontal className="size-3.5" aria-hidden />
             {open ? t('catalog.filters.hide') : t('catalog.filters.label')}
             {activeCount > 0 && !open ? (
-              <span className="ms-0.5 inline-flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground leading-none">
+              <span className="ms-0.5 inline-flex size-4 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground leading-none">
                 {activeCount}
               </span>
             ) : null}
@@ -214,8 +214,8 @@ function GenderPill({
       onClick={onClick}
       className={
         selected
-          ? 'rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-          : 'rounded-full border border-divider/60 bg-content2 px-3 py-1 text-xs font-medium text-default-700 transition-colors hover:bg-content2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-default-300'
+          ? 'rounded-md bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+          : 'rounded-md border border-divider/60 bg-content2 px-3 py-1 text-xs font-medium text-default-700 transition-colors hover:bg-content2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-default-300'
       }
     >
       {label}

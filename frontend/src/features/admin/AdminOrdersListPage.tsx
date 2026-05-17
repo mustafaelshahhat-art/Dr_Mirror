@@ -1,4 +1,3 @@
-import { Spinner } from '@heroui/react';
 import { Package } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +13,7 @@ import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { PaginationControls } from '../../shared/components/PaginationControls';
+import { TableRowSkeleton } from '../../shared/components/Skeleton';
 
 /**
  * Admin's order queue at <c>/admin/orders</c>. Filterable by status; lists
@@ -54,8 +54,18 @@ export function AdminOrdersListPage() {
       </header>
 
       {query.isLoading ? (
-        <div className="flex h-32 items-center justify-center">
-          <Spinner aria-label={t('admin.list.loading')} />
+        <div
+          className="overflow-hidden rounded-large border border-divider/60"
+          aria-busy="true"
+          aria-label={t('admin.list.loading')}
+        >
+          <table className="w-full text-sm">
+            <tbody>
+              {Array.from({ length: 8 }).map((_, i) => (
+                <TableRowSkeleton key={i} cols={5} />
+              ))}
+            </tbody>
+          </table>
         </div>
       ) : query.isError ? (
         <QueryErrorState
@@ -91,13 +101,13 @@ export function AdminOrdersListPage() {
                   <th scope="col" className="px-4 py-3 text-end text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.total')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-divider/40">
+              <tbody className="divide-y divide-divider/60">
                 {query.data.items.map((order) => (
                   <tr key={order.id} className="bg-content1 transition-colors hover:bg-content2">
                     <td className="px-4 py-3 font-medium">
                       <Link
                         to={`/admin/orders/${encodeURIComponent(order.orderNumber)}`}
-                        className="rounded-small text-primary underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                        className="rounded-medium text-primary underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                         aria-label={t('admin.list.openOrder', { orderNumber: order.orderNumber })}
                       >
                         {order.orderNumber}

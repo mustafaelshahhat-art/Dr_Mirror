@@ -1,4 +1,3 @@
-import { Spinner } from '@heroui/react';
 import { ArrowLeft, ImageOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
@@ -7,6 +6,11 @@ import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { LinkButton } from '../../shared/components/LinkButton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
+import {
+  CartLineSkeleton,
+  CheckoutSummarySkeleton,
+  Skeleton,
+} from '../../shared/components/Skeleton';
 
 import { CancelOrderButton } from './components/CancelOrderButton';
 import { OrderStatusBadge } from './components/OrderStatusBadge';
@@ -26,9 +30,28 @@ export function OrderDetailPage() {
 
   if (query.isLoading) {
     return (
-      <div className="flex min-h-[30vh] items-center justify-center">
-        <Spinner aria-label={t('orders.detail.loading')} />
-      </div>
+      <section
+        className="space-y-6"
+        aria-busy="true"
+        aria-label={t('orders.detail.loading')}
+      >
+        <Skeleton className="h-4 w-32" />
+        <header className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-2">
+            <Skeleton className="h-7 w-40" />
+            <Skeleton className="h-3 w-56" />
+          </div>
+          <Skeleton className="h-6 w-24" />
+        </header>
+        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <CartLineSkeleton key={i} />
+            ))}
+          </div>
+          <CheckoutSummarySkeleton />
+        </div>
+      </section>
     );
   }
 

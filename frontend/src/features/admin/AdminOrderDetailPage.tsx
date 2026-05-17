@@ -1,4 +1,4 @@
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ImageOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
@@ -43,7 +43,7 @@ export function AdminOrderDetailPage() {
             <Skeleton className="h-6 w-40" />
             <Skeleton className="h-3 w-56" />
           </div>
-          <Skeleton className="h-6 w-24 rounded-full" />
+          <Skeleton className="h-6 w-24 rounded-md" />
         </header>
         <article className="rounded-large border border-divider/60 bg-content1 p-4 space-y-2">
           <Skeleton className="h-3 w-24" />
@@ -182,8 +182,12 @@ export function AdminOrderDetailPage() {
                           loading="lazy"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center text-default-400">
-                          —
+                        <div
+                          className="flex h-full w-full items-center justify-center text-default-400"
+                          role="img"
+                          aria-label={t('catalog.detail.noImage')}
+                        >
+                          <ImageOff className="size-5" aria-hidden />
                         </div>
                       )}
                     </Link>
@@ -205,7 +209,7 @@ export function AdminOrderDetailPage() {
                         <span aria-hidden>·</span>
                         <span>×{item.quantity}</span>
                       </p>
-                      <p className="mt-0.5 font-mono text-[11px] uppercase tracking-wide text-default-400">
+                      <p className="mt-0.5 font-mono text-xs uppercase tracking-wide text-default-400">
                         {item.sku}
                       </p>
                     </div>

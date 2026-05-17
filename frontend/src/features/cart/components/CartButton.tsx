@@ -41,7 +41,7 @@ export function CartButton() {
         <ShoppingBag className="size-5" aria-hidden />
         {cart.totalQuantity > 0 ? (
           <span
-            className="absolute -end-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground"
+            className="absolute -end-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold leading-none text-primary-foreground"
             aria-hidden
           >
             {cart.totalQuantity > 99 ? '99+' : cart.totalQuantity}

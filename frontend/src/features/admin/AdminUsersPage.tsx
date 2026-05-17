@@ -1,5 +1,6 @@
 import { Switch } from '@heroui/react';
 import { isAxiosError } from 'axios';
+import { Users } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -73,7 +74,7 @@ export function AdminUsersPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-divider/40">
+              <tbody className="divide-y divide-divider/60">
                 {query.data.items.map((user) => (
                   <UserRow key={user.id} user={user} dateFmt={dateFmt} />
                 ))}
@@ -87,8 +88,9 @@ export function AdminUsersPage() {
           />
         </div>
       ) : (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center text-sm text-default-500">
-          {t('admin.users.empty')}
+        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
+          <Users className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="text-sm text-default-500">{t('admin.users.empty')}</p>
         </div>
       )}
     </section>

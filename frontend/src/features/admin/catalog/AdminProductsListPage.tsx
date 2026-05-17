@@ -1,7 +1,6 @@
 import { Package, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 
 import { SearchInput } from '../../catalog/components/SearchInput';
 import { genderTranslationKey } from '../../catalog/hooks';
@@ -9,6 +8,7 @@ import type { ProductGender } from '../../catalog/types';
 
 import { useAdminCategoriesQuery, useAdminProductsQuery } from './hooks';
 
+import { LinkButton } from '../../../shared/components/LinkButton';
 import { PaginationControls } from '../../../shared/components/PaginationControls';
 import { SelectField } from '../../../shared/components/SelectField';
 import { TableRowSkeleton } from '../../../shared/components/Skeleton';
@@ -38,13 +38,10 @@ export function AdminProductsListPage() {
           </h1>
           <p className="text-sm text-default-500">{t('admin.products.list.subtitle')}</p>
         </div>
-        <Link
-          to="/admin/products/new"
-          className="inline-flex items-center gap-1.5 rounded-medium bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
-        >
+        <LinkButton to="/admin/products/new" size="sm">
           <Plus className="size-4" aria-hidden />
           {t('admin.products.list.new')}
-        </Link>
+        </LinkButton>
       </header>
 
       <div className="grid gap-2 sm:grid-cols-[1fr_12rem_10rem_10rem]">
@@ -145,7 +142,7 @@ export function AdminProductsListPage() {
                   <th scope="col" className="w-12 px-4 py-3" aria-hidden />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-divider/40">
+              <tbody className="divide-y divide-divider/60">
                 {(products.data?.items ?? []).map((p) => (
                   <tr key={p.id} className="bg-content1 transition-colors hover:bg-content2">
                     <td className="px-4 py-3">
@@ -164,7 +161,7 @@ export function AdminProductsListPage() {
                     <td className="px-4 py-3">
                       <span
                         className={[
-                          'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
+                          'inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium leading-none',
                           p.isPublished
                             ? 'border-success/30 bg-success/15 text-success'
                             : 'border-warning/30 bg-warning/15 text-warning',
@@ -179,13 +176,14 @@ export function AdminProductsListPage() {
                       {formatCurrency(p.price, lang)}
                     </td>
                     <td className="px-4 py-3 text-end">
-                      <Link
+                      <LinkButton
                         to={`/admin/products/${p.id}/edit`}
                         aria-label={t('admin.catalog.actions.edit')}
-                        className="inline-flex size-8 items-center justify-center rounded-medium text-default-500 transition-colors hover:bg-content2 hover:text-foreground"
+                        tone="outline"
+                        size="sm"
                       >
                         <Pencil className="size-4" aria-hidden />
-                      </Link>
+                      </LinkButton>
                     </td>
                   </tr>
                 ))}

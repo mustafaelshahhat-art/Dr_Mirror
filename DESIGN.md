@@ -45,6 +45,9 @@ All colour in **OKLCH** (perceptual uniformity for dark/light parity). Tokens li
 | Token | Value (OKLCH) | Use |
 |---|---|---|
 | `--brand` | `oklch(0.50 0.14 165)` | Slightly darker emerald — AA contrast on light surfaces |
+| `--brand-hover` | `oklch(0.55 0.14 165)` | Hover state on emerald surfaces (+0.05 L vs `--brand`) |
+| `--brand-active` | `oklch(0.46 0.14 165)` | Pressed/active state (−0.04 L vs `--brand`) |
+| `--brand-subtle` | `oklch(0.92 0.04 165)` | Brand-tinted backgrounds (badges, callouts, selected-row washes) |
 | `--background` | `oklch(0.99 0 0)` | Page background — warm off-white |
 | `--surface` | `oklch(1 0 0)` | Cards |
 | `--surface-2` | `oklch(0.97 0 0)` | Elevated surfaces — inputs, table headers |

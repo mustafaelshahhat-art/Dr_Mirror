@@ -41,7 +41,7 @@ export function ColorSwatchRow({
         />
       ))}
       {overflow > 0 ? (
-        <span className="ms-1 text-[11px] font-medium tabular-nums text-default-500">
+        <span className="ms-1 text-xs font-medium tabular-nums text-default-500">
           +{overflow}
         </span>
       ) : null}

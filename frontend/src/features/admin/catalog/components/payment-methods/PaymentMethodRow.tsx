@@ -47,7 +47,7 @@ export function PaymentMethodRow({
             <span className="text-xs text-default-500">{t(KIND_LABEL_KEY[method.kind])}</span>
             <span
               className={[
-                'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
+                'inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium leading-none',
                 method.isActive
                   ? 'border-success/30 bg-success/15 text-success'
                   : 'border-divider/60 bg-content2 text-default-500',

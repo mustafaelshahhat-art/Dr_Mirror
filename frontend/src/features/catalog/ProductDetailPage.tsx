@@ -1,5 +1,5 @@
 import { Button } from '@heroui/react';
-import { ArrowLeft, Check, MessageSquare, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Check, MessageSquare, PackageX, ShoppingBag } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
@@ -84,6 +84,7 @@ export function ProductDetailPage() {
     }
     return (
       <div className="space-y-4 rounded-large border border-divider/60 bg-content1 p-10 text-center">
+        <PackageX className="mx-auto size-6 text-default-400" aria-hidden />
         <h1 className="text-lg font-semibold">
           {t('catalog.detail.notFoundTitle')}
         </h1>

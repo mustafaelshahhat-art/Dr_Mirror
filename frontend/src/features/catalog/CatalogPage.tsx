@@ -1,4 +1,5 @@
 import { Button } from '@heroui/react';
+import { SearchX } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -136,7 +137,7 @@ export function CatalogPage() {
           most two screen rows so the catalog stays one scroll away. */}
       <section className="relative -mx-4 border-b border-divider/60 px-4 py-10 md:-mx-6 md:px-6 md:py-12 lg:-mx-8 lg:px-8 lg:py-14">
         <div className="space-y-3">
-          <span className="inline-flex items-center rounded-full bg-bone px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground/80">
+          <span className="inline-flex items-center rounded-md bg-bone px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground/80">
             {t('appName')}
           </span>
           <h1 className="max-w-2xl text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
@@ -185,7 +186,8 @@ export function CatalogPage() {
         />
       ) : items.length === 0 ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <p className="text-base font-medium text-foreground">{t('catalog.empty.title')}</p>
+          <SearchX className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="text-base font-semibold text-foreground">{t('catalog.empty.title')}</p>
           <p className="mt-1 text-sm text-default-500">{t('catalog.empty.subtitle')}</p>
           {hasActiveFilters ? (
             <Button variant="primary" size="sm" onPress={clearAllFilters} className="mt-4">

@@ -176,7 +176,7 @@ function Field({
         dir={dir}
       />
       {description ? (
-        <Description className="text-[11px] text-default-500">{description}</Description>
+        <Description className="text-xs text-default-500">{description}</Description>
       ) : null}
     </TextField>
   );

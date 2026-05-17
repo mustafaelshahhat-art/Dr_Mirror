@@ -14,7 +14,7 @@ import type { HTMLInputTypeAttribute } from 'react';
  */
 
 const LABEL_CLASS = 'text-xs uppercase tracking-wide text-default-500';
-const DESCRIPTION_CLASS = 'text-[11px] text-default-500';
+const DESCRIPTION_CLASS = 'text-xs text-default-500';
 
 export interface FieldProps {
   label: string;

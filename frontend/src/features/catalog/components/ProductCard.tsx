@@ -46,7 +46,7 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
           </div>
         )}
         {isSoldOut ? (
-          <span className="absolute top-2 start-2 inline-flex items-center rounded-medium bg-foreground/85 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-background">
+          <span className="absolute top-2 start-2 inline-flex items-center rounded-medium bg-foreground/85 px-2 py-0.5 text-xs font-medium uppercase tracking-wide text-background">
             {t('catalog.list.soldOut')}
           </span>
         ) : null}

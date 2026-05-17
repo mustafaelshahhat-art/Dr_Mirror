@@ -104,6 +104,9 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
       >
         <UploadCloud className="size-5 text-default-500" aria-hidden />
         <span>{selected ? selected.name : t('orders.upload.pickFile')}</span>
+        {/* Documented exception (audit §1.8): HeroUI v3 has no native file-input
+            primitive. The visible affordance is the styled <label> above; the
+            <input type="file"> is sr-only and only handles the OS file picker. */}
         <input
           id={`proof-input-${orderNumber}`}
           ref={inputRef}

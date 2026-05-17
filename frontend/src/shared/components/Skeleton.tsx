@@ -65,7 +65,7 @@ export function OrderRowSkeleton({ variant = 'page' }: { variant?: 'compact' | '
         <Skeleton className="h-3 w-44" />
       </div>
       <div className="flex shrink-0 items-center gap-3">
-        <Skeleton className="h-5 w-16 rounded-full" />
+        <Skeleton className="h-5 w-16 rounded-md" />
         <Skeleton className="h-4 w-16" />
       </div>
     </div>

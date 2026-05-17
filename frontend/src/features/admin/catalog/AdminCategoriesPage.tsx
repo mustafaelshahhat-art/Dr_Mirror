@@ -1,11 +1,12 @@
-import { Button, Form, Input, Label, Spinner, TextField } from '@heroui/react';
+import { Button, Form, Input, Label, TextField } from '@heroui/react';
 import { isAxiosError } from 'axios';
-import { Pencil, Plus, ToggleLeft, ToggleRight } from 'lucide-react';
+import { FolderTree, Pencil, Plus, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ProblemDetails } from '../../auth/types';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
+import { Skeleton } from '../../../shared/components/Skeleton';
 
 import {
   useAdminCategoriesQuery,
@@ -28,9 +29,35 @@ export function AdminCategoriesPage() {
 
   if (query.isLoading) {
     return (
-      <div className="flex min-h-[30vh] items-center justify-center">
-        <Spinner aria-label={t('admin.catalog.loading')} />
-      </div>
+      <section
+        className="space-y-5"
+        aria-busy="true"
+        aria-label={t('admin.catalog.loading')}
+      >
+        <header className="space-y-2">
+          <Skeleton className="h-7 w-1/3" />
+          <Skeleton className="h-4 w-2/3" />
+        </header>
+        <Skeleton className="h-16 w-full rounded-large" />
+        <ul className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <li
+              key={i}
+              className="flex items-center justify-between rounded-medium border border-divider/60 bg-content1 p-3"
+            >
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-8 w-8" />
+                <Skeleton className="h-8 w-8" />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
     );
   }
 
@@ -89,8 +116,9 @@ export function AdminCategoriesPage() {
       />
 
       {categories.length === 0 ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center text-sm text-default-500">
-          {t('admin.catalog.categories.empty')}
+        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
+          <FolderTree className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="text-sm text-default-500">{t('admin.catalog.categories.empty')}</p>
         </div>
       ) : (
         <ul className="space-y-2">
@@ -134,10 +162,10 @@ export function AdminCategoriesPage() {
                   <div className="flex shrink-0 items-center gap-2">
                     <span
                       className={[
-                        'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
+                        'inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium leading-none',
                         cat.isActive
                           ? 'border-success/30 bg-success/15 text-success'
-                          : 'border-default/30 bg-default/10 text-default-500',
+                          : 'border-divider/60 bg-content2 text-default-500',
                       ].join(' ')}
                     >
                       {cat.isActive
@@ -217,33 +245,36 @@ function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
           setDisplayOrder(0);
         }
       }}
-      className="grid gap-3 rounded-large border border-divider/60 bg-content1 p-3 sm:grid-cols-[1fr_1fr_100px_auto]"
+      className="flex flex-col gap-3 rounded-large border border-divider/60 bg-content1 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto] sm:items-end"
     >
       <TextField className="flex flex-col gap-1">
-        <Label className="sr-only">{t('admin.catalog.categories.nameAr')}</Label>
+        <Label className="text-xs uppercase tracking-wide text-default-500">
+          {t('admin.catalog.categories.nameAr')}
+        </Label>
         <Input
           value={nameAr}
           onChange={(e) => setNameAr((e.target as HTMLInputElement).value)}
-          placeholder={t('admin.catalog.categories.nameAr')}
           maxLength={120}
         />
       </TextField>
       <TextField className="flex flex-col gap-1">
-        <Label className="sr-only">{t('admin.catalog.categories.nameEn')}</Label>
+        <Label className="text-xs uppercase tracking-wide text-default-500">
+          {t('admin.catalog.categories.nameEn')}
+        </Label>
         <Input
           value={nameEn}
           onChange={(e) => setNameEn((e.target as HTMLInputElement).value)}
-          placeholder={t('admin.catalog.categories.nameEn')}
           maxLength={120}
         />
       </TextField>
       <TextField className="flex flex-col gap-1">
-        <Label className="sr-only">{t('admin.catalog.categories.displayOrder')}</Label>
+        <Label className="text-xs uppercase tracking-wide text-default-500">
+          {t('admin.catalog.categories.displayOrder')}
+        </Label>
         <Input
           type="number"
           value={String(displayOrder)}
           onChange={(e) => setDisplayOrder(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
-          aria-label={t('admin.catalog.categories.displayOrder')}
           className="tabular-nums"
         />
       </TextField>
@@ -274,10 +305,12 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
         e.preventDefault();
         await onSubmit({ nameAr: nameAr.trim(), nameEn: nameEn.trim(), displayOrder });
       }}
-      className="grid gap-3 rounded-medium border border-primary/40 bg-primary/5 p-3 sm:grid-cols-[1fr_1fr_100px_auto_auto]"
+      className="flex flex-col gap-3 rounded-medium border border-primary/40 bg-primary/5 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto_auto] sm:items-end"
     >
       <TextField isRequired className="flex flex-col gap-1">
-        <Label className="sr-only">{t('admin.catalog.categories.nameAr')}</Label>
+        <Label className="text-xs uppercase tracking-wide text-default-500">
+          {t('admin.catalog.categories.nameAr')}
+        </Label>
         <Input
           value={nameAr}
           onChange={(e) => setNameAr((e.target as HTMLInputElement).value)}
@@ -285,7 +318,9 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
         />
       </TextField>
       <TextField isRequired className="flex flex-col gap-1">
-        <Label className="sr-only">{t('admin.catalog.categories.nameEn')}</Label>
+        <Label className="text-xs uppercase tracking-wide text-default-500">
+          {t('admin.catalog.categories.nameEn')}
+        </Label>
         <Input
           value={nameEn}
           onChange={(e) => setNameEn((e.target as HTMLInputElement).value)}
@@ -293,12 +328,13 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
         />
       </TextField>
       <TextField className="flex flex-col gap-1">
-        <Label className="sr-only">{t('admin.catalog.categories.displayOrder')}</Label>
+        <Label className="text-xs uppercase tracking-wide text-default-500">
+          {t('admin.catalog.categories.displayOrder')}
+        </Label>
         <Input
           type="number"
           value={String(displayOrder)}
           onChange={(e) => setDisplayOrder(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
-          aria-label={t('admin.catalog.categories.displayOrder')}
           className="tabular-nums"
         />
       </TextField>

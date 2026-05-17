@@ -90,10 +90,10 @@ export function SizePicker({
               onClick={() => onSelect(s)}
               className={
                 isOut
-                  ? 'inline-flex min-w-[3rem] cursor-not-allowed items-center justify-center rounded-medium border border-divider/40 bg-default-100/40 px-3 py-1.5 text-sm text-default-400 line-through'
+                  ? 'inline-flex min-w-12 cursor-not-allowed items-center justify-center rounded-medium border border-divider/40 bg-default-100/40 px-3 py-1.5 text-sm text-default-400 line-through'
                   : isSelected
-                    ? 'inline-flex min-w-[3rem] items-center justify-center rounded-medium border-2 border-foreground bg-content1 px-3 py-1.5 text-sm font-medium text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-                    : 'inline-flex min-w-[3rem] items-center justify-center rounded-medium border border-divider/60 bg-content1 px-3 py-1.5 text-sm text-default-700 transition-colors hover:border-default-400 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-default-300'
+                    ? 'inline-flex min-w-12 items-center justify-center rounded-medium border-2 border-foreground bg-content1 px-3 py-1.5 text-sm font-medium text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+                    : 'inline-flex min-w-12 items-center justify-center rounded-medium border border-divider/60 bg-content1 px-3 py-1.5 text-sm text-default-700 transition-colors hover:border-default-400 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-default-300'
               }
             >
               {s}

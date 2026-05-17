@@ -1,5 +1,5 @@
 import { Button } from '@heroui/react';
-import { Mail } from 'lucide-react';
+import { Mail, MailOpen } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -74,7 +74,7 @@ export function AdminInquiriesPage() {
               className="space-y-3 rounded-large border border-divider/60 bg-content1 p-4"
             >
               <div className="flex items-center gap-2">
-                <Skeleton className="h-5 w-16 rounded-full" />
+                <Skeleton className="h-5 w-16 rounded-md" />
                 <Skeleton className="h-3 w-32" />
               </div>
               <Skeleton className="h-4 w-2/3" />
@@ -104,8 +104,9 @@ export function AdminInquiriesPage() {
           />
         </div>
       ) : (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center text-sm text-default-500">
-          {t('inquiries.admin.empty')}
+        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
+          <MailOpen className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="text-sm text-default-500">{t('inquiries.admin.empty')}</p>
         </div>
       )}
     </section>
@@ -162,7 +163,12 @@ function InquiryRow({
               })}
             </span>
           </div>
-          <h2 className="mt-1 line-clamp-1 text-sm font-semibold text-foreground">
+          <h2
+            className={[
+              'mt-1 line-clamp-1 text-sm text-foreground',
+              isNew ? 'font-semibold' : 'font-medium',
+            ].join(' ')}
+          >
             {inquiry.subject}
           </h2>
           <p className="mt-0.5 text-xs text-default-500">
@@ -186,11 +192,11 @@ function InquiryRow({
 
       <div className="flex flex-wrap items-center gap-2 text-xs text-default-500">
         {productName ? (
-          <span className="rounded-full bg-content2 px-2 py-0.5">
+          <span className="rounded-md bg-content2 px-2 py-0.5">
             {t('inquiries.admin.productLabel')}: <span className="font-medium text-foreground">{productName}</span>
           </span>
         ) : (
-          <span className="rounded-full bg-content2 px-2 py-0.5">
+          <span className="rounded-md bg-content2 px-2 py-0.5">
             {t('inquiries.admin.generalLabel')}
           </span>
         )}
@@ -276,7 +282,7 @@ function StatusBadge({ status }: { status: InquiryStatus }) {
   return (
     <span
       className={[
-        'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
+        'inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium leading-none',
         classes,
       ].join(' ')}
     >

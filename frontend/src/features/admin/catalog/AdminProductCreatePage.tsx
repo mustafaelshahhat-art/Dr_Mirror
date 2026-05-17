@@ -1,4 +1,4 @@
-import { Button, Form, Spinner } from '@heroui/react';
+import { Button, Form } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
@@ -13,6 +13,7 @@ import { useAdminCategoriesQuery, useCreateProductMutation } from './hooks';
 import { Field, TextAreaField } from '../../../shared/components/Field';
 import { SelectField } from '../../../shared/components/SelectField';
 import { LinkButton } from '../../../shared/components/LinkButton';
+import { Skeleton } from '../../../shared/components/Skeleton';
 
 export function AdminProductCreatePage() {
   const { t } = useTranslation();
@@ -34,9 +35,31 @@ export function AdminProductCreatePage() {
 
   if (categories.isLoading) {
     return (
-      <div className="flex min-h-[30vh] items-center justify-center">
-        <Spinner aria-label={t('admin.products.create.loading')} />
-      </div>
+      <section
+        className="space-y-5"
+        aria-busy="true"
+        aria-label={t('admin.products.create.loading')}
+      >
+        <Skeleton className="h-4 w-32" />
+        <header className="space-y-2">
+          <Skeleton className="h-7 w-1/3" />
+          <Skeleton className="h-4 w-2/3" />
+        </header>
+        <div className="space-y-4 rounded-large border border-divider/60 bg-content1 p-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="space-y-2">
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-24" />
+          </div>
+        </div>
+      </section>
     );
   }
 
