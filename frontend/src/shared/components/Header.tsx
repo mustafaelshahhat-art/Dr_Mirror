@@ -35,6 +35,12 @@ export function Header() {
           >
             {t('header.contact')}
           </Link>
+          <Link
+            to="/inquiries"
+            className="rounded-medium px-2 py-1.5 text-xs text-default-700 transition-colors hover:bg-default-100 dark:text-default-300 sm:hidden"
+          >
+            {t('header.contact')}
+          </Link>
 
           {!isBootstrapping && user ? (
             <>
@@ -43,6 +49,12 @@ export function Header() {
                 className="me-2 hidden rounded-medium px-3 py-1.5 text-sm text-default-700 transition-colors hover:bg-default-100 dark:text-default-300 sm:inline-block"
               >
                 {user.fullName}
+              </Link>
+              <Link
+                to="/account"
+                className="rounded-medium px-2 py-1.5 text-xs text-default-700 transition-colors hover:bg-default-100 dark:text-default-300 sm:hidden"
+              >
+                {t('header.myAccount')}
               </Link>
               <Button
                 variant="ghost"

@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Button } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
 interface ErrorBoundaryProps {
@@ -41,13 +42,9 @@ function ErrorFallback({ onReset }: { onReset: () => void }) {
       <p className="max-w-prose text-sm text-default-500">
         {t('common.errorBoundary.subtitle')}
       </p>
-      <button
-        type="button"
-        onClick={onReset}
-        className="mt-2 rounded-medium bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-      >
+      <Button variant="primary" onPress={onReset} className="mt-2">
         {t('common.errorBoundary.retry')}
-      </button>
+      </Button>
     </div>
   );
 }

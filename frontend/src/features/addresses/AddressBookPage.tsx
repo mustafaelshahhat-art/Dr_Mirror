@@ -83,7 +83,7 @@ export function AddressBookPage() {
 
       {addresses.length === 0 && !creating ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <MapPin className="mx-auto mb-3 size-10 text-default-400" aria-hidden />
+          <MapPin className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
           <p className="text-sm text-default-500">{t('addresses.empty')}</p>
         </div>
       ) : (
@@ -140,7 +140,7 @@ function Card({
     <article
       className={[
         'rounded-medium border bg-content1 p-4 transition-colors',
-        a.isDefault ? 'border-primary/40 ring-1 ring-primary/20' : 'border-divider/60',
+        a.isDefault ? 'border-primary/40' : 'border-divider/60',
       ].join(' ')}
     >
       <div className="flex items-start justify-between gap-3">

@@ -217,7 +217,7 @@ export function ProductDetailPage() {
                     </span>
                   </Button>
                 </div>
-                <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-divider/60 bg-background/90 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+                <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-divider/60 bg-background p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] lg:hidden">
                   <Button
                     variant="outline"
                     fullWidth

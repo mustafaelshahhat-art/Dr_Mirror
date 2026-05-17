@@ -45,13 +45,14 @@ export function CartPage() {
           className="flex items-start justify-between gap-3 rounded-medium border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
         >
           <span>{mergeError}</span>
-          <button
-            type="button"
-            onClick={() => void retryMerge()}
-            className="shrink-0 font-medium underline underline-offset-2 hover:no-underline"
+          <Button
+            variant="ghost"
+            size="sm"
+            onPress={() => void retryMerge()}
+            className="shrink-0 text-danger"
           >
             {t('cart.retryMerge')}
-          </button>
+          </Button>
         </div>
       ) : null}
 
@@ -124,10 +125,7 @@ export function CartPage() {
         </div>
       ) : (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <ShoppingBag
-            className="mx-auto mb-3 size-10 text-default-400"
-            aria-hidden
-          />
+          <ShoppingBag className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
           <h2 className="text-base font-semibold">{t('cart.empty.title')}</h2>
           <p className="mt-1 text-sm text-default-500">{t('cart.empty.subtitle')}</p>
           <Link

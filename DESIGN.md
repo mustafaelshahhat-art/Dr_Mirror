@@ -183,10 +183,11 @@ HeroUI v3 is the only library. Use components as-is; restyle via tokens and `cla
 
 ### Buttons (HeroUI variants)
 
-- **Solid (`color="primary"`)** — primary action. Emerald background, `primary-foreground` text. One per visible region.
-- **Bordered / outline** — secondary action. Transparent bg, emerald or muted border + matching text.
-- **Ghost / light** — tertiary. Text-only with subtle hover tint (`hover:bg-default-100 dark:hover:bg-default-50/5`).
-- **Danger / danger-soft** — destructive actions only. Never decoration.
+- **`variant="primary"`** — primary action. Emerald background, `primary-foreground` text. One per visible region.
+- **`variant="secondary"` / `variant="tertiary"`** — lower-emphasis actions inside dense product surfaces.
+- **`variant="outline"`** — secondary action. Transparent bg, muted border + matching text.
+- **`variant="ghost"`** — tertiary. Text-only with subtle hover tint.
+- **`variant="danger"` / `variant="danger-soft"`** — destructive actions only. Never decoration.
 - Sizes: `sm` (admin tables, secondary chrome), `md` (default), `lg` (storefront hero CTA only).
 - Radius: HeroUI default — no `rounded-full`, no sharp corners, no mixed radii on the same page.
 - HeroUI v3 `Button` **does not** accept `as` / polymorphism — use a styled `<Link>` (with HeroUI button classes) for link-shaped buttons.

@@ -10,6 +10,8 @@ import type { ProductGender } from '../../catalog/types';
 
 import { useAdminCategoriesQuery, useCreateProductMutation } from './hooks';
 
+import { SelectField } from '../../../shared/components/SelectField';
+
 export function AdminProductCreatePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -98,41 +100,30 @@ export function AdminProductCreatePage() {
             type="number"
             required
           />
-          <label className="space-y-1 text-sm">
-            <span className="text-xs uppercase tracking-wide text-default-500">
-              {t('admin.products.fields.gender')}
-            </span>
-            <select
-              value={gender}
-              onChange={(e) => setGender(Number(e.target.value) as ProductGender)}
-              className="w-full rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-            >
-              <option value={0}>{t('catalog.gender.men')}</option>
-              <option value={1}>{t('catalog.gender.women')}</option>
-              <option value={2}>{t('catalog.gender.unisex')}</option>
-            </select>
-          </label>
+          <SelectField
+            label={t('admin.products.fields.gender')}
+            value={String(gender)}
+            onChange={(next) => setGender(Number(next) as ProductGender)}
+            options={[
+              { value: '0', label: t('catalog.gender.men') },
+              { value: '1', label: t('catalog.gender.women') },
+              { value: '2', label: t('catalog.gender.unisex') },
+            ]}
+          />
           <HeroField label={t('admin.products.fields.material')} value={material} onChange={setMaterial} maxLength={200} />
           <HeroField label={t('admin.products.fields.brand')} value={brand} onChange={setBrand} maxLength={80} />
           <HeroField label={t('admin.products.fields.sku')} value={sku} onChange={setSku} maxLength={64} dir="ltr" />
-          <label className="space-y-1 text-sm">
-            <span className="text-xs uppercase tracking-wide text-default-500">
-              {t('admin.products.fields.category')}
-            </span>
-            <select
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              required
-              className="w-full rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-            >
-              <option value="">{t('admin.products.fields.pickCategory')}</option>
-              {activeCategories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nameEn} — {c.nameAr}
-                </option>
-              ))}
-            </select>
-          </label>
+          <SelectField
+            label={t('admin.products.fields.category')}
+            value={categoryId}
+            onChange={setCategoryId}
+            placeholder={t('admin.products.fields.pickCategory')}
+            isRequired
+            options={activeCategories.map((c) => ({
+              value: c.id,
+              label: `${c.nameEn} (${c.nameAr})`,
+            }))}
+          />
         </div>
 
         <div className="flex gap-2">

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { ProblemDetails } from '../../auth/types';
 import { PAYMENT_METHOD_KIND, type PaymentMethodKind } from '../../orders/types';
+import { SelectField } from '../../../shared/components/SelectField';
 import { QueryErrorState } from '../components/QueryErrorState';
 
 import {
@@ -282,21 +283,17 @@ function PaymentMethodCreateForm({ onCancel, onSubmit, isPending }: CreateProps)
       <h2 className="text-sm font-semibold">{t('admin.payments.create.heading')}</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <HeroField label={t('admin.payments.fields.code')} value={code} onChange={setCode} placeholder="bank-transfer" required maxLength={32} dir="ltr" />
-        <label className="space-y-1 text-sm">
-          <span className="text-xs uppercase tracking-wide text-default-500">
-            {t('admin.payments.fields.kind')}
-          </span>
-          <select
-            value={kind}
-            onChange={(e) => setKind(Number(e.target.value) as PaymentMethodKind)}
-            className="w-full rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-          >
-            <option value={PAYMENT_METHOD_KIND.Cod}>{t('admin.payments.kind.cod')}</option>
-            <option value={PAYMENT_METHOD_KIND.Instapay}>{t('admin.payments.kind.instapay')}</option>
-            <option value={PAYMENT_METHOD_KIND.Wallet}>{t('admin.payments.kind.wallet')}</option>
-            <option value={PAYMENT_METHOD_KIND.BankTransfer}>{t('admin.payments.kind.bankTransfer')}</option>
-          </select>
-        </label>
+        <SelectField
+          label={t('admin.payments.fields.kind')}
+          value={String(kind)}
+          onChange={(next) => setKind(Number(next) as PaymentMethodKind)}
+          options={[
+            { value: String(PAYMENT_METHOD_KIND.Cod), label: t('admin.payments.kind.cod') },
+            { value: String(PAYMENT_METHOD_KIND.Instapay), label: t('admin.payments.kind.instapay') },
+            { value: String(PAYMENT_METHOD_KIND.Wallet), label: t('admin.payments.kind.wallet') },
+            { value: String(PAYMENT_METHOD_KIND.BankTransfer), label: t('admin.payments.kind.bankTransfer') },
+          ]}
+        />
         <HeroField label={t('admin.payments.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={64} />
         <HeroField label={t('admin.payments.fields.nameEn')} value={nameEn} onChange={setNameEn} required maxLength={64} />
         <HeroTextarea label={t('admin.payments.fields.instructionsAr')} value={instructionsAr} onChange={setInstructionsAr} maxLength={500} />

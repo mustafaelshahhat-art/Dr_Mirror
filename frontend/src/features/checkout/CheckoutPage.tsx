@@ -260,13 +260,14 @@ export function CheckoutPage() {
                   className="flex items-start justify-between gap-3 rounded-medium border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
                 >
                   <span>{t('checkout.payment.errorLoad')}</span>
-                  <button
-                    type="button"
-                    onClick={() => void paymentMethodsQuery.refetch()}
-                    className="shrink-0 font-medium underline underline-offset-2 hover:no-underline"
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onPress={() => void paymentMethodsQuery.refetch()}
+                    className="shrink-0 text-danger"
                   >
                     {t('checkout.payment.retry')}
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <PaymentMethodPicker

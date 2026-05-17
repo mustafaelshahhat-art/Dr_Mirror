@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import { SelectField } from '../../../shared/components/SelectField';
 import { orderStatusTranslationKey } from '../../orders/components/orderStatusTranslationKey';
 import { ORDER_STATUSES, type OrderStatus } from '../../orders/types';
 
@@ -19,31 +20,20 @@ const ALL_STATUSES: OrderStatus[] = [
   ORDER_STATUSES.Cancelled,
 ];
 
-/**
- * Plain &lt;select&gt;-based filter for the admin orders list. RAC's combobox
- * would be heavier than we need here — staff will hammer this dropdown all
- * day; the native control is the right tool.
- */
 export function StatusFilterDropdown({ value, onChange }: StatusFilterDropdownProps) {
   const { t } = useTranslation();
   return (
-    <label className="inline-flex items-center gap-2 text-sm">
-      <span className="text-default-500">{t('admin.filters.status')}</span>
-      <select
-        value={value ?? ''}
-        onChange={(e) => {
-          const v = e.target.value;
-          onChange(v === '' ? undefined : (Number(v) as OrderStatus));
-        }}
-        className="rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-      >
-        <option value="">{t('admin.filters.all')}</option>
-        {ALL_STATUSES.map((s) => (
-          <option key={s} value={s}>
-            {t(orderStatusTranslationKey(s))}
-          </option>
-        ))}
-      </select>
-    </label>
+    <SelectField
+      label={t('admin.filters.status')}
+      hideLabel
+      value={value === undefined ? '' : String(value)}
+      emptyLabel={t('admin.filters.all')}
+      onChange={(next) => onChange(next === '' ? undefined : (Number(next) as OrderStatus))}
+      options={ALL_STATUSES.map((status) => ({
+        value: String(status),
+        label: t(orderStatusTranslationKey(status)),
+      }))}
+      className="w-full sm:w-52"
+    />
   );
 }

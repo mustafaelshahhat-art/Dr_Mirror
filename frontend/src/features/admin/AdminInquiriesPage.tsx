@@ -210,16 +210,12 @@ function InquiryRow({
       ) : null}
 
       <div className="flex flex-wrap gap-2">
-        <a href={replyHref}>
-          <Button
-            variant="primary"
-            size="sm"
-          >
-            <span className="inline-flex items-center gap-1.5">
-              <Mail className="size-4" aria-hidden />
-              {t('inquiries.admin.replyByEmail')}
-            </span>
-          </Button>
+        <a
+          href={replyHref}
+          className="inline-flex h-8 items-center justify-center gap-1.5 rounded-medium bg-primary px-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          <Mail className="size-4" aria-hidden />
+          {t('inquiries.admin.replyByEmail')}
         </a>
         {isNew ? (
           <Button

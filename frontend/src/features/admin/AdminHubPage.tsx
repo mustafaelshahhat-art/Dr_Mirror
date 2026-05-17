@@ -52,34 +52,36 @@ export function AdminHubPage() {
         </div>
       ) : stats ? (
         <>
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
-            <Link
-              to={`/admin/orders?status=${ORDER_STATUSES.PendingPaymentReview}`}
-              className="group rounded-large border border-divider/60 bg-content1 p-5 transition-colors hover:bg-content2"
-            >
-              <p className="text-xs font-medium uppercase tracking-wide text-default-400">
-                {t('admin.hub.queue.proofsLabel')}
-              </p>
-              <p className="mt-3 text-5xl font-bold leading-none tracking-tight text-primary tabular-nums">
-                {proofQueueCount}
-              </p>
-              <p className="mt-3 max-w-prose text-sm text-default-500">
-                {t('admin.hub.queue.proofsHelp')}
-              </p>
-              <span className="mt-5 inline-flex text-sm font-medium text-primary group-hover:underline">
-                {t('admin.hub.queue.reviewProofs')}
+          <div className="overflow-hidden rounded-large border border-divider/60 bg-content1">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-divider/60 px-4 py-3">
+              <p className="text-sm font-semibold">{t('admin.hub.queue.statusHeading')}</p>
+              <span className="text-xs text-default-500 tabular-nums">
+                {t('admin.hub.queue.totalOrders', { count: stats.totalOrders })}
               </span>
-            </Link>
-
-            <div className="rounded-large border border-divider/60 bg-content1 p-4">
-              <div className="flex items-center justify-between gap-3 border-b border-divider/60 pb-3">
-                <p className="text-sm font-semibold">{t('admin.hub.queue.statusHeading')}</p>
-                <span className="text-xs text-default-500 tabular-nums">
-                  {t('admin.hub.queue.totalOrders', { count: stats.totalOrders })}
+            </div>
+            <div className="divide-y divide-divider/60">
+              <Link
+                to={`/admin/orders?status=${ORDER_STATUSES.PendingPaymentReview}`}
+                className="group flex items-center justify-between gap-4 px-4 py-3 text-sm transition-colors hover:bg-content2"
+              >
+                <span className="min-w-0">
+                  <span className="block font-medium text-foreground">
+                    {t('admin.hub.queue.proofsLabel')}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-default-500">
+                    {t('admin.hub.queue.proofsHelp')}
+                  </span>
                 </span>
-              </div>
+                <span className="flex shrink-0 items-center gap-3">
+                  <span className="rounded-md bg-primary/10 px-2 py-1 text-sm font-semibold text-primary tabular-nums">
+                    {proofQueueCount}
+                  </span>
+                  <span className="text-xs font-medium text-primary group-hover:underline">
+                    {t('admin.hub.queue.reviewProofs')}
+                  </span>
+                </span>
+              </Link>
               <dl className="divide-y divide-divider/60">
-                <StatusRow label={t('admin.hub.kpis.pendingReview')} value={proofQueueCount} emphasis />
                 {KPI_STATUSES.map(({ key, status }) => (
                   <StatusRow
                     key={key}
@@ -150,24 +152,14 @@ export function AdminHubPage() {
 function StatusRow({
   label,
   value,
-  emphasis = false,
 }: {
   label: string;
   value: number;
-  emphasis?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 py-3">
-      <dt className={emphasis ? 'text-sm font-medium text-foreground' : 'text-sm text-default-500'}>
-        {label}
-      </dt>
-      <dd
-        className={
-          emphasis
-            ? 'text-base font-semibold text-primary tabular-nums'
-            : 'text-sm font-medium text-foreground tabular-nums'
-        }
-      >
+    <div className="flex items-center justify-between gap-4 px-4 py-3">
+      <dt className="text-sm text-default-500">{label}</dt>
+      <dd className="text-sm font-medium text-foreground tabular-nums">
         {value}
       </dd>
     </div>

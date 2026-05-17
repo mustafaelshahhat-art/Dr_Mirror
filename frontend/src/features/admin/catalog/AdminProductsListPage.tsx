@@ -2,7 +2,7 @@ import { Spinner } from '@heroui/react';
 import { Package, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { SearchInput } from '../../catalog/components/SearchInput';
 import { genderTranslationKey } from '../../catalog/hooks';
@@ -11,6 +11,7 @@ import type { ProductGender } from '../../catalog/types';
 import { useAdminCategoriesQuery, useAdminProductsQuery } from './hooks';
 
 import { PaginationControls } from '../../../shared/components/PaginationControls';
+import { SelectField } from '../../../shared/components/SelectField';
 import { formatCurrency } from '../../../shared/lib/format';
 import type { AppLang } from '../../../shared/lib/theme-storage';
 import { QueryErrorState } from '../components/QueryErrorState';
@@ -19,8 +20,6 @@ export function AdminProductsListPage() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const isAr = lang === 'ar';
-  const navigate = useNavigate();
-
   const [q, setQ] = useState('');
   const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
   const [gender, setGender] = useState<ProductGender | undefined>(undefined);
@@ -48,49 +47,50 @@ export function AdminProductsListPage() {
         </Link>
       </header>
 
-      <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto_auto] max-sm:[&>select]:w-full">
+      <div className="grid gap-2 sm:grid-cols-[1fr_12rem_10rem_10rem]">
         <SearchInput
           value={q}
           onCommit={(val) => { setQ(val); setPage(1); }}
         />
-        <select
+        <SelectField
+          label={t('admin.products.fields.category')}
+          hideLabel
           value={categoryId ?? ''}
-          onChange={(e) => { setCategoryId(e.target.value || undefined); setPage(1); }}
-          className="rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-        >
-          <option value="">{t('admin.products.list.allCategories')}</option>
-          {(categories.data ?? []).map((c) => (
-            <option key={c.id} value={c.id}>
-              {isAr ? c.nameAr : c.nameEn}
-            </option>
-          ))}
-        </select>
-        <select
-          value={gender ?? ''}
-          onChange={(e) => {
-            setGender(e.target.value === '' ? undefined : (Number(e.target.value) as ProductGender));
+          emptyLabel={t('admin.products.list.allCategories')}
+          onChange={(next) => { setCategoryId(next || undefined); setPage(1); }}
+          options={(categories.data ?? []).map((c) => ({
+            value: c.id,
+            label: isAr ? c.nameAr : c.nameEn,
+          }))}
+        />
+        <SelectField
+          label={t('admin.products.fields.gender')}
+          hideLabel
+          value={gender === undefined ? '' : String(gender)}
+          emptyLabel={t('admin.products.list.allGenders')}
+          onChange={(next) => {
+            setGender(next === '' ? undefined : (Number(next) as ProductGender));
             setPage(1);
           }}
-          className="rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-        >
-          <option value="">{t('admin.products.list.allGenders')}</option>
-          <option value={0}>{t(genderTranslationKey(0))}</option>
-          <option value={1}>{t(genderTranslationKey(1))}</option>
-          <option value={2}>{t(genderTranslationKey(2))}</option>
-        </select>
-        <select
+          options={[0, 1, 2].map((next) => ({
+            value: String(next),
+            label: t(genderTranslationKey(next as ProductGender)),
+          }))}
+        />
+        <SelectField
+          label={t('admin.list.status')}
+          hideLabel
           value={published === undefined ? '' : published ? 'pub' : 'draft'}
-          onChange={(e) => {
-            const v = e.target.value;
-            setPublished(v === '' ? undefined : v === 'pub');
+          emptyLabel={t('admin.products.list.allStatuses')}
+          onChange={(next) => {
+            setPublished(next === '' ? undefined : next === 'pub');
             setPage(1);
           }}
-          className="rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-        >
-          <option value="">{t('admin.products.list.allStatuses')}</option>
-          <option value="pub">{t('admin.products.list.published')}</option>
-          <option value="draft">{t('admin.products.list.draft')}</option>
-        </select>
+          options={[
+            { value: 'pub', label: t('admin.products.list.published') },
+            { value: 'draft', label: t('admin.products.list.draft') },
+          ]}
+        />
       </div>
 
       {products.isLoading ? (
@@ -137,11 +137,7 @@ export function AdminProductsListPage() {
               </thead>
               <tbody className="divide-y divide-divider/40">
                 {(products.data?.items ?? []).map((p) => (
-                  <tr
-                    key={p.id}
-                    onClick={() => void navigate(`/admin/products/${p.id}/edit`)}
-                    className="cursor-pointer bg-content1 transition-colors hover:bg-content2"
-                  >
+                  <tr key={p.id} className="bg-content1 transition-colors hover:bg-content2">
                     <td className="px-4 py-3">
                       <p className="font-medium text-foreground">{isAr ? p.nameAr : p.nameEn}</p>
                       <p className="text-xs text-default-500" dir="ltr">/{p.slug}</p>
@@ -176,7 +172,6 @@ export function AdminProductsListPage() {
                       <Link
                         to={`/admin/products/${p.id}/edit`}
                         aria-label={t('admin.catalog.actions.edit')}
-                        onClick={(e) => e.stopPropagation()}
                         className="inline-flex size-8 items-center justify-center rounded-medium text-default-500 transition-colors hover:bg-content2 hover:text-foreground"
                       >
                         <Pencil className="size-4" aria-hidden />
