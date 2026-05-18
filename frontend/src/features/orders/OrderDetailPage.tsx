@@ -141,7 +141,7 @@ export function OrderDetailPage() {
             <PaymentProofsList orderNumber={order.orderNumber} proofs={order.paymentProofs} />
           ) : null}
 
-          <section aria-labelledby="items-heading" className="space-y-2">
+          <section aria-labelledby="items-heading" className="cq space-y-2">
             <h2 id="items-heading" className="text-sm font-semibold text-foreground">
               {t('orders.detail.itemsHeading')}
             </h2>
@@ -152,7 +152,7 @@ export function OrderDetailPage() {
                 return (
                   <li
                     key={item.id}
-                    className="flex gap-3 rounded-medium border border-divider/60 bg-content1 p-3"
+                    className="grid grid-cols-1 gap-3 rounded-medium border border-divider/60 bg-content1 p-3 @md:grid-cols-3 @md:items-start"
                   >
                     <Link
                       to={`/products/${item.productSlug}`}
@@ -202,7 +202,7 @@ export function OrderDetailPage() {
                         {item.sku}
                       </p>
                     </div>
-                    <span className="self-start text-sm font-semibold tabular-nums">
+                    <span className="text-sm font-semibold tabular-nums @md:text-end">
                       {formatCurrency(item.lineTotal, lang)}
                     </span>
                   </li>

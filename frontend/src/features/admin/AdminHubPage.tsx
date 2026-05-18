@@ -123,15 +123,17 @@ export function AdminHubPage() {
                   />
                 </span>
               </Link>
-              <dl className="divide-y divide-divider/60">
-                {KPI_STATUSES.map(({ key, status }) => (
-                  <StatusRow
-                    key={key}
-                    label={t(`admin.hub.kpis.${key}`)}
-                    value={stats.countsByStatus[status] ?? 0}
-                  />
-                ))}
-              </dl>
+              <div className="cq p-3">
+                <dl className="grid gap-2 @md:grid-cols-2 @lg:grid-cols-4">
+                  {KPI_STATUSES.map(({ key, status }) => (
+                    <StatusRow
+                      key={key}
+                      label={t(`admin.hub.kpis.${key}`)}
+                      value={stats.countsByStatus[status] ?? 0}
+                    />
+                  ))}
+                </dl>
+              </div>
             </div>
           </div>
 
@@ -201,9 +203,9 @@ function StatusRow({
   value: number;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 px-4 py-3">
+    <div className="rounded-medium border border-divider/60 bg-content2/40 p-3">
       <dt className="text-sm text-default-500">{label}</dt>
-      <dd className="text-sm font-medium text-foreground tabular-nums">
+      <dd className="mt-1 text-sm font-medium text-foreground tabular-nums">
         {value}
       </dd>
     </div>

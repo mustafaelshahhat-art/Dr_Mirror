@@ -82,9 +82,9 @@ export function AddressForm({
           setSubmitting(false);
         }
       }}
-      className="space-y-4 rounded-large border border-divider/60 bg-content1 p-4"
+      className="cq space-y-4 rounded-large border border-divider/60 bg-content1 p-4"
     >
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 @lg:grid-cols-2">
         <Field
           label={t('addresses.fields.label')}
           value={label}

@@ -29,7 +29,7 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
   return (
     <Link
       to={`/products/${product.slug}`}
-      className="group flex flex-col overflow-hidden rounded-large border border-divider/60 bg-content1 transition-shadow hover:shadow-medium dark:hover:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="cq-card group flex flex-col overflow-hidden rounded-large border border-divider/60 bg-content1 transition-shadow hover:shadow-medium dark:hover:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-bone">
         {product.primaryImageUrl ? (
@@ -70,12 +70,12 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
           <ColorSwatchRow colors={product.availableColors} />
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+        <div className="mt-auto grid grid-cols-1 gap-1 pt-2 @md:grid-cols-2 @md:items-center @md:gap-2">
           <span className="text-base font-semibold tabular-nums text-foreground">
             {formatCurrency(product.price, lang)}
           </span>
           {sizeCount > 0 ? (
-            <span className="text-xs text-default-500 tabular-nums">
+            <span className="text-xs text-default-500 tabular-nums @md:text-end">
               {t('catalog.list.sizesAvailable', { count: sizeCount })}
             </span>
           ) : null}
