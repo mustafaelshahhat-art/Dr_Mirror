@@ -9,7 +9,7 @@ export function NotFoundPage() {
   const isAdminPath = location.pathname.startsWith('/admin');
 
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
+    <div className="enter-fade-up flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
       {/* Numeric "404" glyph is the visual anchor (no Lucide icon), a deliberate
           brand-restraint choice over DESIGN.md section 15.1's optional empty-state icon.
           PRODUCT.md anti-references reject the "AI assistant" / icon-heavy 404

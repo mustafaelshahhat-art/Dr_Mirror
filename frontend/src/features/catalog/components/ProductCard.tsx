@@ -38,7 +38,7 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
             alt={name}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+            className="h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out motion-safe:group-hover:scale-[1.02]"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-default-300 dark:text-default-600">

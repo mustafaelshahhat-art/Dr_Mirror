@@ -14,7 +14,7 @@ export function DowntimeBanner() {
   return (
     <div
       role="alert"
-      className="flex items-center gap-2 border-b border-danger/30 bg-danger/10 px-4 py-2 text-sm text-danger"
+      className="enter-fade-down flex items-center gap-2 border-b border-danger/30 bg-danger/10 px-4 py-2 text-sm text-danger"
     >
       <CloudOff size={16} aria-hidden className="shrink-0" />
       <span className="flex-1">

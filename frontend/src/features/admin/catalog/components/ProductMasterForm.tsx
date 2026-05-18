@@ -96,12 +96,12 @@ export function ProductMasterForm({
       </header>
 
       {serverError ? (
-        <div role="alert" className="mb-3 rounded-medium border border-danger/30 bg-danger/10 p-3 text-sm text-danger">
+        <div role="alert" className="enter-fade mb-3 rounded-medium border border-danger/30 bg-danger/10 p-3 text-sm text-danger">
           {serverError}
         </div>
       ) : null}
       {savedAt !== null ? (
-        <div className="mb-3 rounded-medium border border-success/30 bg-success/10 p-3 text-sm text-success">
+        <div className="enter-fade mb-3 rounded-medium border border-success/30 bg-success/10 p-3 text-sm text-success">
           {t('admin.products.edit.savedToast')}
         </div>
       ) : null}

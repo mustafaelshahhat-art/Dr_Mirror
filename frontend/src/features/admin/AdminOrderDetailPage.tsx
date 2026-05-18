@@ -83,7 +83,7 @@ export function AdminOrderDetailPage() {
       );
     }
     return (
-      <div className="space-y-3 rounded-large border border-divider/60 bg-content1 p-10 text-center">
+      <div className="enter-fade-up space-y-3 rounded-large border border-divider/60 bg-content1 p-10 text-center">
         <h1 className="text-lg font-semibold">
           {t('admin.detail.notFoundTitle')}
         </h1>
