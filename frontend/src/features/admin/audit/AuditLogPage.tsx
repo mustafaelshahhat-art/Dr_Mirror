@@ -138,29 +138,29 @@ export function AuditLogPage() {
                 {query.data.items.map((entry) => (
                   <tr key={entry.id} className="bg-content1 transition-colors hover:bg-content2">
                     <td className="whitespace-nowrap px-4 py-3 tabular-nums text-default-500">
-                      {dateFmt.format(new Date(entry.timestamp))}
+                      {dateFmt.format(new Date(entry.timestampUtc))}
                     </td>
                     <td className="px-4 py-3 font-medium text-foreground">
-                      {entry.actorName}
+                      {entry.actorDisplayName ?? entry.actorUserId}
                     </td>
                     <td className="px-4 py-3 text-default-500">
                       {entry.actionType}
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-xs font-medium text-default-500">
-                        {entry.targetType}
+                        {entry.targetEntityType}
                       </span>
                       <span className="ms-1 text-xs text-default-400">
-                        #{entry.targetId}
+                        #{entry.targetEntityId}
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-4 py-3">
-                      {entry.statusBefore && entry.statusAfter ? (
+                      {entry.previousStatus && entry.newStatus ? (
                         <span className="text-xs text-default-500">
-                          {entry.statusBefore}
+                          {entry.previousStatus}
                           {/* eslint-disable-next-line i18next/no-literal-string -- decorative arrow, same in all locales */}
 <span className="mx-1 text-default-300">&rarr;</span>
-                          {entry.statusAfter}
+                          {entry.newStatus}
                         </span>
                       ) : (
                         <span className="text-xs text-default-400">&mdash;</span>

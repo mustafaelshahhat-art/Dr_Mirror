@@ -1,13 +1,14 @@
 export interface AuditLogEntryDto {
-  id: string;
-  timestamp: string;
-  actorName: string;
+  id: number;
+  actorUserId: string;
+  actorDisplayName: string | null;
   actionType: string;
-  targetType: string;
-  targetId: string;
-  summary: string;
-  statusBefore?: string;
-  statusAfter?: string;
+  targetEntityType: string;
+  targetEntityId: string;
+  previousStatus: string | null;
+  newStatus: string | null;
+  correlationId: string | null;
+  timestampUtc: string;
 }
 
 export interface AuditLogParams {

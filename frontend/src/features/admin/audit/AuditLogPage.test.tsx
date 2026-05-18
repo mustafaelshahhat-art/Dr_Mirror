@@ -31,15 +31,16 @@ const adminAuth = makeAuthValue({
 });
 
 const mockEntry = {
-  id: 'log-1',
-  timestamp: '2025-06-01T10:00:00.000Z',
-  actorName: 'Admin User',
+  id: 1,
+  actorUserId: '00000000-0000-0000-0000-000000000001',
+  actorDisplayName: 'Admin User',
   actionType: 'OrderStatusChanged',
-  targetType: 'Order',
-  targetId: 'ORD-001',
-  summary: 'Order status changed from Pending to Paid',
-  statusBefore: 'Pending',
-  statusAfter: 'Paid',
+  targetEntityType: 'Order',
+  targetEntityId: 'ORD-001',
+  previousStatus: 'Pending',
+  newStatus: 'Paid',
+  correlationId: null,
+  timestampUtc: '2025-06-01T10:00:00.000Z',
 };
 
 describe('AuditLogPage', () => {
@@ -82,7 +83,7 @@ describe('AuditLogPage', () => {
     vi.mocked(adminAuditApi.list)
       .mockRejectedValueOnce(new Error('network'))
       .mockResolvedValueOnce({
-        items: [{ ...mockEntry, id: 'log-2', targetId: 'ORD-002' }],
+        items: [{ ...mockEntry, id: 2, targetEntityId: 'ORD-002' }],
         page: 1,
         pageSize: 25,
         totalCount: 1,
