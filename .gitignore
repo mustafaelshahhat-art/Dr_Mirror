@@ -60,7 +60,7 @@ CLAUDE.md
 specs/
 .agents/
 .claude/
-.specify/
+# .specify/ — tracked for constitution & project memory
 .windsurf/
 
 # --- Media & Uploads ---
