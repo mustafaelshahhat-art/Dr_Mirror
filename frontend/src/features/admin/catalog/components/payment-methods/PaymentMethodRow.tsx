@@ -1,5 +1,5 @@
-import { Button } from '@heroui/react';
-import { Pencil, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Button, Switch, Tooltip } from '@heroui/react';
+import { Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { type PaymentMethodKind } from '../../../../orders/types';
@@ -61,7 +61,7 @@ export function PaymentMethodRow({
           {method.accountNumber ? (
             <p className="font-mono text-xs text-default-500" dir="ltr">
               {method.accountNumber}
-              {method.accountHolder ? ` — ${method.accountHolder}` : ''}
+              {method.accountHolder ? ` · ${method.accountHolder}` : ''}
             </p>
           ) : null}
           <p className="text-xs text-default-500">
@@ -69,33 +69,40 @@ export function PaymentMethodRow({
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <Button
-            isIconOnly
-            variant="ghost"
-            size="md"
-            onPress={onEdit}
-            aria-label={t('admin.catalog.actions.edit')}
-          >
-            <Pencil className="size-4" aria-hidden />
-          </Button>
-          <Button
-            isIconOnly
-            variant="ghost"
-            size="md"
-            isDisabled={isToggling}
-            onPress={onToggleActive}
-            aria-label={
-              method.isActive
+          <Tooltip delay={300} closeDelay={0}>
+            <Button
+              isIconOnly
+              variant="ghost"
+              size="md"
+              onPress={onEdit}
+              aria-label={t('admin.catalog.actions.edit')}
+            >
+              <Pencil className="size-4" aria-hidden />
+            </Button>
+            <Tooltip.Content placement="top">{t('admin.catalog.actions.edit')}</Tooltip.Content>
+          </Tooltip>
+          <Tooltip delay={300} closeDelay={0}>
+            <Switch
+              size="sm"
+              isSelected={method.isActive}
+              isDisabled={isToggling}
+              onChange={onToggleActive}
+              aria-label={
+                method.isActive
+                  ? t('admin.catalog.actions.deactivate')
+                  : t('admin.catalog.actions.activate')
+              }
+            >
+              <Switch.Control>
+                <Switch.Thumb />
+              </Switch.Control>
+            </Switch>
+            <Tooltip.Content placement="top">
+              {method.isActive
                 ? t('admin.catalog.actions.deactivate')
-                : t('admin.catalog.actions.activate')
-            }
-          >
-            {method.isActive ? (
-              <ToggleRight className="size-4 text-success" aria-hidden />
-            ) : (
-              <ToggleLeft className="size-4 text-default-400" aria-hidden />
-            )}
-          </Button>
+                : t('admin.catalog.actions.activate')}
+            </Tooltip.Content>
+          </Tooltip>
         </div>
       </div>
     </div>

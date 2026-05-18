@@ -1,8 +1,7 @@
-import { Button } from '@heroui/react';
-import { Banknote, Copy } from 'lucide-react';
-import { useState } from 'react';
+import { Banknote } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { Snippet } from '../../../shared/components/Snippet';
 import { formatCurrency } from '../../../shared/lib/format';
 import type { AppLang } from '../../../shared/lib/theme-storage';
 import type { OrderDetailDto } from '../types';
@@ -17,22 +16,10 @@ export function PaymentInstructionsCard({ order }: { order: OrderDetailDto }) {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const isAr = lang === 'ar';
-  const [copied, setCopied] = useState(false);
 
   const instructions = isAr ? order.paymentInstructionsAr : order.paymentInstructionsEn;
   const accountNumber = order.paymentAccountNumber;
   const accountHolder = order.paymentAccountHolder;
-
-  async function copyToClipboard(value: string | null) {
-    if (!value) return;
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* clipboard may be unavailable — silent fail is fine */
-    }
-  }
 
   return (
     <section
@@ -67,23 +54,18 @@ export function PaymentInstructionsCard({ order }: { order: OrderDetailDto }) {
             <dt className="text-xs uppercase tracking-wide text-default-500">
               {t('orders.paymentInstructions.accountNumber')}
             </dt>
-            <dd className="mt-0.5 flex items-center gap-2">
-              <span className="font-mono text-sm text-foreground" dir="ltr">
-                {accountNumber}
-              </span>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                onPress={() => void copyToClipboard(accountNumber)}
+            <dd className="mt-0.5">
+              <Snippet
+                value={accountNumber}
                 aria-label={t('orders.paymentInstructions.copy')}
-                className="border border-divider/60 bg-content2 text-xs text-default-700 hover:bg-default-100"
+                text={t('orders.paymentInstructions.copy')}
+                copiedText={t('orders.paymentInstructions.copied')}
+                tooltipPlacement="top"
               >
-                <span className="inline-flex items-center gap-1">
-                  <Copy className="size-3" aria-hidden />
-                  {copied ? t('orders.paymentInstructions.copied') : t('orders.paymentInstructions.copy')}
+                <span className="font-mono text-sm text-foreground" dir="ltr">
+                  {accountNumber}
                 </span>
-              </Button>
+              </Snippet>
             </dd>
           </div>
         ) : null}

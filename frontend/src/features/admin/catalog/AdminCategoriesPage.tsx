@@ -1,4 +1,4 @@
-import { Button, Form, Input, Label, TextField } from '@heroui/react';
+import { Button, Form, Input, Label, TextField, Tooltip } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { FolderTree, Pencil, Plus, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useState } from 'react';
@@ -172,46 +172,56 @@ export function AdminCategoriesPage() {
                         ? t('admin.catalog.status.active')
                         : t('admin.catalog.status.inactive')}
                     </span>
-                    <Button
-                      isIconOnly
-                      variant="ghost"
-                      size="md"
-                      onPress={() => setEditingId(cat.id)}
-                      aria-label={t('admin.catalog.actions.edit')}
-                    >
-                      <Pencil className="size-4" aria-hidden />
-                    </Button>
-                    <Button
-                      isIconOnly
-                      variant="ghost"
-                      size="md"
-                      isDisabled={toggleMutation.isPending}
-                      onPress={async () => {
-                        setServerError(null);
-                        try {
-                          await toggleMutation.mutateAsync({
-                            id: cat.id,
-                            activate: !cat.isActive,
-                          });
-                        } catch (err) {
-                          const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                          setServerError(
-                            problem?.detail ?? problem?.title ?? t('admin.catalog.errors.unknown'),
-                          );
+                    <Tooltip>
+                      <Button
+                        isIconOnly
+                        variant="ghost"
+                        size="md"
+                        onPress={() => setEditingId(cat.id)}
+                        aria-label={t('admin.catalog.actions.edit')}
+                      >
+                        <Pencil className="size-4" aria-hidden />
+                      </Button>
+                      <Tooltip.Content placement="top">{t('admin.catalog.actions.edit')}</Tooltip.Content>
+                    </Tooltip>
+                    <Tooltip>
+                      <Button
+                        isIconOnly
+                        variant="ghost"
+                        size="md"
+                        isDisabled={toggleMutation.isPending}
+                        onPress={async () => {
+                          setServerError(null);
+                          try {
+                            await toggleMutation.mutateAsync({
+                              id: cat.id,
+                              activate: !cat.isActive,
+                            });
+                          } catch (err) {
+                            const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
+                            setServerError(
+                              problem?.detail ?? problem?.title ?? t('admin.catalog.errors.unknown'),
+                            );
+                          }
+                        }}
+                        aria-label={
+                          cat.isActive
+                            ? t('admin.catalog.actions.deactivate')
+                            : t('admin.catalog.actions.activate')
                         }
-                      }}
-                      aria-label={
-                        cat.isActive
+                      >
+                        {cat.isActive ? (
+                          <ToggleRight className="size-4 text-success" aria-hidden />
+                        ) : (
+                          <ToggleLeft className="size-4 text-default-400" aria-hidden />
+                        )}
+                      </Button>
+                      <Tooltip.Content placement="top">
+                        {cat.isActive
                           ? t('admin.catalog.actions.deactivate')
-                          : t('admin.catalog.actions.activate')
-                      }
-                    >
-                      {cat.isActive ? (
-                        <ToggleRight className="size-4 text-success" aria-hidden />
-                      ) : (
-                        <ToggleLeft className="size-4 text-default-400" aria-hidden />
-                      )}
-                    </Button>
+                          : t('admin.catalog.actions.activate')}
+                      </Tooltip.Content>
+                    </Tooltip>
                   </div>
                 </div>
               )}

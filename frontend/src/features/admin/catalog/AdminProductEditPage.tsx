@@ -1,4 +1,4 @@
-import { Spinner } from '@heroui/react';
+import { Spinner, Tabs } from '@heroui/react';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
@@ -44,9 +44,31 @@ function Inner({ product }: { product: AdminProductDetailDto }) {
         {t('admin.products.edit.back')}
       </Link>
 
-      <ProductMasterForm product={product} />
-      <ProductVariantsSection product={product} />
-      <ProductImagesSection product={product} />
+      <header className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight">{product.nameEn}</h1>
+        <p className="text-xs text-default-500" dir="ltr">
+          /{product.slug}
+        </p>
+      </header>
+
+      <Tabs variant="secondary" className="space-y-4">
+        <Tabs.ListContainer>
+          <Tabs.List aria-label={t('admin.products.edit.title')}>
+            <Tabs.Tab id="master">{t('admin.products.edit.title')}</Tabs.Tab>
+            <Tabs.Tab id="variants">{t('admin.products.variants.heading')}</Tabs.Tab>
+            <Tabs.Tab id="images">{t('admin.products.images.heading')}</Tabs.Tab>
+          </Tabs.List>
+        </Tabs.ListContainer>
+        <Tabs.Panel id="master">
+          <ProductMasterForm product={product} hideTitle />
+        </Tabs.Panel>
+        <Tabs.Panel id="variants">
+          <ProductVariantsSection product={product} />
+        </Tabs.Panel>
+        <Tabs.Panel id="images">
+          <ProductImagesSection product={product} />
+        </Tabs.Panel>
+      </Tabs>
     </section>
   );
 }

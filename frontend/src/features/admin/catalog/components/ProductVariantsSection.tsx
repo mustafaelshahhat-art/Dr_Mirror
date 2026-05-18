@@ -1,4 +1,4 @@
-import { Button, Form, Label, NumberField } from '@heroui/react';
+import { Button, Form, Label, NumberField, Tooltip } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -111,9 +111,12 @@ function VariantRow({
         <span className="text-sm tabular-nums">
           {t('admin.products.variants.stock', { count: variant.stock })}
         </span>
-        <Button isIconOnly variant="ghost" size="md" onPress={onEdit} aria-label={t('admin.catalog.actions.edit')}>
-          <Pencil className="size-4" aria-hidden />
-        </Button>
+        <Tooltip>
+          <Button isIconOnly variant="ghost" size="md" onPress={onEdit} aria-label={t('admin.catalog.actions.edit')}>
+            <Pencil className="size-4" aria-hidden />
+          </Button>
+          <Tooltip.Content placement="top">{t('admin.catalog.actions.edit')}</Tooltip.Content>
+        </Tooltip>
         <Button
           variant="ghost"
           size="sm"

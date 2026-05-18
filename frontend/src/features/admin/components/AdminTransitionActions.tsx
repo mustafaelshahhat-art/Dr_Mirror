@@ -1,4 +1,4 @@
-import { Button, TextArea } from '@heroui/react';
+import { Button, Modal, TextArea, useOverlayState } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +24,7 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
   const [reason, setReason] = useState('');
   const [error, setError] = useState<string | null>(null);
   const transition = useAdminTransitionMutation({ orderNumber: order.orderNumber });
+  const cancelState = useOverlayState({ defaultOpen: false });
 
   if (order.allowedNextStatesForAdmin.length === 0) {
     return (
@@ -47,8 +48,9 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
         toStatus: target,
         reason: reason.trim() || null,
       });
-      // Reset panel on success — the new allowedNextStatesForAdmin will drive
+      // Reset panel on success; the new allowedNextStatesForAdmin will drive
       // the next render anyway.
+      if (cancelState.isOpen) cancelState.close();
       setTarget(null);
       setReason('');
     } catch (err) {
@@ -78,6 +80,12 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
               size="sm"
               onPress={() => {
                 setError(null);
+                if (isCancel && !isActive) {
+                  setTarget(status);
+                  setReason('');
+                  cancelState.open();
+                  return;
+                }
                 setTarget(isActive ? null : status);
                 if (!isActive) setReason('');
               }}
@@ -88,7 +96,7 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
         })}
       </div>
 
-      {target !== null ? (
+      {target !== null && !isCancelling ? (
         <div className="space-y-2 rounded-medium border border-divider/60 bg-content2 p-3">
           <p className="text-sm font-medium">
             {t('admin.transition.confirmHeading', {
@@ -141,6 +149,74 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
           </div>
         </div>
       ) : null}
+
+      <Modal>
+        <Modal.Backdrop
+          isOpen={cancelState.isOpen}
+          onOpenChange={(open) => {
+            cancelState.setOpen(open);
+            if (!open && !transition.isPending) {
+              setTarget(null);
+              setReason('');
+              setError(null);
+            }
+          }}
+        >
+          <Modal.Container size="sm">
+            <Modal.Dialog>
+              {({ close }) => (
+                <>
+                  <Modal.Header>
+                    <Modal.Heading>
+                      {t('admin.transition.confirmHeading', {
+                        status: t(orderStatusTranslationKey(ORDER_STATUSES.Cancelled)),
+                      })}
+                    </Modal.Heading>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <TextArea
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                      rows={3}
+                      maxLength={500}
+                      fullWidth
+                      placeholder={t('admin.transition.reasonPlaceholderRequired')}
+                      className="text-sm text-start"
+                    />
+                    {error ? (
+                      <p role="alert" className="text-xs text-danger">
+                        {error}
+                      </p>
+                    ) : null}
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      isDisabled={transition.isPending}
+                      onPress={close}
+                    >
+                      {t('admin.transition.dismiss')}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      isDisabled={transition.isPending}
+                      onPress={() => void submit()}
+                    >
+                      {transition.isPending
+                        ? t('admin.transition.submitting')
+                        : t('admin.transition.confirm')}
+                    </Button>
+                  </Modal.Footer>
+                </>
+              )}
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
     </section>
   );
 }

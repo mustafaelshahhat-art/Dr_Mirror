@@ -1,4 +1,4 @@
-import { Button, Form } from '@heroui/react';
+import { Button, Form, Modal, useOverlayState } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,11 +14,18 @@ import {
 } from '../hooks';
 import type { AdminProductDetailDto } from '../types';
 
-export function ProductMasterForm({ product }: { product: AdminProductDetailDto }) {
+export function ProductMasterForm({
+  product,
+  hideTitle = false,
+}: {
+  product: AdminProductDetailDto;
+  hideTitle?: boolean;
+}) {
   const { t } = useTranslation();
   const categories = useAdminCategoriesQuery();
   const updateMutation = useUpdateProductMutation();
   const publishMutation = useTogglePublishMutation();
+  const unpublishState = useOverlayState({ defaultOpen: false });
 
   const [nameAr, setNameAr] = useState(product.nameAr);
   const [nameEn, setNameEn] = useState(product.nameEn);
@@ -42,12 +49,14 @@ export function ProductMasterForm({ product }: { product: AdminProductDetailDto 
   return (
     <article className="rounded-large border border-divider/60 bg-content1 p-4">
       <header className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">{product.nameEn}</h1>
-          <p className="text-xs text-default-500" dir="ltr">
-            /{product.slug}
-          </p>
-        </div>
+        {hideTitle ? <span aria-hidden /> : (
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight">{product.nameEn}</h1>
+            <p className="text-xs text-default-500" dir="ltr">
+              /{product.slug}
+            </p>
+          </div>
+        )}
         <div className="flex items-center gap-2">
           <span
             className={[
@@ -66,20 +75,18 @@ export function ProductMasterForm({ product }: { product: AdminProductDetailDto 
             variant={product.isPublished ? 'outline' : 'primary'}
             size="sm"
             isDisabled={publishMutation.isPending}
-            onPress={async () => {
-              setServerError(null);
-              try {
-                await publishMutation.mutateAsync({
-                  id: product.id,
-                  publish: !product.isPublished,
-                });
-              } catch (err) {
-                const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                setServerError(
-                  problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'),
-                );
-              }
-            }}
+            onPress={product.isPublished
+              ? unpublishState.open
+              : async () => {
+                  setServerError(null);
+                  try {
+                    await publishMutation.mutateAsync({ id: product.id, publish: true });
+                  } catch (err) {
+                    const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
+                    setServerError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
+                  }
+                }
+            }
           >
             {product.isPublished
               ? t('admin.products.actions.unpublish')
@@ -165,6 +172,46 @@ export function ProductMasterForm({ product }: { product: AdminProductDetailDto 
           </Button>
         </div>
       </Form>
+      <Modal>
+        <Modal.Backdrop
+          isOpen={unpublishState.isOpen}
+          onOpenChange={unpublishState.setOpen}
+        >
+          <Modal.Container size="xs">
+            <Modal.Dialog>
+              {({ close }) => (
+                <>
+                  <Modal.Header>
+                    <Modal.Heading>{t('admin.products.actions.unpublish')}</Modal.Heading>
+                  </Modal.Header>
+                  <Modal.Footer>
+                    <Button variant="ghost" onPress={close}>
+                      {t('admin.catalog.actions.cancel')}
+                    </Button>
+                    <Button
+                      variant="danger"
+                      isDisabled={publishMutation.isPending}
+                      onPress={async () => {
+                        setServerError(null);
+                        try {
+                          await publishMutation.mutateAsync({ id: product.id, publish: false });
+                          close();
+                        } catch (err) {
+                          const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
+                          setServerError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
+                          close();
+                        }
+                      }}
+                    >
+                      {t('admin.transition.confirm')}
+                    </Button>
+                  </Modal.Footer>
+                </>
+              )}
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
     </article>
   );
 }
