@@ -5,6 +5,7 @@ import { Outlet } from 'react-router-dom';
 import { AdminHeader } from './AdminHeader';
 import { AdminSidebar } from './AdminSidebar';
 import { ForbiddenBanner } from '../../../shared/components/ForbiddenBanner';
+import { LiveRegion } from '../../../shared/components/LiveRegion';
 
 export function AdminLayout() {
   const { t } = useTranslation();
@@ -26,6 +27,7 @@ export function AdminLayout() {
           <Outlet />
         </main>
       </div>
+      <LiveRegion />
     </div>
   );
 }

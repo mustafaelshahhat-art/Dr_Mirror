@@ -98,7 +98,7 @@ export function AuditLogPage() {
       ) : query.data?.items?.length ? (
         <div className="space-y-4">
           <div className="overflow-x-auto rounded-large border border-divider/60">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" aria-busy={query.isFetching}>
               <thead>
                 <tr className="border-b border-divider/60 bg-content2 text-start">
                   <th scope="col" className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400">

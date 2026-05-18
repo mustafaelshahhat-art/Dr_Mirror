@@ -90,7 +90,7 @@ export function AdminInquiriesPage() {
         />
       ) : query.data?.items?.length ? (
         <div className="space-y-4">
-          <ul className="space-y-3">
+          <ul className="space-y-3" aria-busy={query.isFetching}>
             {query.data.items.map((inquiry) => (
               <li key={inquiry.id}>
                 <InquiryRow inquiry={inquiry} dateFmt={dateFmt} isAr={isAr ?? false} />

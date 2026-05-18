@@ -148,7 +148,7 @@ export function AdminHubPage() {
                   <p className="enter-fade-up text-sm text-default-500">{t('admin.hub.recent.empty')}</p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2" aria-busy={recentQuery.isFetching}>
                   {recentOrders.slice(0, 5).map((o) => (
                     <Link
                       key={o.orderNumber}

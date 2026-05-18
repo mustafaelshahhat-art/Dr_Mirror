@@ -83,7 +83,10 @@ export function CartPage() {
           </div>
         </div>
       ) : hasItems ? (
-        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div
+          className="grid gap-6 lg:grid-cols-[1fr_320px]"
+          aria-busy={cart.isMutating}
+        >
           <div className="space-y-3">
             {cart.items.map((line) => (
               <CartLineRow
