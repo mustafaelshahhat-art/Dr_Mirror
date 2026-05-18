@@ -160,7 +160,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
       <Button
         type="submit"
         variant="primary"
-        isDisabled={submit.isPending}
+        isPending={submit.isPending}
       >
         <span className="inline-flex items-center gap-2">
           <Send className="size-4" aria-hidden />

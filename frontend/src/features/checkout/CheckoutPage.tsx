@@ -1,4 +1,4 @@
-import { Button, Form } from '@heroui/react';
+import { Button, Form, ProgressBar } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isAxiosError } from 'axios';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
@@ -29,6 +29,12 @@ import {
   CheckoutSummarySkeleton,
   Skeleton,
 } from '../../shared/components/Skeleton';
+
+const CHECKOUT_STEP_PROGRESS: Record<CheckoutStep, number> = {
+  address: 1,
+  payment: 2,
+  review: 3,
+};
 
 /**
  * Multi-step checkout. Behind <c>ProtectedRoute</c> — anonymous users land
@@ -223,7 +229,21 @@ function CheckoutBody() {
         <p className="text-sm text-default-500">{t('checkout.subtitle')}</p>
       </header>
 
-      <CheckoutSteps current={step} />
+      <div className="space-y-3">
+        <ProgressBar
+          value={CHECKOUT_STEP_PROGRESS[step]}
+          minValue={0}
+          maxValue={3}
+          aria-label={t('checkout.title')}
+          size="sm"
+          color="accent"
+        >
+          <ProgressBar.Track className="h-1 bg-primary/10">
+            <ProgressBar.Fill />
+          </ProgressBar.Track>
+        </ProgressBar>
+        <CheckoutSteps current={step} />
+      </div>
 
       <Form
         onSubmit={onSubmit}
@@ -314,7 +334,7 @@ function CheckoutBody() {
                 </span>
               </Button>
             ) : (
-              <Button type="submit" variant="primary" isDisabled={isSubmitting}>
+              <Button type="submit" variant="primary" isPending={isSubmitting}>
                 {isSubmitting ? t('checkout.placing') : t('checkout.placeOrder')}
               </Button>
             )}
