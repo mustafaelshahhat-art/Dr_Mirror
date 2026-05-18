@@ -10,8 +10,8 @@ export function NotFoundPage() {
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
-      {/* Numeric "404" glyph is the visual anchor (no Lucide icon) — a deliberate
-          brand-restraint choice over DESIGN.md §15.1's optional empty-state icon.
+      {/* Numeric "404" glyph is the visual anchor (no Lucide icon), a deliberate
+          brand-restraint choice over DESIGN.md section 15.1's optional empty-state icon.
           PRODUCT.md anti-references reject the "AI assistant" / icon-heavy 404
           aesthetic; the typographic glyph reads clinical and quiet, in line with
           the `confident, clinical, calm` brand register. tabular-nums keeps the

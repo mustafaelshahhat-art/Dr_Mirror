@@ -576,3 +576,87 @@ Legend: `S` = static-pass (this rollout cleared every defect class above for tha
 Recorded immediately after the last edit of Phase 7. See bottom of this document; the matrix is updated in `git status`-stable form.
 
 *End of audit. Rollout phases 1–8 complete.*
+
+---
+
+## UI/UX Excellence Pass - Inventory
+
+Phase A inventory for `specs/004-uiux-excellence-pass`. Current count: 51 files import `@heroui/react` from `frontend/src`. The feature brief expected 51 files; no count drift was found in this pass.
+
+### Files importing `@heroui/react`
+
+- `frontend/src/app/providers.tsx`
+- `frontend/src/app/router.tsx`
+- `frontend/src/features/addresses/AddressBookPage.tsx`
+- `frontend/src/features/addresses/components/AddressForm.tsx`
+- `frontend/src/features/admin/AdminInquiriesPage.tsx`
+- `frontend/src/features/admin/AdminUsersPage.tsx`
+- `frontend/src/features/admin/catalog/AdminCategoriesPage.tsx`
+- `frontend/src/features/admin/catalog/AdminPaymentMethodsPage.tsx`
+- `frontend/src/features/admin/catalog/AdminProductCreatePage.tsx`
+- `frontend/src/features/admin/catalog/AdminProductEditPage.tsx`
+- `frontend/src/features/admin/catalog/components/ProductImagesSection.tsx`
+- `frontend/src/features/admin/catalog/components/ProductMasterForm.tsx`
+- `frontend/src/features/admin/catalog/components/ProductVariantsSection.tsx`
+- `frontend/src/features/admin/catalog/components/payment-methods/PaymentMethodForm.tsx`
+- `frontend/src/features/admin/catalog/components/payment-methods/PaymentMethodRow.tsx`
+- `frontend/src/features/admin/components/AdminHeader.tsx`
+- `frontend/src/features/admin/components/AdminProofReview.tsx`
+- `frontend/src/features/admin/components/AdminSidebar.tsx`
+- `frontend/src/features/admin/components/AdminTransitionActions.tsx`
+- `frontend/src/features/auth/LoginPage.tsx`
+- `frontend/src/features/auth/ProtectedRoute.tsx`
+- `frontend/src/features/auth/RegisterPage.tsx`
+- `frontend/src/features/auth/components/FormField.tsx`
+- `frontend/src/features/cart/CartPage.tsx`
+- `frontend/src/features/cart/components/CartButton.tsx`
+- `frontend/src/features/cart/components/CartLineRow.tsx`
+- `frontend/src/features/catalog/CatalogPage.tsx`
+- `frontend/src/features/catalog/ProductDetailPage.tsx`
+- `frontend/src/features/catalog/components/FilterPanel.tsx`
+- `frontend/src/features/catalog/components/PaginationBar.tsx`
+- `frontend/src/features/catalog/components/SearchInput.tsx`
+- `frontend/src/features/checkout/CheckoutPage.tsx`
+- `frontend/src/features/checkout/components/AddressStep.tsx`
+- `frontend/src/features/checkout/components/CheckoutAuthGate.tsx`
+- `frontend/src/features/checkout/components/PaymentMethodPicker.tsx`
+- `frontend/src/features/checkout/components/PaymentMethodSection.tsx`
+- `frontend/src/features/inquiries/components/InquiryForm.tsx`
+- `frontend/src/features/orders/components/CancelOrderButton.tsx`
+- `frontend/src/features/orders/components/PaymentInstructionsCard.tsx`
+- `frontend/src/features/orders/components/PaymentProofUpload.tsx`
+- `frontend/src/shared/components/DowntimeBanner.tsx`
+- `frontend/src/shared/components/EmptyState.tsx`
+- `frontend/src/shared/components/ErrorBoundary.tsx`
+- `frontend/src/shared/components/Field.tsx`
+- `frontend/src/shared/components/ForbiddenBanner.tsx`
+- `frontend/src/shared/components/Header.tsx`
+- `frontend/src/shared/components/LangSwitcher.tsx`
+- `frontend/src/shared/components/PaginationControls.tsx`
+- `frontend/src/shared/components/QueryErrorState.tsx`
+- `frontend/src/shared/components/SelectField.tsx`
+- `frontend/src/shared/components/ThemeToggle.tsx`
+
+### HeroUI components in use today
+
+Required component surface: Breadcrumbs, Button, Checkbox, Description, Drawer, Form, Input, Label, ListBox, Radio, RadioGroup, Select, Spinner, Switch, TextArea, TextField.
+
+Additional HeroUI exports currently imported by app infrastructure or compound APIs: BreadcrumbsItem, FieldError, I18nProvider, RouterProvider.
+
+### Components scheduled for adoption
+
+| Component | Target call sites |
+|---|---|
+| Tabs | `ProductDetailPage` via new `ProductInfoTabs`; `AdminOrderDetailPage` timeline/proofs/line-items; `AdminProductEditPage` master/variants/images |
+| Accordion | `FilterPanel` category, gender, price, size, and color groups |
+| Tooltip | Admin icon-only actions in `AdminProductsListPage`, `AdminUsersPage`, `AdminInquiriesPage`, `AdminProofReview`, `AdminOrderDetailPage`, `ProductImagesSection`, `PaymentMethodRow` |
+| NumberField | `CartLineRow` quantity; `ProductImagesSection` display order; `ProductVariantsSection` stock |
+| Pagination | `PaginationControls` wrapper, preserving all six consumers |
+| Autocomplete | No explicit target in `tasks.md`; reserved for future catalog/admin lookup fields if a phase discovers an existing HeroUI-compatible call site |
+| Skeleton | `shared/components/Skeleton.tsx`, preserving named layout primitives while wrapping HeroUI Skeleton |
+| DatePicker | `AuditLogPage` date filters |
+| DateRangePicker | No explicit target in `tasks.md`; audit-log date range remains split DatePicker fields unless a later phase documents a safe consolidation |
+| Progress | `PaymentProofUpload`, `ProductImagesSection`, and checkout step progress |
+| Modal | Admin reject-proof flow in `AdminProofReview`; admin cancel-order flow in `AdminOrderDetailPage` |
+| ScrollShadow | No explicit target in `tasks.md`; reserved for overflowing drawer/modal/list interiors if found during later phase implementation |
+| Chip | No explicit target in `tasks.md`; status/category pills remain existing badge markup unless a later phase explicitly adopts HeroUI Chip |

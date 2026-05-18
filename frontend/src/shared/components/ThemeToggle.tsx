@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Moon, Sun } from 'lucide-react';
 
 /**
- * Theme toggle — DESIGN_PRINCIPLES §7: 100ms instant flip via HeroUI Button's
+ * Theme toggle - DESIGN_PRINCIPLES section 7: 100ms instant flip via HeroUI Button's
  * built-in transition. Honors prefers-reduced-motion via globals.css.
  *
  * Pre-mount the icon is rendered as "dark" by default to avoid hydration

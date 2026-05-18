@@ -8,7 +8,7 @@ import type { AppLang } from '../lib/theme-storage';
  * user understands what clicking will do (e.g. "EN" while currently Arabic).
  *
  * The button text is intentionally Latin/Arabic short-form, never an icon
- * alone: per DESIGN_PRINCIPLES §9, primary actions must not rely on icons
+ * alone: per DESIGN_PRINCIPLES section 9, primary actions must not rely on icons
  * for meaning.
  */
 export function LangSwitcher() {
