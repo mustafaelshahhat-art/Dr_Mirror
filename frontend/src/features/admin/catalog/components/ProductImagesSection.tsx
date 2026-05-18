@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Button, Input, Label, NumberField } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Trash2, UploadCloud } from 'lucide-react';
 import { useRef, useState } from 'react';
@@ -53,6 +53,7 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
         <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-medium border border-divider bg-content2 px-3 py-1.5 text-sm hover:bg-default-100">
           <UploadCloud className="size-4" aria-hidden />
           {uploadMutation.isPending ? t('admin.products.images.uploading') : t('admin.products.images.upload')}
+          {/* intentional: HeroUI v3 has no file input — see DESIGN.md */}
           <input
             ref={inputRef}
             type="file"
@@ -76,7 +77,7 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
               <div className="aspect-square overflow-hidden rounded-medium bg-default-100">
                 <img src={img.url} alt={img.alt ?? ''} className="h-full w-full object-cover" loading="lazy" />
               </div>
-              <input
+              <Input
                 defaultValue={img.alt ?? ''}
                 placeholder={t('admin.products.images.altPlaceholder')}
                 maxLength={180}
@@ -94,33 +95,40 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
                     setError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
                   }
                 }}
-                className="w-full rounded-medium border border-divider bg-background px-2 py-1 text-xs"
+                variant="secondary"
+                className="w-full text-xs"
               />
               <div className="flex items-center justify-between gap-2">
-                <label className="inline-flex items-center gap-1 text-xs">
-                  <span className="text-default-500">{t('admin.products.images.order')}</span>
-                  <input
-                    type="number"
-                    defaultValue={img.displayOrder}
-                    min={0}
-                    max={999}
-                    onBlur={async (e) => {
-                      const next = Number.parseInt(e.target.value, 10) || 0;
-                      if (next === img.displayOrder) return;
-                      setError(null);
-                      try {
-                        await updateMutation.mutateAsync({
-                          imageId: img.id,
-                          body: { alt: img.alt, displayOrder: next },
-                        });
-                      } catch (err) {
-                        const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                        setError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
-                      }
-                    }}
-                    className="w-12 rounded-medium border border-divider bg-background px-1 py-0.5 text-xs tabular-nums"
-                  />
-                </label>
+                <NumberField
+                  defaultValue={img.displayOrder}
+                  minValue={0}
+                  maxValue={999}
+                  step={1}
+                  variant="secondary"
+                  className="w-24 text-xs"
+                  onBlur={async (e) => {
+                    const input = e.currentTarget.querySelector('input');
+                    const next = Number.parseInt(input?.value ?? '', 10) || 0;
+                    if (next === img.displayOrder) return;
+                    setError(null);
+                    try {
+                      await updateMutation.mutateAsync({
+                        imageId: img.id,
+                        body: { alt: img.alt, displayOrder: next },
+                      });
+                    } catch (err) {
+                      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
+                      setError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
+                    }
+                  }}
+                >
+                  <Label className="text-xs text-default-500">{t('admin.products.images.order')}</Label>
+                  <NumberField.Group>
+                    <NumberField.DecrementButton />
+                    <NumberField.Input className="tabular-nums" />
+                    <NumberField.IncrementButton />
+                  </NumberField.Group>
+                </NumberField>
                 <Button
                   isIconOnly
                   variant="ghost"

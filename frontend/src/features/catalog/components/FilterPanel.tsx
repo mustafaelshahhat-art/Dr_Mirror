@@ -207,6 +207,7 @@ function GenderPill({
   tabIndex: number;
 }) {
   return (
+    // intentional: raw <button role="radio"> keeps the RAC radiogroup pattern per DESIGN.md.
     <button
       type="button"
       role="radio"

@@ -84,6 +84,7 @@ function Pill({
   children: React.ReactNode;
 }) {
   return (
+    // intentional: raw <button role="radio"> keeps the RAC radiogroup pattern per DESIGN.md.
     <button
       type="button"
       role="radio"

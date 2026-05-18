@@ -1,4 +1,4 @@
-import { Button, Form } from '@heroui/react';
+import { Button, Form, Label, NumberField } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -196,6 +196,7 @@ function VariantForm({
         <SimpleField label={t('admin.products.variants.colorNameAr')} value={colorNameAr} onChange={setColorNameAr} required maxLength={60} />
         <label className="space-y-1 text-sm">
           <span className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.variants.hex')}</span>
+          {/* intentional: HeroUI v3 has no color input — see DESIGN.md */}
           <input
             type="color"
             value={colorHex}
@@ -204,17 +205,22 @@ function VariantForm({
           />
         </label>
         <SimpleField label={t('admin.products.variants.sku')} value={sku} onChange={setSku} required maxLength={64} dir="ltr" />
-        <label className="space-y-1 text-sm">
-          <span className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.variants.stockLabel')}</span>
-          <input
-            type="number"
-            min={0}
-            max={1_000_000}
-            value={stock}
-            onChange={(e) => setStock(Number.parseInt(e.target.value, 10) || 0)}
-            className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm tabular-nums"
-          />
-        </label>
+        <NumberField
+          value={stock}
+          minValue={0}
+          maxValue={1_000_000}
+          step={1}
+          onChange={(next) => setStock(next ?? 0)}
+          variant="secondary"
+          className="text-sm"
+        >
+          <Label className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.variants.stockLabel')}</Label>
+          <NumberField.Group>
+            <NumberField.DecrementButton />
+            <NumberField.Input className="tabular-nums" />
+            <NumberField.IncrementButton />
+          </NumberField.Group>
+        </NumberField>
       </div>
       {error ? <p className="text-xs text-danger">{error}</p> : null}
       <div className="flex gap-2">

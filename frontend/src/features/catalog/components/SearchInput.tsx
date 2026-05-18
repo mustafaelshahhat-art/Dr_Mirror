@@ -1,4 +1,4 @@
-import { Input } from '@heroui/react';
+import { Button, Input } from '@heroui/react';
 import { Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,17 +45,20 @@ export function SearchInput({ value, onCommit, debounceMs = 350 }: SearchInputPr
         className="ps-9 pe-9"
       />
       {draft.length > 0 ? (
-        <button
+        <Button
           type="button"
+          isIconOnly
+          variant="ghost"
+          size="sm"
           aria-label={t('catalog.search.clear')}
-          onClick={() => {
+          onPress={() => {
             setDraft('');
             onCommit('');
           }}
-          className="absolute end-2 top-1/2 inline-flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-default-500 hover:bg-default-100 hover:text-foreground"
+          className="absolute end-2 top-1/2 size-6 min-w-0 -translate-y-1/2 text-default-500 hover:text-foreground"
         >
-          <X className="size-3.5" />
-        </button>
+          <X className="size-3.5" aria-hidden />
+        </Button>
       ) : null}
     </div>
   );
