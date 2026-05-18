@@ -66,9 +66,9 @@ export function OrdersListPage() {
 
       {orders.length === 0 ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Package className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <h2 className="text-base font-semibold">{t('orders.list.empty.title')}</h2>
-          <p className="mt-1 text-sm text-default-500">{t('orders.list.empty.subtitle')}</p>
+          <Package className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <h2 className="enter-fade-up text-base font-semibold">{t('orders.list.empty.title')}</h2>
+          <p className="enter-fade-up mt-1 text-sm text-default-500">{t('orders.list.empty.subtitle')}</p>
           <LinkButton
             to="/"
             className="mt-4"

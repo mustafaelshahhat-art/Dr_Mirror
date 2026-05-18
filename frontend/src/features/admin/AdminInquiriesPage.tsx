@@ -105,8 +105,8 @@ export function AdminInquiriesPage() {
         </div>
       ) : (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <MailOpen className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="text-sm text-default-500">{t('inquiries.admin.empty')}</p>
+          <MailOpen className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="enter-fade-up text-sm text-default-500">{t('inquiries.admin.empty')}</p>
         </div>
       )}
     </section>

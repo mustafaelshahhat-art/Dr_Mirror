@@ -84,7 +84,7 @@ export function ProductDetailPage() {
       );
     }
     return (
-      <div className="space-y-4 rounded-large border border-divider/60 bg-content1 p-10 text-center">
+      <div className="enter-fade-up space-y-4 rounded-large border border-divider/60 bg-content1 p-10 text-center">
         <PackageX className="mx-auto size-6 text-default-400" aria-hidden />
         <h1 className="text-lg font-semibold">
           {t('catalog.detail.notFoundTitle')}

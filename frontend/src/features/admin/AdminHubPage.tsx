@@ -142,8 +142,8 @@ export function AdminHubPage() {
                 <div className="h-32 animate-pulse rounded-large border border-divider/60 bg-content1" />
               ) : recentOrders.length === 0 ? (
                 <div className="rounded-large border border-divider/60 bg-content1 p-6 text-center">
-                  <Inbox className="mx-auto mb-2 size-6 text-default-400" aria-hidden />
-                  <p className="text-sm text-default-500">{t('admin.hub.recent.empty')}</p>
+                  <Inbox className="enter-fade-up mx-auto mb-2 size-6 text-default-400" aria-hidden />
+                  <p className="enter-fade-up text-sm text-default-500">{t('admin.hub.recent.empty')}</p>
                 </div>
               ) : (
                 <div className="space-y-2">

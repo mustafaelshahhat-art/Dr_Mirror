@@ -123,8 +123,8 @@ export function AdminPaymentMethodsPage() {
 
       {methods.length === 0 ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <CreditCard className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="text-sm text-default-500">{t('admin.payments.empty')}</p>
+          <CreditCard className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="enter-fade-up text-sm text-default-500">{t('admin.payments.empty')}</p>
         </div>
       ) : (
         <ul className="space-y-2">

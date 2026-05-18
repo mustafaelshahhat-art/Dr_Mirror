@@ -59,13 +59,13 @@ function Inner({ product }: { product: AdminProductDetailDto }) {
             <Tabs.Tab id="images">{t('admin.products.images.heading')}</Tabs.Tab>
           </Tabs.List>
         </Tabs.ListContainer>
-        <Tabs.Panel id="master">
+        <Tabs.Panel id="master" className="data-[selected=true]:enter-fade">
           <ProductMasterForm product={product} hideTitle />
         </Tabs.Panel>
-        <Tabs.Panel id="variants">
+        <Tabs.Panel id="variants" className="data-[selected=true]:enter-fade">
           <ProductVariantsSection product={product} />
         </Tabs.Panel>
-        <Tabs.Panel id="images">
+        <Tabs.Panel id="images" className="data-[selected=true]:enter-fade">
           <ProductImagesSection product={product} />
         </Tabs.Panel>
       </Tabs>

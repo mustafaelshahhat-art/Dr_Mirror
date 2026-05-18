@@ -186,9 +186,9 @@ export function CatalogPage() {
         />
       ) : items.length === 0 ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <SearchX className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="text-base font-semibold text-foreground">{t('catalog.empty.title')}</p>
-          <p className="mt-1 text-sm text-default-500">{t('catalog.empty.subtitle')}</p>
+          <SearchX className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="enter-fade-up text-base font-semibold text-foreground">{t('catalog.empty.title')}</p>
+          <p className="enter-fade-up mt-1 text-sm text-default-500">{t('catalog.empty.subtitle')}</p>
           {hasActiveFilters ? (
             <Button variant="primary" size="sm" onPress={clearAllFilters} className="mt-4">
               {t('catalog.empty.clearFilters')}

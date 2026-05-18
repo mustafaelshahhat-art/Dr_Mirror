@@ -89,8 +89,8 @@ export function AdminUsersPage() {
         </div>
       ) : (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Users className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="text-sm text-default-500">{t('admin.users.empty')}</p>
+          <Users className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="enter-fade-up text-sm text-default-500">{t('admin.users.empty')}</p>
         </div>
       )}
     </section>
