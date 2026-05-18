@@ -1,0 +1,88 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      perf_smoke:
+        description: Run opt-in performance smoke tests
+        required: false
+        default: 'false'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+          global-json-file: backend/global.json
+
+      - name: Restore backend
+        run: dotnet restore backend/DrMirror.slnx
+
+      - name: Build backend
+        run: dotnet build backend/DrMirror.slnx --configuration Release --no-restore
+
+      - name: Test backend
+        run: dotnet test backend/DrMirror.slnx --configuration Release --no-build --logger "trx;LogFileName=test_results.trx"
+
+      - name: Test backend with SQL Server
+        if: ${{ secrets.DRMIRROR_TEST_SQL_CONNECTION != '' }}
+        env:
+          DRMIRROR_TEST_SQL_CONNECTION: ${{ secrets.DRMIRROR_TEST_SQL_CONNECTION }}
+        run: dotnet test backend/DrMirror.slnx --configuration Release --no-build --logger "trx;LogFileName=sql_test_results.trx"
+
+      - name: Performance smoke tests
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.perf_smoke == 'true' }}
+        env:
+          DRMIRROR_PERF_SMOKE: '1'
+        run: dotnet test backend/DrMirror.slnx --configuration Release --no-build --filter PerfSmoke
+
+  frontend:
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Build frontend
+        env:
+          VITE_SENTRY_DSN: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.SENTRY_DSN || '' }}
+          VITE_APP_RELEASE: ${{ github.sha }}
+          SENTRY_AUTH_TOKEN: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.SENTRY_AUTH_TOKEN || '' }}
+        run: npm run build --prefix frontend
+
+      - name: Test frontend
+        run: npm test --prefix frontend -- --run
+
+      - name: Check i18n parity
+        run: npm run i18n:check --prefix frontend
+
+      - name: Lint frontend
+        run: |
+          if npm pkg get scripts.lint --prefix frontend | grep -qv null; then
+            npm run lint --prefix frontend
+          else
+            echo "No lint script defined; skipping."
+          fi

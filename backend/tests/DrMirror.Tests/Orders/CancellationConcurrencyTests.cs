@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using DrMirror.Api.Domain.Entities;
@@ -176,7 +177,11 @@ public class CancellationTestAuthHandler : AuthenticationHandler<AuthenticationS
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, _caller.UserId.ToString()) };
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, _caller.UserId.ToString()),
+            new(JwtRegisteredClaimNames.Sub, _caller.UserId.ToString()),
+        };
         claims.AddRange(_caller.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
         var identity = new ClaimsIdentity(claims, "TestAuth");
         var principal = new ClaimsPrincipal(identity);

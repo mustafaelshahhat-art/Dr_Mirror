@@ -12,6 +12,16 @@ An online store for medical scrubs and uniforms, built for the Egyptian market. 
 ## Project structure
 
 ```
+
+## Documentation
+
+- [Project Map](docs/PROJECT_MAP.md)
+- [Deployment Guide](docs/DEPLOY.md)
+- [Operational Runbook](docs/RUNBOOK.md)
+- [Backup and Restore](docs/BACKUP_RESTORE.md)
+- [Threat Model](docs/THREAT_MODEL.md)
+- [Redesign Audit](docs/REDESIGN_AUDIT.md)
+
 backend/
   src/DrMirror.Api/      ASP.NET Core 10 — vertical slices under /Features
   tests/DrMirror.Tests/  xUnit
@@ -123,4 +133,4 @@ Current focus is Phase 5 — Documentation cleanup and final repository hygiene.
 
 ---
 
-Architecture decisions and constraints live in [PROJECT_MAP](docs/PROJECT_MAP.md). UI rules are in [DESIGN_PRINCIPLES](docs/DESIGN_PRINCIPLES.md) — read that before touching the frontend.
+Architecture decisions, branching rules, breakpoints, migration safety, and UI system discipline live in [Project Map](docs/PROJECT_MAP.md).

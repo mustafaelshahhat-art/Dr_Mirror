@@ -1,4 +1,4 @@
-/* eslint-disable i18next/no-literal-string */
+ 
 import { screen } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { Route, Routes } from 'react-router-dom';

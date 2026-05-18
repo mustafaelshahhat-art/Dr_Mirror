@@ -10,7 +10,8 @@ import type {
   ProductVariantDto,
 } from './types';
 
-const ONE_HOUR = 60 * 60 * 1000;
+const CATALOG_STALE = 60_000;
+const CATALOG_GC = 5 * 60_000;
 
 /**
  * Categories rarely change at runtime, so we cache them aggressively.
@@ -19,8 +20,8 @@ export function useCategoriesQuery() {
   return useQuery({
     queryKey: ['catalog', 'categories'],
     queryFn: ({ signal }) => catalogApi.listCategories(signal),
-    staleTime: ONE_HOUR,
-    gcTime: ONE_HOUR,
+    staleTime: CATALOG_STALE,
+    gcTime: CATALOG_GC,
   });
 }
 
@@ -33,6 +34,8 @@ export function useProductsQuery(filter: ProductFilter) {
     queryKey: ['catalog', 'products', filter],
     queryFn: ({ signal }) => catalogApi.listProducts(filter, signal),
     placeholderData: keepPreviousData,
+    staleTime: CATALOG_STALE,
+    gcTime: CATALOG_GC,
   });
 }
 
@@ -41,6 +44,8 @@ export function useProductDetailQuery(slug: string | undefined) {
     queryKey: ['catalog', 'product', slug],
     queryFn: ({ signal }) => catalogApi.getBySlug(slug!, signal),
     enabled: Boolean(slug),
+    staleTime: CATALOG_STALE,
+    gcTime: CATALOG_GC,
     retry: (failureCount, error) => {
       // Don't retry on 404 — the slug is wrong, not the network.
       const status = (error as { response?: { status?: number } })?.response?.status;

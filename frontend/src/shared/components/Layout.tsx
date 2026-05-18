@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+import { DowntimeBanner } from './DowntimeBanner';
 import { ForbiddenBanner } from './ForbiddenBanner';
 import { Header } from './Header';
 
@@ -20,13 +21,14 @@ export function Layout() {
       >
         {t('common.a11y.skipToContent')}
       </a>
+      <DowntimeBanner />
       <ForbiddenBanner />
       <Header />
       <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 md:px-6 lg:px-8">
         <Outlet />
       </main>
-      <footer className="border-t border-divider/40 py-6 text-center text-xs text-muted">
-        Dr. Mirror &copy; {new Date().getFullYear()}
+      <footer className="border-t border-divider/60 py-6 text-center text-xs text-muted">
+        {t('common.footer.copyright', { year: new Date().getFullYear() })}
       </footer>
     </div>
   );

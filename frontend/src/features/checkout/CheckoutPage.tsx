@@ -60,6 +60,7 @@ function CheckoutBody() {
 
   const [step, setStep] = useState<CheckoutStep>('address');
   const [serverError, setServerError] = useState<string | null>(null);
+  const [idempotencyKey] = useState(() => crypto.randomUUID());
   const [paymentAvailable, setPaymentAvailable] = useState(false);
   // Saved-address mode: when set, the inline form is hidden and we send
   // BuyerAddressId at submit time. null means inline form (which can
@@ -127,6 +128,9 @@ function CheckoutBody() {
     return <CheckoutEmptyState />;
   }
 
+  // react-hook-form's watch() is a stable function; the React Compiler hint
+  // is a known false positive for this library API.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const paymentMethodId = watch('paymentMethodId');
   const buyerNote = watch('buyerNote');
   const address = watch('address');
@@ -175,24 +179,27 @@ function CheckoutBody() {
     try {
       const usingSaved = savedAddressId !== null;
       const order = await createOrder.mutateAsync({
-        paymentMethodId: values.paymentMethodId,
-        buyerAddressId: usingSaved ? savedAddressId : null,
-        shippingAddress: usingSaved
-          ? null
-          : {
-              recipientName: values.address.recipientName,
-              phone: values.address.phone,
-              governorate: values.address.governorate,
-              city: values.address.city,
-              streetAddress: values.address.streetAddress,
-              floor: values.address.floor || null,
-              apartment: values.address.apartment || null,
-              landmark: values.address.landmark || null,
-              notes: values.address.notes || null,
-            },
-        saveAsNewAddress: !usingSaved && saveAsNewAddress,
-        label: !usingSaved && saveAsNewAddress ? newAddressLabel.trim() : null,
-        buyerNote: values.buyerNote?.trim() ? values.buyerNote.trim() : null,
+        idempotencyKey,
+        input: {
+          paymentMethodId: values.paymentMethodId,
+          buyerAddressId: usingSaved ? savedAddressId : null,
+          shippingAddress: usingSaved
+            ? null
+            : {
+                recipientName: values.address.recipientName,
+                phone: values.address.phone,
+                governorate: values.address.governorate,
+                city: values.address.city,
+                streetAddress: values.address.streetAddress,
+                floor: values.address.floor || null,
+                apartment: values.address.apartment || null,
+                landmark: values.address.landmark || null,
+                notes: values.address.notes || null,
+              },
+          saveAsNewAddress: !usingSaved && saveAsNewAddress,
+          label: !usingSaved && saveAsNewAddress ? newAddressLabel.trim() : null,
+          buyerNote: values.buyerNote?.trim() ? values.buyerNote.trim() : null,
+        },
       });
       navigate(`/account/orders/${encodeURIComponent(order.orderNumber)}`);
     } catch (err) {
@@ -255,6 +262,7 @@ function CheckoutBody() {
               <PaymentMethodSection
                 selectedId={paymentMethodId || null}
                 onSelect={(id) =>
+                  // eslint-disable-next-line i18next/no-literal-string
                   setValue('paymentMethodId', id, {
                     shouldValidate: true,
                     shouldDirty: true,

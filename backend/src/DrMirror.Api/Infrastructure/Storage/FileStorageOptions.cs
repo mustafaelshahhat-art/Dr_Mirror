@@ -26,10 +26,10 @@ public sealed class FileStorageOptions : IValidatableObject
     public string LocalPublicBaseUrl { get; set; } = "/uploads";
 
     /// <summary>
-    /// Maximum upload size in bytes. Default: 10 MB.
+    /// Maximum payment-proof upload size in bytes. Default: 5 MB.
     /// Reasonable for screenshots of bank-transfer receipts.
     /// </summary>
-    public long MaxFileSizeBytes { get; set; } = 10 * 1024 * 1024;
+    public long MaxFileSizeBytes { get; set; } = 5 * 1024 * 1024;
 
     /// <summary>
     /// Backwards-compatible proof upload allow-list. Kept image-only to match
@@ -46,17 +46,13 @@ public sealed class FileStorageOptions : IValidatableObject
     };
 
     /// <summary>
-    /// Payment-proof upload allow-list. Image-only by design: the buyer + admin
-    /// proof screens render previews via <c>&lt;img&gt;</c>, so anything that
-    /// can't be displayed as an image (e.g. PDFs) is intentionally excluded.
+    /// Payment-proof upload allow-list.
     /// </summary>
     public string[] PaymentProofContentTypes { get; set; } = new[]
     {
         "image/jpeg",
         "image/png",
-        "image/webp",
-        "image/heic",
-        "image/heif",
+        "application/pdf",
     };
 
     public string[] ProductImageContentTypes { get; set; } = new[]

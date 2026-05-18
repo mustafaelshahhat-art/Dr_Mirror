@@ -1,5 +1,7 @@
+using System.Text.Json;
 using System.Text.Encodings.Web;
 using System.Text.Json.Serialization;
+using DrMirror.Api.BackgroundServices;
 using DrMirror.Api.Features.Addresses;
 using DrMirror.Api.Features.Admin;
 using DrMirror.Api.Features.AppConfig;
@@ -11,8 +13,12 @@ using DrMirror.Api.Features.Inquiries;
 using DrMirror.Api.Features.Orders;
 using DrMirror.Api.Infrastructure.Extensions;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.HealthChecks;
+using DrMirror.Api.Shared.Logging;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Serilog;
 using Serilog.Events;
 
@@ -37,8 +43,19 @@ try
         configuration
             .ReadFrom.Configuration(context.Configuration)
             .ReadFrom.Services(services)
+            .Filter.With(new SecretLogEventFilter())
             .Enrich.FromLogContext()
             .Enrich.WithCorrelationId()
+            .Destructure.ByTransforming<HttpRequest>(request => new
+            {
+                request.Method,
+                Path = request.Path.Value,
+                Headers = request.Headers
+                    .Where(h => !string.Equals(h.Key, "Authorization", StringComparison.OrdinalIgnoreCase)
+                        && !string.Equals(h.Key, "Cookie", StringComparison.OrdinalIgnoreCase)
+                        && !string.Equals(h.Key, "X-Idempotency-Key", StringComparison.OrdinalIgnoreCase))
+                    .ToDictionary(h => h.Key, h => h.Value.ToString())
+            })
             .WriteTo.Async(a => a.File(
                 path: "logs/drmirror-.log",
                 rollingInterval: RollingInterval.Day,
@@ -168,6 +185,25 @@ try
     // -----------------------------------------------------------------------
     builder.Services.AddRateLimitingPolicies();
 
+    builder.Services.AddHealthChecks()
+        .AddCheck<SqlServerHealthCheck>("sqlserver")
+        .AddCheck<FileStorageHealthCheck>("filestorage")
+        .AddCheck<OutboxHealthCheck>("outbox");
+
+    var proofPurgeEnabled = builder.Configuration.GetValue<bool?>("Retention:EnableProofPurge")
+        ?? builder.Environment.IsProduction();
+    if (proofPurgeEnabled)
+    {
+        builder.Services.AddHostedService<PaymentProofRetentionPurgeService>();
+    }
+
+    var outboxPurgeEnabled = builder.Configuration.GetValue<bool?>("Retention:EnableOutboxPurge")
+        ?? builder.Environment.IsProduction();
+    if (outboxPurgeEnabled)
+    {
+        builder.Services.AddHostedService<EmailOutboxRetentionService>();
+    }
+
     var app = builder.Build();
 
     // Production safety: CORS origins must be explicitly configured.
@@ -180,6 +216,27 @@ try
             throw new InvalidOperationException(
                 "Cors:AllowedOrigins must contain at least one origin in production. " +
                 "Set it via the Cors__AllowedOrigins__0 environment variable.");
+
+        RequireConfig(app.Configuration, "ConnectionStrings:Default");
+        var jwtSecret = RequireConfig(app.Configuration, "Jwt:Secret");
+        if (jwtSecret.Length < 64)
+            throw new InvalidOperationException("Jwt:Secret must be at least 64 characters in production.");
+
+        if (string.Equals(app.Configuration["FileStorage:Provider"], "cloudinary", StringComparison.OrdinalIgnoreCase))
+        {
+            RequireConfig(app.Configuration, "FileStorage:CloudinaryCloudName");
+            RequireConfig(app.Configuration, "FileStorage:CloudinaryApiKey");
+            RequireConfig(app.Configuration, "FileStorage:CloudinaryApiSecret");
+        }
+
+        if (string.Equals(app.Configuration["Email:Provider"], "mailkit", StringComparison.OrdinalIgnoreCase))
+        {
+            RequireConfig(app.Configuration, "Email:FromAddress");
+            RequireConfig(app.Configuration, "Email:SmtpHost");
+            RequireConfig(app.Configuration, "Email:SmtpPort");
+            RequireConfig(app.Configuration, "Email:SmtpUsername");
+            RequireConfig(app.Configuration, "Email:SmtpPassword");
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -227,13 +284,72 @@ try
     app.UseStaticFiles();
 
     app.UseAuthentication();
-    app.UseAuthorization();
     app.UseRateLimiter();
+    app.UseAuthorization();
+    app.Use(async (ctx, next) =>
+    {
+        await next();
+
+        if (!HttpMethods.IsGet(ctx.Request.Method) || ctx.Response.HasStarted)
+            return;
+
+        var path = ctx.Request.Path;
+        if (path.StartsWithSegments("/api/catalog"))
+        {
+            ctx.Response.Headers.CacheControl = "public, max-age=60, stale-while-revalidate=300";
+            ctx.Response.Headers.Vary = "Accept-Language";
+            return;
+        }
+
+        if (path.StartsWithSegments("/api/orders")
+            || path.StartsWithSegments("/api/cart")
+            || path.StartsWithSegments("/api/addresses")
+            || path.StartsWithSegments("/api/auth")
+            || path.StartsWithSegments("/api/admin")
+            || path.StartsWithSegments("/api/health"))
+        {
+            ctx.Response.Headers.CacheControl = "private, no-store";
+        }
+    });
 
     // -----------------------------------------------------------------------
     // Endpoints.
     // -----------------------------------------------------------------------
-    app.MapGet("/api/health", () => Results.Json(new { status = "ok" }))
+    app.MapGet("/api/health/live", () => Results.Json(new { status = "Healthy" }))
+        .WithName("HealthLive")
+        .WithTags("Diagnostics");
+
+    var readyOptions = new HealthCheckOptions
+    {
+        ResponseWriter = async (context, report) =>
+        {
+            context.Response.ContentType = "application/json";
+            context.Response.Headers.CacheControl = "no-store";
+            var response = new
+            {
+                status = report.Status.ToString(),
+                checks = report.Entries.Select(e => new
+                {
+                    name = e.Key,
+                    status = e.Value.Status.ToString(),
+                    duration = e.Value.Duration.ToString(),
+                    description = e.Value.Description,
+                }),
+            };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+        },
+        ResultStatusCodes =
+        {
+            [HealthStatus.Healthy] = StatusCodes.Status200OK,
+            [HealthStatus.Degraded] = StatusCodes.Status200OK,
+            [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
+        },
+    };
+
+    app.MapHealthChecks("/api/health/ready", readyOptions)
+        .WithName("HealthReady")
+        .WithTags("Diagnostics");
+    app.MapHealthChecks("/api/health", readyOptions)
         .WithName("Health")
         .WithTags("Diagnostics");
 
@@ -257,6 +373,14 @@ catch (Exception ex) when (ex is not HostAbortedException)
 finally
 {
     Log.CloseAndFlush();
+}
+
+static string RequireConfig(IConfiguration configuration, string key)
+{
+    var value = configuration[key];
+    if (string.IsNullOrWhiteSpace(value))
+        throw new InvalidOperationException($"{key} is required in production.");
+    return value;
 }
 
 // Expose Program class for WebApplicationFactory in integration tests.

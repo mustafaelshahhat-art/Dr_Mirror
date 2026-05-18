@@ -22,6 +22,7 @@ node_modules/
 frontend/node_modules/
 [Bb]in/
 [Oo]bj/
+build/
 dist/
 dist-ssr/
 out/
@@ -41,12 +42,14 @@ pnpm-debug.log*
 
 # --- Secrets & Local Config ---
 .env
+.env*
 .env.local
 .env.*.local
 *.pfx
 *.p12
 secrets.json
 appsettings.*.Local.json
+appsettings.Local.json
 backend/src/DrMirror.Api/appsettings.json
 backend/src/DrMirror.Api/appsettings.Development.json
 
@@ -64,6 +67,7 @@ specs/
 tmp/
 temp/
 backend/src/DrMirror.Api/wwwroot/uploads/
+wwwroot/uploads/
 dr-mirror/README.md
 dr-mirror/project/Admin Dashboard - Dark RTL.html
 dr-mirror/project/Admin Dashboard - Dark.html
@@ -78,3 +82,12 @@ dr-mirror/project/Product Detail - Dark LTR.html
 dr-mirror/project/Product Detail - Dark RTL.html
 dr-mirror/project/Product Detail - Light LTR.html
 design-system-migration-plan.md
+.opencode/commands/speckit.analyze.md
+.opencode/commands/speckit.checklist.md
+.opencode/commands/speckit.clarify.md
+.opencode/commands/speckit.constitution.md
+.opencode/commands/speckit.implement.md
+.opencode/commands/speckit.plan.md
+.opencode/commands/speckit.specify.md
+.opencode/commands/speckit.tasks.md
+.opencode/commands/speckit.taskstoissues.md

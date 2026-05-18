@@ -31,9 +31,13 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         // Slug → URL contract; must be unique across the catalog.
         builder.HasIndex(p => p.Slug).IsUnique();
+        builder.HasIndex(p => p.CategoryId).HasDatabaseName("IX_Products_CategoryId");
 
         // Public listings always filter on (IsPublished, CategoryId, CreatedAt) — composite index pays off fast.
         builder.HasIndex(p => new { p.IsPublished, p.CategoryId, p.CreatedAt });
+        builder.HasIndex(p => new { p.CategoryId, p.IsPublished, p.CreatedAt })
+            .HasDatabaseName("IX_Product_CategoryId_IsActive_CreatedAtUtc")
+            .IsDescending(false, false, true);
 
         // Restrict deletion of a category that still has products — admin must
         // either reassign or unpublish before removing the category.

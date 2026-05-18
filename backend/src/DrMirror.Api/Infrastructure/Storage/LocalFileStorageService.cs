@@ -126,6 +126,7 @@ public sealed class LocalFileStorageService : IFileStorageService
     {
         "image/jpeg"       => ".jpg",
         "image/png"        => ".png",
+        "application/pdf"  => ".pdf",
         "image/webp"       => ".webp",
         "image/heic"       => ".heic",
         "image/heif"       => ".heif",

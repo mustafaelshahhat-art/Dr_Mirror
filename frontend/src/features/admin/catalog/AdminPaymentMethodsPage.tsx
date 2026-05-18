@@ -103,8 +103,8 @@ export function AdminPaymentMethodsPage() {
       ) : null}
 
       {creating ? (
-        <PaymentMethodForm
-          mode="create"
+        // eslint-disable-next-line i18next/no-literal-string -- programmatic form mode, not user copy
+        <PaymentMethodForm mode="create"
           onCancel={() => setCreating(false)}
           isPending={createMutation.isPending}
           onSubmit={async (body) => {
@@ -131,8 +131,8 @@ export function AdminPaymentMethodsPage() {
           {methods.map((m) => (
             <li key={m.id}>
               {editingId === m.id ? (
-                <PaymentMethodForm
-                  mode="edit"
+                // eslint-disable-next-line i18next/no-literal-string -- programmatic form mode, not user copy
+                <PaymentMethodForm mode="edit"
                   initial={m}
                   onCancel={() => setEditingId(null)}
                   isPending={updateMutation.isPending}

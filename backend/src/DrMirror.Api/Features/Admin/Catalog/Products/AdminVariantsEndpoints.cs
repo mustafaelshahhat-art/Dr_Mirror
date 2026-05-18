@@ -1,6 +1,7 @@
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.Auditing;
 using DrMirror.Api.Shared.Validation;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -76,6 +77,7 @@ public static class AdminVariantsEndpoints
         Guid productId,
         AdminVariantUpsertRequest request,
         AppDbContext db,
+        IAdminAuditWriter audit,
         CancellationToken ct)
     {
         var product = await db.Products.FindAsync(new object[] { productId }, ct);
@@ -121,6 +123,7 @@ public static class AdminVariantsEndpoints
         };
 
         db.ProductVariants.Add(entity);
+        await audit.WriteAsync("Stock.Adjust", "ProductVariant", entity.Id.ToString(), null, entity.Stock.ToString(), ct);
         await db.SaveChangesAsync(ct);
 
         return Results.Created(
@@ -133,6 +136,7 @@ public static class AdminVariantsEndpoints
         Guid variantId,
         AdminVariantUpsertRequest request,
         AppDbContext db,
+        IAdminAuditWriter audit,
         CancellationToken ct)
     {
         var entity = await db.ProductVariants
@@ -172,6 +176,8 @@ public static class AdminVariantsEndpoints
             }
         }
 
+        var previousStock = entity.Stock;
+
         entity.Size = request.Size.Trim();
         entity.ColorName = request.ColorName.Trim();
         entity.ColorNameAr = request.ColorNameAr.Trim();
@@ -179,6 +185,11 @@ public static class AdminVariantsEndpoints
         entity.Sku = request.Sku.Trim();
         entity.Stock = request.Stock;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+        if (previousStock != entity.Stock)
+        {
+            await audit.WriteAsync("Stock.Adjust", "ProductVariant", entity.Id.ToString(), previousStock.ToString(), entity.Stock.ToString(), ct);
+        }
 
         await db.SaveChangesAsync(ct);
         return Results.Ok(ToDto(entity));
@@ -188,6 +199,7 @@ public static class AdminVariantsEndpoints
         Guid productId,
         Guid variantId,
         AppDbContext db,
+        IAdminAuditWriter audit,
         CancellationToken ct)
     {
         var entity = await db.ProductVariants
@@ -199,6 +211,7 @@ public static class AdminVariantsEndpoints
 
         entity.IsActive = false;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
+        await audit.WriteAsync("Product.Update", "ProductVariant", entity.Id.ToString(), "Active", "Inactive", ct);
         await db.SaveChangesAsync(ct);
 
         return Results.Ok(ToDto(entity));
@@ -208,6 +221,7 @@ public static class AdminVariantsEndpoints
         Guid productId,
         Guid variantId,
         AppDbContext db,
+        IAdminAuditWriter audit,
         CancellationToken ct)
     {
         var entity = await db.ProductVariants
@@ -219,6 +233,7 @@ public static class AdminVariantsEndpoints
 
         entity.IsActive = true;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
+        await audit.WriteAsync("Product.Update", "ProductVariant", entity.Id.ToString(), "Inactive", "Active", ct);
         await db.SaveChangesAsync(ct);
 
         return Results.Ok(ToDto(entity));

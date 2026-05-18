@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using DrMirror.Api.Features.Admin.Audit;
 using DrMirror.Api.Features.Admin.Catalog.Categories;
 using DrMirror.Api.Features.Admin.Catalog.Products;
 using DrMirror.Api.Features.Admin.Orders.GetOrderByNumber;
@@ -21,6 +22,15 @@ public static class AdminEndpoints
     /// <c>RequireRole(Admin)</c> on top of the JWT authentication.
     /// A conservative rate-limit (120 req/min per user) is applied to the group.
     /// </summary>
+    /// <remarks>
+    /// <b>Defense-in-depth:</b> The group-level <c>RequireAuthorization</c> with
+    /// <c>Roles = Admin</c> is the primary gate. Individual endpoints may add
+    /// further authorization policies, but must never relax the Admin requirement.
+    /// The rate limiter (<c>RateLimitPolicies.AdminApi</c>) provides a secondary
+    /// layer that limits blast radius even with a compromised token.
+    /// New admin endpoints must be registered inside this method so they inherit
+    /// the group-level role + rate-limit protections automatically.
+    /// </remarks>
     public static IEndpointRouteBuilder MapAdminEndpoints(this IEndpointRouteBuilder app)
     {
         var admin = app.MapGroup("/api/admin")
@@ -54,6 +64,10 @@ public static class AdminEndpoints
         var users = admin.MapGroup("/users").WithTags("Admin: Users");
         users.MapListUsers();
         users.MapUpdateUserRoles();
+        users.MapUserStatus();
+
+        var audit = admin.MapGroup("/audit").WithTags("Admin: Audit");
+        audit.MapAuditEndpoints();
 
         return app;
     }

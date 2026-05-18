@@ -41,6 +41,7 @@ const AdminProductEditPage = lazy(() => import('../features/admin/catalog/AdminP
 const AdminPaymentMethodsPage = lazy(() => import('../features/admin/catalog/AdminPaymentMethodsPage').then((m) => ({ default: m.AdminPaymentMethodsPage })));
 const AdminInquiriesPage = lazy(() => import('../features/admin/AdminInquiriesPage').then((m) => ({ default: m.AdminInquiriesPage })));
 const AdminUsersPage = lazy(() => import('../features/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
+const AdminAuditPage = lazy(() => import('../features/admin/audit/AuditLogPage').then((m) => ({ default: m.AuditLogPage })));
 
 function PageFallback() {
   const { t } = useTranslation();
@@ -96,6 +97,7 @@ export function AppRoutes() {
             <Route path="admin/payment-methods" element={<AdminPaymentMethodsPage />} />
             <Route path="admin/inquiries" element={<AdminInquiriesPage />} />
             <Route path="admin/users" element={<AdminUsersPage />} />
+            <Route path="admin/audit" element={<AdminAuditPage />} />
             <Route path="admin/*" element={<NotFoundPage />} />
           </Route>
         </Route>

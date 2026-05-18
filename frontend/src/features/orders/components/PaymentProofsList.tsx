@@ -64,7 +64,7 @@ export function PaymentProofsList({
               ) : null}
               {proof.reviewNote ? (
                 <p className="rounded-medium bg-content2 px-2 py-1 text-xs text-foreground">
-                  &ldquo;{proof.reviewNote}&rdquo;
+                  {t('orders.proofs.reviewNoteQuoted', { note: proof.reviewNote })}
                 </p>
               ) : null}
             </div>

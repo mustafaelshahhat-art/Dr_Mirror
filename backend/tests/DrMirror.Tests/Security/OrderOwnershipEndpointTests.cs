@@ -146,7 +146,7 @@ public class OrderOwnershipEndpointTests : IClassFixture<OrderOwnershipEndpointT
     }
 
     [Fact]
-    public async Task PDF_proof_upload_returns_unsupported_file_type()
+    public async Task PDF_proof_upload_is_accepted()
     {
         var buyer = await CreateUserAsync("ep-pdf-proof@example.com", UserRoles.Buyer);
         var orderNumber = await SeedOrderAsync(buyer.Id, PaymentMethodKind.Instapay);
@@ -162,9 +162,7 @@ public class OrderOwnershipEndpointTests : IClassFixture<OrderOwnershipEndpointT
 
         var response = await client.PostAsync($"/api/orders/{orderNumber}/proof", content);
 
-        Assert.Equal(HttpStatusCode.UnsupportedMediaType, response.StatusCode);
-        var body = await response.Content.ReadAsStringAsync();
-        Assert.Contains("Upload a JPEG, PNG, WebP, HEIC, or HEIF image", body);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     // ── Protected proof file streaming ────────────────────────────────────
@@ -197,7 +195,7 @@ public class OrderOwnershipEndpointTests : IClassFixture<OrderOwnershipEndpointT
     }
 
     [Fact]
-    public async Task Buyer_gets_403_from_another_buyers_payment_proof_file()
+    public async Task Buyer_gets_404_from_another_buyers_payment_proof_file()
     {
         var buyerA = await CreateUserAsync("ep-proof-a@example.com", UserRoles.Buyer);
         var buyerB = await CreateUserAsync("ep-proof-b@example.com", UserRoles.Buyer);
@@ -209,7 +207,7 @@ public class OrderOwnershipEndpointTests : IClassFixture<OrderOwnershipEndpointT
 
         var response = await client.GetAsync($"/api/orders/{orderNumber}/proof/{proofId}/file");
 
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]

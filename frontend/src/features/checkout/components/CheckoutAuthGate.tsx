@@ -22,7 +22,10 @@ export function CheckoutAuthGate({ children }: { children: ReactNode }) {
     );
   }
   if (!user) {
-    return <Navigate to="/login" state={{ from: { pathname: '/checkout' } }} replace />;
+    return (
+      // eslint-disable-next-line i18next/no-literal-string -- route path, not user copy
+      <Navigate to="/login" state={{ from: { pathname: '/checkout' } }} replace />
+    );
   }
 
   return <>{children}</>;

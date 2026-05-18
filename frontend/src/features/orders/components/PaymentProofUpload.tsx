@@ -10,7 +10,8 @@ interface PaymentProofUploadProps {
 }
 
 const BYTES_PER_MEGABYTE = 1024 * 1024;
-const ACCEPTED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+const ACCEPTED_MIME = ['image/jpeg', 'image/png', 'application/pdf'];
+const ACCEPTED_EXTENSIONS = '.jpg,.jpeg,.png,.pdf';
 
 /**
  * Buyer's "Upload payment proof" card. Validates the file client-side
@@ -63,7 +64,9 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
     }
 
     setSelected(file);
-    setPreviewUrl(URL.createObjectURL(file));
+    if (file.type.startsWith('image/')) {
+      setPreviewUrl(URL.createObjectURL(file));
+    }
   }
 
   async function submit() {
@@ -111,7 +114,7 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
           id={`proof-input-${orderNumber}`}
           ref={inputRef}
           type="file"
-          accept={ACCEPTED_MIME.join(',')}
+          accept={ACCEPTED_EXTENSIONS}
           disabled={!canPickFile}
           className="sr-only"
           onChange={(e) => onPickFile(e.target.files?.[0] ?? null)}

@@ -2,6 +2,8 @@ using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.Storage;
+using DrMirror.Api.Shared.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace DrMirror.Api.Features.Orders.GetPaymentProofFile;
@@ -18,9 +20,9 @@ public static class GetPaymentProofFileEndpoint
             .WithName("Orders.GetPaymentProofFile")
             .WithSummary("Stream a payment-proof file. Buyers: own orders only. Admins: any order.")
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.ProofFileRead)
             .Produces(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status404NotFound);
 
         return group;
@@ -52,13 +54,21 @@ public static class GetPaymentProofFileEndpoint
 
         if (!isAdmin && order.BuyerUserId != userId)
         {
-            return Results.Problem(title: "Access denied", statusCode: StatusCodes.Status403Forbidden);
+            return Results.Problem(title: "Proof not found", statusCode: StatusCodes.Status404NotFound);
         }
 
         var proof = order.PaymentProofs.FirstOrDefault(p => p.Id == proofId);
         if (proof is null)
         {
             return Results.Problem(title: "Proof not found", statusCode: StatusCodes.Status404NotFound);
+        }
+
+        if (proof.FilePurgedAtUtc is not null)
+        {
+            return Results.Problem(
+                title: "File no longer available",
+                detail: "This payment proof was purged 2 years after the order was completed.",
+                statusCode: StatusCodes.Status410Gone);
         }
 
         try

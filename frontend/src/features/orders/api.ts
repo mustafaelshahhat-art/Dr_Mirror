@@ -1,5 +1,6 @@
 import { api } from '../../shared/lib/api-client';
 import type { PagedResult } from '../../shared/types/paged-result';
+import { appConfigApi } from '../app-config/api';
 
 import type {
   CancelOrderRequest,
@@ -7,8 +8,6 @@ import type {
   OrderDetailDto,
   OrderSummaryDto,
   PaymentMethodDto,
-  PaymentProofUploadConfigDto,
-  AppConfigDto,
 } from './types';
 
 /**
@@ -17,23 +16,24 @@ import type {
  * and refresh interceptor handle session restoration silently.
  */
 export const ordersApi = {
-  async getAppConfig(): Promise<AppConfigDto> {
-    const { data } = await api.get<AppConfigDto>('/app-config');
-    return data;
-  },
-
-  async getPaymentProofUploadConfig(): Promise<PaymentProofUploadConfigDto> {
-    const { data } = await api.get<AppConfigDto>('/app-config');
-    return data.paymentProofUpload;
-  },
+  getAppConfig: appConfigApi.getAppConfig,
 
   async getPaymentMethods(): Promise<PaymentMethodDto[]> {
     const { data } = await api.get<PaymentMethodDto[]>('/checkout/payment-methods');
     return data;
   },
 
-  async createOrder(input: CreateOrderRequest): Promise<OrderDetailDto> {
-    const { data } = await api.post<OrderDetailDto>('/checkout', input);
+  /**
+   * Convert the signed-in buyer's cart into an order.
+   * Maps to the backend's `POST /api/checkout` (MapPost("/") on the
+   * /api/checkout route group), NOT `/api/checkout/` with trailing slash.
+   * The backend route group is mounted at "/api/checkout" and the handler
+   * is registered as MapPost("/"), so the effective path is "/api/checkout".
+   */
+  async createOrder(input: CreateOrderRequest, idempotencyKey?: string): Promise<OrderDetailDto> {
+    const { data } = await api.post<OrderDetailDto>('/checkout', input, {
+      headers: idempotencyKey ? { 'X-Idempotency-Key': idempotencyKey } : undefined,
+    });
     return data;
   },
 

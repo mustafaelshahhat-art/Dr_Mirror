@@ -77,6 +77,7 @@ export function AdminProductsListPage() {
         <SelectField
           label={t('admin.list.status')}
           hideLabel
+          // eslint-disable-next-line i18next/no-literal-string -- API enum values, not user copy
           value={published === undefined ? '' : published ? 'pub' : 'draft'}
           emptyLabel={t('admin.products.list.allStatuses')}
           onChange={(next) => {
@@ -84,7 +85,9 @@ export function AdminProductsListPage() {
             setPage(1);
           }}
           options={[
+            // eslint-disable-next-line i18next/no-literal-string -- API enum value, not user copy
             { value: 'pub', label: t('admin.products.list.published') },
+            // eslint-disable-next-line i18next/no-literal-string -- API enum value, not user copy
             { value: 'draft', label: t('admin.products.list.draft') },
           ]}
         />

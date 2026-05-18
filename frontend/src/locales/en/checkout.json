@@ -54,7 +54,8 @@
     "heading": "Review your order",
     "shippingTo": "Shipping to",
     "payingWith": "Paying with",
-    "noMethod": "(no payment method picked)"
+    "noMethod": "(no payment method picked)",
+    "buyerNoteQuoted": "“{{note}}”"
   },
   "summary": {
     "heading": "Order summary",

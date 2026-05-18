@@ -154,7 +154,7 @@ export function ProductMasterForm({ product }: { product: AdminProductDetailDto 
           isRequired
           options={(categories.data ?? []).map((c) => ({
             value: c.id,
-            label: `${c.nameEn} (${c.nameAr})${c.isActive ? '' : ' (inactive)'}`,
+            label: `${c.nameEn} (${c.nameAr})${c.isActive ? '' : ` (${t('admin.catalog.status.inactive')})`}`,
           }))}
         />
         <div className="sm:col-span-2 flex gap-2 pt-1">

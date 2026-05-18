@@ -3,6 +3,7 @@ using DrMirror.Api.Domain.Orders;
 using DrMirror.Api.Features.Inquiries.Common;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.Auditing;
 using Microsoft.EntityFrameworkCore;
 
 namespace DrMirror.Api.Features.Admin.Inquiries;
@@ -30,6 +31,7 @@ public static class MarkInquiryRespondedEndpoint
         Guid inquiryId,
         ICurrentUser current,
         AppDbContext db,
+        IAdminAuditWriter audit,
         CancellationToken ct)
     {
         if (current.UserId is not { } adminId)
@@ -60,6 +62,14 @@ public static class MarkInquiryRespondedEndpoint
             inquiry.ReadByUserId = adminId;
             inquiry.ReadAt = inquiry.RespondedAt;
         }
+
+        await audit.WriteAsync(
+            "Inquiry.Respond",
+            "Inquiry",
+            inquiry.Id.ToString(),
+            InquiryStatus.Read.ToString(),
+            inquiry.Status.ToString(),
+            ct);
 
         await db.SaveChangesAsync(ct);
 

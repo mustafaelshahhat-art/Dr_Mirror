@@ -5,7 +5,10 @@ using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.Storage;
+using DrMirror.Api.Shared;
+using DrMirror.Api.Shared.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -24,25 +27,13 @@ public static class UploadPaymentProofEndpoint
         {
             { "image/jpeg",       new byte[] { 0xFF, 0xD8, 0xFF } },
             { "image/png",        new byte[] { 0x89, 0x50, 0x4E, 0x47 } },
-            { "image/webp",       new byte[] { 0x52, 0x49, 0x46, 0x46 } }, // RIFF header
+            { "application/pdf",  new byte[] { 0x25, 0x50, 0x44, 0x46 } },
         };
 
-    private static bool HasValidMagicBytes(Stream stream, string contentType)
+    private static bool HasValidMagicBytes(ReadOnlySpan<byte> header, string contentType)
     {
-        // HEIC/HEIF use a complex container format; skip magic-byte check for those.
-        if (contentType.Equals("image/heic", StringComparison.OrdinalIgnoreCase) ||
-            contentType.Equals("image/heif", StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
-
         if (!MagicBytes.TryGetValue(contentType, out var magic)) return false;
-
-        Span<byte> header = stackalloc byte[magic.Length];
-        int read = stream.Read(header);
-        stream.Position = 0;
-
-        return read == magic.Length && header.SequenceEqual(magic);
+        return header.Length >= magic.Length && header[..magic.Length].SequenceEqual(magic);
     }
 
     public static RouteGroupBuilder MapUploadPaymentProof(this RouteGroupBuilder group)
@@ -51,6 +42,7 @@ public static class UploadPaymentProofEndpoint
             .WithName("Orders.UploadPaymentProof")
             .WithSummary("Upload a payment-proof image for an Instapay / Wallet order.")
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.ProofUpload)
             .DisableAntiforgery() // bearer-token API, multipart upload
             .Produces<OrderDetailDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -91,33 +83,35 @@ public static class UploadPaymentProofEndpoint
             return Results.Problem(
                 title: "File too large",
                 detail: $"Maximum allowed size is {o.MaxFileSizeBytes / 1024 / 1024} MB.",
-                statusCode: StatusCodes.Status400BadRequest);
+                statusCode: StatusCodes.Status413PayloadTooLarge);
         }
 
-        if (!o.PaymentProofContentTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase)
-            && !o.AllowedContentTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
+        if (!o.PaymentProofContentTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
         {
             return Results.Problem(
                 title: "Unsupported file type",
-                detail: $"Upload a JPEG, PNG, WebP, HEIC, or HEIF image (received {file.ContentType}).",
+                detail: $"Upload a JPEG, PNG, or PDF file (received {file.ContentType}).",
                 statusCode: StatusCodes.Status415UnsupportedMediaType);
         }
 
-        // Read file into memory so we can (a) inspect magic bytes and (b) pass to storage.
-        using var ms = new MemoryStream();
-        await file.OpenReadStream().CopyToAsync(ms, ct);
-        ms.Position = 0;
+        // Read a small header for magic-byte validation, then stream the rest
+        // directly to storage without buffering the entire file in memory.
+        var fileStream = file.OpenReadStream();
+        var maxMagicLen = MagicBytes.Values.Max(m => m.Length);
+        var header = new byte[maxMagicLen];
+        var headerRead = await fileStream.ReadAsync(header, ct);
 
         // Validate file signature to prevent content-type spoofing.
-        if (!HasValidMagicBytes(ms, file.ContentType))
+        if (!HasValidMagicBytes(header[..headerRead], file.ContentType))
         {
+            await fileStream.DisposeAsync();
             return Results.Problem(
                 title: "File content does not match declared type",
                 detail: "The uploaded file's content does not match its declared content-type.",
                 statusCode: StatusCodes.Status415UnsupportedMediaType);
         }
 
-        ms.Position = 0;
+        using var combined = new PrefixedStream(header[..headerRead].ToArray(), fileStream);
 
         // Load the order with the bits needed for FSM + the detail projection.
         var order = await db.Orders
@@ -154,9 +148,20 @@ public static class UploadPaymentProofEndpoint
                 statusCode: StatusCodes.Status409Conflict);
         }
 
+        // Stale-proof guard: if the order is already under review with a pending
+        // proof, block another upload until the admin acts on the current one.
+        if (order.Status == OrderStatus.PendingPaymentReview &&
+            order.PaymentProofs.Any(p => p.Status == PaymentProofStatus.Pending))
+        {
+            return Results.Problem(
+                title: "A payment proof is already pending review",
+                detail: "Please wait for the admin to review it before uploading again.",
+                statusCode: StatusCodes.Status409Conflict);
+        }
+
         // Upload to storage. Folder is keyed by order number for tidy listings.
         var stored = await storage.UploadAsync(
-            ms,
+            combined,
             folder: $"payment-proofs/{order.OrderNumber}",
             originalFileName: file.FileName,
             contentType: file.ContentType,

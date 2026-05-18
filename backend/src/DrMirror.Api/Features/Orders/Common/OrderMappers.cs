@@ -58,6 +58,22 @@ internal static class OrderMappers
         ReviewNote: proof.ReviewNote,
         UploadedAt: proof.UploadedAt);
 
+    /// <summary>
+    /// Entity → DTO projection for the full order detail response.
+    /// </summary>
+    /// <remarks>
+    /// <b>Caller contract</b> — the <paramref name="order"/> must be loaded with
+    /// these EF Core includes <b>before</b> being passed here, otherwise EF will
+    /// either throw or silently return null for missing nav properties:
+    /// <code>
+    /// .Include(o => o.BuyerUser)
+    /// .Include(o => o.PaymentMethod)
+    /// .Include(o => o.Items).ThenInclude(i => i.Product)
+    /// .Include(o => o.PaymentProofs).ThenInclude(p => p.ReviewedByUser)
+    /// </code>
+    /// Endpoints that <c>SaveChanges</c> and then re-query for the response must
+    /// repeat these includes on the re-query (they are not retained after save).
+    /// </remarks>
     public static OrderDetailDto ToDetail(this Order order, OrderStateMachine fsm) => new(
         Id: order.Id,
         OrderNumber: order.OrderNumber,

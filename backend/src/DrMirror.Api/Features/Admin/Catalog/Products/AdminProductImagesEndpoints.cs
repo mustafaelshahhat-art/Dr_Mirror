@@ -2,6 +2,7 @@ using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.Storage;
+using DrMirror.Api.Shared.Auditing;
 using DrMirror.Api.Shared.Validation;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -83,6 +84,7 @@ public static class AdminProductImagesEndpoints
         Guid productId,
         IFormFile file,
         AppDbContext db,
+        IAdminAuditWriter audit,
         [FromServices] IFileStorageService storage,
         [FromServices] IOptions<FileStorageOptions> opts,
         CancellationToken ct)
@@ -157,6 +159,7 @@ public static class AdminProductImagesEndpoints
         };
 
         db.ProductImages.Add(entity);
+        await audit.WriteAsync("Product.Update", "ProductImage", entity.Id.ToString(), null, "Created", ct);
         await db.SaveChangesAsync(ct);
 
         return Results.Created($"/api/admin/products/{productId}/images/{entity.Id}", ToDto(entity));
@@ -167,6 +170,7 @@ public static class AdminProductImagesEndpoints
         Guid imageId,
         AdminProductImageUpdateRequest request,
         AppDbContext db,
+        IAdminAuditWriter audit,
         CancellationToken ct)
     {
         var entity = await db.ProductImages
@@ -179,6 +183,7 @@ public static class AdminProductImagesEndpoints
         entity.Alt = string.IsNullOrWhiteSpace(request.Alt) ? null : request.Alt.Trim();
         entity.DisplayOrder = request.DisplayOrder;
 
+        await audit.WriteAsync("Product.Update", "ProductImage", entity.Id.ToString(), null, null, ct);
         await db.SaveChangesAsync(ct);
         return Results.Ok(ToDto(entity));
     }
@@ -187,6 +192,7 @@ public static class AdminProductImagesEndpoints
         Guid productId,
         Guid imageId,
         AppDbContext db,
+        IAdminAuditWriter audit,
         [FromServices] IFileStorageService storage,
         CancellationToken ct)
     {
@@ -207,6 +213,7 @@ public static class AdminProductImagesEndpoints
         }
 
         db.ProductImages.Remove(entity);
+        await audit.WriteAsync("Product.Update", "ProductImage", entity.Id.ToString(), "Present", "Deleted", ct);
         await db.SaveChangesAsync(ct);
 
         return Results.NoContent();

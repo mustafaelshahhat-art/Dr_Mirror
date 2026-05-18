@@ -59,6 +59,7 @@
     "imageUnavailable": "Payment proof preview is unavailable.",
     "imageLoadError": "Couldn't load this payment proof image.",
     "openFile": "Open payment proof file",
+    "reviewNoteQuoted": "“{{note}}”",
     "reviewedAt": "Reviewed on {{when}} by {{by}}",
     "status": {
       "pending": "Awaiting review",
@@ -68,7 +69,7 @@
   },
   "upload": {
     "heading": "Upload payment proof",
-    "subtitle": "JPEG, PNG, WebP, HEIC, or HEIF. Maximum {{mb}} MB.",
+    "subtitle": "JPEG, PNG, or PDF. Maximum {{mb}} MB.",
     "loadingRequirements": "Loading upload requirements...",
     "requirementsUnavailable": "Couldn't load upload requirements. Refresh and try again.",
     "pickFile": "Choose a file",
@@ -78,7 +79,7 @@
     "clear": "Clear",
     "errors": {
       "tooLarge": "File is larger than {{mb}} MB.",
-      "unsupportedType": "Only JPEG, PNG, WebP, HEIC, and HEIF images are allowed.",
+      "unsupportedType": "Only JPEG, PNG, or PDF files are allowed.",
       "configUnavailable": "Couldn't load upload requirements. Refresh and try again.",
       "unknown": "Couldn't upload the file. Please try again."
     }

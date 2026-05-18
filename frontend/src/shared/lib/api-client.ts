@@ -7,6 +7,7 @@ import {
   setAccessToken,
 } from './auth-storage';
 import { setForbiddenMessage } from './forbidden-store';
+import { setRateLimitState } from './rate-limit-store';
 
 /**
  * Single axios instance for the app.
@@ -122,6 +123,14 @@ api.interceptors.response.use(
     if (status === 403) {
       const detail = (error.response?.data as { detail?: string })?.detail ?? '';
       setForbiddenMessage(detail || 'Forbidden');
+    }
+
+    if (status === 429) {
+      const retryAfter = error.response?.headers?.['retry-after'];
+      const retryAfterSeconds = retryAfter ? Number(retryAfter) : NaN;
+      if (!Number.isNaN(retryAfterSeconds)) {
+        setRateLimitState({ retryAfterSeconds });
+      }
     }
 
     return Promise.reject(error);

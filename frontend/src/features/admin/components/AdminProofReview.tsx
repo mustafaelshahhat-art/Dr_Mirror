@@ -166,7 +166,7 @@ function ProofRow({
           ) : null}
           {proof.reviewNote ? (
             <p className="mt-1 rounded-medium bg-content2 px-2 py-1 text-xs text-foreground">
-              &ldquo;{proof.reviewNote}&rdquo;
+              {t('orders.proofs.reviewNoteQuoted', { note: proof.reviewNote })}
             </p>
           ) : null}
           <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -199,6 +199,7 @@ function ProofRow({
               variant="primary"
               size="sm"
               onPress={() => {
+                // eslint-disable-next-line i18next/no-literal-string -- state machine value, not user copy
                 setMode('approve');
                 setNote('');
                 setError(null);
@@ -214,6 +215,7 @@ function ProofRow({
               variant="danger-soft"
               size="sm"
               onPress={() => {
+                // eslint-disable-next-line i18next/no-literal-string -- state machine value, not user copy
                 setMode('reject');
                 setNote('');
                 setError(null);
@@ -268,6 +270,7 @@ function ProofRow({
                 size="sm"
                 isDisabled={inFlight}
                 onPress={() => {
+                  // eslint-disable-next-line i18next/no-literal-string -- state machine value, not user copy
                   setMode('idle');
                   setNote('');
                   setError(null);

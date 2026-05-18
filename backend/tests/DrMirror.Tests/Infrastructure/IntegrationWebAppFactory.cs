@@ -1,3 +1,4 @@
+using DrMirror.Api.BackgroundServices;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
@@ -102,5 +103,11 @@ public abstract class IntegrationWebAppFactory : WebApplicationFactory<Program>
             d => d.ImplementationType == typeof(EmailOutboxProcessor));
         if (outboxProcessor is not null)
             services.Remove(outboxProcessor);
+
+        // Remove EmailOutboxRetentionService so it doesn't purge during tests.
+        var outboxRetention = services.FirstOrDefault(
+            d => d.ImplementationType == typeof(EmailOutboxRetentionService));
+        if (outboxRetention is not null)
+            services.Remove(outboxRetention);
     }
 }

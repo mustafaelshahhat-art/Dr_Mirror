@@ -25,7 +25,7 @@ export function CheckoutSummary({ items, subTotal, lang }: Props) {
             <li key={line.id} className="flex justify-between gap-3">
               <span className="line-clamp-2 min-w-0 flex-1">
                 {name}{' '}
-                <span className="text-xs text-default-500">× {line.quantity}</span>
+                <span className="text-xs text-default-500">{t('common.quantityMultiplier', { count: line.quantity })}</span>
               </span>
               <span className="shrink-0 tabular-nums">
                 {formatCurrency(line.lineTotal, lang)}

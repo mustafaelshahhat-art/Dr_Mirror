@@ -35,14 +35,17 @@ export function PaymentProofFilePreview({
     isImage: false,
   });
   const [imageFailed, setImageFailed] = useState(false);
+  const [lastProofId, setLastProofId] = useState(proof.id);
+  if (lastProofId !== proof.id) {
+    setLastProofId(proof.id);
+    setFile({ status: 'loading', url: null, isImage: false });
+    setImageFailed(false);
+  }
 
   useEffect(() => {
     const controller = new AbortController();
     let objectUrl: string | null = null;
     let cancelled = false;
-
-    setFile({ status: 'loading', url: null, isImage: false });
-    setImageFailed(false);
 
     ordersApi
       .getPaymentProofFile(orderNumber, proof.id, controller.signal)

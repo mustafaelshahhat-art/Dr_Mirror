@@ -42,6 +42,7 @@ public sealed class MailKitEmailSender : IEmailSender
         mime.Body = builder.ToMessageBody();
 
         using var client = new SmtpClient();
+        client.Timeout = 15_000;
         var secureOption = _opts.SmtpUseStartTls
             ? SecureSocketOptions.StartTls
             : SecureSocketOptions.Auto;

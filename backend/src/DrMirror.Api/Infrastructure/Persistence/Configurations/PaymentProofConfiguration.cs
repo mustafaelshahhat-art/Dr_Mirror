@@ -18,6 +18,7 @@ internal sealed class PaymentProofConfiguration : IEntityTypeConfiguration<Payme
         builder.Property(p => p.Status).HasConversion<int>();
         builder.Property(p => p.ReviewNote).HasMaxLength(1000);
         builder.Property(p => p.UploadedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(p => p.FilePurgedAtUtc).HasPrecision(7);
 
         // Cascade with the order — deleting the order purges proofs.
         builder.HasOne(p => p.Order)
