@@ -42,7 +42,7 @@ export function CartLineRow({
   return (
     <div
       className={[
-        'flex gap-3 rounded-medium border border-divider/60 bg-content1 p-3',
+        'cq flex flex-col gap-3 rounded-medium border border-divider/60 bg-content1 p-3 @sm:flex-row',
         isUnavailable ? 'opacity-60' : '',
       ].join(' ')}
     >
@@ -72,14 +72,14 @@ export function CartLineRow({
       </Link>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex flex-col gap-1 @sm:flex-row @sm:items-start @sm:justify-between @sm:gap-2">
           <Link
             to={`/products/${line.productSlug}`}
             className="line-clamp-2 text-sm font-medium leading-tight text-foreground hover:underline"
           >
             {name}
           </Link>
-          <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
+          <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground @sm:text-end">
             {formatCurrency(line.lineTotal, lang)}
           </span>
         </div>
@@ -109,7 +109,7 @@ export function CartLineRow({
           <p className="text-xs text-danger">{t('cart.line.unavailable')}</p>
         ) : null}
 
-        <div className="mt-1 flex items-center justify-between gap-2">
+        <div className="mt-1 flex flex-col gap-2 @sm:flex-row @sm:items-center @sm:justify-between">
           <NumberField
             value={line.quantity}
             minValue={1}
@@ -120,7 +120,7 @@ export function CartLineRow({
               if (Number.isFinite(next) && next !== line.quantity) onUpdate(next);
             }}
             variant="secondary"
-            className="w-28"
+            className="w-full @sm:w-28"
             aria-label={t('cart.line.increaseQuantity')}
           >
             <Label className="sr-only">{t('cart.line.increaseQuantity')}</Label>
@@ -143,7 +143,7 @@ export function CartLineRow({
               onPress={onRemove}
               isDisabled={isMutating}
               aria-label={t('cart.line.remove')}
-              className="text-default-500 hover:text-danger"
+              className="text-default-500 hover:text-danger self-start @sm:self-auto"
             >
               <Trash2 className="size-4" aria-hidden />
             </Button>
