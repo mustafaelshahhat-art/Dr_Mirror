@@ -110,13 +110,34 @@ export function PublicOnlyRoute() {
   return <Outlet />;
 }
 
-function getSafeNextPath(search: string): string | null {
-  const next = new URLSearchParams(search).get('next');
+export function getSafeNextPath(search: string): string | null {
+  const raw = new URLSearchParams(search).get('next');
+  if (raw === null) return null;
 
-  if (next === null || !next.startsWith('/') || next.startsWith('//')) return null;
-  if (next === '/login' || next === '/register') return null;
+  // Reject anything that didn't come in as a plain in-app path.
+  if (!raw.startsWith('/')) return null;
 
-  return next;
+  // Single-decode percent escapes so attempts like %2F%2Fevil.com or
+  // %2f%2fevil.com are detected. Anything that fails to decode (malformed
+  // sequences) is rejected outright.
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(raw);
+  } catch {
+    return null;
+  }
+
+  // Protocol-relative / backslash-relative redirects can navigate off-origin.
+  if (decoded.startsWith('//') || decoded.startsWith('/\\')) return null;
+
+  // Scheme-relative redirects like "/path?to=http://evil.com" are fine, but
+  // a `://` substring on a leading-decoded path is a strong signal of an
+  // attacker-controlled host smuggled through additional encoding layers.
+  if (/^[^?#]*:\/\//.test(decoded)) return null;
+
+  if (decoded === '/login' || decoded === '/register') return null;
+
+  return decoded;
 }
 
 function ForbiddenRedirect({ to, message }: { to: string; message: string }) {

@@ -128,6 +128,8 @@ export interface OrderSummaryDto {
   createdAt: string;
 }
 
+export type AddressSaveOutcome = 'not_requested' | 'saved' | 'skipped_book_full';
+
 export interface OrderDetailDto {
   id: string;
   orderNumber: string;
@@ -159,6 +161,12 @@ export interface OrderDetailDto {
   items: OrderItemDto[];
   paymentProofs: PaymentProofDto[];
   buyer: BuyerSummaryDto;
+  /**
+   * Populated by the checkout-create endpoint to indicate whether the inline
+   * shipping address was persisted to the buyer's address book.
+   * Defaults to "not_requested" on plain order reads.
+   */
+  addressSaveOutcome?: AddressSaveOutcome;
 }
 
 // -----------------------------------------------------------------------------

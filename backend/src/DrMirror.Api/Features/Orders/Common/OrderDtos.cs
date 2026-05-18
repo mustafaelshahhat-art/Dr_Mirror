@@ -1,4 +1,5 @@
 using DrMirror.Api.Domain.Orders;
+using DrMirror.Api.Features.Checkout.CreateOrder;
 
 namespace DrMirror.Api.Features.Orders.Common;
 
@@ -71,7 +72,16 @@ public sealed record OrderDetailDto(
     IReadOnlyList<OrderItemDto> Items,
     IReadOnlyList<PaymentProofDto> PaymentProofs,
     // Buyer-only summary (admin view also exposes it for convenience).
-    BuyerSummaryDto Buyer);
+    BuyerSummaryDto Buyer)
+{
+    /// <summary>
+    /// Populated by <c>CreateOrderEndpoint</c> to indicate whether the inline
+    /// shipping address was persisted to the buyer's address book. For
+    /// non-checkout reads of an order (e.g. GET /api/orders/{number}) the
+    /// value defaults to <see cref="AddressSaveOutcome.NotRequested"/>.
+    /// </summary>
+    public AddressSaveOutcome AddressSaveOutcome { get; init; } = AddressSaveOutcome.NotRequested;
+}
 
 /// <summary>
 /// One payment-proof upload visible on an order. Buyers see all proofs they

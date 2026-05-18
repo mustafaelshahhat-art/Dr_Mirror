@@ -11,6 +11,10 @@ on:
         description: Run opt-in performance smoke tests
         required: false
         default: 'false'
+      release:
+        description: Run the release-target gates (prod-secrets validation)
+        required: false
+        default: 'false'
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -38,6 +42,16 @@ jobs:
       - name: Test backend
         run: dotnet test backend/DrMirror.slnx --configuration Release --no-build --logger "trx;LogFileName=test_results.trx"
 
+      - name: Backend dependency-audit gate (high+critical)
+        shell: pwsh
+        run: |
+          dotnet list backend/DrMirror.slnx package --vulnerable --include-transitive --format json > backend-vuln.json
+          pwsh -File backend/scripts/check-vulns.ps1 -InputPath backend-vuln.json -Severity high
+
+      - name: check-vulns.ps1 self-test
+        shell: pwsh
+        run: pwsh -File backend/scripts/check-vulns.Tests.ps1
+
       - name: Test backend with SQL Server
         if: ${{ secrets.DRMIRROR_TEST_SQL_CONNECTION != '' }}
         env:
@@ -49,6 +63,25 @@ jobs:
         env:
           DRMIRROR_PERF_SMOKE: '1'
         run: dotnet test backend/DrMirror.slnx --configuration Release --no-build --filter PerfSmoke
+
+      - name: Pre-deploy production-secrets gate
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release == 'true') }}
+        shell: pwsh
+        env:
+          ConnectionStrings__Default: ${{ secrets.PROD_DB_CONNECTION }}
+          Jwt__Secret: ${{ secrets.PROD_JWT_SECRET }}
+          Cors__AllowedOrigins__0: ${{ secrets.PROD_CORS_ORIGIN }}
+          FileStorage__Provider: ${{ secrets.PROD_FILESTORAGE_PROVIDER }}
+          FileStorage__CloudinaryCloudName: ${{ secrets.PROD_CLOUDINARY_CLOUD_NAME }}
+          FileStorage__CloudinaryApiKey: ${{ secrets.PROD_CLOUDINARY_API_KEY }}
+          FileStorage__CloudinaryApiSecret: ${{ secrets.PROD_CLOUDINARY_API_SECRET }}
+          Email__Provider: ${{ secrets.PROD_EMAIL_PROVIDER }}
+          Email__FromAddress: ${{ secrets.PROD_EMAIL_FROM_ADDRESS }}
+          Email__SmtpHost: ${{ secrets.PROD_EMAIL_SMTP_HOST }}
+          Email__SmtpPort: ${{ secrets.PROD_EMAIL_SMTP_PORT }}
+          Email__SmtpUsername: ${{ secrets.PROD_EMAIL_SMTP_USERNAME }}
+          Email__SmtpPassword: ${{ secrets.PROD_EMAIL_SMTP_PASSWORD }}
+        run: pwsh -File backend/scripts/verify-prod-secrets.ps1
 
   frontend:
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
@@ -78,6 +111,9 @@ jobs:
 
       - name: Check i18n parity
         run: npm run i18n:check --prefix frontend
+
+      - name: Frontend dependency-audit gate (high+critical)
+        run: npm --prefix frontend audit --audit-level=high --omit=dev
 
       - name: Lint frontend
         run: |

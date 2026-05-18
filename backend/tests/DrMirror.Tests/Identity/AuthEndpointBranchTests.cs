@@ -152,6 +152,7 @@ public class AuthEndpointBranchTests : IClassFixture<AuthEndpointBranchTests.Fac
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
         request.Headers.Add("Cookie", $"drmirror_refresh={rawCookie}");
+        request.Headers.Add("Origin", IntegrationWebAppFactory.TestTrustedOrigin);
         var response = await _factory.CreateClient().SendAsync(request);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -192,6 +193,7 @@ public class AuthEndpointBranchTests : IClassFixture<AuthEndpointBranchTests.Fac
 
         var refresh = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
         refresh.Headers.Add("Cookie", $"drmirror_refresh={rawCookie}");
+        refresh.Headers.Add("Origin", IntegrationWebAppFactory.TestTrustedOrigin);
         var refreshResponse = await _factory.CreateClient().SendAsync(refresh);
         Assert.Equal(HttpStatusCode.Unauthorized, refreshResponse.StatusCode);
     }

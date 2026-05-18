@@ -6,6 +6,8 @@ using DrMirror.Api.Features.Addresses;
 using DrMirror.Api.Features.Admin;
 using DrMirror.Api.Features.AppConfig;
 using DrMirror.Api.Features.Auth;
+using DrMirror.Api.Features.Auth.Refresh;
+using DrMirror.Api.Features.Checkout.CreateOrder;
 using DrMirror.Api.Features.Cart;
 using DrMirror.Api.Features.Catalog;
 using DrMirror.Api.Features.Checkout;
@@ -14,7 +16,9 @@ using DrMirror.Api.Features.Orders;
 using DrMirror.Api.Infrastructure.Extensions;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Shared.HealthChecks;
+using DrMirror.Api.Shared.Http;
 using DrMirror.Api.Shared.Logging;
+using DrMirror.Api.Shared.Startup;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +33,28 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.Console()
     .CreateBootstrapLogger();
+
+// CI pre-deploy gate (FR-024): validate required production secrets and exit
+// without touching the database or starting the host. Invoked from
+// `backend/scripts/verify-prod-secrets.ps1`.
+if (args.Contains("--validate-prod-secrets"))
+{
+    try
+    {
+        var earlyConfig = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+        ProdSecretsValidator.Validate(earlyConfig);
+        Console.WriteLine("ProdSecretsValidator: all required secrets present.");
+        Log.CloseAndFlush();
+        return;
+    }
+    catch (ProdSecretsValidationException ex)
+    {
+        Console.Error.WriteLine(ex.Message);
+        Log.CloseAndFlush();
+        Environment.Exit(1);
+        return;
+    }
+}
 
 try
 {
@@ -168,6 +194,14 @@ try
     builder.Services.AddRouting();
 
     // -----------------------------------------------------------------------
+    // Security headers — middleware attaches the baseline header set to every
+    // response via Response.OnStarting so it survives Results.Stream(...) too.
+    // -----------------------------------------------------------------------
+    builder.Services
+        .AddOptions<SecurityHeadersOptions>()
+        .Bind(builder.Configuration.GetSection("Security:Headers"));
+
+    // -----------------------------------------------------------------------
     // JSON serializer — use UnsafeRelaxedJsonEscaping so Arabic (and other
     // non-ASCII) characters are written as native UTF-8 in responses instead
     // of being escaped as \uXXXX sequences. The payload is still valid UTF-8
@@ -177,6 +211,11 @@ try
     {
         opts.SerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
         opts.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        // The specific snake-case converter must precede the global enum
+        // converter — System.Text.Json picks the first matching converter
+        // from JsonSerializerOptions.Converters, ahead of any [JsonConverter]
+        // attribute on the type.
+        opts.SerializerOptions.Converters.Add(new AddressSaveOutcomeJsonConverter());
         opts.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
@@ -206,37 +245,13 @@ try
 
     var app = builder.Build();
 
-    // Production safety: CORS origins must be explicitly configured.
-    // An empty allowlist silently blocks all cross-origin requests with no error.
+    // Production safety: every required secret must be configured. Delegates
+    // to ProdSecretsValidator so the same logic is shared with the CI
+    // pre-deploy gate (backend/scripts/verify-prod-secrets.ps1), eliminating
+    // CI/runtime drift.
     if (app.Environment.IsProduction())
     {
-        var corsOrigins = app.Configuration
-            .GetSection("Cors:AllowedOrigins").Get<string[]>();
-        if (corsOrigins is null || corsOrigins.Length == 0)
-            throw new InvalidOperationException(
-                "Cors:AllowedOrigins must contain at least one origin in production. " +
-                "Set it via the Cors__AllowedOrigins__0 environment variable.");
-
-        RequireConfig(app.Configuration, "ConnectionStrings:Default");
-        var jwtSecret = RequireConfig(app.Configuration, "Jwt:Secret");
-        if (jwtSecret.Length < 64)
-            throw new InvalidOperationException("Jwt:Secret must be at least 64 characters in production.");
-
-        if (string.Equals(app.Configuration["FileStorage:Provider"], "cloudinary", StringComparison.OrdinalIgnoreCase))
-        {
-            RequireConfig(app.Configuration, "FileStorage:CloudinaryCloudName");
-            RequireConfig(app.Configuration, "FileStorage:CloudinaryApiKey");
-            RequireConfig(app.Configuration, "FileStorage:CloudinaryApiSecret");
-        }
-
-        if (string.Equals(app.Configuration["Email:Provider"], "mailkit", StringComparison.OrdinalIgnoreCase))
-        {
-            RequireConfig(app.Configuration, "Email:FromAddress");
-            RequireConfig(app.Configuration, "Email:SmtpHost");
-            RequireConfig(app.Configuration, "Email:SmtpPort");
-            RequireConfig(app.Configuration, "Email:SmtpUsername");
-            RequireConfig(app.Configuration, "Email:SmtpPassword");
-        }
+        ProdSecretsValidator.Validate(app.Configuration);
     }
 
     // -----------------------------------------------------------------------
@@ -262,6 +277,11 @@ try
 
     app.UseExceptionHandler();
     app.UseStatusCodePages();
+
+    // Security headers — registered before CORS/static/auth so the
+    // OnStarting callback runs for every response shape (JSON, stream, 401, 404, 429).
+    app.UseMiddleware<SecurityHeadersMiddleware>();
+
     app.UseCors(CorsPolicy);
 
     // Static files for the local upload provider — serves product images
@@ -284,6 +304,9 @@ try
     app.UseStaticFiles();
 
     app.UseAuthentication();
+    // Reject forged refresh requests (missing/unknown Origin) before the
+    // rate-limiter so a forgery cannot consume a budget slot.
+    app.UseMiddleware<RequireTrustedOriginMiddleware>();
     app.UseRateLimiter();
     app.UseAuthorization();
     app.Use(async (ctx, next) =>
@@ -373,14 +396,6 @@ catch (Exception ex) when (ex is not HostAbortedException)
 finally
 {
     Log.CloseAndFlush();
-}
-
-static string RequireConfig(IConfiguration configuration, string key)
-{
-    var value = configuration[key];
-    if (string.IsNullOrWhiteSpace(value))
-        throw new InvalidOperationException($"{key} is required in production.");
-    return value;
 }
 
 // Expose Program class for WebApplicationFactory in integration tests.

@@ -57,7 +57,7 @@ backend/src/DrMirror.Api/appsettings.Development.json
 # These are kept locally for reference but excluded from the repository
 AGENTS.md
 CLAUDE.md
-specs/
+# specs/ — un-ignored so the spec workflow can write directly (kept locally; opt back in by un-commenting)
 .agents/
 .claude/
 # .specify/ — tracked for constitution & project memory

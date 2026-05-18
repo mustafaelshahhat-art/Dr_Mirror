@@ -15,6 +15,7 @@ import { AddressStep } from './components/AddressStep';
 import { CheckoutAuthGate } from './components/CheckoutAuthGate';
 import { CheckoutEmptyState } from './components/CheckoutEmptyState';
 import { CheckoutSteps, type CheckoutStep } from './components/CheckoutSteps';
+import { fireAddressSaveOutcomeToast } from './components/CheckoutSuccessNotice';
 import { CheckoutSummary } from './components/CheckoutSummary';
 import { PaymentMethodSection } from './components/PaymentMethodSection';
 import { ReviewStep } from './components/ReviewStep';
@@ -205,6 +206,9 @@ function CheckoutBody() {
           buyerNote: values.buyerNote?.trim() ? values.buyerNote.trim() : null,
         },
       });
+      // Surface the address-book-full notice before navigating; the toast
+      // portal lives at the app root so it survives the route change.
+      fireAddressSaveOutcomeToast(order.addressSaveOutcome, t);
       navigate(`/account/orders/${encodeURIComponent(order.orderNumber)}`);
     } catch {
       // Toast emitted by mutation onError.

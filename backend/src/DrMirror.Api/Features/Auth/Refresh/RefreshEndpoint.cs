@@ -15,9 +15,12 @@ public static class RefreshEndpoint
         group.MapPost("/refresh", HandleAsync)
             .WithName("Refresh")
             .WithSummary("Rotate the refresh cookie and return a fresh access token.")
+            // The Origin allowlist is enforced earlier by RequireTrustedOriginMiddleware,
+            // before UseRateLimiter, so a forged refresh never consumes a budget slot.
             .RequireRateLimiting(RateLimitPolicies.AuthRefresh)
             .Produces<AuthResponse>(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status401Unauthorized);
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden);
 
         return group;
     }

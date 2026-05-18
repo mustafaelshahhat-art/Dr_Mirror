@@ -144,16 +144,13 @@ public static class CreateOrderEndpoint
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForOrderConfirmation(order.Id));
 
         // ---- Optional: save the inline address to the buyer's address book. ----
+        var addressSaveOutcome = AddressSaveOutcome.NotRequested;
         if (request.SaveAsNewAddress && request.ShippingAddress is not null)
         {
             var addrCount = await db.BuyerAddresses.CountAsync(a => a.UserId == userId, ct);
             if (addrCount < Features.Addresses.AddressLimits.MaxAddressesPerUser)
             {
                 var makeDefault = addrCount == 0;
-                if (makeDefault)
-                {
-                    // First-ever address — also mark it default.
-                }
                 db.BuyerAddresses.Add(new BuyerAddress
                 {
                     Id = Guid.NewGuid(),
@@ -170,9 +167,15 @@ public static class CreateOrderEndpoint
                     Notes = shippingAddress.Notes,
                     IsDefault = makeDefault,
                 });
+                addressSaveOutcome = AddressSaveOutcome.Saved;
             }
-            // Over the cap → we silently skip the save-to-book. The order itself
-            // still goes through; the buyer can prune the book and resave later.
+            else
+            {
+                // Book is at the per-user cap. Surface this in the response so the
+                // SPA can show a localized notice instead of silently dropping
+                // the save. The order itself still goes through.
+                addressSaveOutcome = AddressSaveOutcome.SkippedBookFull;
+            }
         }
 
         // ---- Stock decrement with bounded retries on RowVersion conflict. ------
@@ -242,6 +245,6 @@ public static class CreateOrderEndpoint
 
         return Results.Created(
             uri: $"/api/orders/{detail.OrderNumber}",
-            value: detail.ToDetail(fsm));
+            value: detail.ToDetail(fsm) with { AddressSaveOutcome = addressSaveOutcome });
     }
 }

@@ -240,6 +240,14 @@ public static class AdminProductsEndpoints
             return Results.Problem(title: "Product not found", statusCode: StatusCodes.Status404NotFound);
         }
 
+        // Idempotent on no-op transitions: a publish call on an already-published
+        // product is a success with no state change and no audit row.
+        if (entity.IsPublished)
+        {
+            var current = await LoadDetail(db, entity.Id, ct);
+            return Results.Ok(ToDetail(current!));
+        }
+
         // A product without active in-stock variants would publish as "Sold out"
         // immediately, which is confusing. Block until at least one variant
         // exists and is active. Stock can still be zero (admin can flag
@@ -262,9 +270,11 @@ public static class AdminProductsEndpoints
                 statusCode: StatusCodes.Status409Conflict);
         }
 
+        // PreviousValue is the actual pre-mutation state — never a hardcoded literal.
+        var previousValue = entity.IsPublished ? "Published" : "Unpublished";
         entity.IsPublished = true;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
-        await audit.WriteAsync("Product.Update", "Product", entity.Id.ToString(), "Unpublished", "Published", ct);
+        await audit.WriteAsync("Product.Publish", "Product", entity.Id.ToString(), previousValue, "Published", ct);
         await db.SaveChangesAsync(ct);
 
         var reloaded = await LoadDetail(db, entity.Id, ct);
@@ -279,9 +289,16 @@ public static class AdminProductsEndpoints
             return Results.Problem(title: "Product not found", statusCode: StatusCodes.Status404NotFound);
         }
 
+        if (!entity.IsPublished)
+        {
+            var current = await LoadDetail(db, entity.Id, ct);
+            return Results.Ok(ToDetail(current!));
+        }
+
+        var previousValue = entity.IsPublished ? "Published" : "Unpublished";
         entity.IsPublished = false;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
-        await audit.WriteAsync("Product.Update", "Product", entity.Id.ToString(), "Published", "Unpublished", ct);
+        await audit.WriteAsync("Product.Unpublish", "Product", entity.Id.ToString(), previousValue, "Unpublished", ct);
         await db.SaveChangesAsync(ct);
 
         var reloaded = await LoadDetail(db, entity.Id, ct);

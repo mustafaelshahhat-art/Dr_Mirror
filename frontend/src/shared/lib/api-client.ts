@@ -61,6 +61,23 @@ const LOGIN_PATH = '/auth/login';
 const REGISTER_PATH = '/auth/register';
 const LOGOUT_PATH = '/auth/logout';
 
+const AUTH_PATH_SUFFIXES = [REFRESH_PATH, LOGIN_PATH, REGISTER_PATH, LOGOUT_PATH] as const;
+
+/**
+ * Anchored exact-suffix match: the configured `url` must end with one of the
+ * four auth paths, AFTER any query string has been stripped. Substring matching
+ * would misclassify synthetic endpoints like `/api/auth-debug-ping` or
+ * `/api/orders/auth-info` as auth endpoints and silently skip refresh-and-retry.
+ */
+function isAuthEndpoint(url: string): boolean {
+  if (!url) return false;
+  const pathOnly = url.split(/[?#]/, 1)[0] ?? '';
+  return AUTH_PATH_SUFFIXES.some((suffix) => pathOnly.endsWith(suffix));
+}
+
+// Test-only export so vitest can target the matcher without monkey-patching axios.
+export const __isAuthEndpointForTests = isAuthEndpoint;
+
 // Single-flight refresh: if many parallel calls fail with 401 concurrently we
 // only want one /refresh request in flight. The rest await this promise.
 let inflightRefresh: Promise<string | null> | null = null;
@@ -99,14 +116,7 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const url = original?.url ?? '';
 
-    // Don't refresh-and-retry for the auth endpoints themselves.
-    const isAuthEndpoint =
-      url.includes(REFRESH_PATH) ||
-      url.includes(LOGIN_PATH) ||
-      url.includes(REGISTER_PATH) ||
-      url.includes(LOGOUT_PATH);
-
-    if (status === 401 && original && !original._retry && !isAuthEndpoint) {
+    if (status === 401 && original && !original._retry && !isAuthEndpoint(url)) {
       original._retry = true;
       const newToken = await performRefresh();
       if (newToken) {

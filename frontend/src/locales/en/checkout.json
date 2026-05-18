@@ -69,6 +69,8 @@
     "subtitle": "Add at least one item before checking out.",
     "cta": "Browse catalog"
   },
+  "addressNotSavedTitle": "Address not saved to your address book",
+  "addressNotSavedBody": "Your order went through, but your address book is full. Remove one and add this address from Account → Addresses later.",
   "errors": {
     "unknown": "Something went wrong while placing your order. Please try again.",
     "recipientNameTooShort": "Recipient name must be at least 2 characters.",

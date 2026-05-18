@@ -107,15 +107,16 @@ public sealed class CloudinaryFileStorageService : IFileStorageService
         }
         var url = urlBuilder.BuildUrl(fileKey);
         var http = _httpClientFactory.CreateClient(nameof(CloudinaryFileStorageService));
-        byte[] bytes;
+        // Stream the response body directly to the caller without buffering the
+        // entire payload in API memory. The caller (e.g. Results.Stream) owns
+        // disposal of the returned stream.
         try
         {
-            bytes = await http.GetByteArrayAsync(url, ct);
+            return await http.GetStreamAsync(url, ct);
         }
         catch (TaskCanceledException ex) when (!ct.IsCancellationRequested)
         {
             throw new ExternalServiceUnavailableException("Cloudinary file read timed out after 10 seconds.", ex);
         }
-        return new MemoryStream(bytes);
     }
 }

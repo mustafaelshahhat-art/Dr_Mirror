@@ -27,6 +27,7 @@ public class RefreshReuseTests : IClassFixture<RefreshReuseTests.Factory>
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
         request.Headers.Add("Cookie", $"drmirror_refresh={reusedRaw}");
+        request.Headers.Add("Origin", IntegrationWebAppFactory.TestTrustedOrigin);
 
         var response = await _factory.CreateClient().SendAsync(request);
 

@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/react';
 
 const PII_KEY_PATTERN = /email|phone|address/i;
+const MAX_DEPTH = 10;
 
 export function initSentry() {
   const dsn = import.meta.env.VITE_SENTRY_DSN;
@@ -12,11 +13,12 @@ export function initSentry() {
     release: import.meta.env.VITE_APP_RELEASE,
     tracesSampleRate: 0,
     beforeSend(event) {
-      scrubObject(event.extra);
-      scrubObject(event.contexts);
+      const seen = new WeakSet<object>();
+      scrubObject(event.extra, seen, 0);
+      scrubObject(event.contexts, seen, 0);
 
       for (const breadcrumb of event.breadcrumbs ?? []) {
-        scrubObject(breadcrumb.data);
+        scrubObject(breadcrumb.data, seen, 0);
       }
 
       if (event.request?.headers) {
@@ -33,17 +35,34 @@ export function initSentry() {
   });
 }
 
-function scrubObject(value: unknown) {
+function scrubObject(value: unknown, seen: WeakSet<object>, depth: number) {
   if (!value || typeof value !== 'object') return;
+  if (depth >= MAX_DEPTH) return;
 
-  for (const key of Object.keys(value as Record<string, unknown>)) {
-    const record = value as Record<string, unknown>;
+  const obj = value as Record<string, unknown>;
+  if (seen.has(obj)) return;
+  seen.add(obj);
+
+  for (const key of Object.keys(obj)) {
     if (PII_KEY_PATTERN.test(key)) {
-      record[key] = '[redacted]';
+      obj[key] = '[redacted]';
       continue;
     }
-    scrubObject(record[key]);
+    const child = obj[key];
+    if (child && typeof child === 'object') {
+      if (seen.has(child as object)) {
+        obj[key] = '[circular]';
+        continue;
+      }
+      scrubObject(child, seen, depth + 1);
+    }
   }
+}
+
+// Test-only — exposes the pure scrubber so vitest can call it without bringing
+// Sentry's init dependency into the unit test.
+export function __scrubObjectForTests(value: unknown): void {
+  scrubObject(value, new WeakSet<object>(), 0);
 }
 
 export { Sentry };

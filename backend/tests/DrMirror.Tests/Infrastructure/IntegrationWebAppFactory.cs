@@ -4,6 +4,7 @@ using DrMirror.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -59,9 +60,24 @@ public abstract class IntegrationWebAppFactory : WebApplicationFactory<Program>
     /// <summary>Unique in-memory database name per factory instance. Override for a stable name.</summary>
     public virtual string DbName { get; } = "DrMirrorTest_" + Guid.NewGuid();
 
+    /// <summary>
+    /// Default trusted origin for tests that hit /api/auth/refresh. Tests can
+    /// reference this when constructing requests so the
+    /// <c>RequireTrustedOriginMiddleware</c> accepts them.
+    /// </summary>
+    public const string TestTrustedOrigin = "https://test.local";
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
+
+        builder.ConfigureAppConfiguration((_, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Cors:AllowedOrigins:0"] = TestTrustedOrigin,
+            });
+        });
 
         builder.ConfigureServices(services =>
         {
