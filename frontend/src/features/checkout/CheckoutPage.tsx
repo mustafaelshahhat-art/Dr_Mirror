@@ -1,13 +1,11 @@
 import { Button, Form, ProgressBar } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { isAxiosError } from 'axios';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 
-import type { ProblemDetails } from '../auth/types';
 import { useAuth } from '../auth/useAuth';
 import { useAddressesQuery } from '../addresses/hooks';
 import { useCart } from '../cart/useCart';
@@ -65,7 +63,7 @@ function CheckoutBody() {
   const navigate = useNavigate();
 
   const [step, setStep] = useState<CheckoutStep>('address');
-  const [serverError, setServerError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
   const [paymentAvailable, setPaymentAvailable] = useState(false);
   // Saved-address mode: when set, the inline form is hidden and we send
@@ -162,7 +160,7 @@ function CheckoutBody() {
       if (!ok) return;
       // If they want to save the inline address, we additionally need a label.
       if (saveAsNewAddress && newAddressLabel.trim().length === 0) {
-        setServerError(t('checkout.errors.labelRequired'));
+        setFormError(t('checkout.errors.labelRequired'));
         return;
       }
       setStep('payment');
@@ -175,13 +173,13 @@ function CheckoutBody() {
     }
   }
   function previous() {
-    setServerError(null);
+    setFormError(null);
     if (step === 'review') setStep('payment');
     else if (step === 'payment') setStep('address');
   }
 
   const onSubmit = handleSubmit(async (values) => {
-    setServerError(null);
+    setFormError(null);
     try {
       const usingSaved = savedAddressId !== null;
       const order = await createOrder.mutateAsync({
@@ -208,9 +206,8 @@ function CheckoutBody() {
         },
       });
       navigate(`/account/orders/${encodeURIComponent(order.orderNumber)}`);
-    } catch (err) {
-      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-      setServerError(problem?.detail ?? problem?.title ?? t('checkout.errors.unknown'));
+    } catch {
+      // Toast emitted by mutation onError.
     }
   });
 
@@ -250,12 +247,12 @@ function CheckoutBody() {
         className="grid gap-6 lg:grid-cols-[1fr_320px]"
       >
         <div className="space-y-4">
-          {serverError ? (
+          {formError ? (
             <div
               role="alert"
               className="rounded-medium border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
             >
-              {serverError}
+              {formError}
             </div>
           ) : null}
 

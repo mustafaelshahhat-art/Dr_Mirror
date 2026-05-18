@@ -16,5 +16,23 @@
   "upload": {
     "tooLarge": "File size must be {{mb}} MB or smaller.",
     "unsupportedType": "Only JPEG, PNG, or PDF files are allowed."
+  },
+  "toast": {
+    "generic": "Something went wrong. Please try again.",
+    "serverError": "The service is having trouble. Please try again shortly.",
+    "validation": "Please check the highlighted fields and try again.",
+    "signedOut": "Please sign in again to continue.",
+    "forbidden": "You do not have permission to do that.",
+    "rateLimited": "Too many attempts. Please wait and try again.",
+    "orderNotFound": "We could not find that order.",
+    "proofNotFound": "We could not find that payment proof.",
+    "proofPurged": "That payment proof is no longer available.",
+    "inquiryNotFound": "We could not find that inquiry.",
+    "addressNotFound": "We could not find that address.",
+    "addressInUse": "That address is still used by an order.",
+    "idempotencyConflict": "This request was already submitted.",
+    "orderStateConflict": "That order can no longer be changed this way.",
+    "fileTooLarge": "The selected file is too large.",
+    "fileTypeUnsupported": "This file type is not supported."
   }
 }

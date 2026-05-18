@@ -1,9 +1,5 @@
 # Product
 
-## Register
-
-product
-
 ## Users
 
 **Primary buyers — healthcare professionals in Egypt.** Doctors, nurses, dentists, lab technicians, students entering clinical rotations. They shop in Arabic, on phones during clinic downtime or at home after long shifts. They need apparel that fits, lasts a wash cycle, and ships to an Egyptian address paid in EGP via Cash on Delivery, Instapay, or mobile wallet. They are not casual browsers; they arrive with a category in mind (scrub top, lab coat, surgical headwear, footwear) and want to compare colour, size, and price without being marketed to.
@@ -17,7 +13,7 @@ product
 Dr_Mirror is an Arabic-first e-commerce product for medical scrubs and uniforms. Two surfaces, one product:
 
 - **Storefront** — buyers browse the catalog by category, gender, size, and colour; pick a Size × Colour variant; cart; check out across a three-step flow (address → payment → review); upload a payment proof when the method requires one; and track the order through an eight-state lifecycle (`Pending` → `Confirmed` / `PendingPaymentReview` → `Paid` → `Preparing` → `Shipped` → `Delivered`, with `Cancelled` terminal).
-- **Admin dashboard** — operators run the queue: approve or reject payment proofs, transition orders through the state machine, CRUD products and categories, manage payment methods, read inquiries, and audit users by role.
+- **Admin dashboard** — operators run the queue: approve or reject payment proofs, transition orders through the state machine, CRUD products and categories, manage payment methods, read inquiries, audit users by role, and review the full admin audit log (every order transition and catalog mutation is recorded).
 
 Success looks like a buyer who finds their scrubs in three taps and an admin who clears the proof queue without leaving the keyboard. Both happen in Arabic by default, on a dark theme by default, in EGP by default.
 

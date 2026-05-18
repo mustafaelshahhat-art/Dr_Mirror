@@ -1,9 +1,7 @@
 import { Button, Checkbox, Description, Form, Input, Label, TextField } from '@heroui/react';
-import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { ProblemDetails } from '../../auth/types';
 import type { BuyerAddressDto, BuyerAddressUpsertRequest } from '../types';
 
 import { GovernorateSelect } from './GovernorateSelect';
@@ -46,7 +44,6 @@ export function AddressForm({
   const [landmark, setLandmark] = useState(initial?.landmark ?? '');
   const [notes, setNotes] = useState(initial?.notes ?? '');
   const [setDefault, setSetDefault] = useState(initial?.isDefault ?? Boolean(isFirstAddress));
-  const [error, setError] = useState<string | null>(null);
   const [governorateError, setGovernorateError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -56,7 +53,6 @@ export function AddressForm({
     <Form
       onSubmit={async (e) => {
         e.preventDefault();
-        setError(null);
         setGovernorateError(null);
         if (!governorate) {
           setGovernorateError(t('addresses.errors.governorateRequired'));
@@ -77,9 +73,8 @@ export function AddressForm({
             notes: notes.trim() || null,
             setDefault,
           });
-        } catch (err) {
-          const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-          setError(problem?.detail ?? problem?.title ?? t('addresses.errors.unknown'));
+        } catch {
+          // Toast emitted by mutation onError.
         } finally {
           setSubmitting(false);
         }
@@ -136,12 +131,6 @@ export function AddressForm({
           ) : null}
         </span>
       </Checkbox>
-
-      {error ? (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      ) : null}
 
       <div className="flex gap-2">
         <Button type="submit" variant="primary" isPending={submitting}>

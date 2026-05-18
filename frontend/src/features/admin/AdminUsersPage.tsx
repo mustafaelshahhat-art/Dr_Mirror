@@ -1,10 +1,8 @@
 import { Switch, Tooltip } from '@heroui/react';
-import { isAxiosError } from 'axios';
 import { Users } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { ProblemDetails } from '../auth/types';
 import { SearchInput } from '../catalog/components/SearchInput';
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import { TableRowSkeleton } from '../../shared/components/Skeleton';
@@ -106,10 +104,8 @@ function UserRow({
 }) {
   const { t } = useTranslation();
   const updateRoles = useUpdateUserRolesMutation();
-  const [error, setError] = useState<string | null>(null);
 
   async function toggleRole(role: UserRole, enabled: boolean) {
-    setError(null);
     const nextRoles = enabled
       ? [...user.roles, role]
       : user.roles.filter((current) => current !== role);
@@ -119,9 +115,8 @@ function UserRow({
         userId: user.id,
         roles: ALL_ROLES.filter((candidate) => nextRoles.includes(candidate)),
       });
-    } catch (err) {
-      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-      setError(problem?.detail ?? problem?.title ?? t('admin.users.roles.errorUnknown'));
+    } catch {
+      // Toast emitted by mutation onError.
     }
   }
 
@@ -164,11 +159,6 @@ function UserRow({
               );
             })}
           </div>
-          {error ? (
-            <p role="alert" className="max-w-md text-xs text-danger">
-              {error}
-            </p>
-          ) : null}
         </div>
       </td>
     </tr>

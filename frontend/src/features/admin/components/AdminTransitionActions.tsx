@@ -1,9 +1,7 @@
 import { Button, FieldError, Label, Modal, TextArea, TextField, useOverlayState } from '@heroui/react';
-import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { ProblemDetails } from '../../auth/types';
 import { orderStatusTranslationKey } from '../../orders/components/orderStatusTranslationKey';
 import { ORDER_STATUSES, type OrderDetailDto, type OrderStatus } from '../../orders/types';
 import { useAdminTransitionMutation } from '../hooks';
@@ -53,9 +51,8 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
       if (cancelState.isOpen) cancelState.close();
       setTarget(null);
       setReason('');
-    } catch (err) {
-      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-      setError(problem?.detail ?? problem?.title ?? t('admin.transition.errorUnknown'));
+    } catch {
+      // Toast emitted by mutation onError.
     }
   }
 

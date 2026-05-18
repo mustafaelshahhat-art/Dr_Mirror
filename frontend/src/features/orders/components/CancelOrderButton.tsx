@@ -1,9 +1,7 @@
 import { Button, TextArea } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isAxiosError } from 'axios';
 
-import type { ProblemDetails } from '../../auth/types';
 import { useCancelOrderMutation } from '../hooks';
 import { ORDER_STATUSES, type OrderDetailDto } from '../types';
 
@@ -18,7 +16,6 @@ export function CancelOrderButton({ order }: { order: OrderDetailDto }) {
   const cancel = useCancelOrderMutation(order.orderNumber);
   const [expanded, setExpanded] = useState(false);
   const [reason, setReason] = useState('');
-  const [error, setError] = useState<string | null>(null);
 
   const buyerCanCancel = order.allowedNextStatesForBuyer.includes(
     ORDER_STATUSES.Cancelled,
@@ -27,14 +24,12 @@ export function CancelOrderButton({ order }: { order: OrderDetailDto }) {
   if (!buyerCanCancel) return null;
 
   async function submit() {
-    setError(null);
     try {
       await cancel.mutateAsync({ reason: reason.trim() || null });
       setExpanded(false);
       setReason('');
-    } catch (err) {
-      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-      setError(problem?.detail ?? problem?.title ?? t('orders.cancel.errorUnknown'));
+    } catch {
+      // Toast emitted by mutation onError.
     }
   }
 
@@ -66,11 +61,6 @@ export function CancelOrderButton({ order }: { order: OrderDetailDto }) {
         placeholder={t('orders.cancel.reasonPlaceholder')}
         className="text-sm text-start"
       />
-      {error ? (
-        <p role="alert" className="text-xs text-danger">
-          {error}
-        </p>
-      ) : null}
       <div className="flex gap-2">
         <Button
           type="button"
@@ -87,7 +77,6 @@ export function CancelOrderButton({ order }: { order: OrderDetailDto }) {
           onPress={() => {
             setExpanded(false);
             setReason('');
-            setError(null);
           }}
         >
           {t('orders.cancel.dismiss')}

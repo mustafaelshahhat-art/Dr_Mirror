@@ -94,6 +94,7 @@ public sealed class CloudinaryFileStorageService : IFileStorageService
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Cloudinary destroy failed for {Key}", fileKey);
+            throw;
         }
     }
 

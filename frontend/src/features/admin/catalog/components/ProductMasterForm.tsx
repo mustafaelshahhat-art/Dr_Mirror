@@ -1,9 +1,7 @@
 import { Button, Form, Modal, useOverlayState } from '@heroui/react';
-import { isAxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { ProblemDetails } from '../../../auth/types';
 import type { ProductGender } from '../../../catalog/types';
 import { Field, TextAreaField } from '../../../../shared/components/Field';
 import { SelectField } from '../../../../shared/components/SelectField';
@@ -37,7 +35,6 @@ export function ProductMasterForm({
   const [brand, setBrand] = useState(product.brand ?? '');
   const [sku, setSku] = useState(product.sku ?? '');
   const [categoryId, setCategoryId] = useState(product.categoryId);
-  const [serverError, setServerError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
 
   useEffect(() => {
@@ -78,12 +75,10 @@ export function ProductMasterForm({
             onPress={product.isPublished
               ? unpublishState.open
               : async () => {
-                  setServerError(null);
                   try {
                     await publishMutation.mutateAsync({ id: product.id, publish: true });
-                  } catch (err) {
-                    const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                    setServerError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
+                  } catch {
+                    // Toast emitted by mutation onError.
                   }
                 }
             }
@@ -95,11 +90,6 @@ export function ProductMasterForm({
         </div>
       </header>
 
-      {serverError ? (
-        <div role="alert" className="enter-fade mb-3 rounded-medium border border-danger/30 bg-danger/10 p-3 text-sm text-danger">
-          {serverError}
-        </div>
-      ) : null}
       {savedAt !== null ? (
         <div className="enter-fade mb-3 rounded-medium border border-success/30 bg-success/10 p-3 text-sm text-success">
           {t('admin.products.edit.savedToast')}
@@ -109,7 +99,6 @@ export function ProductMasterForm({
       <Form
         onSubmit={async (e) => {
           e.preventDefault();
-          setServerError(null);
           try {
             await updateMutation.mutateAsync({
               id: product.id,
@@ -127,11 +116,8 @@ export function ProductMasterForm({
               },
             });
             setSavedAt(Date.now());
-          } catch (err) {
-            const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-            setServerError(
-              problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'),
-            );
+          } catch {
+            // Toast emitted by mutation onError.
           }
         }}
         className="grid gap-3 sm:grid-cols-2"
@@ -192,13 +178,11 @@ export function ProductMasterForm({
                       variant="danger"
                       isDisabled={publishMutation.isPending}
                       onPress={async () => {
-                        setServerError(null);
                         try {
                           await publishMutation.mutateAsync({ id: product.id, publish: false });
                           close();
-                        } catch (err) {
-                          const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                          setServerError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
+                        } catch {
+                          // Toast emitted by mutation onError.
                           close();
                         }
                       }}

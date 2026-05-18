@@ -65,9 +65,20 @@ public sealed class PaymentProofRetentionPurgeService : BackgroundService
                 proof.FileUrl = string.Empty;
                 proof.FilePurgedAtUtc = DateTimeOffset.UtcNow;
             }
+            catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException)
+            {
+                proof.FileKey = string.Empty;
+                proof.FileUrl = string.Empty;
+                proof.FilePurgedAtUtc = DateTimeOffset.UtcNow;
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to purge payment proof {ProofId}. Skipping.", proof.Id);
+                _logger.LogWarning(
+                    ex,
+                    "Failed to delete payment-proof file {FileKey}; leaving row unpurged for retry. Reason: {Reason}",
+                    proof.FileKey,
+                    ex.GetType().Name);
+                continue;
             }
         }
 

@@ -73,9 +73,9 @@ public sealed class LocalFileStorageService : IFileStorageService
             var full = ResolveUploadPath(fileKey);
             if (File.Exists(full)) File.Delete(full);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException)
         {
-            _logger.LogWarning(ex, "Local delete failed for {Key}", fileKey);
+            _logger.LogInformation(ex, "Local delete skipped because {Key} is already missing", fileKey);
         }
         return Task.CompletedTask;
     }

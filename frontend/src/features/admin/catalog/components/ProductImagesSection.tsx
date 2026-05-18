@@ -1,10 +1,8 @@
 import { Button, Input, Label, Modal, NumberField, ProgressBar, Tooltip } from '@heroui/react';
-import { isAxiosError } from 'axios';
 import { Trash2, UploadCloud } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { ProblemDetails } from '../../../auth/types';
 import {
   useDeleteImageMutation,
   useUpdateImageMutation,
@@ -37,9 +35,8 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
     }
     try {
       await uploadMutation.mutateAsync(file);
-    } catch (err) {
-      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-      setError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
+    } catch {
+      // Toast emitted by mutation onError.
     } finally {
       if (inputRef.current) inputRef.current.value = '';
     }
@@ -103,9 +100,8 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
                       imageId: img.id,
                       body: { alt: next || null, displayOrder: img.displayOrder },
                     });
-                  } catch (err) {
-                    const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                    setError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
+                  } catch {
+                    // Toast emitted by mutation onError.
                   }
                 }}
                 variant="secondary"
@@ -129,9 +125,8 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
                         imageId: img.id,
                         body: { alt: img.alt, displayOrder: next },
                       });
-                    } catch (err) {
-                      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                      setError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
+                    } catch {
+                      // Toast emitted by mutation onError.
                     }
                   }}
                 >
@@ -186,9 +181,8 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
                         try {
                           await deleteMutation.mutateAsync(pendingDeleteId);
                           close();
-                        } catch (err) {
-                          const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                          setError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
+                        } catch {
+                          // Toast emitted by mutation onError.
                           close();
                         }
                       }}

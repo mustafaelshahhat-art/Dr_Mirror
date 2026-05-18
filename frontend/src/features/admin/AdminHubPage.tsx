@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import type { OrderStatus } from '../orders/types';
 import { ORDER_STATUSES } from '../orders/types';
+import { queryKeys } from '../../shared/lib/query-keys';
 import {
   KpiRowSkeleton,
   RecentOrderRowSkeleton,
@@ -33,12 +34,12 @@ export function AdminHubPage() {
   const { user } = useAuth();
 
   const statsQuery = useQuery({
-    queryKey: ['admin', 'orders', 'stats'],
+    queryKey: queryKeys.admin.orders.stats(),
     queryFn: () => adminOrdersApi.stats(),
   });
 
   const recentQuery = useQuery({
-    queryKey: ['admin', 'orders', 'recent'],
+    queryKey: queryKeys.admin.orders.recent(),
     queryFn: () => adminOrdersApi.list({ pageSize: 5 }),
   });
 

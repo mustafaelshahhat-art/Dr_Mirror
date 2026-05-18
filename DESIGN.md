@@ -10,7 +10,7 @@
 
 **Elevation by lightness, not shadow** in dark mode. Surfaces step ~4% lighter each level (`background` → `surface` → `surface-2`); shadows are weak or absent. Light mode permits a single shadow step (`shadow-sm` max) on hero/product cards.
 
-**Stack.** React 19, Vite, Tailwind CSS 4, HeroUI v3 (single component system; no mixed libraries), next-themes, react-i18next, framer-motion (used sparingly for HeroUI internals only), Lucide icons.
+**Stack.** React 19, TypeScript ~6, Vite 8, Tailwind CSS v4, HeroUI v3 (single component system; no mixed libraries), react-router-dom v7, TanStack Query v5, react-hook-form + Zod (all forms), axios, dayjs, next-themes, react-i18next, framer-motion (used sparingly for HeroUI internals only), Lucide icons.
 
 ## Color
 
@@ -200,8 +200,9 @@ HeroUI v3 is the only library. Use components as-is; restyle via tokens and `cla
 - **Underlined** — auth, checkout step 1, editorial forms. Bottom-border only, lighter feel.
 - **Bordered** — admin forms, dense forms, anywhere boundaries help scanning. Default elsewhere.
 - Labels **above** inputs always — never floating in dense admin contexts.
-- Helper text below the input; error message replaces helper inline (don't stack).
+- Helper text below the input; error message replaces helper inline (don’t stack).
 - Focus ring uses `--brand`. Never suppress focus visibility.
+- All forms use **react-hook-form + Zod**. Never manage form state with `useState`. Validation runs on submit then on change after first error.
 
 ### Tables (admin)
 

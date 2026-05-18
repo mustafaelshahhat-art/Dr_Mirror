@@ -4,8 +4,8 @@ An online store for medical scrubs and uniforms, built for the Egyptian market. 
 
 ## Stack
 
-- **Backend** — .NET 10, ASP.NET Core (Minimal APIs, vertical slices), EF Core, SQL Server, ASP.NET Identity + JWT, Serilog, MailKit, Cloudinary. Hosted on MonsterASP.NET.
-- **Frontend** — React 19, TypeScript, Vite, HeroUI, Tailwind CSS v4, i18next, React Query. Hosted on Vercel.
+- **Backend** — .NET 10, ASP.NET Core (Minimal APIs, vertical slices), EF Core, SQL Server, ASP.NET Identity + JWT (access + refresh token via HttpOnly cookie), Serilog, MailKit, Cloudinary, Mapster, FluentValidation, IP-keyed rate limiting. Hosted on MonsterASP.NET.
+- **Frontend** — React 19, TypeScript ~6, Vite 8, HeroUI v3, Tailwind CSS v4, react-router-dom v7, TanStack Query v5, react-hook-form + Zod, axios, dayjs, i18next, next-themes, Lucide icons, Sentry. Hosted on Vercel.
 - **Fonts** — Satoshi (Latin) and Alexandria (Arabic), self-hosted variable WOFF2, preloaded.
 - **Theming** — Dark-first; light and dark both ship; user choice persisted; full RTL parity.
 
@@ -13,20 +13,32 @@ An online store for medical scrubs and uniforms, built for the Egyptian market. 
 
 ```
 backend/
-  src/DrMirror.Api/      ASP.NET Core 10 — vertical slices under /Features
-  tests/DrMirror.Tests/  xUnit
+  src/DrMirror.Api/
+    Features/            Vertical slices: Addresses, Admin, AppConfig, Auth,
+                         Cart, Catalog, Checkout, Inquiries, Orders
+    Domain/              Entities + Orders (enums, state machine)
+    Infrastructure/      Email outbox, Identity, Persistence (EF + seeder +
+                         migrations), Storage
+    BackgroundServices/  Proof retention purge, email outbox retention
+    Shared/              Auditing, HealthChecks, RateLimiting, Slugs, Validation
+  tests/DrMirror.Tests/  xUnit + in-memory EF
 frontend/
   public/fonts/          Self-hosted WOFF2 variable fonts
-  src/                   App, providers, features, shared, locales, styles
+  src/
+    app/                 router.tsx, providers.tsx
+    features/            addresses, admin (+ audit/ catalog/ components/ users/),
+                         app-config, auth, cart, catalog, checkout, inquiries, orders
+    shared/              components, lib (api-client, format, i18n, sentry, …),
+                         hooks, pages, types
+    locales/             ar/ + en/ — 12 namespace files each
+    styles/              globals.css — OKLCH palette, font-face, HeroUI v3 aliases
 ```
 
 ## Documentation
 
 - [Project Map](docs/PROJECT_MAP.md)
 - [Deployment Guide](docs/DEPLOY.md)
-- [Operational Runbook](docs/RUNBOOK.md)
 - [Backup and Restore](docs/BACKUP_RESTORE.md)
-- [Threat Model](docs/THREAT_MODEL.md)
 - [Redesign Audit](docs/REDESIGN_AUDIT.md)
 
 ## Quick start
@@ -38,7 +50,9 @@ cd backend\src\DrMirror.Api
 dotnet run
 ```
 
-Health check: `http://localhost:5223/api/health`
+Health checks:
+- `http://localhost:5223/api/health` — readiness (DB + file storage + outbox)
+- `http://localhost:5223/api/health/live` — liveness only (no dependency checks)
 
 **Frontend**
 
@@ -71,10 +85,14 @@ npm run i18n:check # Verify Arabic/English localization key parity
 
 Secrets are never committed. Configure via environment variables:
 
+**Backend (environment variables or `appsettings.*.json`)**
+
 | Variable | Purpose |
 |---|---|
 | `ConnectionStrings__Default` | MSSQL connection string |
-| `Jwt__Issuer`, `Jwt__Audience`, `Jwt__Secret` | JWT config |
+| `Jwt__Issuer`, `Jwt__Audience`, `Jwt__Secret` | JWT config (`Secret` must be ≥ 64 chars in production) |
+| `Jwt__AccessTokenLifetimeMinutes` | Access token TTL (default: 15) |
+| `Jwt__RefreshTokenLifetimeDays` | Refresh token TTL (default: 14) |
 | `Admin__SeedEmail`, `Admin__SeedPassword` | Seeded admin account (first boot only) |
 | `Cors__AllowedOrigins__0` | Allowed CORS origins (array format required) |
 | `Auth__UseCrossSiteCookies` | Set `true` in prod when SPA and API are on different origins |
@@ -83,6 +101,19 @@ Secrets are never committed. Configure via environment variables:
 | `FileStorage__CloudinaryCloudName`, `...ApiKey`, `...ApiSecret` | Required when provider is `cloudinary` |
 | `Email__Provider` | `logonly` (dev) or `mailkit` (prod) |
 | `Email__FromAddress`, `Email__FromName`, `Email__SmtpHost`, `Email__SmtpPort`, `Email__SmtpUseStartTls`, `Email__SmtpUsername`, `Email__SmtpPassword` | Required when provider is `mailkit` |
+| `Retention__EnableProofPurge` | `true` enables background purge of old payment proof files (default: prod=true) |
+| `Retention__ProofPurgeIntervalHours` | How often the proof purge runs (default: 24) |
+| `Retention__OutboxRetentionDays` | Days to keep processed outbox messages (default: 90) |
+| `Support__ContactEmail` | Contact email exposed via `/api/app-config` to the SPA |
+| `HealthChecks__OutboxStuckThreshold` | Alert threshold for stuck outbox messages (default: 100) |
+
+**Frontend (`.env` / Vercel env)**
+
+| Variable | Purpose |
+|---|---|
+| `VITE_API_BASE_URL` | Backend root URL in production (e.g. `https://api.drmirror.com`); `/api` appended automatically. Leave blank in dev (Vite proxy). |
+| `VITE_SENTRY_DSN` | Sentry DSN for frontend error tracking. Omit to disable Sentry entirely. |
+| `VITE_APP_RELEASE` | Release tag passed to Sentry (e.g. `v1.2.3`). |
 
 ### Dev secrets
 
@@ -116,11 +147,13 @@ dotnet ef database update `
 
 The store is functional end-to-end: customers can browse the catalog, manage a cart, check out, upload payment proof, and track orders through an eight-state lifecycle. Payment proofs are stored privately and streamed via an authenticated endpoint. Cash on Delivery requires no proof upload; online flows (Instapay/Wallet) do.
 
-Admins have a dashboard, order queue with proof approve/reject, product and category CRUD, an inquiry inbox, and a read-only list of users with role badges.
+Admins have a dashboard, order queue with proof approve/reject, product and category CRUD, payment method management, an inquiry inbox, a read-only user list with role badges, and a full audit log that records every order transition and catalog mutation.
 
-Email delivery utilizes a durable outbox pattern (polling) to guarantee status emails survive transient network faults.
+Email delivery utilizes a durable outbox pattern (polling) to guarantee status emails survive transient network faults. Background retention services purge old payment proof files and processed outbox messages on a configurable schedule.
 
-Current focus is Phase 5 — Documentation cleanup and final repository hygiene.
+Rate limiting is applied IP-keyed on sensitive endpoints (auth, checkout, proof upload). Frontend error tracking is available via Sentry (opt-in — requires `VITE_SENTRY_DSN`).
+
+Current focus is Phase 004 — UI/UX Excellence Pass.
 
 ## Production Deployment
 
@@ -132,4 +165,4 @@ Current focus is Phase 5 — Documentation cleanup and final repository hygiene.
 
 ---
 
-Architecture decisions, branching rules, breakpoints, migration safety, and UI system discipline live in [Project Map](docs/PROJECT_MAP.md).
+Architecture decisions, branching rules, breakpoints, migration safety, and UI system discipline live in [Project Map](docs/PROJECT_MAP.md). Visual system tokens, component rules, and RTL conventions live in [DESIGN.md](DESIGN.md). Product strategy and brand principles live in [PRODUCT.md](PRODUCT.md).

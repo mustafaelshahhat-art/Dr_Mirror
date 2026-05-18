@@ -1,10 +1,8 @@
 import { Button, Form, Input, Label, TextField, Tooltip } from '@heroui/react';
-import { isAxiosError } from 'axios';
 import { FolderTree, Pencil, Plus, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { ProblemDetails } from '../../auth/types';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { Skeleton } from '../../../shared/components/Skeleton';
 
@@ -25,7 +23,6 @@ export function AdminCategoriesPage() {
   const toggleMutation = useToggleCategoryActiveMutation();
 
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [serverError, setServerError] = useState<string | null>(null);
 
   if (query.isLoading) {
     return (
@@ -94,21 +91,13 @@ export function AdminCategoriesPage() {
         </p>
       </header>
 
-      {serverError ? (
-        <div role="alert" className="rounded-medium border border-danger/30 bg-danger/10 p-3 text-sm text-danger">
-          {serverError}
-        </div>
-      ) : null}
-
       <CreateCategoryForm
         onSubmit={async (body) => {
-          setServerError(null);
           try {
             await createMutation.mutateAsync(body);
             return true;
-          } catch (err) {
-            const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-            setServerError(problem?.detail ?? problem?.title ?? t('admin.catalog.errors.unknown'));
+          } catch {
+            // Toast emitted by mutation onError.
             return false;
           }
         }}
@@ -137,16 +126,12 @@ export function AdminCategoriesPage() {
                   category={cat}
                   onCancel={() => setEditingId(null)}
                   onSubmit={async (body) => {
-                    setServerError(null);
                     try {
                       await updateMutation.mutateAsync({ id: cat.id, body });
                       setEditingId(null);
                       return true;
-                    } catch (err) {
-                      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                      setServerError(
-                        problem?.detail ?? problem?.title ?? t('admin.catalog.errors.unknown'),
-                      );
+                    } catch {
+                      // Toast emitted by mutation onError.
                       return false;
                     }
                   }}
@@ -199,17 +184,13 @@ export function AdminCategoriesPage() {
                         size="md"
                         isDisabled={toggleMutation.isPending}
                         onPress={async () => {
-                          setServerError(null);
                           try {
                             await toggleMutation.mutateAsync({
                               id: cat.id,
                               activate: !cat.isActive,
                             });
-                          } catch (err) {
-                            const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                            setServerError(
-                              problem?.detail ?? problem?.title ?? t('admin.catalog.errors.unknown'),
-                            );
+                          } catch {
+                            // Toast emitted by mutation onError.
                           }
                         }}
                         aria-label={

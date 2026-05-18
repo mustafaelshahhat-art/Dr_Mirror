@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
-import { I18nProvider, RouterProvider } from '@heroui/react';
+import { I18nProvider, RouterProvider, ToastProvider } from '@heroui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { I18nextProvider, useTranslation } from 'react-i18next';
@@ -68,7 +68,8 @@ function LocaleScope({ children }: { children: ReactNode }) {
  *       → QueryClientProvider
  *         → I18nextProvider (translation backbone)
  *           → LocaleScope (RAC I18nProvider, picks current locale)
- *             → DirectionSync (sets html lang + dir, persists lang)
+ *             → ToastProvider (localized, directional toast surface)
+ *               → DirectionSync (sets html lang + dir, persists lang)
  */
 export function Providers({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
@@ -84,6 +85,7 @@ export function Providers({ children }: { children: ReactNode }) {
         <QueryClientProvider client={queryClient}>
           <I18nextProvider i18n={i18n}>
             <LocaleScope>
+              <ToastProvider />
               <DirectionSync>
                 <AuthProvider>
                   <CartProvider>

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMutation, type QueryClient } from '@tanstack/react-query';
 
+import { useApiErrorToast } from '../../../shared/hooks/useApiErrorToast';
+import { queryKeys } from '../../../shared/lib/query-keys';
 import type { AuthUser } from '../../auth/types';
 import { cartApi } from '../api';
 import { clearGuestCart, readGuestCart } from '../guest-cart-storage';
@@ -25,6 +27,7 @@ export function useCartMerge({
   const autoMergedForUserId = useRef<string | null>(null);
   const inFlightForUserId = useRef<string | null>(null);
   const latestUserIdRef = useRef<string | null>(null);
+  const errorToast = useApiErrorToast();
 
   const [mergeError, setMergeError] = useState<string | null>(null);
 
@@ -38,6 +41,7 @@ export function useCartMerge({
     { items: { productVariantId: string; quantity: number }[] }
   >({
     mutationFn: (payload) => cartApi.merge(payload),
+    onError: errorToast,
   });
 
   const performMerge = useCallback(async () => {
@@ -67,7 +71,7 @@ export function useCartMerge({
       if (latestUserIdRef.current !== userId) return;
 
       clearGuestCart();
-      queryClient.setQueryData(['cart'], merged);
+      queryClient.setQueryData(queryKeys.cart(), merged);
     } catch (err) {
       if (latestUserIdRef.current !== userId) return;
 

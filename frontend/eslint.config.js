@@ -19,6 +19,19 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "Property[key.name='queryKey'][value.type='ArrayExpression']",
+          message: 'Use the keys module for React Query keys.',
+        },
+        {
+          selector: "CallExpression[callee.property.name=/^(setQueryData|invalidateQueries|getQueryData)$/] > ArrayExpression.arguments:first-child",
+          message: 'Use the keys module for React Query keys.',
+        },
+      ],
+    },
   },
   {
     files: ['**/*.tsx'],

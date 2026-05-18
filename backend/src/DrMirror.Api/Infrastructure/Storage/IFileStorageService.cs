@@ -23,7 +23,10 @@ public interface IFileStorageService
         string contentType,
         CancellationToken ct);
 
-    /// <summary>Best-effort delete; never throws if the file is already gone.</summary>
+    /// <summary>
+    /// Best-effort delete. Missing files are treated as success; storage failures
+    /// other than <see cref="FileNotFoundException"/> and <see cref="DirectoryNotFoundException"/> are surfaced to the caller.
+    /// </summary>
     Task DeleteAsync(string fileKey, CancellationToken ct);
 
     /// <summary>

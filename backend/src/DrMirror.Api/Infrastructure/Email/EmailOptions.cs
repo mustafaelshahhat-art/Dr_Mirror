@@ -33,6 +33,11 @@ public sealed class EmailOptions : IValidatableObject
     public string? SmtpUsername { get; set; }
     public string? SmtpPassword { get; set; }
 
+    [Range(1, 100)]
+    public int MaxAttempts { get; set; } = 7;
+
+    public TimeSpan MaxBackoff { get; set; } = TimeSpan.FromDays(7);
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (!KnownProviders.Contains(Provider))
@@ -51,6 +56,11 @@ public sealed class EmailOptions : IValidatableObject
                 yield return new ValidationResult(
                     "Email:Provider=mailkit requires SmtpHost, SmtpUsername, and SmtpPassword.");
             }
+        }
+
+        if (MaxBackoff <= TimeSpan.Zero)
+        {
+            yield return new ValidationResult("Email:MaxBackoff must be greater than zero.");
         }
     }
 }

@@ -41,7 +41,7 @@ public sealed class EmailOutboxProcessor : BackgroundService
         var email = scope.ServiceProvider.GetRequiredService<IEmailSender>();
         var emailOptions = scope.ServiceProvider.GetRequiredService<IOptions<EmailOptions>>().Value;
 
-        const int maxAttempts = 10;
+        var maxAttempts = emailOptions.MaxAttempts;
         var now = DateTimeOffset.UtcNow;
         var staleBefore = now.AddMinutes(-5);
 
@@ -56,18 +56,37 @@ public sealed class EmailOutboxProcessor : BackgroundService
 
         if (claimableIds.Count == 0) return;
 
-        await db.EmailOutboxMessages
+        var claimQuery = db.EmailOutboxMessages
             .Where(m => claimableIds.Contains(m.Id)
                      && m.Attempts < maxAttempts
                      && ((m.Status == OutboxMessageStatus.Pending && m.NextRetryAt <= now)
-                         || (m.Status == OutboxMessageStatus.Processing && m.LockedAt <= staleBefore)))
-            .ExecuteUpdateAsync(setters => setters
+                         || (m.Status == OutboxMessageStatus.Processing && m.LockedAt <= staleBefore)));
+
+        if (db.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
+        {
+            var inMemoryClaimed = await claimQuery.ToListAsync(ct);
+            foreach (var msg in inMemoryClaimed)
+            {
+                msg.Status = OutboxMessageStatus.Processing;
+                msg.LockedAt = now;
+                msg.LockedBy = _workerId;
+                msg.Attempts++;
+                msg.LastAttemptAt = now;
+                msg.FailureReason = null;
+            }
+
+            await db.SaveChangesAsync(ct);
+        }
+        else
+        {
+            await claimQuery.ExecuteUpdateAsync(setters => setters
                 .SetProperty(m => m.Status, OutboxMessageStatus.Processing)
                 .SetProperty(m => m.LockedAt, now)
                 .SetProperty(m => m.LockedBy, _workerId)
                 .SetProperty(m => m.Attempts, m => m.Attempts + 1)
                 .SetProperty(m => m.LastAttemptAt, now)
                 .SetProperty(m => m.FailureReason, (string?)null), ct);
+        }
 
         var claimed = await db.EmailOutboxMessages
             .Where(m => claimableIds.Contains(m.Id)
@@ -104,9 +123,10 @@ public sealed class EmailOutboxProcessor : BackgroundService
                     msg.Status = OutboxMessageStatus.Pending;
                     msg.LockedAt = null;
                     msg.LockedBy = null;
-                    // Exponential backoff: 30s, 2m, 8m, 30m, 2h, …
+                    // Exponential backoff: 30s, 2m, 8m, 30m, 2h, capped by configuration.
+                    var delay = TimeSpan.FromSeconds(Math.Pow(4, msg.Attempts) * 30);
                     msg.NextRetryAt = DateTimeOffset.UtcNow
-                        .AddSeconds(Math.Pow(4, msg.Attempts) * 30);
+                        .Add(delay < emailOptions.MaxBackoff ? delay : emailOptions.MaxBackoff);
                     _logger.LogWarning(ex,
                         "EmailOutbox: attempt {Attempts} failed for {EventType} (id={Id}), retry at {NextRetry}",
                         msg.Attempts, msg.EventType, msg.Id, msg.NextRetryAt);

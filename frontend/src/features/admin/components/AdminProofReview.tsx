@@ -1,10 +1,8 @@
 import { Button, FieldError, Label, Modal, TextArea, TextField, useOverlayState } from '@heroui/react';
 import { Check, Download, X } from 'lucide-react';
-import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { ProblemDetails } from '../../auth/types';
 import { ordersApi } from '../../orders/api';
 import { PaymentProofFilePreview } from '../../orders/components/PaymentProofFilePreview';
 import { ProofStatusBadge } from '../../orders/components/ProofStatusBadge';
@@ -123,9 +121,8 @@ function ProofRow({
       if (rejectState.isOpen) rejectState.close();
       setMode('idle');
       setNote('');
-    } catch (err) {
-      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-      setError(problem?.detail ?? problem?.title ?? t('admin.proofs.errorUnknown'));
+    } catch {
+      // Toast emitted by mutation onError.
     }
   }
 

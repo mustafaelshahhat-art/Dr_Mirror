@@ -1,10 +1,8 @@
 import { Button, Form, Input, Label, TextArea, TextField } from '@heroui/react';
-import { isAxiosError } from 'axios';
 import { Check, Send } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { ProblemDetails } from '../../auth/types';
 import { useSubmitInquiryMutation } from '../hooks';
 
 interface InquiryFormProps {
@@ -23,7 +21,6 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
   const { t } = useTranslation();
   const submit = useSubmitInquiryMutation();
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -39,7 +36,6 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
     try {
       await submit.mutateAsync({
         productId: productId ?? null,
@@ -50,15 +46,13 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
         message: form.message.trim(),
       });
       setSuccess(true);
-    } catch (err) {
-      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-      setError(problem?.detail ?? problem?.title ?? t('inquiries.form.errors.unknown'));
+    } catch {
+      // Toast emitted by mutation onError.
     }
   }
 
   function reset() {
     setSuccess(false);
-    setError(null);
     setForm({
       fullName: '',
       email: '',
@@ -150,12 +144,6 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
           onChange={(e) => update('message', (e.target as HTMLTextAreaElement).value)}
         />
       </TextField>
-
-      {error ? (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      ) : null}
 
       <Button
         type="submit"

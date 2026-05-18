@@ -1,11 +1,9 @@
 import { Button, Form } from '@heroui/react';
-import { isAxiosError } from 'axios';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 
-import type { ProblemDetails } from '../../auth/types';
 import type { ProductGender } from '../../catalog/types';
 
 import { useAdminCategoriesQuery, useCreateProductMutation } from './hooks';
@@ -31,7 +29,6 @@ export function AdminProductCreatePage() {
   const [brand, setBrand] = useState('');
   const [sku, setSku] = useState('');
   const [categoryId, setCategoryId] = useState<string>('');
-  const [serverError, setServerError] = useState<string | null>(null);
 
   if (categories.isLoading) {
     return (
@@ -80,16 +77,9 @@ export function AdminProductCreatePage() {
         <p className="text-sm text-default-500">{t('admin.products.create.subtitle')}</p>
       </header>
 
-      {serverError ? (
-        <div role="alert" className="rounded-medium border border-danger/30 bg-danger/10 p-3 text-sm text-danger">
-          {serverError}
-        </div>
-      ) : null}
-
       <Form
         onSubmit={async (e) => {
           e.preventDefault();
-          setServerError(null);
           try {
             const product = await createMutation.mutateAsync({
               nameAr: nameAr.trim(),
@@ -104,11 +94,8 @@ export function AdminProductCreatePage() {
               categoryId,
             });
             navigate(`/admin/products/${product.id}/edit`);
-          } catch (err) {
-            const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-            setServerError(
-              problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'),
-            );
+          } catch {
+            // Toast emitted by mutation onError.
           }
         }}
         className="space-y-4 rounded-large border border-divider/60 bg-content1 p-4"

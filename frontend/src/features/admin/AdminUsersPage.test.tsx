@@ -6,6 +6,12 @@ import { makeAdminUser, makeAuthValue, renderWithProviders } from '../../test/ut
 import { AdminUsersPage } from './AdminUsersPage';
 import { adminUsersApi } from './users/api';
 
+const toastDangerMock = vi.hoisted(() => vi.fn());
+
+vi.mock('@heroui/react/toast', () => ({
+  toast: { danger: toastDangerMock },
+}));
+
 vi.mock('./users/api', () => ({
   adminUsersApi: {
     list: vi.fn(),
@@ -34,6 +40,7 @@ describe('AdminUsersPage', () => {
   beforeEach(() => {
     vi.mocked(adminUsersApi.list).mockReset();
     vi.mocked(adminUsersApi.updateRoles).mockReset();
+    toastDangerMock.mockClear();
   });
 
   it('updates user roles from the dashboard', async () => {
@@ -72,7 +79,7 @@ describe('AdminUsersPage', () => {
     expect(adminUsersApi.updateRoles).toHaveBeenCalledWith('user-1', ['Admin', 'Vendor', 'Buyer']);
   });
 
-  it('shows backend role update errors including the last-admin guard', async () => {
+  it('shows backend role update errors through the shared toast helper', async () => {
     vi.mocked(adminUsersApi.list).mockResolvedValue({
       items: [
         {
@@ -105,9 +112,8 @@ describe('AdminUsersPage', () => {
     expect(await screen.findByText('Only Admin')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('switch', { name: /toggle admin role/i }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'At least one admin account must remain active.',
-    );
+    expect(toastDangerMock).toHaveBeenCalledWith('Something went wrong. Please try again.');
+    expect(screen.queryByText('At least one admin account must remain active.')).not.toBeInTheDocument();
   });
 
   it('shows a retryable error state when users fail to load', async () => {

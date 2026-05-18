@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
+import { queryKeys } from '../../shared/lib/query-keys';
 import { catalogApi } from './api';
 import type {
   ProductDetailDto,
@@ -18,7 +19,7 @@ const CATALOG_GC = 5 * 60_000;
  */
 export function useCategoriesQuery() {
   return useQuery({
-    queryKey: ['catalog', 'categories'],
+    queryKey: queryKeys.catalog.categories(),
     queryFn: ({ signal }) => catalogApi.listCategories(signal),
     staleTime: CATALOG_STALE,
     gcTime: CATALOG_GC,
@@ -31,7 +32,7 @@ export function useCategoriesQuery() {
  */
 export function useProductsQuery(filter: ProductFilter) {
   return useQuery({
-    queryKey: ['catalog', 'products', filter],
+    queryKey: queryKeys.catalog.list(filter),
     queryFn: ({ signal }) => catalogApi.listProducts(filter, signal),
     placeholderData: keepPreviousData,
     staleTime: CATALOG_STALE,
@@ -41,7 +42,7 @@ export function useProductsQuery(filter: ProductFilter) {
 
 export function useProductDetailQuery(slug: string | undefined) {
   return useQuery({
-    queryKey: ['catalog', 'product', slug],
+    queryKey: queryKeys.catalog.detail(slug ?? ''),
     queryFn: ({ signal }) => catalogApi.getBySlug(slug!, signal),
     enabled: Boolean(slug),
     staleTime: CATALOG_STALE,

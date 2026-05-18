@@ -7,6 +7,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { announce } from '../../shared/lib/live-announcer';
+import { useApiErrorToast } from '../../shared/hooks/useApiErrorToast';
+import { queryKeys } from '../../shared/lib/query-keys';
 import { useAuth } from '../auth/useAuth';
 
 import { cartApi } from './api';
@@ -40,6 +42,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const { user, isBootstrapping } = useAuth();
   const queryClient = useQueryClient();
+  const errorToast = useApiErrorToast();
   const isAuthed = Boolean(user);
 
   // ------- Guest cart (localStorage) ----------------------------------------
@@ -47,7 +50,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // ------- Server cart (React Query) ----------------------------------------
   const serverCartQuery = useQuery<CartDto>({
-    queryKey: ['cart'],
+    queryKey: queryKeys.cart(),
     queryFn: () => cartApi.get(),
     enabled: isAuthed && !isBootstrapping,
     staleTime: 0,
@@ -64,33 +67,37 @@ export function CartProvider({ children }: { children: ReactNode }) {
         quantity: input.quantity,
       }),
     onSuccess: (data) => {
-      queryClient.setQueryData(['cart'], data);
+      queryClient.setQueryData(queryKeys.cart(), data);
       announce(t('cart.addedToCart'));
     },
+    onError: errorToast,
   });
 
   const updateMutation = useMutation<CartDto, Error, { id: string; quantity: number }>({
     mutationFn: ({ id, quantity }) => cartApi.update(id, { quantity }),
     onSuccess: (data) => {
-      queryClient.setQueryData(['cart'], data);
+      queryClient.setQueryData(queryKeys.cart(), data);
       announce(t('cart.countSr', { count: data.totalQuantity }));
     },
+    onError: errorToast,
   });
 
   const removeMutation = useMutation<CartDto, Error, string>({
     mutationFn: (id) => cartApi.remove(id),
     onSuccess: (data) => {
-      queryClient.setQueryData(['cart'], data);
+      queryClient.setQueryData(queryKeys.cart(), data);
       announce(t('cart.line.remove'));
     },
+    onError: errorToast,
   });
 
   const clearMutation = useMutation<CartDto, Error, void>({
     mutationFn: () => cartApi.clear(),
     onSuccess: (data) => {
-      queryClient.setQueryData(['cart'], data);
+      queryClient.setQueryData(queryKeys.cart(), data);
       announce(t('cart.countSr', { count: 0 }));
     },
+    onError: errorToast,
   });
 
   const isMutating =
@@ -98,13 +105,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     updateMutation.isPending ||
     removeMutation.isPending ||
     clearMutation.isPending;
-
-  const mutationError =
-    addMutation.error ??
-    updateMutation.error ??
-    removeMutation.error ??
-    clearMutation.error ??
-    null;
 
   // ------- Unified view -----------------------------------------------------
   const cart = useMemo<CartView>(() => {
@@ -116,7 +116,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         totalQuantity: data?.totalQuantity ?? 0,
         isMutating,
         isLoading: serverCartQuery.isLoading,
-        error: (serverCartQuery.error as Error | null) ?? mutationError,
+        error: (serverCartQuery.error as Error | null) ?? null,
       };
     }
     return {
@@ -140,7 +140,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     serverCartQuery.isLoading,
     serverCartQuery.error,
     isMutating,
-    mutationError,
   ]);
 
   // ------- Public actions ---------------------------------------------------

@@ -1,10 +1,8 @@
 import { Button, Form, Label, NumberField, Tooltip } from '@heroui/react';
-import { isAxiosError } from 'axios';
 import { Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { ProblemDetails } from '../../../auth/types';
 import {
   useCreateVariantMutation,
   useToggleVariantActiveMutation,
@@ -83,7 +81,6 @@ function VariantRow({
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
   const toggleMutation = useToggleVariantActiveMutation(productId);
-  const [error, setError] = useState<string | null>(null);
 
   return (
     <div
@@ -122,13 +119,10 @@ function VariantRow({
           size="sm"
           isDisabled={toggleMutation.isPending}
           onPress={async () => {
-            setError(null);
             try {
               await toggleMutation.mutateAsync({ variantId: variant.id, activate: !variant.isActive });
-            } catch (err) {
-              const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-              // eslint-disable-next-line i18next/no-literal-string -- fallback string for error display, not user copy
-              setError(problem?.detail ?? problem?.title ?? 'error');
+            } catch {
+              // Toast emitted by mutation onError.
             }
           }}
         >
@@ -137,7 +131,6 @@ function VariantRow({
             : t('admin.catalog.actions.activate')}
         </Button>
       </div>
-      {error ? <p className="text-xs text-danger">{error}</p> : null}
     </div>
   );
 }
@@ -162,7 +155,6 @@ function VariantForm({
   const [colorHex, setColorHex] = useState(variant?.colorHex ?? '#000000');
   const [sku, setSku] = useState(variant?.sku ?? '');
   const [stock, setStock] = useState(variant?.stock ?? 0);
-  const [error, setError] = useState<string | null>(null);
 
   const inFlight = createMutation.isPending || updateMutation.isPending;
 
@@ -170,7 +162,6 @@ function VariantForm({
     <Form
       onSubmit={async (e) => {
         e.preventDefault();
-        setError(null);
         const body = {
           size: size.trim(),
           colorName: colorName.trim(),
@@ -186,9 +177,8 @@ function VariantForm({
             await updateMutation.mutateAsync({ variantId: variant.id, body });
           }
           onDone();
-        } catch (err) {
-          const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-          setError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
+        } catch {
+          // Toast emitted by mutation onError.
         }
       }}
       className="space-y-3 rounded-medium border border-primary/40 bg-primary/5 p-3"
@@ -225,7 +215,6 @@ function VariantForm({
           </NumberField.Group>
         </NumberField>
       </div>
-      {error ? <p className="text-xs text-danger">{error}</p> : null}
       <div className="flex gap-2">
         <Button type="submit" variant="primary" size="sm" isPending={inFlight}>
           {inFlight
