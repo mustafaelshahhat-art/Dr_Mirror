@@ -29,7 +29,7 @@ export function OrdersListPage() {
 
   if (query.isLoading) {
     return (
-      <section className="space-y-5" aria-busy="true" aria-label={t('orders.list.loading')}>
+      <section className="space-y-8" aria-busy="true" aria-label={t('orders.list.loading')}>
         <header className="space-y-2">
           <Skeleton className="h-7 w-1/3" />
           <Skeleton className="h-4 w-2/3" />
@@ -58,7 +58,7 @@ export function OrdersListPage() {
   const orders = query.data?.items ?? [];
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">{t('orders.list.title')}</h1>
         <p className="text-sm text-default-500">{t('orders.list.subtitle')}</p>

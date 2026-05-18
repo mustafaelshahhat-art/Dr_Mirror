@@ -35,7 +35,7 @@ export function AdminProductEditPage() {
 function Inner({ product }: { product: AdminProductDetailDto }) {
   const { t } = useTranslation();
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <Link
         to="/admin/products"
         className="inline-flex items-center gap-1.5 text-sm text-default-500 hover:text-foreground"

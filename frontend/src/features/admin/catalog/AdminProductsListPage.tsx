@@ -31,7 +31,7 @@ export function AdminProductsListPage() {
   const products = useAdminProductsQuery({ q: q || undefined, categoryId, gender, published, page });
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-8">
       <header className="flex items-center justify-between gap-3">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">

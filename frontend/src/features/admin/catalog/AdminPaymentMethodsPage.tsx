@@ -33,7 +33,7 @@ export function AdminPaymentMethodsPage() {
   if (query.isLoading) {
     return (
       <section
-        className="space-y-5"
+        className="space-y-8"
         aria-busy="true"
         aria-label={t('admin.payments.loading')}
       >
@@ -54,7 +54,7 @@ export function AdminPaymentMethodsPage() {
 
   if (query.isError) {
     return (
-      <section className="space-y-5">
+      <section className="space-y-8">
         <header className="flex items-center justify-between gap-3">
           <div className="space-y-1">
             <h1 className="text-2xl font-semibold tracking-tight">{t('admin.payments.title')}</h1>
@@ -80,7 +80,7 @@ export function AdminPaymentMethodsPage() {
   }
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-8">
       <header className="flex items-center justify-between gap-3">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">{t('admin.payments.title')}</h1>

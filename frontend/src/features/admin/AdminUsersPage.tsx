@@ -24,7 +24,7 @@ export function AdminUsersPage() {
   });
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">{t('admin.users.title')}</h1>
         <p className="text-sm text-default-500">{t('admin.users.subtitle')}</p>

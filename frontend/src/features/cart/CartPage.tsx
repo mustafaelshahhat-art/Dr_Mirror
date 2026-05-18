@@ -27,7 +27,7 @@ export function CartPage() {
   const errorMessage = cart.error?.message;
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <Link
         to="/"
         className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"

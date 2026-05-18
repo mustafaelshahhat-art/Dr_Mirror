@@ -34,7 +34,7 @@ export function AddressBookPage() {
 
   if (query.isLoading) {
     return (
-      <section className="space-y-5" aria-busy="true" aria-label={t('addresses.loading')}>
+      <section className="space-y-8" aria-busy="true" aria-label={t('addresses.loading')}>
         <header className="space-y-2">
           <Skeleton className="h-7 w-1/3" />
           <Skeleton className="h-4 w-2/3" />
@@ -52,7 +52,7 @@ export function AddressBookPage() {
 
   if (query.isError) {
     return (
-      <section className="space-y-5">
+      <section className="space-y-8">
         <Link
           to="/account"
           className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
@@ -77,7 +77,7 @@ export function AddressBookPage() {
   const isFirstAddress = addresses.length === 0;
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-8">
       <Link
         to="/account"
         className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"

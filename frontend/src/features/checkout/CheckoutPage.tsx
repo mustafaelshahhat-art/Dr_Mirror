@@ -215,7 +215,7 @@ function CheckoutBody() {
   });
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <Link
         to="/cart"
         className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"

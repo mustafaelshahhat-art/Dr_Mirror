@@ -30,7 +30,7 @@ export function AdminCategoriesPage() {
   if (query.isLoading) {
     return (
       <section
-        className="space-y-5"
+        className="space-y-8"
         aria-busy="true"
         aria-label={t('admin.catalog.loading')}
       >
@@ -63,7 +63,7 @@ export function AdminCategoriesPage() {
 
   if (query.isError) {
     return (
-      <section className="space-y-5">
+      <section className="space-y-8">
         <header className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">
             {t('admin.catalog.categories.title')}
@@ -84,7 +84,7 @@ export function AdminCategoriesPage() {
   const categories = query.data ?? [];
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">
           {t('admin.catalog.categories.title')}

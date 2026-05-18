@@ -660,3 +660,45 @@ Additional HeroUI exports currently imported by app infrastructure or compound A
 | Modal | Admin reject-proof flow in `AdminProofReview`; admin cancel-order flow in `AdminOrderDetailPage` |
 | ScrollShadow | No explicit target in `tasks.md`; reserved for overflowing drawer/modal/list interiors if found during later phase implementation |
 | Chip | No explicit target in `tasks.md`; status/category pills remain existing badge markup unless a later phase explicitly adopts HeroUI Chip |
+
+---
+
+## UI/UX Excellence Pass — Closing
+
+Final close-out for `specs/004-uiux-excellence-pass`. The eight-phase pass landed across the eight commits below; each phase's per-phase gate (build + lint at-or-below pre-flight baseline + test count at-or-above pre-flight + i18n parity + four sweep regexes returning zero hits outside the documented `Header.tsx:31` backdrop-blur exception) was green before the phase committed.
+
+### Per-phase outcomes
+
+| Phase | Commit subject | Gate result |
+|-------|----------------|-------------|
+| A | `feat(ui): UI/UX pass phase A — token + utility expansion` | green — `@custom-variant ar`/`en`/`dense`, `.enter-fade*` entry utilities, `.cq` / `.cq-card` container helpers, `accent-color: var(--brand)` landed on `globals.css` without disturbing any OKLCH token value; inventory section appended to this document |
+| B | `feat(ui): UI/UX pass phase B — raw HTML → HeroUI conversion` | green — six raw-HTML controls replaced (Audit Select × 2, Audit DatePicker × 2, ProductImagesSection alt-text Input + display-order NumberField, ProductVariantsSection stock NumberField, SearchInput clear Button isIconOnly); intentional non-conversion sites carry one-line comments (file inputs, color input, RAC radiogroup pickers) |
+| C | `feat(ui): UI/UX pass phase C — HeroUI component uplift` | green — `PaginationControls` re-shimmed over HeroUI `Pagination` with public API preserved across six consumers; new `Snippet.tsx` + `Snippet.test.tsx` (only intended test-count addition of the pass); admin icon-only actions wrapped in `Tooltip`; HeroUI `Tabs` on `ProductInfoTabs`, `AdminOrderDetailPage`, `AdminProductEditPage`; `Accordion` in `FilterPanel`; `NumberField` in `CartLineRow` with paired test rewrite; `Skeleton` wraps HeroUI Skeleton; `Switch` shape verified on `PaymentMethodRow` / `AdminUsersPage`; `Progress` on upload surfaces; HeroUI `Modal` for admin destructive confirmations |
+| D | `feat(ui): UI/UX pass phase D — motion uplift` | green — `enter-fade-down` on `DowntimeBanner` + `ForbiddenBanner`; motion-safe hover on `ProductCard`; `data-[selected=true]:enter-fade` on Tabs panels; `enter-fade-up` on every empty state (`CatalogPage`, `OrdersListPage`, `AddressBookPage`, `AdminHubPage`, `AdminInquiriesPage`, `AdminUsersPage`, `AdminCategoriesPage`, `AdminPaymentMethodsPage`, `AuditLogPage`) and on the 404/403/503 shells; toast and inline-error surfaces use `enter-fade`; reduced-motion verified pinned-at-final-state |
+| E | `feat(ui): UI/UX pass phase E — container-query responsive` | green — `.cq` / `.cq-card` wrapping with `@`-prefixed breakpoints on `ProductCard`, `CartLineRow`, `AdminHubPage` KPI tiles, `OrderDetailPage` line items, and `AddressForm` name/phone row; same pixel thresholds as the prior viewport breakpoints; narrow-drawer collapse verified |
+| F | `feat(ui): UI/UX pass phase F — form excellence` | green — every HeroUI form field across `admin/**`, `checkout/**`, `addresses/**`, `inquiries/**`, `auth/**` moved to the field's own `isInvalid` + `errorMessage` + `description` slots; submit buttons use `isLoading` + `loadingContent` with existing verb keys; pre-submit summary banners gated to submit-failure only; subtle linear `Progress` above `CheckoutSteps` |
+| G | `feat(ui): UI/UX pass phase G — a11y semantic uplift` | green — `aria-busy` wired on every list / grid / table container in storefront and admin; shared `aria-live="polite"` `LiveRegion` mounted once in both `Layout` and `AdminLayout` with cart-update and admin-filter announcements routed through it; every `Button isIconOnly` site verified to carry a non-empty `aria-label`; `axe.test.tsx` suite remains green |
+| H | `chore(ui): UI/UX pass phase H — polish & micro-craft` (this commit) | green — per-page typography sweep returns zero disallowed weights; spacing rhythm bumped to `space-y-8` on every top-level page section (storefront + admin); cursor states verified against HeroUI defaults; focus-ring sweep returns zero orphan `focus:outline-none`; tabular numerals verified on cart NumberField, pagination, count displays; skip-link confirmed first focusable in both shells; 404 / 403 / 503 shells carry Phase D `enter-fade-up` and specific (non-AI-slop) copy; README `## Documentation` block code fence closed; `AuditLogPage.tsx` `ms-1` confirmed logical (no regression); `AuditLogPage.tsx` `&mdash;` placeholder replaced with `·` middle-dot separator |
+
+### DESIGN.md sections moved from "spec" to "implemented"
+
+The pass closes the gap between several DESIGN.md sections that were prescriptive but only partially carried by the codebase. After this pass they are uniformly carried by code:
+
+- **Logical CSS (`§RTL`)** — pre-flight sweep already returned zero hits; the four-state matrix enforced by every phase's gate keeps it that way.
+- **Motion utilities (`§Motion`)** — `.enter-fade`, `.enter-fade-up`, `.enter-fade-down` codified in `globals.css` (Phase A) and applied to every empty state, error shell, banner, and Tabs panel surface (Phase D), all guarded by `@media (prefers-reduced-motion: no-preference)`.
+- **Container queries (`§Responsive`)** — `.cq` / `.cq-card` codified (Phase A) and adopted on `ProductCard`, `CartLineRow`, `AdminHubPage` KPI tiles, `OrderDetailPage` line items, and `AddressForm` (Phase E), so panels embedded in drawers and modals respond to their own width rather than the viewport.
+- **RAC `radiogroup` non-conversions (`§Variant pickers`)** — `CategoryChips`, `SizePicker`, `FilterPanel` `GenderPill`, `ColorPicker` carry one-line non-conversion comments so future audits don't re-litigate why they remain `button role="radio"` rather than HeroUI `Radio` (Phase B).
+- **Em-dash anti-pattern (`§Anti-patterns`)** — the last user-visible em-dash placeholder (`AuditLogPage.tsx` audit-log status fallback) was replaced with a middle-dot separator (Phase H), in addition to the earlier admin order item image-missing fix (Phase 5 of the prior rollout).
+- **Custom variants (`§Theming`)** — `ar`, `en`, `dense` `@custom-variant` declarations live in `globals.css` (Phase A) so feature code can target direction and density without `dir=`/`density-*` selectors at every call site.
+- **In-house `Snippet` primitive (`§Components`)** — composed from HeroUI `Button isIconOnly` + `Tooltip` + Lucide `Copy`/`Check` (Phase C) and adopted at `PaymentInstructionsCard`, `OrderDetailPage`, `AdminOrderDetailPage`; documented here as a v3-bridging primitive (no new design system).
+- **`isLoading` + `loadingContent` on submits (`§Forms`)** — every form submit across storefront and admin (Phase F) now flips to a loading state with a verb-form label drawn from existing i18n keys.
+- **`aria-busy` on async surfaces and shared `aria-live` regions (`§Accessibility`)** — wired on every list / grid / table and on both shell roots (Phase G).
+- **Typography rhythm cap (`§Typography`)** — per-page audit (Phase H) confirms zero disallowed weights (`thin`/`extralight`/`light`/`extrabold`/`black`) anywhere in `frontend/src/**/*.tsx`.
+
+### Done condition (per `quickstart.md`)
+
+- [x] Eight phase commits on `004-uiux-excellence-pass`, each with the brief's prescribed Conventional-Commits subject.
+- [x] Phase H commit's gate fully green.
+- [x] `## UI/UX Excellence Pass — Closing` section appended (this section).
+- [x] Eight `_capture-checklist.md` files exist under `docs/screenshots/uiux-pass/phase-*/`.
+- [x] `README.md` `## Documentation` block code fence closed.

@@ -37,7 +37,7 @@ export function AdminInquiriesPage() {
   });
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">{t('inquiries.admin.title')}</h1>
         <p className="text-sm text-default-500">{t('inquiries.admin.subtitle')}</p>

@@ -36,7 +36,7 @@ export function AdminProductCreatePage() {
   if (categories.isLoading) {
     return (
       <section
-        className="space-y-5"
+        className="space-y-8"
         aria-busy="true"
         aria-label={t('admin.products.create.loading')}
       >
@@ -66,7 +66,7 @@ export function AdminProductCreatePage() {
   const activeCategories = (categories.data ?? []).filter((c) => c.isActive);
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-8">
       <Link
         to="/admin/products"
         className="inline-flex items-center gap-1.5 text-sm text-default-500 hover:text-foreground"

@@ -102,7 +102,7 @@ export function ProductDetailPage() {
   }
 
   return (
-    <article className="space-y-6">
+    <article className="space-y-8">
       <Link
         to="/"
         className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"

@@ -36,7 +36,7 @@ export function AdminOrderDetailPage() {
   if (query.isLoading) {
     return (
       <div
-        className="space-y-6"
+        className="space-y-8"
         aria-busy="true"
         aria-label={t('admin.detail.loading')}
       >
@@ -103,7 +103,7 @@ export function AdminOrderDetailPage() {
   const isNonCod = order.paymentMethodKind !== PAYMENT_METHOD_KIND.Cod;
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <Link
         to="/admin/orders"
         className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"

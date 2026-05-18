@@ -33,7 +33,7 @@ export function OrderDetailPage() {
   if (query.isLoading) {
     return (
       <section
-        className="space-y-6"
+        className="space-y-8"
         aria-busy="true"
         aria-label={t('orders.detail.loading')}
       >
@@ -98,7 +98,7 @@ export function OrderDetailPage() {
       order.status === ORDER_STATUSES.PendingPaymentReview);
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <Link
         to="/account/orders"
         className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"

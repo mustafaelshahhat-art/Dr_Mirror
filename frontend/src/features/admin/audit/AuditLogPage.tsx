@@ -42,7 +42,7 @@ export function AuditLogPage() {
   const loadingRows = actionType || targetType || from || to ? 4 : 15;
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">{t('admin.audit.title')}</h1>
         <p className="text-sm text-default-500">{t('admin.audit.subtitle')}</p>
@@ -147,7 +147,7 @@ export function AuditLogPage() {
                           {entry.newStatus}
                         </span>
                       ) : (
-                        <span className="text-xs text-default-400">&mdash;</span>
+                        <span aria-hidden className="text-xs text-default-400">·</span>
                       )}
                     </td>
                   </tr>
