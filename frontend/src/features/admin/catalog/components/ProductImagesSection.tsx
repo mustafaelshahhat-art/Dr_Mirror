@@ -1,4 +1,4 @@
-import { Button, Input, Label, NumberField } from '@heroui/react';
+import { Button, Input, Label, Modal, NumberField, ProgressBar, Tooltip } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Trash2, UploadCloud } from 'lucide-react';
 import { useRef, useState } from 'react';
@@ -22,6 +22,7 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
   const deleteMutation = useDeleteImageMutation(product.id);
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   async function onPickFile(file: File | null) {
     if (!file) return;
@@ -53,7 +54,7 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
         <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-medium border border-divider bg-content2 px-3 py-1.5 text-sm hover:bg-default-100">
           <UploadCloud className="size-4" aria-hidden />
           {uploadMutation.isPending ? t('admin.products.images.uploading') : t('admin.products.images.upload')}
-          {/* intentional: HeroUI v3 has no file input — see DESIGN.md */}
+          {/* intentional: HeroUI v3 has no file input; see DESIGN.md */}
           <input
             ref={inputRef}
             type="file"
@@ -63,6 +64,18 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
           />
         </label>
       </header>
+
+      {uploadMutation.isPending ? (
+        <ProgressBar
+          isIndeterminate
+          size="sm"
+          aria-label={t('admin.products.images.uploading')}
+        >
+          <ProgressBar.Track>
+            <ProgressBar.Fill />
+          </ProgressBar.Track>
+        </ProgressBar>
+      ) : null}
 
       {error ? <p role="alert" className="text-sm text-danger">{error}</p> : null}
 
@@ -129,30 +142,66 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
                     <NumberField.IncrementButton />
                   </NumberField.Group>
                 </NumberField>
-                <Button
-                  isIconOnly
-                  variant="ghost"
-                  size="md"
-                  isDisabled={deleteMutation.isPending}
-                  onPress={async () => {
-                    setError(null);
-                    try {
-                      await deleteMutation.mutateAsync(img.id);
-                    } catch (err) {
-                      const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                      setError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
-                    }
-                  }}
-                  aria-label={t('admin.products.images.delete')}
-                  className="text-default-500 hover:text-danger"
-                >
-                  <Trash2 className="size-4" aria-hidden />
-                </Button>
+                <Tooltip delay={300} closeDelay={0}>
+                  <Button
+                    isIconOnly
+                    variant="ghost"
+                    size="md"
+                    isDisabled={deleteMutation.isPending}
+                    onPress={() => setPendingDeleteId(img.id)}
+                    aria-label={t('admin.products.images.delete')}
+                    className="text-default-500 hover:text-danger"
+                  >
+                    <Trash2 className="size-4" aria-hidden />
+                  </Button>
+                  <Tooltip.Content placement="top">{t('admin.products.images.delete')}</Tooltip.Content>
+                </Tooltip>
               </div>
             </li>
           ))}
         </ul>
       )}
+      <Modal>
+        <Modal.Backdrop
+          isOpen={pendingDeleteId !== null}
+          onOpenChange={(open) => { if (!open) setPendingDeleteId(null); }}
+        >
+          <Modal.Container size="xs">
+            <Modal.Dialog>
+              {({ close }) => (
+                <>
+                  <Modal.Header>
+                    <Modal.Heading>{t('admin.products.images.delete')}</Modal.Heading>
+                  </Modal.Header>
+                  <Modal.Footer>
+                    <Button variant="ghost" onPress={close}>
+                      {t('admin.catalog.actions.cancel')}
+                    </Button>
+                    <Button
+                      variant="danger"
+                      isDisabled={deleteMutation.isPending}
+                      onPress={async () => {
+                        if (!pendingDeleteId) return;
+                        setError(null);
+                        try {
+                          await deleteMutation.mutateAsync(pendingDeleteId);
+                          close();
+                        } catch (err) {
+                          const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
+                          setError(problem?.detail ?? problem?.title ?? t('admin.products.errors.unknown'));
+                          close();
+                        }
+                      }}
+                    >
+                      {t('admin.transition.confirm')}
+                    </Button>
+                  </Modal.Footer>
+                </>
+              )}
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
     </article>
   );
 }

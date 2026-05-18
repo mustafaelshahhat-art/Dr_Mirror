@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Button, Label, NumberField, Tooltip } from '@heroui/react';
 import { ImageOff, Minus, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -18,7 +18,7 @@ interface CartLineRowProps {
 }
 
 /**
- * One row in the cart — image, name, color + size, quantity stepper, line
+ * One row in the cart: image, name, color + size, quantity stepper, line
  * total, remove button. Works for both the drawer and the full /cart page;
  * the <c>variant</c> prop only tweaks spacing / image size.
  */
@@ -36,10 +36,8 @@ export function CartLineRow({
   const colorName = isAr ? line.colorNameAr : line.colorName;
   const isCompact = variant === 'compact';
 
-  const canIncrement =
-    line.quantity < MAX_QUANTITY_PER_LINE && line.quantity < line.variantStock;
-  const canDecrement = line.quantity > 1;
   const isUnavailable = !line.isAvailable;
+  const maxQuantity = Math.min(MAX_QUANTITY_PER_LINE, line.variantStock);
 
   return (
     <div
@@ -112,48 +110,45 @@ export function CartLineRow({
         ) : null}
 
         <div className="mt-1 flex items-center justify-between gap-2">
-          <div className="flex items-center rounded-medium border border-divider/60">
-            <Button
-              isIconOnly
-              variant="ghost"
-              size="sm"
-              onPress={() => onUpdate(line.quantity - 1)}
-              isDisabled={!canDecrement || isMutating}
-              aria-label={t('cart.line.decreaseQuantity')}
-              className="rounded-e-none"
-            >
-              <Minus className="size-3.5" aria-hidden />
-            </Button>
-            <span
-              className="min-w-8 px-1 text-center text-sm tabular-nums"
-              aria-live="polite"
-            >
-              {line.quantity}
-            </span>
-            <Button
-              isIconOnly
-              variant="ghost"
-              size="sm"
-              onPress={() => onUpdate(line.quantity + 1)}
-              isDisabled={!canIncrement || isMutating}
-              aria-label={t('cart.line.increaseQuantity')}
-              className="rounded-s-none"
-            >
-              <Plus className="size-3.5" aria-hidden />
-            </Button>
-          </div>
-
-          <Button
-            isIconOnly
-            variant="ghost"
-            size="sm"
-            onPress={onRemove}
-            isDisabled={isMutating}
-            aria-label={t('cart.line.remove')}
-            className="text-default-500 hover:text-danger"
+          <NumberField
+            value={line.quantity}
+            minValue={1}
+            maxValue={maxQuantity}
+            step={1}
+            isDisabled={isMutating || isUnavailable}
+            onChange={(next) => {
+              if (Number.isFinite(next) && next !== line.quantity) onUpdate(next);
+            }}
+            variant="secondary"
+            className="w-28"
+            aria-label={t('cart.line.increaseQuantity')}
           >
-            <Trash2 className="size-4" aria-hidden />
-          </Button>
+            <Label className="sr-only">{t('cart.line.increaseQuantity')}</Label>
+            <NumberField.Group>
+              <NumberField.DecrementButton aria-label={t('cart.line.decreaseQuantity')}>
+                <Minus className="size-3.5" aria-hidden />
+              </NumberField.DecrementButton>
+              <NumberField.Input className="tabular-nums" />
+              <NumberField.IncrementButton aria-label={t('cart.line.increaseQuantity')}>
+                <Plus className="size-3.5" aria-hidden />
+              </NumberField.IncrementButton>
+            </NumberField.Group>
+          </NumberField>
+
+          <Tooltip>
+            <Button
+              isIconOnly
+              variant="ghost"
+              size="sm"
+              onPress={onRemove}
+              isDisabled={isMutating}
+              aria-label={t('cart.line.remove')}
+              className="text-default-500 hover:text-danger"
+            >
+              <Trash2 className="size-4" aria-hidden />
+            </Button>
+            <Tooltip.Content placement="top">{t('cart.line.remove')}</Tooltip.Content>
+          </Tooltip>
         </div>
       </div>
     </div>

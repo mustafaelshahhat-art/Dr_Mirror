@@ -1,4 +1,4 @@
-import { Button, TextArea } from '@heroui/react';
+import { Button, Modal, TextArea, useOverlayState } from '@heroui/react';
 import { Check, Download, X } from 'lucide-react';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
@@ -78,6 +78,7 @@ function ProofRow({
   const [isDownloading, setIsDownloading] = useState(false);
   const approve = useApproveProofMutation({ orderNumber });
   const reject = useRejectProofMutation({ orderNumber });
+  const rejectState = useOverlayState({ defaultOpen: false });
 
   const isPending = proof.status === PAYMENT_PROOF_STATUS.Pending;
   const isSuperseded = isPending && !isLatestPending;
@@ -119,6 +120,7 @@ function ProofRow({
         }
         await reject.mutateAsync({ proofId: proof.id, reviewNote: note.trim() });
       }
+      if (rejectState.isOpen) rejectState.close();
       setMode('idle');
       setNote('');
     } catch (err) {
@@ -219,6 +221,7 @@ function ProofRow({
                 setMode('reject');
                 setNote('');
                 setError(null);
+                rejectState.open();
               }}
             >
               <span className="inline-flex items-center gap-1.5">
@@ -227,12 +230,10 @@ function ProofRow({
               </span>
             </Button>
           </div>
-        ) : (
+        ) : mode === 'approve' ? (
           <div className="space-y-2 rounded-medium border border-divider/60 bg-content2 p-2">
             <p className="text-xs font-medium text-foreground">
-              {mode === 'approve'
-                ? t('admin.proofs.approveConfirm')
-                : t('admin.proofs.rejectConfirm')}
+              {t('admin.proofs.approveConfirm')}
             </p>
             <TextArea
               value={note}
@@ -241,9 +242,7 @@ function ProofRow({
               maxLength={500}
               fullWidth
               placeholder={
-                mode === 'reject'
-                  ? t('admin.proofs.notePlaceholderRequired')
-                  : t('admin.proofs.notePlaceholderOptional')
+                t('admin.proofs.notePlaceholderOptional')
               }
               className="text-sm text-start"
             />
@@ -255,7 +254,7 @@ function ProofRow({
             <div className="flex gap-2">
               <Button
                 type="button"
-                variant={mode === 'reject' ? 'danger' : 'primary'}
+                variant="primary"
                 size="sm"
                 isDisabled={inFlight}
                 onPress={() => void submit()}
@@ -280,8 +279,74 @@ function ProofRow({
               </Button>
             </div>
           </div>
-        )
+        ) : null
       ) : null}
+      <Modal>
+        <Modal.Backdrop
+          isOpen={rejectState.isOpen}
+          onOpenChange={(open) => {
+            rejectState.setOpen(open);
+            if (!open && !inFlight) {
+              setMode('idle');
+              setNote('');
+              setError(null);
+            }
+          }}
+        >
+          <Modal.Container size="sm">
+            <Modal.Dialog>
+              {({ close }) => (
+                <>
+                  <Modal.Header>
+                    <Modal.Heading>{t('admin.proofs.reject')}</Modal.Heading>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <p className="text-sm font-medium">
+                      {t('admin.proofs.rejectConfirm')}
+                    </p>
+                    <TextArea
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      rows={3}
+                      maxLength={500}
+                      fullWidth
+                      placeholder={t('admin.proofs.notePlaceholderRequired')}
+                      className="text-sm text-start"
+                    />
+                    {error ? (
+                      <p role="alert" className="text-xs text-danger">
+                        {error}
+                      </p>
+                    ) : null}
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      isDisabled={inFlight}
+                      onPress={close}
+                    >
+                      {t('admin.proofs.cancel')}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      isDisabled={inFlight}
+                      onPress={() => void submit()}
+                    >
+                      {inFlight
+                        ? t('admin.proofs.submitting')
+                        : t('admin.proofs.confirm')}
+                    </Button>
+                  </Modal.Footer>
+                </>
+              )}
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
     </div>
   );
 }

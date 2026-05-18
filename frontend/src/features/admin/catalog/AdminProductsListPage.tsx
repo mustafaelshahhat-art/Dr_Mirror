@@ -1,3 +1,4 @@
+import { Tooltip } from '@heroui/react';
 import { Package, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -179,14 +180,19 @@ export function AdminProductsListPage() {
                       {formatCurrency(p.price, lang)}
                     </td>
                     <td className="px-4 py-3 text-end">
-                      <LinkButton
-                        to={`/admin/products/${p.id}/edit`}
-                        aria-label={t('admin.catalog.actions.edit')}
-                        tone="outline"
-                        size="sm"
-                      >
-                        <Pencil className="size-4" aria-hidden />
-                      </LinkButton>
+                      <Tooltip delay={300} closeDelay={0}>
+                        <LinkButton
+                          to={`/admin/products/${p.id}/edit`}
+                          aria-label={t('admin.catalog.actions.edit')}
+                          tone="outline"
+                          size="sm"
+                        >
+                          <Pencil className="size-4" aria-hidden />
+                        </LinkButton>
+                        <Tooltip.Content placement="top">
+                          {t('admin.catalog.actions.edit')}
+                        </Tooltip.Content>
+                      </Tooltip>
                     </td>
                   </tr>
                 ))}

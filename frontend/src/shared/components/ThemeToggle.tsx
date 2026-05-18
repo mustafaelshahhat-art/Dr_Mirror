@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@heroui/react';
+import { Button, Tooltip } from '@heroui/react';
 import { useTheme } from 'next-themes';
 import { useTranslation } from 'react-i18next';
 import { Moon, Sun } from 'lucide-react';
@@ -24,14 +24,17 @@ export function ThemeToggle() {
   const label = t('header.switchTheme');
 
   return (
-    <Button
-      isIconOnly
-      variant="ghost"
-      size="sm"
-      onPress={() => setTheme(next)}
-      aria-label={label}
-    >
-      {isDark ? <Sun size={16} aria-hidden /> : <Moon size={16} aria-hidden />}
-    </Button>
+    <Tooltip>
+      <Button
+        isIconOnly
+        variant="ghost"
+        size="sm"
+        onPress={() => setTheme(next)}
+        aria-label={label}
+      >
+        {isDark ? <Sun size={16} aria-hidden /> : <Moon size={16} aria-hidden />}
+      </Button>
+      <Tooltip.Content placement="bottom">{label}</Tooltip.Content>
+    </Tooltip>
   );
 }

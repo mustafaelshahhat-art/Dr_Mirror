@@ -1,4 +1,4 @@
-import { Switch } from '@heroui/react';
+import { Switch, Tooltip } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Users } from 'lucide-react';
 import { useState } from 'react';
@@ -137,27 +137,32 @@ function UserRow({
       <td className="px-4 py-3">
         <div className="space-y-2">
           <div className="flex flex-wrap gap-2">
-            {ALL_ROLES.map((role) => (
-              <Switch
-                key={role}
-                size="sm"
-                isSelected={user.roles.includes(role)}
-                isDisabled={updateRoles.isPending}
-                onChange={(enabled) => void toggleRole(role, enabled)}
-                className="items-center gap-1.5"
-                aria-label={t('admin.users.roles.toggle', {
-                  role: t(`admin.users.roles.names.${role}`),
-                  name: user.fullName,
-                })}
-              >
-                <Switch.Control>
-                  <Switch.Thumb />
-                </Switch.Control>
-                <Switch.Content className="text-xs font-medium">
-                  {t(`admin.users.roles.names.${role}`)}
-                </Switch.Content>
-              </Switch>
-            ))}
+            {ALL_ROLES.map((role) => {
+              const label = t('admin.users.roles.toggle', {
+                role: t(`admin.users.roles.names.${role}`),
+                name: user.fullName,
+              });
+              return (
+                <Tooltip key={role} delay={300} closeDelay={0}>
+                  <Switch
+                    size="sm"
+                    isSelected={user.roles.includes(role)}
+                    isDisabled={updateRoles.isPending}
+                    onChange={(enabled) => void toggleRole(role, enabled)}
+                    className="items-center gap-1.5"
+                    aria-label={label}
+                  >
+                    <Switch.Control>
+                      <Switch.Thumb />
+                    </Switch.Control>
+                    <Switch.Content className="text-xs font-medium">
+                      {t(`admin.users.roles.names.${role}`)}
+                    </Switch.Content>
+                  </Switch>
+                  <Tooltip.Content placement="top">{label}</Tooltip.Content>
+                </Tooltip>
+              );
+            })}
           </div>
           {error ? (
             <p role="alert" className="max-w-md text-xs text-danger">

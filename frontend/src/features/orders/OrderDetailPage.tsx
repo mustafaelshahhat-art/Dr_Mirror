@@ -12,6 +12,8 @@ import {
   Skeleton,
 } from '../../shared/components/Skeleton';
 
+import { Snippet } from '../../shared/components/Snippet';
+
 import { CancelOrderButton } from './components/CancelOrderButton';
 import { OrderStatusBadge } from './components/OrderStatusBadge';
 import { OrderTimeline } from './components/OrderTimeline';
@@ -107,7 +109,18 @@ export function OrderDetailPage() {
 
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">{order.orderNumber}</h1>
+          <div className="flex items-center gap-1.5">
+            <h1 className="text-2xl font-semibold tracking-tight">{order.orderNumber}</h1>
+            <Snippet
+              value={order.orderNumber}
+              aria-label={t('orders.paymentInstructions.copy')}
+              text={t('orders.paymentInstructions.copy')}
+              copiedText={t('orders.paymentInstructions.copied')}
+              tooltipPlacement="end"
+            >
+              <span className="sr-only" aria-hidden />
+            </Snippet>
+          </div>
           <p className="text-sm text-default-500">
             {t('orders.detail.subtitle', {
               count: order.items.length,
