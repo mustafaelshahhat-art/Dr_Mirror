@@ -163,6 +163,13 @@
     },
     "errors": {
       "unknown": "حدث خطأ ما. حاول مرة أخرى."
+    },
+    "validation": {
+      "nameArRequired": "الاسم بالعربي مطلوب.",
+      "nameArTooLong": "الاسم بالعربي يجب ألا يزيد عن 120 حرفًا.",
+      "nameEnRequired": "الاسم بالإنجليزي مطلوب.",
+      "nameEnTooLong": "الاسم بالإنجليزي يجب ألا يزيد عن 120 حرفًا.",
+      "displayOrderInteger": "الترتيب يجب أن يكون رقمًا صحيحًا."
     }
   },
   "products": {
@@ -240,7 +247,19 @@
       "stock_two": "قطعتان",
       "stock_few": "{{count}} قطع",
       "stock_many": "{{count}} قطعة",
-      "stock_other": "{{count}} في المخزون"
+      "stock_other": "{{count}} في المخزون",
+      "validation": {
+        "sizeRequired": "المقاس مطلوب.",
+        "sizeTooLong": "المقاس يجب ألا يزيد عن 20 حرفًا.",
+        "colorNameRequired": "اسم اللون بالإنجليزي مطلوب.",
+        "colorNameTooLong": "اسم اللون بالإنجليزي يجب ألا يزيد عن 50 حرفًا.",
+        "colorNameArRequired": "اسم اللون بالعربي مطلوب.",
+        "colorNameArTooLong": "اسم اللون بالعربي يجب ألا يزيد عن 50 حرفًا.",
+        "colorHexInvalid": "اختر لونًا صحيحًا.",
+        "skuTooLong": "الكود يجب ألا يزيد عن 50 حرفًا.",
+        "stockInteger": "المخزون يجب أن يكون رقمًا صحيحًا.",
+        "stockNonNegative": "المخزون لا يمكن أن يكون أقل من صفر."
+      }
     },
     "images": {
       "heading": "الصور",
@@ -257,6 +276,19 @@
     },
     "errors": {
       "unknown": "حدث خطأ ما. حاول مرة أخرى."
+    },
+    "validation": {
+      "nameArRequired": "الاسم بالعربي مطلوب.",
+      "nameArTooLong": "الاسم بالعربي يجب ألا يزيد عن 120 حرفًا.",
+      "nameEnRequired": "الاسم بالإنجليزي مطلوب.",
+      "nameEnTooLong": "الاسم بالإنجليزي يجب ألا يزيد عن 120 حرفًا.",
+      "descriptionArTooLong": "الوصف بالعربي يجب ألا يزيد عن 2000 حرف.",
+      "descriptionEnTooLong": "الوصف بالإنجليزي يجب ألا يزيد عن 2000 حرف.",
+      "pricePositive": "السعر يجب أن يكون أكبر من صفر.",
+      "materialTooLong": "الخامة يجب ألا تزيد عن 100 حرف.",
+      "brandTooLong": "الماركة يجب ألا تزيد عن 100 حرف.",
+      "skuTooLong": "الكود يجب ألا يزيد عن 50 حرفًا.",
+      "categoryRequired": "اختر فئة."
     }
   },
   "payments": {
@@ -297,6 +329,19 @@
     },
     "errors": {
       "unknown": "حدث خطأ ما. حاول مرة أخرى."
+    },
+    "validation": {
+      "codeRequired": "الكود مطلوب.",
+      "codeTooLong": "الكود يجب ألا يزيد عن 32 حرفًا.",
+      "nameArRequired": "الاسم بالعربي مطلوب.",
+      "nameArTooLong": "الاسم بالعربي يجب ألا يزيد عن 64 حرفًا.",
+      "nameEnRequired": "الاسم بالإنجليزي مطلوب.",
+      "nameEnTooLong": "الاسم بالإنجليزي يجب ألا يزيد عن 64 حرفًا.",
+      "instructionsArTooLong": "تعليمات الدفع بالعربي يجب ألا تزيد عن 500 حرف.",
+      "instructionsEnTooLong": "تعليمات الدفع بالإنجليزي يجب ألا تزيد عن 500 حرف.",
+      "accountNumberTooLong": "رقم الحساب يجب ألا يزيد عن 64 حرفًا.",
+      "accountHolderTooLong": "صاحب الحساب يجب ألا يزيد عن 100 حرف.",
+      "displayOrderInteger": "الترتيب يجب أن يكون رقمًا صحيحًا."
     }
   },
   "proofs": {

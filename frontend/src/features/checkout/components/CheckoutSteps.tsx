@@ -14,7 +14,7 @@ export function CheckoutSteps({ current }: { current: CheckoutStep }) {
   const currentIndex = ORDER.indexOf(current);
 
   return (
-    <ol className="flex w-full items-center gap-2" role="list">
+    <ol className="flex w-full items-center gap-2">
       {ORDER.map((step, idx) => {
         const reached = idx <= currentIndex;
         const isLast = idx === ORDER.length - 1;

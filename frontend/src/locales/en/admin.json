@@ -147,6 +147,13 @@
     },
     "errors": {
       "unknown": "Something went wrong. Please try again."
+    },
+    "validation": {
+      "nameArRequired": "Arabic name is required.",
+      "nameArTooLong": "Arabic name must be 120 characters or fewer.",
+      "nameEnRequired": "English name is required.",
+      "nameEnTooLong": "English name must be 120 characters or fewer.",
+      "displayOrderInteger": "Order must be a whole number."
     }
   },
   "products": {
@@ -212,7 +219,19 @@
       "sku": "SKU",
       "stockLabel": "Stock",
       "stock_one": "1 in stock",
-      "stock_other": "{{count}} in stock"
+      "stock_other": "{{count}} in stock",
+      "validation": {
+        "sizeRequired": "Size is required.",
+        "sizeTooLong": "Size must be 20 characters or fewer.",
+        "colorNameRequired": "English color is required.",
+        "colorNameTooLong": "English color must be 50 characters or fewer.",
+        "colorNameArRequired": "Arabic color is required.",
+        "colorNameArTooLong": "Arabic color must be 50 characters or fewer.",
+        "colorHexInvalid": "Choose a valid hex color.",
+        "skuTooLong": "SKU must be 50 characters or fewer.",
+        "stockInteger": "Stock must be a whole number.",
+        "stockNonNegative": "Stock cannot be negative."
+      }
     },
     "images": {
       "heading": "Images",
@@ -229,6 +248,19 @@
     },
     "errors": {
       "unknown": "Something went wrong. Please try again."
+    },
+    "validation": {
+      "nameArRequired": "Arabic name is required.",
+      "nameArTooLong": "Arabic name must be 120 characters or fewer.",
+      "nameEnRequired": "English name is required.",
+      "nameEnTooLong": "English name must be 120 characters or fewer.",
+      "descriptionArTooLong": "Arabic description must be 2000 characters or fewer.",
+      "descriptionEnTooLong": "English description must be 2000 characters or fewer.",
+      "pricePositive": "Price must be greater than zero.",
+      "materialTooLong": "Material must be 100 characters or fewer.",
+      "brandTooLong": "Brand must be 100 characters or fewer.",
+      "skuTooLong": "SKU must be 50 characters or fewer.",
+      "categoryRequired": "Pick a category."
     }
   },
   "payments": {
@@ -265,6 +297,19 @@
     },
     "errors": {
       "unknown": "Something went wrong. Please try again."
+    },
+    "validation": {
+      "codeRequired": "Code is required.",
+      "codeTooLong": "Code must be 32 characters or fewer.",
+      "nameArRequired": "Arabic name is required.",
+      "nameArTooLong": "Arabic name must be 64 characters or fewer.",
+      "nameEnRequired": "English name is required.",
+      "nameEnTooLong": "English name must be 64 characters or fewer.",
+      "instructionsArTooLong": "Arabic instructions must be 500 characters or fewer.",
+      "instructionsEnTooLong": "English instructions must be 500 characters or fewer.",
+      "accountNumberTooLong": "Account number must be 64 characters or fewer.",
+      "accountHolderTooLong": "Account holder must be 100 characters or fewer.",
+      "displayOrderInteger": "Order must be a whole number."
     }
   },
   "proofs": {

@@ -96,7 +96,7 @@ public static class UploadPaymentProofEndpoint
 
         // Read a small header for magic-byte validation, then stream the rest
         // directly to storage without buffering the entire file in memory.
-        var fileStream = file.OpenReadStream();
+        using var fileStream = file.OpenReadStream();
         var maxMagicLen = MagicBytes.Values.Max(m => m.Length);
         var header = new byte[maxMagicLen];
         var headerRead = await fileStream.ReadAsync(header, ct);
@@ -104,7 +104,6 @@ public static class UploadPaymentProofEndpoint
         // Validate file signature to prevent content-type spoofing.
         if (!HasValidMagicBytes(header[..headerRead], file.ContentType))
         {
-            await fileStream.DisposeAsync();
             return Results.Problem(
                 title: "File content does not match declared type",
                 detail: "The uploaded file's content does not match its declared content-type.",

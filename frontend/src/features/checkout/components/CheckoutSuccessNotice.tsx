@@ -34,6 +34,7 @@ export function CheckoutSuccessNotice({ outcome }: CheckoutSuccessNoticeProps) {
  * <c>CheckoutPage.onSubmit</c> path. Returns <c>true</c> when a toast was
  * actually emitted so callers can avoid double-firing.
  */
+// eslint-disable-next-line react-refresh/only-export-components -- imperative helper is shared by checkout submit and tests.
 export function fireAddressSaveOutcomeToast(
   outcome: AddressSaveOutcome | undefined,
   t: Translate,

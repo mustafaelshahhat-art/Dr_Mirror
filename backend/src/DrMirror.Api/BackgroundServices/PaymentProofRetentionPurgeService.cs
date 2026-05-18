@@ -56,6 +56,7 @@ public sealed class PaymentProofRetentionPurgeService : BackgroundService
             .Take(100)
             .ToListAsync(cancellationToken);
 
+        var purgedCount = 0;
         foreach (var proof in proofs)
         {
             try
@@ -64,12 +65,14 @@ public sealed class PaymentProofRetentionPurgeService : BackgroundService
                 proof.FileKey = string.Empty;
                 proof.FileUrl = string.Empty;
                 proof.FilePurgedAtUtc = DateTimeOffset.UtcNow;
+                purgedCount++;
             }
             catch (Exception ex) when (ex is FileNotFoundException or DirectoryNotFoundException)
             {
                 proof.FileKey = string.Empty;
                 proof.FileUrl = string.Empty;
                 proof.FilePurgedAtUtc = DateTimeOffset.UtcNow;
+                purgedCount++;
             }
             catch (Exception ex)
             {
@@ -85,7 +88,10 @@ public sealed class PaymentProofRetentionPurgeService : BackgroundService
         if (proofs.Count > 0)
         {
             await db.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Purged {Count} old payment-proof files.", proofs.Count);
+            _logger.LogInformation(
+                "Purged {PurgedCount} of {TotalCount} old payment-proof files.",
+                purgedCount,
+                proofs.Count);
         }
     }
 }

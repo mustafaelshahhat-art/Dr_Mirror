@@ -36,6 +36,8 @@
     "firstAddressNote": "auto-set as default"
   },
   "errors": {
+    "labelRequired": "Label is required.",
+    "labelTooLong": "Label must be 64 characters or fewer.",
     "governorateRequired": "Please select a governorate.",
     "unknown": "Something went wrong. Please try again."
   }

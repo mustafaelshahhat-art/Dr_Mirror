@@ -36,6 +36,8 @@
     "firstAddressNote": "يُعيَّن تلقائيًا كافتراضي"
   },
   "errors": {
+    "labelRequired": "اسم العنوان مطلوب.",
+    "labelTooLong": "اسم العنوان يجب ألا يزيد عن 64 حرفًا.",
     "governorateRequired": "من فضلك اختر المحافظة.",
     "unknown": "حدث خطأ. حاول مرة أخرى."
   }

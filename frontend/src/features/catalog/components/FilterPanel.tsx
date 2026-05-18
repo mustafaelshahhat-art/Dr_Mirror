@@ -135,6 +135,7 @@ export function FilterPanel({
                   className="flex flex-wrap gap-1.5"
                   role="radiogroup"
                   aria-label={t('catalog.filters.genderLabel')}
+                  tabIndex={-1}
                   onKeyDown={handleGenderKeyDown}
                 >
                   <GenderPill

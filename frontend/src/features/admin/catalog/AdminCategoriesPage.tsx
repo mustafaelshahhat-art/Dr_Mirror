@@ -1,7 +1,10 @@
 import { Button, Form, Input, Label, TextField, Tooltip } from '@heroui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { FolderTree, Pencil, Plus, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { Skeleton } from '../../../shared/components/Skeleton';
@@ -227,60 +230,77 @@ interface CategoryFormProps {
   isPending: boolean;
 }
 
+const categoryFormSchema = z.object({
+  nameAr: z.string().trim().min(1, 'admin.catalog.validation.nameArRequired').max(120, 'admin.catalog.validation.nameArTooLong'),
+  nameEn: z.string().trim().min(1, 'admin.catalog.validation.nameEnRequired').max(120, 'admin.catalog.validation.nameEnTooLong'),
+  displayOrder: z.number().int('admin.catalog.validation.displayOrderInteger'),
+});
+
+type CategoryFormValues = z.infer<typeof categoryFormSchema>;
+
 function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
   const { t } = useTranslation();
-  const [nameAr, setNameAr] = useState('');
-  const [nameEn, setNameEn] = useState('');
-  const [displayOrder, setDisplayOrder] = useState(0);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<CategoryFormValues>({
+    resolver: zodResolver(categoryFormSchema),
+    defaultValues: { nameAr: '', nameEn: '', displayOrder: 0 },
+  });
+  const pending = isPending || isSubmitting;
+  const error = (message?: string) => (message ? t(message) : null);
 
   return (
     <Form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        const ok = await onSubmit({ nameAr: nameAr.trim(), nameEn: nameEn.trim(), displayOrder });
+      onSubmit={handleSubmit(async (values) => {
+        const ok = await onSubmit({
+          nameAr: values.nameAr.trim(),
+          nameEn: values.nameEn.trim(),
+          displayOrder: values.displayOrder,
+        });
         if (ok) {
-          setNameAr('');
-          setNameEn('');
-          setDisplayOrder(0);
+          reset();
         }
-      }}
+      })}
       className="flex flex-col gap-3 rounded-large border border-divider/60 bg-content1 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto] sm:items-end"
     >
-      <TextField className="flex flex-col gap-1">
+      <TextField isRequired isInvalid={Boolean(errors.nameAr)} className="flex flex-col gap-1">
         <Label className="text-xs uppercase tracking-wide text-default-500">
           {t('admin.catalog.categories.nameAr')}
         </Label>
         <Input
-          value={nameAr}
-          onChange={(e) => setNameAr((e.target as HTMLInputElement).value)}
+          {...register('nameAr')}
           maxLength={120}
         />
+        {errors.nameAr?.message ? <p className="text-xs text-danger">{error(errors.nameAr.message)}</p> : null}
       </TextField>
-      <TextField className="flex flex-col gap-1">
+      <TextField isRequired isInvalid={Boolean(errors.nameEn)} className="flex flex-col gap-1">
         <Label className="text-xs uppercase tracking-wide text-default-500">
           {t('admin.catalog.categories.nameEn')}
         </Label>
         <Input
-          value={nameEn}
-          onChange={(e) => setNameEn((e.target as HTMLInputElement).value)}
+          {...register('nameEn')}
           maxLength={120}
         />
+        {errors.nameEn?.message ? <p className="text-xs text-danger">{error(errors.nameEn.message)}</p> : null}
       </TextField>
-      <TextField className="flex flex-col gap-1">
+      <TextField isInvalid={Boolean(errors.displayOrder)} className="flex flex-col gap-1">
         <Label className="text-xs uppercase tracking-wide text-default-500">
           {t('admin.catalog.categories.displayOrder')}
         </Label>
         <Input
           type="number"
-          value={String(displayOrder)}
-          onChange={(e) => setDisplayOrder(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
+          {...register('displayOrder', { valueAsNumber: true })}
           className="tabular-nums"
         />
+        {errors.displayOrder?.message ? <p className="text-xs text-danger">{error(errors.displayOrder.message)}</p> : null}
       </TextField>
-      <Button type="submit" variant="primary" size="sm" isPending={isPending}>
+      <Button type="submit" variant="primary" size="sm" isPending={pending}>
         <span className="inline-flex items-center gap-1.5">
           <Plus className="size-4" aria-hidden />
-          {isPending ? t('admin.catalog.actions.creating') : t('admin.catalog.actions.create')}
+          {pending ? t('admin.catalog.actions.creating') : t('admin.catalog.actions.create')}
         </span>
       </Button>
     </Form>
@@ -294,53 +314,67 @@ interface EditCategoryRowProps extends CategoryFormProps {
 
 function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCategoryRowProps) {
   const { t } = useTranslation();
-  const [nameAr, setNameAr] = useState(category.nameAr);
-  const [nameEn, setNameEn] = useState(category.nameEn);
-  const [displayOrder, setDisplayOrder] = useState(category.displayOrder);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<CategoryFormValues>({
+    resolver: zodResolver(categoryFormSchema),
+    defaultValues: {
+      nameAr: category.nameAr,
+      nameEn: category.nameEn,
+      displayOrder: category.displayOrder,
+    },
+  });
+  const pending = isPending || isSubmitting;
+  const error = (message?: string) => (message ? t(message) : null);
 
   return (
     <Form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        await onSubmit({ nameAr: nameAr.trim(), nameEn: nameEn.trim(), displayOrder });
-      }}
+      onSubmit={handleSubmit(async (values) => {
+        await onSubmit({
+          nameAr: values.nameAr.trim(),
+          nameEn: values.nameEn.trim(),
+          displayOrder: values.displayOrder,
+        });
+      })}
       className="flex flex-col gap-3 rounded-medium border border-primary/40 bg-primary/5 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto_auto] sm:items-end"
     >
-      <TextField isRequired className="flex flex-col gap-1">
+      <TextField isRequired isInvalid={Boolean(errors.nameAr)} className="flex flex-col gap-1">
         <Label className="text-xs uppercase tracking-wide text-default-500">
           {t('admin.catalog.categories.nameAr')}
         </Label>
         <Input
-          value={nameAr}
-          onChange={(e) => setNameAr((e.target as HTMLInputElement).value)}
+          {...register('nameAr')}
           maxLength={120}
         />
+        {errors.nameAr?.message ? <p className="text-xs text-danger">{error(errors.nameAr.message)}</p> : null}
       </TextField>
-      <TextField isRequired className="flex flex-col gap-1">
+      <TextField isRequired isInvalid={Boolean(errors.nameEn)} className="flex flex-col gap-1">
         <Label className="text-xs uppercase tracking-wide text-default-500">
           {t('admin.catalog.categories.nameEn')}
         </Label>
         <Input
-          value={nameEn}
-          onChange={(e) => setNameEn((e.target as HTMLInputElement).value)}
+          {...register('nameEn')}
           maxLength={120}
         />
+        {errors.nameEn?.message ? <p className="text-xs text-danger">{error(errors.nameEn.message)}</p> : null}
       </TextField>
-      <TextField className="flex flex-col gap-1">
+      <TextField isInvalid={Boolean(errors.displayOrder)} className="flex flex-col gap-1">
         <Label className="text-xs uppercase tracking-wide text-default-500">
           {t('admin.catalog.categories.displayOrder')}
         </Label>
         <Input
           type="number"
-          value={String(displayOrder)}
-          onChange={(e) => setDisplayOrder(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
+          {...register('displayOrder', { valueAsNumber: true })}
           className="tabular-nums"
         />
+        {errors.displayOrder?.message ? <p className="text-xs text-danger">{error(errors.displayOrder.message)}</p> : null}
       </TextField>
-      <Button type="submit" variant="primary" size="sm" isPending={isPending}>
-        {isPending ? t('admin.catalog.actions.saving') : t('admin.catalog.actions.save')}
+      <Button type="submit" variant="primary" size="sm" isPending={pending}>
+        {pending ? t('admin.catalog.actions.saving') : t('admin.catalog.actions.save')}
       </Button>
-      <Button type="button" variant="ghost" size="sm" onPress={onCancel} isDisabled={isPending}>
+      <Button type="button" variant="ghost" size="sm" onPress={onCancel} isDisabled={pending}>
         {t('admin.catalog.actions.cancel')}
       </Button>
     </Form>

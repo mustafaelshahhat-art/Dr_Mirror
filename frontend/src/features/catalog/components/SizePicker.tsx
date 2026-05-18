@@ -65,6 +65,7 @@ export function SizePicker({
         className="flex flex-wrap gap-2"
         role="radiogroup"
         aria-label={t('catalog.detail.sizeLabel')}
+        tabIndex={-1}
         onKeyDown={handleKeyDown}
       >
         {sizes.map((s, idx) => {

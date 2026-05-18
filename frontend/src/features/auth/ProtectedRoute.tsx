@@ -110,6 +110,7 @@ export function PublicOnlyRoute() {
   return <Outlet />;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- tested pure helper co-located with route guard.
 export function getSafeNextPath(search: string): string | null {
   const raw = new URLSearchParams(search).get('next');
   if (raw === null) return null;

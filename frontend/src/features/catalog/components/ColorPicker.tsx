@@ -64,6 +64,7 @@ export function ColorPicker({ colors, selected, onSelect }: ColorPickerProps) {
         className="flex flex-wrap gap-2"
         role="radiogroup"
         aria-label={t('catalog.detail.colorLabel')}
+        tabIndex={-1}
         onKeyDown={handleKeyDown}
       >
         {colors.map((c, idx) => {

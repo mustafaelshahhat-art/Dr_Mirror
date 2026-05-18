@@ -46,14 +46,16 @@ public sealed class EmailOutboxRetentionService : BackgroundService
         var cutoff = DateTimeOffset.UtcNow.AddDays(-retentionDays);
 
         var rows = await db.EmailOutboxMessages
-            .Where(m => m.Status == OutboxMessageStatus.Sent && m.DeliveredAt < cutoff)
+            .Where(m => (m.Status == OutboxMessageStatus.Sent && m.DeliveredAt < cutoff)
+                || (m.Status == OutboxMessageStatus.Failed
+                    && (m.LastAttemptAt == null || m.LastAttemptAt < cutoff)))
             .ToListAsync(cancellationToken);
 
         if (rows.Count > 0)
         {
             db.EmailOutboxMessages.RemoveRange(rows);
             await db.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Purged {Count} old dispatched email-outbox messages.", rows.Count);
+            _logger.LogInformation("Purged {Count} old sent/failed email-outbox messages.", rows.Count);
         }
     }
 }

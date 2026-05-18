@@ -1,8 +1,10 @@
-import { Button, Checkbox, Description, Form, Input, Label, TextField } from '@heroui/react';
-import { useState } from 'react';
+import { Button, Checkbox, Description, FieldError, Form, Input, Label, TextField } from '@heroui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
-import type { BuyerAddressDto, BuyerAddressUpsertRequest } from '../types';
+import { GOVERNORATE_SLUGS, type BuyerAddressDto, type BuyerAddressUpsertRequest } from '../types';
 
 import { GovernorateSelect } from './GovernorateSelect';
 
@@ -16,9 +18,30 @@ interface AddressFormProps {
   pendingLabel: string;
 }
 
+const egyptPhoneRegex = /^\+?2?01[0125]\d{8}$/;
+
+const addressFormSchema = z.object({
+  label: z.string().trim().min(1, 'addresses.errors.labelRequired').max(64, 'addresses.errors.labelTooLong'),
+  recipientName: z.string().trim().min(2, 'checkout.errors.recipientNameTooShort').max(100, 'checkout.errors.recipientNameTooLong'),
+  phone: z.string().trim().regex(egyptPhoneRegex, 'checkout.errors.phoneInvalid'),
+  governorate: z.string().refine(
+    (value) => GOVERNORATE_SLUGS.includes(value as (typeof GOVERNORATE_SLUGS)[number]),
+    'addresses.errors.governorateRequired',
+  ),
+  city: z.string().trim().min(2, 'checkout.errors.cityRequired').max(100, 'checkout.errors.cityTooLong'),
+  streetAddress: z.string().trim().min(5, 'checkout.errors.streetAddressRequired').max(200, 'checkout.errors.streetAddressTooLong'),
+  floor: z.string().trim().max(50, 'checkout.errors.floorTooLong'),
+  apartment: z.string().trim().max(50, 'checkout.errors.apartmentTooLong'),
+  landmark: z.string().trim().max(200, 'checkout.errors.landmarkTooLong'),
+  notes: z.string().trim().max(500, 'checkout.errors.notesTooLong'),
+  setDefault: z.boolean(),
+});
+
+type AddressFormValues = z.infer<typeof addressFormSchema>;
+
 /**
- * Plain-state buyer address form used by both the create and edit flows on
- * the address-book page. Mirrors the backend's <c>BuyerAddressUpsertValidator</c>:
+ * Buyer address form used by both the create and edit flows on the address-book
+ * page. Mirrors the backend's <c>BuyerAddressUpsertValidator</c>:
  *   - phone matches the Egyptian regex,
  *   - governorate must be one of the 27 canonical slugs,
  *   - label / recipient / city / streetAddress are required.
@@ -32,111 +55,111 @@ export function AddressForm({
   pendingLabel,
 }: AddressFormProps) {
   const { t } = useTranslation();
-
-  const [label, setLabel] = useState(initial?.label ?? '');
-  const [recipientName, setRecipientName] = useState(initial?.recipientName ?? '');
-  const [phone, setPhone] = useState(initial?.phone ?? '');
-  const [governorate, setGovernorate] = useState(initial?.governorate ?? '');
-  const [city, setCity] = useState(initial?.city ?? '');
-  const [streetAddress, setStreetAddress] = useState(initial?.streetAddress ?? '');
-  const [floor, setFloor] = useState(initial?.floor ?? '');
-  const [apartment, setApartment] = useState(initial?.apartment ?? '');
-  const [landmark, setLandmark] = useState(initial?.landmark ?? '');
-  const [notes, setNotes] = useState(initial?.notes ?? '');
-  const [setDefault, setSetDefault] = useState(initial?.isDefault ?? Boolean(isFirstAddress));
-  const [governorateError, setGovernorateError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<AddressFormValues>({
+    resolver: zodResolver(addressFormSchema),
+    defaultValues: {
+      label: initial?.label ?? '',
+      recipientName: initial?.recipientName ?? '',
+      phone: initial?.phone ?? '',
+      governorate: initial?.governorate ?? '',
+      city: initial?.city ?? '',
+      streetAddress: initial?.streetAddress ?? '',
+      floor: initial?.floor ?? '',
+      apartment: initial?.apartment ?? '',
+      landmark: initial?.landmark ?? '',
+      notes: initial?.notes ?? '',
+      setDefault: initial?.isDefault ?? Boolean(isFirstAddress),
+    },
+  });
 
   const setDefaultLocked = Boolean(isFirstAddress);
+  const error = (message?: string) => (message ? t(message) : null);
+  const blankToNull = (value: string) => value.trim() || null;
+
+  const submit = handleSubmit(async (values) => {
+    try {
+      await onSubmit({
+        label: values.label.trim(),
+        recipientName: values.recipientName.trim(),
+        phone: values.phone.trim(),
+        governorate: values.governorate,
+        city: values.city.trim(),
+        streetAddress: values.streetAddress.trim(),
+        floor: blankToNull(values.floor),
+        apartment: blankToNull(values.apartment),
+        landmark: blankToNull(values.landmark),
+        notes: blankToNull(values.notes),
+        setDefault: values.setDefault,
+      });
+    } catch {
+      // Toast emitted by mutation onError.
+    }
+  });
 
   return (
     <Form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        setGovernorateError(null);
-        if (!governorate) {
-          setGovernorateError(t('addresses.errors.governorateRequired'));
-          return;
-        }
-        setSubmitting(true);
-        try {
-          await onSubmit({
-            label: label.trim(),
-            recipientName: recipientName.trim(),
-            phone: phone.trim(),
-            governorate,
-            city: city.trim(),
-            streetAddress: streetAddress.trim(),
-            floor: floor.trim() || null,
-            apartment: apartment.trim() || null,
-            landmark: landmark.trim() || null,
-            notes: notes.trim() || null,
-            setDefault,
-          });
-        } catch {
-          // Toast emitted by mutation onError.
-        } finally {
-          setSubmitting(false);
-        }
-      }}
+      onSubmit={submit}
       className="cq space-y-4 rounded-large border border-divider/60 bg-content1 p-4"
     >
       <div className="grid gap-3 @lg:grid-cols-2">
-        <Field
-          label={t('addresses.fields.label')}
-          value={label}
-          onChange={setLabel}
-          required
-          maxLength={64}
-          description={t('addresses.fields.labelHint')}
-        />
-        <Field label={t('addresses.fields.recipientName')} value={recipientName} onChange={setRecipientName} required maxLength={100} />
-        <Field
-          label={t('addresses.fields.phone')}
-          value={phone}
-          onChange={setPhone}
-          required
-          dir="ltr"
-          description={t('addresses.fields.phoneHint')}
-        />
-        <GovernorateSelect
-          label={t('addresses.fields.governorate')}
-          value={governorate}
-          onChange={(next) => {
-            setGovernorate(next);
-            if (next) setGovernorateError(null);
-          }}
-          required
-          errorMessage={governorateError}
-        />
-        <Field label={t('addresses.fields.city')} value={city} onChange={setCity} required maxLength={100} />
-        <Field label={t('addresses.fields.streetAddress')} value={streetAddress} onChange={setStreetAddress} required maxLength={200} />
-        <Field label={t('addresses.fields.floor')} value={floor} onChange={setFloor} maxLength={50} />
-        <Field label={t('addresses.fields.apartment')} value={apartment} onChange={setApartment} maxLength={50} />
-        <Field label={t('addresses.fields.landmark')} value={landmark} onChange={setLandmark} maxLength={200} />
-        <Field label={t('addresses.fields.notes')} value={notes} onChange={setNotes} maxLength={500} />
+        <Controller name="label" control={control} render={({ field }) => (
+          <Field {...field} label={t('addresses.fields.label')} required maxLength={64} description={t('addresses.fields.labelHint')} errorMessage={error(errors.label?.message)} />
+        )} />
+        <Controller name="recipientName" control={control} render={({ field }) => (
+          <Field {...field} label={t('addresses.fields.recipientName')} required maxLength={100} errorMessage={error(errors.recipientName?.message)} />
+        )} />
+        <Controller name="phone" control={control} render={({ field }) => (
+          <Field {...field} label={t('addresses.fields.phone')} required dir="ltr" description={t('addresses.fields.phoneHint')} errorMessage={error(errors.phone?.message)} />
+        )} />
+        <Controller name="governorate" control={control} render={({ field }) => (
+          <GovernorateSelect label={t('addresses.fields.governorate')} value={field.value} onChange={field.onChange} required errorMessage={error(errors.governorate?.message)} />
+        )} />
+        <Controller name="city" control={control} render={({ field }) => (
+          <Field {...field} label={t('addresses.fields.city')} required maxLength={100} errorMessage={error(errors.city?.message)} />
+        )} />
+        <Controller name="streetAddress" control={control} render={({ field }) => (
+          <Field {...field} label={t('addresses.fields.streetAddress')} required maxLength={200} errorMessage={error(errors.streetAddress?.message)} />
+        )} />
+        <Controller name="floor" control={control} render={({ field }) => (
+          <Field {...field} label={t('addresses.fields.floor')} maxLength={50} errorMessage={error(errors.floor?.message)} />
+        )} />
+        <Controller name="apartment" control={control} render={({ field }) => (
+          <Field {...field} label={t('addresses.fields.apartment')} maxLength={50} errorMessage={error(errors.apartment?.message)} />
+        )} />
+        <Controller name="landmark" control={control} render={({ field }) => (
+          <Field {...field} label={t('addresses.fields.landmark')} maxLength={200} errorMessage={error(errors.landmark?.message)} />
+        )} />
+        <Controller name="notes" control={control} render={({ field }) => (
+          <Field {...field} label={t('addresses.fields.notes')} maxLength={500} errorMessage={error(errors.notes?.message)} />
+        )} />
       </div>
 
-      <Checkbox
-        isSelected={setDefault}
-        isDisabled={setDefaultLocked}
-        onChange={setSetDefault}
-      >
-        <span className="text-sm">
-          {t('addresses.fields.setDefault')}
-          {setDefaultLocked ? (
-            <span className="ms-2 text-xs text-default-500">
-              ({t('addresses.fields.firstAddressNote')})
-            </span>
-          ) : null}
-        </span>
-      </Checkbox>
+      <Controller name="setDefault" control={control} render={({ field }) => (
+        <Checkbox
+          isSelected={field.value}
+          isDisabled={setDefaultLocked}
+          onChange={field.onChange}
+        >
+          <span className="text-sm">
+            {t('addresses.fields.setDefault')}
+            {setDefaultLocked ? (
+              <span className="ms-2 text-xs text-default-500">
+                ({t('addresses.fields.firstAddressNote')})
+              </span>
+            ) : null}
+          </span>
+        </Checkbox>
+      )} />
 
       <div className="flex gap-2">
-        <Button type="submit" variant="primary" isPending={submitting}>
-          {submitting ? pendingLabel : submitLabel}
+        <Button type="submit" variant="primary" isPending={isSubmitting}>
+          {isSubmitting ? pendingLabel : submitLabel}
         </Button>
-        <Button type="button" variant="ghost" onPress={onCancel} isDisabled={submitting}>
+        <Button type="button" variant="ghost" onPress={onCancel} isDisabled={isSubmitting}>
           {t('addresses.actions.cancel')}
         </Button>
       </div>
@@ -148,30 +171,41 @@ function Field({
   label,
   value,
   onChange,
+  onBlur,
+  name,
   required,
   maxLength,
   description,
   dir,
+  errorMessage,
 }: {
   label: string;
   value: string;
   onChange: (next: string) => void;
+  onBlur?: () => void;
+  name?: string;
   required?: boolean;
   maxLength?: number;
   description?: string;
   dir?: 'ltr' | 'rtl';
+  errorMessage?: string | null;
 }) {
   return (
-    <TextField isRequired={required} className="flex flex-col gap-1">
+    <TextField isRequired={required} isInvalid={Boolean(errorMessage)} className="flex flex-col gap-1">
       <Label className="text-xs uppercase tracking-wide text-default-500">{label}</Label>
       <Input
         value={value}
         onChange={(e) => onChange((e.target as HTMLInputElement).value)}
+        onBlur={onBlur}
+        name={name}
         maxLength={maxLength}
         dir={dir}
       />
       {description ? (
         <Description className="text-xs text-default-500">{description}</Description>
+      ) : null}
+      {errorMessage ? (
+        <FieldError className="text-xs text-danger">{errorMessage}</FieldError>
       ) : null}
     </TextField>
   );

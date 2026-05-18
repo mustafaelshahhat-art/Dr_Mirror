@@ -53,6 +53,7 @@ export function CategoryChips({ categories, selectedId, onSelect }: CategoryChip
       className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       role="radiogroup"
       aria-label={t('catalog.filters.categoryLabel')}
+      tabIndex={-1}
       onKeyDown={handleKeyDown}
     >
       <Pill selected={!selectedId} tabIndex={!selectedId ? 0 : -1} onClick={() => onSelect(undefined)}>

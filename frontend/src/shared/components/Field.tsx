@@ -1,4 +1,4 @@
-import { Description, Input, Label, TextArea, TextField } from '@heroui/react';
+import { Description, FieldError, Input, Label, TextArea, TextField } from '@heroui/react';
 import type { HTMLInputTypeAttribute } from 'react';
 
 /**
@@ -26,6 +26,7 @@ export interface FieldProps {
   dir?: 'ltr' | 'rtl';
   description?: string;
   placeholder?: string;
+  errorMessage?: string | null;
 }
 
 export function Field({
@@ -38,9 +39,10 @@ export function Field({
   dir,
   description,
   placeholder,
+  errorMessage,
 }: FieldProps) {
   return (
-    <TextField isRequired={required} className="flex flex-col gap-1">
+    <TextField isRequired={required} isInvalid={Boolean(errorMessage)} className="flex flex-col gap-1">
       <Label className={LABEL_CLASS}>{label}</Label>
       <Input
         value={value}
@@ -52,6 +54,9 @@ export function Field({
       />
       {description ? (
         <Description className={DESCRIPTION_CLASS}>{description}</Description>
+      ) : null}
+      {errorMessage ? (
+        <FieldError className="text-xs text-danger">{errorMessage}</FieldError>
       ) : null}
     </TextField>
   );
@@ -65,6 +70,7 @@ export interface TextAreaFieldProps {
   maxLength?: number;
   rows?: number;
   spanFull?: boolean;
+  errorMessage?: string | null;
 }
 
 export function TextAreaField({
@@ -75,10 +81,12 @@ export function TextAreaField({
   maxLength,
   rows = 3,
   spanFull = true,
+  errorMessage,
 }: TextAreaFieldProps) {
   return (
     <TextField
       isRequired={required}
+      isInvalid={Boolean(errorMessage)}
       className={`flex flex-col gap-1${spanFull ? ' sm:col-span-2' : ''}`}
     >
       <Label className={LABEL_CLASS}>{label}</Label>
@@ -88,6 +96,9 @@ export function TextAreaField({
         maxLength={maxLength}
         rows={rows}
       />
+      {errorMessage ? (
+        <FieldError className="text-xs text-danger">{errorMessage}</FieldError>
+      ) : null}
     </TextField>
   );
 }

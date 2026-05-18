@@ -1,7 +1,10 @@
-import { Button, Form, Label, NumberField, Tooltip } from '@heroui/react';
+import { Button, FieldError, Form, Label, NumberField, Tooltip } from '@heroui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 import {
   useCreateVariantMutation,
@@ -11,6 +14,17 @@ import {
 import type { AdminProductDetailDto, AdminProductVariantDto } from '../types';
 
 import { Field as SimpleField } from '../../../../shared/components/Field';
+
+const variantFormSchema = z.object({
+  size: z.string().trim().min(1, 'admin.products.variants.validation.sizeRequired').max(20, 'admin.products.variants.validation.sizeTooLong'),
+  colorName: z.string().trim().min(1, 'admin.products.variants.validation.colorNameRequired').max(50, 'admin.products.variants.validation.colorNameTooLong'),
+  colorNameAr: z.string().trim().min(1, 'admin.products.variants.validation.colorNameArRequired').max(50, 'admin.products.variants.validation.colorNameArTooLong'),
+  colorHex: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'admin.products.variants.validation.colorHexInvalid'),
+  sku: z.string().trim().max(50, 'admin.products.variants.validation.skuTooLong'),
+  stock: z.number().int('admin.products.variants.validation.stockInteger').nonnegative('admin.products.variants.validation.stockNonNegative'),
+});
+
+type VariantFormValues = z.infer<typeof variantFormSchema>;
 
 export function ProductVariantsSection({ product }: { product: AdminProductDetailDto }) {
   const { t } = useTranslation();
@@ -149,26 +163,35 @@ function VariantForm({
   const { t } = useTranslation();
   const createMutation = useCreateVariantMutation(productId);
   const updateMutation = useUpdateVariantMutation(productId);
-  const [size, setSize] = useState(variant?.size ?? '');
-  const [colorName, setColorName] = useState(variant?.colorName ?? '');
-  const [colorNameAr, setColorNameAr] = useState(variant?.colorNameAr ?? '');
-  const [colorHex, setColorHex] = useState(variant?.colorHex ?? '#000000');
-  const [sku, setSku] = useState(variant?.sku ?? '');
-  const [stock, setStock] = useState(variant?.stock ?? 0);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<VariantFormValues>({
+    resolver: zodResolver(variantFormSchema),
+    defaultValues: {
+      size: variant?.size ?? '',
+      colorName: variant?.colorName ?? '',
+      colorNameAr: variant?.colorNameAr ?? '',
+      colorHex: variant?.colorHex ?? '#000000',
+      sku: variant?.sku ?? '',
+      stock: variant?.stock ?? 0,
+    },
+  });
 
   const inFlight = createMutation.isPending || updateMutation.isPending;
+  const error = (message?: string) => (message ? t(message) : null);
 
   return (
     <Form
-      onSubmit={async (e) => {
-        e.preventDefault();
+      onSubmit={handleSubmit(async (values) => {
         const body = {
-          size: size.trim(),
-          colorName: colorName.trim(),
-          colorNameAr: colorNameAr.trim(),
-          colorHex,
-          sku: sku.trim(),
-          stock,
+          size: values.size.trim(),
+          colorName: values.colorName.trim(),
+          colorNameAr: values.colorNameAr.trim(),
+          colorHex: values.colorHex,
+          sku: values.sku.trim(),
+          stock: values.stock,
         };
         try {
           if (mode === 'create') {
@@ -180,40 +203,58 @@ function VariantForm({
         } catch {
           // Toast emitted by mutation onError.
         }
-      }}
+      })}
       className="space-y-3 rounded-medium border border-primary/40 bg-primary/5 p-3"
     >
       <div className="grid gap-3 sm:grid-cols-[1fr_1fr_1fr_60px_1fr_100px]">
-        <SimpleField label={t('admin.products.variants.size')} value={size} onChange={setSize} required maxLength={16} />
-        <SimpleField label={t('admin.products.variants.colorName')} value={colorName} onChange={setColorName} required maxLength={60} />
-        <SimpleField label={t('admin.products.variants.colorNameAr')} value={colorNameAr} onChange={setColorNameAr} required maxLength={60} />
-        <label className="space-y-1 text-sm">
-          <span className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.variants.hex')}</span>
-          {/* intentional: HeroUI v3 has no color input — see DESIGN.md */}
-          <input
-            type="color"
-            value={colorHex}
-            onChange={(e) => setColorHex(e.target.value)}
-            className="h-9 w-full rounded-medium border border-divider bg-background"
-          />
-        </label>
-        <SimpleField label={t('admin.products.variants.sku')} value={sku} onChange={setSku} required maxLength={64} dir="ltr" />
-        <NumberField
-          value={stock}
-          minValue={0}
-          maxValue={1_000_000}
-          step={1}
-          onChange={(next) => setStock(next ?? 0)}
-          variant="secondary"
-          className="text-sm"
-        >
-          <Label className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.variants.stockLabel')}</Label>
-          <NumberField.Group>
-            <NumberField.DecrementButton />
-            <NumberField.Input className="tabular-nums" />
-            <NumberField.IncrementButton />
-          </NumberField.Group>
-        </NumberField>
+        <Controller name="size" control={control} render={({ field }) => (
+          <SimpleField {...field} label={t('admin.products.variants.size')} required maxLength={20} errorMessage={error(errors.size?.message)} />
+        )} />
+        <Controller name="colorName" control={control} render={({ field }) => (
+          <SimpleField {...field} label={t('admin.products.variants.colorName')} required maxLength={50} errorMessage={error(errors.colorName?.message)} />
+        )} />
+        <Controller name="colorNameAr" control={control} render={({ field }) => (
+          <SimpleField {...field} label={t('admin.products.variants.colorNameAr')} required maxLength={50} errorMessage={error(errors.colorNameAr?.message)} />
+        )} />
+        <Controller name="colorHex" control={control} render={({ field }) => (
+          <label className="space-y-1 text-sm">
+            <span className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.variants.hex')}</span>
+            {/* intentional: HeroUI v3 has no color input — see DESIGN.md */}
+            <input
+              type="color"
+              value={field.value}
+              onChange={field.onChange}
+              required
+              aria-required="true"
+              aria-invalid={Boolean(errors.colorHex)}
+              className="h-9 w-full rounded-medium border border-divider bg-background"
+            />
+            {errors.colorHex?.message ? <span className="text-xs text-danger">{error(errors.colorHex.message)}</span> : null}
+          </label>
+        )} />
+        <Controller name="sku" control={control} render={({ field }) => (
+          <SimpleField {...field} label={t('admin.products.variants.sku')} maxLength={50} dir="ltr" errorMessage={error(errors.sku?.message)} />
+        )} />
+        <Controller name="stock" control={control} render={({ field }) => (
+          <NumberField
+            value={field.value}
+            minValue={0}
+            maxValue={1_000_000}
+            step={1}
+            onChange={(next) => field.onChange(next ?? 0)}
+            isInvalid={Boolean(errors.stock)}
+            variant="secondary"
+            className="text-sm"
+          >
+            <Label className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.variants.stockLabel')}</Label>
+            <NumberField.Group>
+              <NumberField.DecrementButton />
+              <NumberField.Input className="tabular-nums" />
+              <NumberField.IncrementButton />
+            </NumberField.Group>
+            {errors.stock?.message ? <FieldError className="text-xs text-danger">{error(errors.stock.message)}</FieldError> : null}
+          </NumberField>
+        )} />
       </div>
       <div className="flex gap-2">
         <Button type="submit" variant="primary" size="sm" isPending={inFlight}>

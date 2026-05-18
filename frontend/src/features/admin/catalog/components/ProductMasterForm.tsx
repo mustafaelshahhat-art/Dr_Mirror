@@ -1,6 +1,9 @@
-import { Button, Form, Modal, useOverlayState } from '@heroui/react';
+import { Button, FieldError, Form, Label, Modal, NumberField, useOverlayState } from '@heroui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 import type { ProductGender } from '../../../catalog/types';
 import { Field, TextAreaField } from '../../../../shared/components/Field';
@@ -11,6 +14,21 @@ import {
   useUpdateProductMutation,
 } from '../hooks';
 import type { AdminProductDetailDto } from '../types';
+
+const productMasterSchema = z.object({
+  nameAr: z.string().trim().min(1, 'admin.products.validation.nameArRequired').max(120, 'admin.products.validation.nameArTooLong'),
+  nameEn: z.string().trim().min(1, 'admin.products.validation.nameEnRequired').max(120, 'admin.products.validation.nameEnTooLong'),
+  descriptionAr: z.string().trim().max(2000, 'admin.products.validation.descriptionArTooLong'),
+  descriptionEn: z.string().trim().max(2000, 'admin.products.validation.descriptionEnTooLong'),
+  price: z.number().positive('admin.products.validation.pricePositive'),
+  gender: z.union([z.literal(0), z.literal(1), z.literal(2)]),
+  material: z.string().trim().max(100, 'admin.products.validation.materialTooLong'),
+  brand: z.string().trim().max(100, 'admin.products.validation.brandTooLong'),
+  sku: z.string().trim().max(50, 'admin.products.validation.skuTooLong'),
+  categoryId: z.string().uuid('admin.products.validation.categoryRequired'),
+});
+
+type ProductMasterFormValues = z.infer<typeof productMasterSchema>;
 
 export function ProductMasterForm({
   product,
@@ -25,23 +43,33 @@ export function ProductMasterForm({
   const publishMutation = useTogglePublishMutation();
   const unpublishState = useOverlayState({ defaultOpen: false });
 
-  const [nameAr, setNameAr] = useState(product.nameAr);
-  const [nameEn, setNameEn] = useState(product.nameEn);
-  const [descriptionAr, setDescriptionAr] = useState(product.descriptionAr);
-  const [descriptionEn, setDescriptionEn] = useState(product.descriptionEn);
-  const [price, setPrice] = useState(String(product.price));
-  const [gender, setGender] = useState<ProductGender>(product.gender);
-  const [material, setMaterial] = useState(product.material ?? '');
-  const [brand, setBrand] = useState(product.brand ?? '');
-  const [sku, setSku] = useState(product.sku ?? '');
-  const [categoryId, setCategoryId] = useState(product.categoryId);
-  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [saved, setSaved] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ProductMasterFormValues>({
+    resolver: zodResolver(productMasterSchema),
+    defaultValues: {
+      nameAr: product.nameAr,
+      nameEn: product.nameEn,
+      descriptionAr: product.descriptionAr,
+      descriptionEn: product.descriptionEn,
+      price: product.price,
+      gender: product.gender,
+      material: product.material ?? '',
+      brand: product.brand ?? '',
+      sku: product.sku ?? '',
+      categoryId: product.categoryId,
+    },
+  });
+  const error = (message?: string) => (message ? t(message) : null);
 
   useEffect(() => {
-    if (savedAt === null) return;
-    const id = window.setTimeout(() => setSavedAt(null), 1500);
+    if (!saved) return;
+    const id = window.setTimeout(() => setSaved(false), 1500);
     return () => window.clearTimeout(id);
-  }, [savedAt]);
+  }, [saved]);
 
   return (
     <article className="rounded-large border border-divider/60 bg-content1 p-4">
@@ -90,66 +118,102 @@ export function ProductMasterForm({
         </div>
       </header>
 
-      {savedAt !== null ? (
+      {saved ? (
         <div className="enter-fade mb-3 rounded-medium border border-success/30 bg-success/10 p-3 text-sm text-success">
           {t('admin.products.edit.savedToast')}
         </div>
       ) : null}
 
       <Form
-        onSubmit={async (e) => {
-          e.preventDefault();
+        onSubmit={handleSubmit(async (values) => {
           try {
             await updateMutation.mutateAsync({
               id: product.id,
               body: {
-                nameAr: nameAr.trim(),
-                nameEn: nameEn.trim(),
-                descriptionAr: descriptionAr.trim(),
-                descriptionEn: descriptionEn.trim(),
-                price: Number.parseFloat(price) || 0,
-                gender,
-                material: material.trim() || null,
-                brand: brand.trim() || null,
-                sku: sku.trim() || null,
-                categoryId,
+                nameAr: values.nameAr.trim(),
+                nameEn: values.nameEn.trim(),
+                descriptionAr: values.descriptionAr.trim(),
+                descriptionEn: values.descriptionEn.trim(),
+                price: values.price,
+                gender: values.gender as ProductGender,
+                material: values.material.trim() || null,
+                brand: values.brand.trim() || null,
+                sku: values.sku.trim() || null,
+                categoryId: values.categoryId,
               },
             });
-            setSavedAt(Date.now());
+            setSaved(true);
           } catch {
             // Toast emitted by mutation onError.
           }
-        }}
+        })}
         className="grid gap-3 sm:grid-cols-2"
       >
-        <Field label={t('admin.products.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={200} />
-        <Field label={t('admin.products.fields.nameEn')} value={nameEn} onChange={setNameEn} required maxLength={200} />
-        <TextAreaField label={t('admin.products.fields.descriptionAr')} value={descriptionAr} onChange={setDescriptionAr} required maxLength={4000} />
-        <TextAreaField label={t('admin.products.fields.descriptionEn')} value={descriptionEn} onChange={setDescriptionEn} required maxLength={4000} />
-        <Field label={t('admin.products.fields.price')} value={price} onChange={setPrice} type="number" required />
-        <SelectField
-          label={t('admin.products.fields.gender')}
-          value={String(gender)}
-          onChange={(next) => setGender(Number(next) as ProductGender)}
-          options={[
-            { value: '0', label: t('catalog.gender.men') },
-            { value: '1', label: t('catalog.gender.women') },
-            { value: '2', label: t('catalog.gender.unisex') },
-          ]}
-        />
-        <Field label={t('admin.products.fields.material')} value={material} onChange={setMaterial} maxLength={200} />
-        <Field label={t('admin.products.fields.brand')} value={brand} onChange={setBrand} maxLength={80} />
-        <Field label={t('admin.products.fields.sku')} value={sku} onChange={setSku} maxLength={64} dir="ltr" />
-        <SelectField
-          label={t('admin.products.fields.category')}
-          value={categoryId}
-          onChange={setCategoryId}
-          isRequired
-          options={(categories.data ?? []).map((c) => ({
-            value: c.id,
-            label: `${c.nameEn} (${c.nameAr})${c.isActive ? '' : ` (${t('admin.catalog.status.inactive')})`}`,
-          }))}
-        />
+        <Controller name="nameAr" control={control} render={({ field }) => (
+          <Field {...field} label={t('admin.products.fields.nameAr')} required maxLength={120} errorMessage={error(errors.nameAr?.message)} />
+        )} />
+        <Controller name="nameEn" control={control} render={({ field }) => (
+          <Field {...field} label={t('admin.products.fields.nameEn')} required maxLength={120} errorMessage={error(errors.nameEn?.message)} />
+        )} />
+        <Controller name="descriptionAr" control={control} render={({ field }) => (
+          <TextAreaField {...field} label={t('admin.products.fields.descriptionAr')} maxLength={2000} errorMessage={error(errors.descriptionAr?.message)} />
+        )} />
+        <Controller name="descriptionEn" control={control} render={({ field }) => (
+          <TextAreaField {...field} label={t('admin.products.fields.descriptionEn')} maxLength={2000} errorMessage={error(errors.descriptionEn?.message)} />
+        )} />
+        <Controller name="price" control={control} render={({ field }) => (
+          <NumberField
+            value={field.value}
+            minValue={0}
+            onChange={(next) => field.onChange(next ?? 0)}
+            isRequired
+            isInvalid={Boolean(errors.price)}
+            variant="secondary"
+            className="text-sm"
+          >
+            <Label className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.fields.price')}</Label>
+            <NumberField.Group>
+              <NumberField.Input className="tabular-nums" />
+            </NumberField.Group>
+            {errors.price?.message ? <FieldError className="text-xs text-danger">{error(errors.price.message)}</FieldError> : null}
+          </NumberField>
+        )} />
+        <Controller name="gender" control={control} render={({ field }) => (
+          <SelectField
+            label={t('admin.products.fields.gender')}
+            value={String(field.value)}
+            onChange={(next) => field.onChange(Number(next) as ProductGender)}
+            isRequired
+            errorMessage={error(errors.gender?.message)}
+            options={[
+              { value: '0', label: t('catalog.gender.men') },
+              { value: '1', label: t('catalog.gender.women') },
+              { value: '2', label: t('catalog.gender.unisex') },
+            ]}
+          />
+        )} />
+        <Controller name="material" control={control} render={({ field }) => (
+          <Field {...field} label={t('admin.products.fields.material')} maxLength={100} errorMessage={error(errors.material?.message)} />
+        )} />
+        <Controller name="brand" control={control} render={({ field }) => (
+          <Field {...field} label={t('admin.products.fields.brand')} maxLength={100} errorMessage={error(errors.brand?.message)} />
+        )} />
+        <Controller name="sku" control={control} render={({ field }) => (
+          <Field {...field} label={t('admin.products.fields.sku')} maxLength={50} dir="ltr" errorMessage={error(errors.sku?.message)} />
+        )} />
+        <Controller name="categoryId" control={control} render={({ field }) => (
+          <SelectField
+            label={t('admin.products.fields.category')}
+            value={field.value}
+            onChange={field.onChange}
+            isRequired
+            errorMessage={error(errors.categoryId?.message)}
+            options={(categories.data ?? []).map((c) => ({
+              value: c.id,
+              label: `${c.nameEn} (${c.nameAr})${c.isActive ? '' : ` (${t('admin.catalog.status.inactive')})`}`,
+            }))}
+          />
+        )} />
         <div className="sm:col-span-2 flex gap-2 pt-1">
           <Button type="submit" variant="primary" isPending={updateMutation.isPending}>
             {updateMutation.isPending

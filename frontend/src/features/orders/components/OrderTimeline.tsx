@@ -24,7 +24,7 @@ export function OrderTimeline({ order }: { order: OrderDetailDto }) {
   );
 
   return (
-    <ol className="flex flex-col gap-3" role="list">
+    <ol className="flex flex-col gap-3">
       {points.map((p, idx) => {
         const isLast = idx === points.length - 1;
         const isCancelledPoint = p.status === ORDER_STATUSES.Cancelled;

@@ -61,7 +61,7 @@ The Dr_Mirror codebase is in strong overall health. Security posture is solid â€
 - **Observation**: The inline middleware calls await next (line 314), then checks Response.HasStarted (line 316). For every JSON endpoint (catalog, orders, cart, etc.), the response body has already been written by the time control returns, so HasStarted is true and the branch that sets Cache-Control/Vary headers never executes.
 - **Impact**: Catalog responses lack the intended public caching directive. Browser and CDN caching does not behave as designed.
 - **Suggested Remediation**: Use Response.OnStarting (the same pattern used by SecurityHeadersMiddleware) or implement an endpoint filter to set cache headers before the response starts.
-- **Triage**: Open
+- **Triage**: Resolved
 
 ---
 
@@ -74,7 +74,7 @@ The Dr_Mirror codebase is in strong overall health. Security posture is solid â€
 - **Observation**: The query filter only targets Sent messages with DeliveredAt older than the retention cutoff. Messages that reached the terminal Failed status (introduced per spec 005) are excluded and accumulate indefinitely.
 - **Impact**: Slow unbounded growth of the EmailOutboxMessages table from permanently-failed rows. Low practical impact given low failure volume.
 - **Suggested Remediation**: Extend the purge query to also delete Failed rows whose LastAttemptAt is older than the retention cutoff.
-- **Triage**: Open
+- **Triage**: Resolved
 
 ---
 
@@ -87,7 +87,7 @@ The Dr_Mirror codebase is in strong overall health. Security posture is solid â€
 - **Observation**: On line 81, failed deletions execute continue, skipping the FilePurgedAtUtc assignment. However, the log at line 88 reports proofs.Count (total batch size) as the purged count, not the number that were actually processed.
 - **Impact**: Operational dashboards and log alerts receive an inflated number of purged files.
 - **Suggested Remediation**: Maintain a purgedCount counter that increments only on successful delete, and log that value instead of proofs.Count.
-- **Triage**: Open
+- **Triage**: Resolved
 
 ---
 
@@ -100,7 +100,7 @@ The Dr_Mirror codebase is in strong overall health. Security posture is solid â€
 - **Observation**: file.OpenReadStream() is captured at line 99. If an exception occurs between lines 99 and 114 (where it is wrapped into a using declaration), the stream is not disposed. The only explicit disposal path before line 114 is the magic-bytes failure branch (line 107).
 - **Impact**: Extremely unlikely in practice but technically constitutes a resource leak path under adversarial or OOM conditions.
 - **Suggested Remediation**: Declare the stream variable with a using declaration immediately at line 99, or wrap the intervening lines in a try/finally that disposes on failure.
-- **Triage**: Open
+- **Triage**: Resolved
 
 ## 4. Frontend Findings
 
@@ -118,7 +118,7 @@ The Dr_Mirror codebase is in strong overall health. Security posture is solid â€
 - **Observation**: These forms manage all field state via individual useState hooks with manual onSubmit aggregation. No Zod schema is defined or validated at submit time. Login, Register, and Checkout properly use useForm with zodResolver.
 - **Impact**: No client-side schema validation for admin data entry; inconsistent error UX; violates the established convention and invites further drift.
 - **Suggested Remediation**: Create a Zod schema per form and refactor each to useForm with zodResolver. Use HeroUI isInvalid and errorMessage props for field-level feedback.
-- **Triage**: Open
+- **Triage**: Resolved
 
 ---
 
@@ -133,7 +133,7 @@ The Dr_Mirror codebase is in strong overall health. Security posture is solid â€
 - **Observation**: Neither layout component renders a Skip to main content link. Keyboard-only users must tab through the full header and navigation on every page load.
 - **Impact**: Reduced usability for keyboard and screen-reader users; fails WCAG 2.1 Level A criterion 2.4.1 (Bypass Blocks).
 - **Suggested Remediation**: Add a visually-hidden anchor at the top of each layout that jumps to the main landmark, and ensure the main element has a matching id with tabIndex -1 for programmatic focus.
-- **Triage**: Open
+- **Triage**: Resolved â€” already implemented before spec `001-audit-fix-pass`; both storefront and admin layouts include skip-links.
 
 ---
 
@@ -149,7 +149,7 @@ The Dr_Mirror codebase is in strong overall health. Security posture is solid â€
 - **Observation**: Because these forms bypass HeroUI form-aware isRequired prop (which automatically sets aria-required) and use raw useState with manual TextField/Input, mandatory fields do not communicate their required status to assistive technology.
 - **Impact**: Screen-reader users on the admin surface cannot identify which fields are required without trial and error.
 - **Suggested Remediation**: When refactoring to react-hook-form (see F-005), use isRequired on each HeroUI field. Alternatively, add aria-required explicitly to all mandatory TextField wrappers.
-- **Triage**: Open
+- **Triage**: Resolved
 
 ## 5. Cross-Cutting Findings
 
@@ -162,7 +162,7 @@ The Dr_Mirror codebase is in strong overall health. Security posture is solid â€
 - **Observation**: The lint step conditionally checks whether a lint script exists before running it. While the script IS currently defined, accidentally removing it in a future refactor would produce a silent pass rather than a pipeline failure.
 - **Impact**: A future refactor that drops the lint script would silently disable CI linting.
 - **Suggested Remediation**: Remove the conditional guard and invoke lint directly so that a missing script causes the step to fail. Alternatively use npm run --if-present combined with a separate assertion step.
-- **Triage**: Open
+- **Triage**: Resolved
 
 ---
 
@@ -175,7 +175,7 @@ The Dr_Mirror codebase is in strong overall health. Security posture is solid â€
 - **Observation**: The ESLint config includes eslint-plugin-react-hooks and eslint-plugin-i18next but not eslint-plugin-jsx-a11y. Common accessibility violations (missing alt text, invalid ARIA roles, interactive elements without keyboard handlers) are not flagged at lint time.
 - **Impact**: Accessibility regressions can enter the codebase without automated static detection. The a11y test suite (vitest-axe) catches render-time issues but not source-level patterns.
 - **Suggested Remediation**: Add eslint-plugin-jsx-a11y to devDependencies and integrate its recommended rule-set into the flat ESLint config.
-- **Triage**: Open
+- **Triage**: Resolved
 
 ## 6. Resolved Prior Findings
 

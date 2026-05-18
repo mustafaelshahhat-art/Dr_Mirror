@@ -311,28 +311,31 @@ try
     app.UseAuthorization();
     app.Use(async (ctx, next) =>
     {
+        if (HttpMethods.IsGet(ctx.Request.Method))
+        {
+            ctx.Response.OnStarting(() =>
+            {
+                var path = ctx.Request.Path;
+                if (path.StartsWithSegments("/api/catalog"))
+                {
+                    ctx.Response.Headers.CacheControl = "public, max-age=60, stale-while-revalidate=300";
+                    ctx.Response.Headers.Vary = "Accept-Language";
+                }
+                else if (path.StartsWithSegments("/api/orders")
+                    || path.StartsWithSegments("/api/cart")
+                    || path.StartsWithSegments("/api/addresses")
+                    || path.StartsWithSegments("/api/auth")
+                    || path.StartsWithSegments("/api/admin")
+                    || path.StartsWithSegments("/api/health"))
+                {
+                    ctx.Response.Headers.CacheControl = "private, no-store";
+                }
+
+                return Task.CompletedTask;
+            });
+        }
+
         await next();
-
-        if (!HttpMethods.IsGet(ctx.Request.Method) || ctx.Response.HasStarted)
-            return;
-
-        var path = ctx.Request.Path;
-        if (path.StartsWithSegments("/api/catalog"))
-        {
-            ctx.Response.Headers.CacheControl = "public, max-age=60, stale-while-revalidate=300";
-            ctx.Response.Headers.Vary = "Accept-Language";
-            return;
-        }
-
-        if (path.StartsWithSegments("/api/orders")
-            || path.StartsWithSegments("/api/cart")
-            || path.StartsWithSegments("/api/addresses")
-            || path.StartsWithSegments("/api/auth")
-            || path.StartsWithSegments("/api/admin")
-            || path.StartsWithSegments("/api/health"))
-        {
-            ctx.Response.Headers.CacheControl = "private, no-store";
-        }
     });
 
     // -----------------------------------------------------------------------
