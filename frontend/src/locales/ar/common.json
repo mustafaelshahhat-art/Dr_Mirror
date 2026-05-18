@@ -63,6 +63,10 @@
   "a11y": {
     "skipToContent": "تخطي إلى المحتوى"
   },
+  "footer": {
+    "copyright": "د. ميرور © {{year}}"
+  },
+  "quantityMultiplier": "× {{count}}",
   "dismiss": "إغلاق",
   "contactSupport": "تواصل مع الدعم",
   "errorBoundary": {

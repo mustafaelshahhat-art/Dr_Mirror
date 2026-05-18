@@ -174,7 +174,8 @@ export function FilterPanel({
                   min="0"
                   className="flex-1"
                 />
-                <span className="pb-2 text-default-400" aria-hidden>–</span>
+                {/* eslint-disable-next-line i18next/no-literal-string -- decorative en dash, same glyph in all locales */}
+<span className="pb-2 text-default-400" aria-hidden>–</span>
                 <DebouncedInput
                   hideLabel
                   label={t('catalog.filters.maxPriceLabel')}

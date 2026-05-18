@@ -7,7 +7,7 @@ import i18next from 'eslint-plugin-i18next'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['node_modules', 'dist', 'build', 'coverage', '*.min.js']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -49,6 +49,15 @@ export default defineConfig([
           },
         },
       ],
+    },
+  },
+  {
+    files: [
+      '**/*.test.{ts,tsx}',
+      'src/test/**/*.{ts,tsx}',
+    ],
+    rules: {
+      'i18next/no-literal-string': 'off',
     },
   },
 ])

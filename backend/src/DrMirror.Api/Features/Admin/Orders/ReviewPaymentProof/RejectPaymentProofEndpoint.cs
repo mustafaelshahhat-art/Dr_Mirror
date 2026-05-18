@@ -4,6 +4,7 @@ using DrMirror.Api.Features.Orders.Common;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.Auditing;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,7 @@ public static class RejectPaymentProofEndpoint
         RejectPaymentProofRequest request,
         ICurrentUser current,
         AppDbContext db,
+        IAdminAuditWriter audit,
         [FromServices] OrderStateMachine fsm,
         CancellationToken ct)
     {
@@ -103,6 +105,14 @@ public static class RejectPaymentProofEndpoint
         proof.ReviewNote = request.ReviewNote;
 
         fsm.Transition(order, OrderStatus.Pending, OrderActor.Admin);
+
+        await audit.WriteAsync(
+            "PaymentProof.Reject",
+            "PaymentProof",
+            proof.Id.ToString(),
+            PaymentProofStatus.Pending.ToString(),
+            proof.Status.ToString(),
+            ct);
 
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
         await db.SaveChangesAsync(ct);

@@ -15,6 +15,7 @@ public static class AuthEndpoints
     ///   POST /api/auth/refresh
     ///   POST /api/auth/logout
     ///   GET  /api/auth/me
+    ///   PUT  /api/auth/me
     /// </summary>
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
     {

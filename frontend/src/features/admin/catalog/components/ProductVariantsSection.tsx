@@ -36,9 +36,8 @@ export function ProductVariantsSection({ product }: { product: AdminProductDetai
       </header>
 
       {showCreate ? (
-        <VariantForm
-          productId={product.id}
-          mode="create"
+        // eslint-disable-next-line i18next/no-literal-string -- programmatic form mode, not user copy
+        <VariantForm productId={product.id} mode="create"
           onDone={() => setShowCreate(false)}
         />
       ) : null}
@@ -52,9 +51,8 @@ export function ProductVariantsSection({ product }: { product: AdminProductDetai
           {product.variants.map((v) => (
             <li key={v.id}>
               {editingId === v.id ? (
-                <VariantForm
-                  productId={product.id}
-                  mode="edit"
+                // eslint-disable-next-line i18next/no-literal-string -- programmatic form mode, not user copy
+                <VariantForm productId={product.id} mode="edit"
                   variant={v}
                   onDone={() => setEditingId(null)}
                 />
@@ -126,6 +124,7 @@ function VariantRow({
               await toggleMutation.mutateAsync({ variantId: variant.id, activate: !variant.isActive });
             } catch (err) {
               const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
+              // eslint-disable-next-line i18next/no-literal-string -- fallback string for error display, not user copy
               setError(problem?.detail ?? problem?.title ?? 'error');
             }
           }}

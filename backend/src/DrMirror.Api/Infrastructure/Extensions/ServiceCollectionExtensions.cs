@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
 using DrMirror.Api.Domain.Entities;
@@ -20,6 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DrMirror.Api.Infrastructure.Extensions;
 
@@ -67,8 +69,9 @@ internal static class ServiceCollectionExtensions
                 {
                     OnTokenValidated = async context =>
                     {
-                        var userManager = context.HttpContext.RequestServices
-                            .GetRequiredService<UserManager<User>>();
+                        var services = context.HttpContext.RequestServices;
+                        var cache = services.GetRequiredService<IMemoryCache>();
+                        var userManager = services.GetRequiredService<UserManager<User>>();
 
                         var userId = context.Principal?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
                         if (!Guid.TryParse(userId, out var id))
@@ -77,15 +80,22 @@ internal static class ServiceCollectionExtensions
                             return;
                         }
 
-                        var user = await userManager.FindByIdAsync(id.ToString());
-                        if (user is null || user.IsDisabled)
+                        var cacheKey = $"OnTokenValidated:{id}";
+                        if (!cache.TryGetValue(cacheKey, out User? cached))
+                        {
+                            var user = await userManager.FindByIdAsync(id.ToString());
+                            cached = user;
+                            cache.Set(cacheKey, cached, TimeSpan.FromSeconds(30));
+                        }
+
+                        if (cached is null || cached.IsDisabled)
                         {
                             context.Fail("The access token user is no longer active.");
                             return;
                         }
 
                         var tokenStamp = context.Principal?.FindFirst(JwtTokenService.SecurityStampClaimType)?.Value;
-                        var currentStamp = user.SecurityStamp ?? string.Empty;
+                        var currentStamp = cached.SecurityStamp ?? string.Empty;
                         if (!string.Equals(tokenStamp, currentStamp, StringComparison.Ordinal))
                         {
                             context.Fail("The access token has been invalidated.");
@@ -129,6 +139,10 @@ internal static class ServiceCollectionExtensions
         this IServiceCollection services, IConfiguration config)
     {
         services.AddHttpClient();
+        services.AddHttpClient(nameof(CloudinaryFileStorageService), client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(10);
+        });
 
         services.AddOptions<FileStorageOptions>()
             .Bind(config.GetSection(FileStorageOptions.SectionName))
@@ -185,7 +199,9 @@ internal static class ServiceCollectionExtensions
     /// </summary>
     internal static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        services.AddMemoryCache();
         services.AddHttpContextAccessor();
+        services.AddAdminAuditServices();
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<RefreshTokenIssuer>();
@@ -246,8 +262,37 @@ internal static class ServiceCollectionExtensions
                 o.AutoReplenishment = true;
             });
 
+            // Payment-proof upload — 10 req/5 min per user (fixed window).
+            options.AddPolicy(RateLimitPolicies.ProofUpload, context =>
+            {
+                var userId = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                    ?? context.Connection.RemoteIpAddress?.ToString()
+                    ?? "anonymous";
+                return RateLimitPartition.GetFixedWindowLimiter(userId, _ => new FixedWindowRateLimiterOptions
+                {
+                    Window = TimeSpan.FromMinutes(5),
+                    PermitLimit = 10,
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                });
+            });
+
+            // Payment-proof file read — 60 req/1 min per IP (sliding window).
+            options.AddPolicy(RateLimitPolicies.ProofFileRead, context =>
+            {
+                var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                return RateLimitPartition.GetSlidingWindowLimiter(ip, _ => new SlidingWindowRateLimiterOptions
+                {
+                    Window = TimeSpan.FromMinutes(1),
+                    SegmentsPerWindow = 6,
+                    PermitLimit = 60,
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                });
+            });
+
             // Emit RFC 7807 ProblemDetails so the SPA's shared
-            // isAxiosError<ProblemDetails> path handles 429 like every other
+            // isAxiosError&lt;ProblemDetails&gt; path handles 429 like every other
             // failure (rather than seeing an opaque text body).
             options.OnRejected = async (ctx, ct) =>
             {

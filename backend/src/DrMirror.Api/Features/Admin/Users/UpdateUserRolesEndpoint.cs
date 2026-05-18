@@ -1,6 +1,7 @@
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.Auditing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +28,7 @@ public static class UpdateUserRolesEndpoint
         UpdateUserRolesRequest request,
         UserManager<User> userManager,
         AppDbContext db,
+        IAdminAuditWriter audit,
         CancellationToken ct)
     {
         var requested = request.Roles
@@ -60,7 +62,7 @@ public static class UpdateUserRolesEndpoint
         var removingAdmin = currentRoles.Contains(UserRoles.Admin, StringComparer.OrdinalIgnoreCase)
             && !desiredRoles.Contains(UserRoles.Admin, StringComparer.OrdinalIgnoreCase);
 
-        if (removingAdmin && await IsLastAdminAsync(db, userId, ct))
+        if (removingAdmin && await IsLastAdminAsync(userManager, userId, ct))
         {
             return Results.Problem(
                 title: "Cannot remove the last admin",
@@ -88,22 +90,22 @@ public static class UpdateUserRolesEndpoint
         }
 
         var updatedRoles = await userManager.GetRolesAsync(user);
+        await audit.WriteAsync(
+            "User.RoleChange",
+            "User",
+            user.Id.ToString(),
+            string.Join(",", currentRoles.OrderBy(r => r)),
+            string.Join(",", updatedRoles.OrderBy(r => r)),
+            ct);
+        await db.SaveChangesAsync(ct);
+
         return Results.Ok(user.ToAdminDto(updatedRoles));
     }
 
-    private static async Task<bool> IsLastAdminAsync(AppDbContext db, Guid userId, CancellationToken ct)
+    private static async Task<bool> IsLastAdminAsync(UserManager<User> userManager, Guid userId, CancellationToken ct)
     {
-        var adminRoleId = await db.Roles
-            .Where(r => r.Name == UserRoles.Admin)
-            .Select(r => r.Id)
-            .FirstOrDefaultAsync(ct);
-
-        if (adminRoleId == Guid.Empty) return true;
-
-        var otherAdminExists = await db.Set<IdentityUserRole<Guid>>()
-            .AnyAsync(ur => ur.RoleId == adminRoleId && ur.UserId != userId, ct);
-
-        return !otherAdminExists;
+        var adminUsers = await userManager.GetUsersInRoleAsync(UserRoles.Admin);
+        return !adminUsers.Any(u => u.Id != userId && !u.IsDisabled);
     }
 
     private static IResult IdentityProblem(IdentityResult result) => Results.Problem(

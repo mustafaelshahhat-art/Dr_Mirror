@@ -183,7 +183,7 @@ export function OrderDetailPage() {
                           {t('orders.detail.sizeLabel')} {item.size}
                         </span>
                         <span aria-hidden>·</span>
-                        <span>×{item.quantity}</span>
+                        <span>{t('common.quantityMultiplier', { count: item.quantity })}</span>
                       </p>
                       <p className="mt-0.5 text-xs font-mono uppercase tracking-wide text-default-400">
                         {item.sku}

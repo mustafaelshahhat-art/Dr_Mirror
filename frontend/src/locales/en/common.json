@@ -63,6 +63,10 @@
   "a11y": {
     "skipToContent": "Skip to content"
   },
+  "footer": {
+    "copyright": "Dr. Mirror © {{year}}"
+  },
+  "quantityMultiplier": "× {{count}}",
   "dismiss": "Dismiss",
   "contactSupport": "Contact support",
   "errorBoundary": {

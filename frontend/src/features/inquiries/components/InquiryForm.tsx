@@ -32,6 +32,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
     message: '',
   });
 
+  // Field-name strings below are RHF programmatic identifiers, not user copy.
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
@@ -100,6 +101,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
         <Field
           label={t('inquiries.form.fullName')}
           value={form.fullName}
+          // eslint-disable-next-line i18next/no-literal-string
           onChange={(v) => update('fullName', v)}
           required
           maxLength={100}
@@ -109,6 +111,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
           label={t('inquiries.form.email')}
           type="email"
           value={form.email}
+          // eslint-disable-next-line i18next/no-literal-string
           onChange={(v) => update('email', v)}
           required
           maxLength={200}
@@ -119,6 +122,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
           label={t('inquiries.form.phone')}
           type="tel"
           value={form.phone}
+          // eslint-disable-next-line i18next/no-literal-string
           onChange={(v) => update('phone', v)}
           maxLength={30}
           autoComplete="tel"
@@ -127,6 +131,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
         <Field
           label={t('inquiries.form.subject')}
           value={form.subject}
+          // eslint-disable-next-line i18next/no-literal-string
           onChange={(v) => update('subject', v)}
           required
           maxLength={200}
@@ -141,6 +146,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
           rows={4}
           maxLength={2000}
           value={form.message}
+          // eslint-disable-next-line i18next/no-literal-string
           onChange={(e) => update('message', (e.target as HTMLTextAreaElement).value)}
         />
       </TextField>

@@ -58,6 +58,7 @@ export function AdminOrderDetailPage() {
           </div>
           <div className="space-y-3 rounded-large border border-divider/60 bg-content1 p-4">
             {Array.from({ length: 4 }).map((_, i) => (
+              // eslint-disable-next-line i18next/no-literal-string -- skeleton size prop, not user copy
               <DetailFieldSkeleton key={i} valueClass="w-32" />
             ))}
           </div>
@@ -207,7 +208,7 @@ export function AdminOrderDetailPage() {
                           {t('admin.detail.sizeLabel')} {item.size}
                         </span>
                         <span aria-hidden>·</span>
-                        <span>×{item.quantity}</span>
+                        <span>{t('common.quantityMultiplier', { count: item.quantity })}</span>
                       </p>
                       <p className="mt-0.5 font-mono text-xs uppercase tracking-wide text-default-400">
                         {item.sku}
@@ -266,7 +267,7 @@ export function AdminOrderDetailPage() {
                 {t('admin.detail.buyerNoteHeading')}
               </h2>
               <p className="rounded-medium border border-divider/60 bg-content1 p-3 text-sm italic">
-                &ldquo;{order.buyerNote}&rdquo;
+                {t('admin.detail.buyerNoteQuoted', { note: order.buyerNote })}
               </p>
             </section>
           ) : null}

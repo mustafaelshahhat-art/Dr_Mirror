@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { Button } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
+import { Sentry } from '../lib/sentry';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -22,6 +23,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('[ErrorBoundary]', error, info.componentStack);
+    Sentry.captureException(error, {
+      contexts: {
+        react: {
+          componentStack: info.componentStack,
+        },
+      },
+    });
   }
 
   render() {

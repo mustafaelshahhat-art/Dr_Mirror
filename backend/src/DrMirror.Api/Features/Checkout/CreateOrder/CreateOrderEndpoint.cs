@@ -31,6 +31,7 @@ public static class CreateOrderEndpoint
 
     private static async Task<IResult> HandleAsync(
         CreateOrderRequest request,
+        [FromHeader(Name = "X-Idempotency-Key")] Guid? idempotencyKey,
         ICurrentUser current,
         AppDbContext db,
         [FromServices] OrderStateMachine fsm,
@@ -40,6 +41,34 @@ public static class CreateOrderEndpoint
         if (!current.IsAuthenticated || current.UserId is not { } userId)
         {
             return Results.Unauthorized();
+        }
+
+        if (idempotencyKey is { } key)
+        {
+            var existingKey = await db.OrderIdempotencyKeys
+                .AsNoTracking()
+                .FirstOrDefaultAsync(k => k.Key == key, ct);
+
+            if (existingKey is not null && existingKey.UserId != userId)
+            {
+                return Results.Problem(
+                    title: "Idempotency key collision",
+                    detail: "The provided X-Idempotency-Key is already in use by another account.",
+                    statusCode: StatusCodes.Status409Conflict);
+            }
+
+            if (existingKey is not null)
+            {
+                var existingOrder = await db.Orders
+                    .AsNoTracking()
+                    .Include(o => o.BuyerUser)
+                    .Include(o => o.PaymentMethod)
+                    .Include(o => o.Items).ThenInclude(i => i.Product)
+                    .Include(o => o.PaymentProofs).ThenInclude(p => p.ReviewedByUser)
+                    .FirstAsync(o => o.Id == existingKey.OrderId, ct);
+
+                return Results.Ok(existingOrder.ToDetail(fsm));
+            }
         }
 
         // ---- Load cart with everything we need to project order items. ----------
@@ -86,12 +115,11 @@ public static class CreateOrderEndpoint
         foreach (var line in cart.Items)
         {
             var v = line.ProductVariant!;
-            var p = v.Product!;
-            if (!v.IsActive || !p.IsPublished || !p.Category!.IsActive)
+            if (!v.IsActive || !(v.Product?.IsPublished ?? false) || !(v.Product?.Category?.IsActive ?? false))
             {
                 return Results.Problem(
                     title: "Item no longer available",
-                    detail: $"\"{p.NameEn}\" ({v.Size} / {v.ColorName}) is no longer available. Please remove it from your cart.",
+                    detail: $"\"{v.Product?.NameEn ?? v.Sku}\" ({v.Size} / {v.ColorName}) is no longer available. Please remove it from your cart.",
                     statusCode: StatusCodes.Status409Conflict);
             }
         }
@@ -101,6 +129,16 @@ public static class CreateOrderEndpoint
         var order = OrderFactory.Build(orderNumber, userId, cart.Items, paymentMethod, shippingAddress!, request.BuyerNote, fsm);
 
         db.Orders.Add(order);
+        if (idempotencyKey is { } newKey)
+        {
+            db.OrderIdempotencyKeys.Add(new OrderIdempotencyKey
+            {
+                Key = newKey,
+                Order = order,
+                UserId = userId,
+                CreatedAtUtc = DateTimeOffset.UtcNow,
+            });
+        }
         db.CartItems.RemoveRange(cart.Items);
         cart.UpdatedAt = DateTimeOffset.UtcNow;
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForOrderConfirmation(order.Id));
@@ -137,11 +175,11 @@ public static class CreateOrderEndpoint
             // still goes through; the buyer can prune the book and resave later.
         }
 
-        // ---- Stock decrement with single retry on RowVersion conflict. ---------
+        // ---- Stock decrement with bounded retries on RowVersion conflict. ------
         // The ProductVariant.RowVersion column makes EF throw
         // DbUpdateConcurrencyException when two checkouts race the same row.
-        // We refresh the conflicting variants, re-validate, and retry once.
-        for (var attempt = 1; attempt <= 2; attempt++)
+        // We refresh the conflicting variants, re-validate, and retry up to 3 times.
+        for (var attempt = 1; attempt <= 3; attempt++)
         {
             // Re-validate stock then decrement. On retry, ReloadAsync has reset
             // each variant's Stock to the DB's current value (clearing our
@@ -151,9 +189,10 @@ public static class CreateOrderEndpoint
                 var v = line.ProductVariant!;
                 if (line.Quantity > v.Stock)
                 {
+                    var productName = v.Product?.NameEn ?? v.Sku;
                     return Results.Problem(
                         title: "Insufficient stock",
-                        detail: $"Only {v.Stock} of \"{v.Product!.NameEn}\" ({v.Size} / {v.ColorName}) available — another buyer may have just bought one. Refresh your cart and try again.",
+                        detail: $"Only {v.Stock} of \"{productName}\" ({v.Size} / {v.ColorName}) available — another buyer may have just bought one. Refresh your cart and try again.",
                         statusCode: StatusCodes.Status409Conflict);
                 }
                 v.Stock -= line.Quantity;
@@ -165,7 +204,7 @@ public static class CreateOrderEndpoint
                 await db.SaveChangesAsync(ct);
                 break; // success
             }
-            catch (DbUpdateConcurrencyException ex) when (attempt == 1)
+            catch (DbUpdateConcurrencyException ex) when (attempt < 3)
             {
                 // Refresh every variant that conflicted so the next pass sees the
                 // current Stock + RowVersion. ReloadAsync also reverts our
@@ -175,6 +214,7 @@ public static class CreateOrderEndpoint
                 {
                     await entry.ReloadAsync(ct);
                 }
+                await Task.Delay(TimeSpan.FromMilliseconds(25 * attempt), ct);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -197,6 +237,7 @@ public static class CreateOrderEndpoint
             .Include(o => o.BuyerUser)
             .Include(o => o.PaymentMethod)
             .Include(o => o.Items).ThenInclude(i => i.Product)
+            .Include(o => o.PaymentProofs).ThenInclude(p => p.ReviewedByUser)
             .FirstAsync(o => o.Id == order.Id, ct);
 
         return Results.Created(

@@ -3,6 +3,7 @@ using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Shared;
+using DrMirror.Api.Shared.Auditing;
 using DrMirror.Api.Shared.Slugs;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
@@ -135,6 +136,7 @@ public static class AdminProductsEndpoints
     private static async Task<IResult> Create(
         AdminProductCreateRequest request,
         AppDbContext db,
+        IAdminAuditWriter audit,
         CancellationToken ct)
     {
         var category = await db.Categories.FindAsync(new object[] { request.CategoryId }, ct);
@@ -173,6 +175,7 @@ public static class AdminProductsEndpoints
         };
 
         db.Products.Add(entity);
+        await audit.WriteAsync("Product.Create", "Product", entity.Id.ToString(), null, "Draft", ct);
         await db.SaveChangesAsync(ct);
 
         var reloaded = await LoadDetail(db, entity.Id, ct);
@@ -183,6 +186,7 @@ public static class AdminProductsEndpoints
         Guid id,
         AdminProductUpdateRequest request,
         AppDbContext db,
+        IAdminAuditWriter audit,
         CancellationToken ct)
     {
         var entity = await db.Products
@@ -217,13 +221,14 @@ public static class AdminProductsEndpoints
         entity.UpdatedAt = DateTimeOffset.UtcNow;
         // Slug stays stable on rename — locked at M2.
 
+        await audit.WriteAsync("Product.Update", "Product", entity.Id.ToString(), null, null, ct);
         await db.SaveChangesAsync(ct);
 
         var reloaded = await LoadDetail(db, entity.Id, ct);
         return Results.Ok(ToDetail(reloaded!));
     }
 
-    private static async Task<IResult> Publish(Guid id, AppDbContext db, CancellationToken ct)
+    private static async Task<IResult> Publish(Guid id, AppDbContext db, IAdminAuditWriter audit, CancellationToken ct)
     {
         var entity = await db.Products
             .Include(p => p.Variants)
@@ -259,13 +264,14 @@ public static class AdminProductsEndpoints
 
         entity.IsPublished = true;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
+        await audit.WriteAsync("Product.Update", "Product", entity.Id.ToString(), "Unpublished", "Published", ct);
         await db.SaveChangesAsync(ct);
 
         var reloaded = await LoadDetail(db, entity.Id, ct);
         return Results.Ok(ToDetail(reloaded!));
     }
 
-    private static async Task<IResult> Unpublish(Guid id, AppDbContext db, CancellationToken ct)
+    private static async Task<IResult> Unpublish(Guid id, AppDbContext db, IAdminAuditWriter audit, CancellationToken ct)
     {
         var entity = await db.Products.FirstOrDefaultAsync(p => p.Id == id, ct);
         if (entity is null)
@@ -275,6 +281,7 @@ public static class AdminProductsEndpoints
 
         entity.IsPublished = false;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
+        await audit.WriteAsync("Product.Update", "Product", entity.Id.ToString(), "Published", "Unpublished", ct);
         await db.SaveChangesAsync(ct);
 
         var reloaded = await LoadDetail(db, entity.Id, ct);

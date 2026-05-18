@@ -49,6 +49,7 @@
     "subtitle_other": "{{count}} منتج · {{total}}",
     "buyerHeading": "المشتري",
     "buyerNoteHeading": "ملاحظة المشتري",
+    "buyerNoteQuoted": "«{{note}}»",
     "itemsHeading": "المنتجات",
     "shippingHeading": "الشحن إلى",
     "proofsHeading": "إثباتات الدفع",
@@ -338,6 +339,7 @@
       "paymentMethods": "طرق الدفع",
       "inquiries": "الاستفسارات",
       "users": "المستخدمون",
+      "audit": "سجل التدقيق",
       "groups": {
         "operations": "العمليات",
         "catalog": "الكتالوج",
@@ -374,5 +376,25 @@
         "Buyer": "مشتري"
       }
     }
+  },
+  "audit": {
+    "title": "سجل تدقيق الإدارة",
+    "subtitle": "أحدث إجراءات المشغلين على الطلبات والمدفوعات والمخزون والمستخدمين.",
+    "filters": {
+      "actor": "المشغل",
+      "actionType": "نوع الإجراء",
+      "target": "الهدف",
+      "from": "من",
+      "to": "إلى"
+    },
+    "columns": {
+      "timestamp": "الوقت",
+      "actor": "المشغل",
+      "action": "الإجراء",
+      "target": "الهدف",
+      "status": "الحالة"
+    },
+    "empty": "لا توجد إدخالات تدقيق بعد.",
+    "errorLoad": "تعذّر تحميل سجل التدقيق. حاول مرة أخرى."
   }
 }

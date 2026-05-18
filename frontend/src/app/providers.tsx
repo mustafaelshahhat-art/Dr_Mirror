@@ -7,6 +7,7 @@ import { useHref, useNavigate } from 'react-router-dom';
 
 import { AuthProvider } from '../features/auth/AuthProvider';
 import { CartProvider } from '../features/cart/CartProvider';
+import { DowntimeProvider } from '../shared/components/DowntimeProvider';
 import i18n from '../shared/lib/i18n';
 import {
   DEFAULT_LANG,
@@ -72,8 +73,8 @@ function LocaleScope({ children }: { children: ReactNode }) {
 export function Providers({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   return (
-    <NextThemesProvider
-      attribute="class"
+    // eslint-disable-next-line i18next/no-literal-string -- next-themes API prop, not user copy
+    <NextThemesProvider attribute="class"
       defaultTheme={DEFAULT_THEME}
       enableSystem={false}
       storageKey={THEME_STORAGE_KEY}
@@ -85,7 +86,9 @@ export function Providers({ children }: { children: ReactNode }) {
             <LocaleScope>
               <DirectionSync>
                 <AuthProvider>
-                  <CartProvider>{children}</CartProvider>
+                  <CartProvider>
+                    <DowntimeProvider>{children}</DowntimeProvider>
+                  </CartProvider>
                 </AuthProvider>
               </DirectionSync>
             </LocaleScope>

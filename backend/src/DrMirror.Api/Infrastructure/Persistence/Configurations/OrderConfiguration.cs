@@ -69,7 +69,11 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(o => o.BuyerUserId);
+        builder.HasIndex(o => new { o.BuyerUserId, o.CreatedAt }).HasDatabaseName("IX_Order_UserId_CreatedAtUtc").IsDescending(false, true);
         builder.HasIndex(o => o.Status);
+        builder.HasIndex(o => new { o.Status, o.CreatedAt }).HasDatabaseName("IX_Order_Status_CreatedAtUtc").IsDescending(false, true);
+        builder.HasIndex(o => new { o.Status, o.UpdatedAt }).HasDatabaseName("IX_Order_StatusTerminal_UpdatedAt")
+            .HasFilter("[Status] IN (6, 99)");
         builder.HasIndex(o => o.CreatedAt);
     }
 }

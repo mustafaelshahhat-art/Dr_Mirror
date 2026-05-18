@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { renderWithProviders } from '../../../test/utils';
+import testI18n from '../../../test/testI18n';
 import { usePaymentProofUploadConfigQuery, useUploadPaymentProofMutation } from '../hooks';
 import { PaymentProofUpload } from './PaymentProofUpload';
 
@@ -13,6 +14,7 @@ vi.mock('../hooks', () => ({
 
 describe('PaymentProofUpload', () => {
   beforeEach(() => {
+    void testI18n.changeLanguage('en');
     vi.mocked(usePaymentProofUploadConfigQuery).mockReturnValue({
       data: { maxFileSizeBytes: 5 * 1024 * 1024 },
       isError: false,
@@ -34,7 +36,7 @@ describe('PaymentProofUpload', () => {
   it('accepts supported image proof files and renders an image preview', async () => {
     renderWithProviders(<PaymentProofUpload orderNumber="DM-2026-TEST" />);
 
-    expect(screen.getByText('JPEG, PNG, WebP, HEIC, or HEIF. Maximum 5 MB.')).toBeInTheDocument();
+    expect(screen.getByText('JPEG, PNG, or PDF. Maximum 5 MB.')).toBeInTheDocument();
 
     await userEvent.upload(
       screen.getByLabelText('Choose a file'),
@@ -56,7 +58,7 @@ describe('PaymentProofUpload', () => {
 
     renderWithProviders(<PaymentProofUpload orderNumber="DM-2026-TEST" />);
 
-    expect(screen.getByText('JPEG, PNG, WebP, HEIC, or HEIF. Maximum 2.5 MB.')).toBeInTheDocument();
+    expect(screen.getByText('JPEG, PNG, or PDF. Maximum 2.5 MB.')).toBeInTheDocument();
 
     await userEvent.upload(
       screen.getByLabelText('Choose a file'),
@@ -68,7 +70,45 @@ describe('PaymentProofUpload', () => {
     expect(URL.createObjectURL).not.toHaveBeenCalled();
   });
 
-  it('rejects PDF proof files before upload', async () => {
+  it('rejects a 6 MB file client-side in English', async () => {
+    renderWithProviders(<PaymentProofUpload orderNumber="DM-2026-TEST" />);
+
+    await userEvent.upload(
+      screen.getByLabelText('Choose a file'),
+      new File([new Uint8Array(6 * 1024 * 1024)], 'proof.jpg', { type: 'image/jpeg' }),
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('File is larger than 5 MB.');
+    expect(screen.getByRole('button', { name: 'Upload' })).toBeDisabled();
+  });
+
+  it('rejects a 6 MB file client-side in Arabic', async () => {
+    await testI18n.changeLanguage('ar');
+    renderWithProviders(<PaymentProofUpload orderNumber="DM-2026-TEST" />);
+
+    await userEvent.upload(
+      screen.getByLabelText('اختر ملف'),
+      new File([new Uint8Array(6 * 1024 * 1024)], 'proof.jpg', { type: 'image/jpeg' }),
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('حجم الملف أكبر من 5 ميجابايت.');
+    expect(screen.getByRole('button', { name: 'رفع' })).toBeDisabled();
+  });
+
+  it('rejects an exe file even if the picker accept filter is bypassed', async () => {
+    renderWithProviders(<PaymentProofUpload orderNumber="DM-2026-TEST" />);
+
+    await userEvent.upload(
+      screen.getByLabelText('Choose a file'),
+      new File(['MZ'], 'proof.exe', { type: 'application/x-msdownload' }),
+      { applyAccept: false },
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Only JPEG, PNG, or PDF files are allowed.');
+    expect(screen.getByRole('button', { name: 'Upload' })).toBeDisabled();
+  });
+
+  it('accepts PDF proof files without rendering an image preview', async () => {
     renderWithProviders(<PaymentProofUpload orderNumber="DM-2026-TEST" />);
 
     await userEvent.upload(
@@ -77,11 +117,8 @@ describe('PaymentProofUpload', () => {
       { applyAccept: false },
     );
 
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      'Only JPEG, PNG, WebP, HEIC, and HEIF images are allowed.',
-    );
     expect(screen.queryByRole('img', { name: "Preview of the file you're about to upload" })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Upload' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Upload' })).toBeEnabled();
     expect(URL.createObjectURL).not.toHaveBeenCalled();
   });
 });

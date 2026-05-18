@@ -22,6 +22,65 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("DrMirror.Api.Domain.Entities.AdminAuditLogEntry", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<Guid>("ActorUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CorrelationId")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("NewStatus")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("PreviousStatus")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("TargetEntityId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("TargetEntityType")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTimeOffset>("TimestampUtc")
+                        .HasPrecision(7)
+                        .HasColumnType("datetimeoffset(7)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TimestampUtc")
+                        .IsDescending()
+                        .HasDatabaseName("IX_AdminAudit_TimestampUtc");
+
+                    b.HasIndex("ActorUserId", "TimestampUtc")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("IX_AdminAudit_Actor");
+
+                    b.HasIndex("TargetEntityType", "TargetEntityId", "TimestampUtc")
+                        .IsDescending(false, false, true)
+                        .HasDatabaseName("IX_AdminAudit_Target");
+
+                    b.ToTable("AdminAuditLogEntries", (string)null);
+                });
+
             modelBuilder.Entity("DrMirror.Api.Domain.Entities.BuyerAddress", b =>
                 {
                     b.Property<Guid>("Id")
@@ -441,6 +500,18 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Status");
 
+                    b.HasIndex("BuyerUserId", "CreatedAt")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("IX_Order_UserId_CreatedAtUtc");
+
+                    b.HasIndex("Status", "CreatedAt")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("IX_Order_Status_CreatedAtUtc");
+
+                    b.HasIndex("Status", "UpdatedAt")
+                        .HasDatabaseName("IX_Order_StatusTerminal_UpdatedAt")
+                        .HasFilter("[Status] IN (6, 99)");
+
                     b.ToTable("Orders", (string)null);
                 });
 
@@ -460,6 +531,34 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.HasKey("Year");
 
                     b.ToTable("OrderCounters", (string)null);
+                });
+
+            modelBuilder.Entity("DrMirror.Api.Domain.Entities.OrderIdempotencyKey", b =>
+                {
+                    b.Property<Guid>("Key")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Key");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("UserId", "CreatedAtUtc")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("IX_OrderIdempotencyKeys_UserId_CreatedAt");
+
+                    b.ToTable("OrderIdempotencyKeys", (string)null);
                 });
 
             modelBuilder.Entity("DrMirror.Api.Domain.Entities.OrderItem", b =>
@@ -623,6 +722,10 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<DateTimeOffset?>("FilePurgedAtUtc")
+                        .HasPrecision(7)
+                        .HasColumnType("datetimeoffset(7)");
+
                     b.Property<string>("FileUrl")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -732,10 +835,15 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("IX_Products_CategoryId");
 
                     b.HasIndex("Slug")
                         .IsUnique();
+
+                    b.HasIndex("CategoryId", "IsPublished", "CreatedAt")
+                        .IsDescending(false, false, true)
+                        .HasDatabaseName("IX_Product_CategoryId_IsActive_CreatedAtUtc");
 
                     b.HasIndex("IsPublished", "CategoryId", "CreatedAt");
 
@@ -1123,6 +1231,17 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("DrMirror.Api.Domain.Entities.AdminAuditLogEntry", b =>
+                {
+                    b.HasOne("DrMirror.Api.Domain.Entities.User", "ActorUser")
+                        .WithMany()
+                        .HasForeignKey("ActorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ActorUser");
+                });
+
             modelBuilder.Entity("DrMirror.Api.Domain.Entities.BuyerAddress", b =>
                 {
                     b.HasOne("DrMirror.Api.Domain.Entities.User", "User")
@@ -1271,6 +1390,25 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
 
                     b.Navigation("ShippingAddress")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DrMirror.Api.Domain.Entities.OrderIdempotencyKey", b =>
+                {
+                    b.HasOne("DrMirror.Api.Domain.Entities.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DrMirror.Api.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DrMirror.Api.Domain.Entities.OrderItem", b =>

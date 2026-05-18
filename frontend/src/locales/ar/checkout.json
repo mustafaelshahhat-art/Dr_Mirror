@@ -54,7 +54,8 @@
     "heading": "راجع الطلب قبل التأكيد",
     "shippingTo": "الشحن إلى",
     "payingWith": "الدفع عن طريق",
-    "noMethod": "(لم تختر طريقة دفع)"
+    "noMethod": "(لم تختر طريقة دفع)",
+    "buyerNoteQuoted": "«{{note}}»"
   },
   "summary": {
     "heading": "ملخص الطلب",

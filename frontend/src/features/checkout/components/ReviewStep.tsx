@@ -61,7 +61,7 @@ export function ReviewStep({ reviewAddress, selectedMethod, buyerNote, isAr }: P
       </article>
       {buyerNote?.trim() ? (
         <article className="rounded-medium border border-divider/60 bg-content1 p-3 text-sm italic text-default-700 dark:text-default-300">
-          &ldquo;{buyerNote}&rdquo;
+          {t('checkout.review.buyerNoteQuoted', { note: buyerNote })}
         </article>
       ) : null}
     </fieldset>

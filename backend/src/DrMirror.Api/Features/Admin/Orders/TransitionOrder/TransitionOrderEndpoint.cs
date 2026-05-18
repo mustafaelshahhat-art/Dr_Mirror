@@ -3,6 +3,7 @@ using DrMirror.Api.Domain.Orders;
 using DrMirror.Api.Features.Orders.Common;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.Auditing;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,7 @@ public static class TransitionOrderEndpoint
         string orderNumber,
         TransitionOrderRequest request,
         AppDbContext db,
+        IAdminAuditWriter audit,
         [FromServices] OrderStateMachine fsm,
         CancellationToken ct)
     {
@@ -59,6 +61,8 @@ public static class TransitionOrderEndpoint
         // If admin is cancelling, restock — same rule as buyer-initiated cancel.
         // All mutations land in one SaveChanges and are committed atomically;
         // the retrying execution strategy disallows user-initiated transactions.
+        var previousStatus = order.Status;
+
         if (request.ToStatus == OrderStatus.Cancelled
             && order.Status != OrderStatus.Cancelled
             && order.Status != OrderStatus.Delivered)
@@ -74,6 +78,14 @@ public static class TransitionOrderEndpoint
         }
 
         fsm.Transition(order, request.ToStatus, OrderActor.Admin, request.Reason);
+
+        await audit.WriteAsync(
+            request.ToStatus == OrderStatus.Cancelled ? "Order.Cancel" : "Order.StatusChange",
+            "Order",
+            order.Id.ToString(),
+            previousStatus.ToString(),
+            order.Status.ToString(),
+            ct);
 
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
         try

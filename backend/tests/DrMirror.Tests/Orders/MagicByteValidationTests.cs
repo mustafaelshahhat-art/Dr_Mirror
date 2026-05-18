@@ -1,3 +1,5 @@
+using DrMirror.Api.Shared;
+
 namespace DrMirror.Tests.Orders;
 
 /// <summary>
@@ -105,5 +107,56 @@ public class MagicByteValidationTests
     {
         var someBytes = new byte[] { 0x01, 0x02, 0x03, 0x04 };
         Assert.False(ValidateHeader(someBytes, "application/octet-stream"));
+    }
+
+    // ── PrefixedStream integration ────────────────────────────────────────────
+
+    [Fact]
+    public async Task PrefixedStream_reads_prefix_then_inner_stream_seamlessly()
+    {
+        var prefix = new byte[] { 0xFF, 0xD8, 0xFF };
+        var body = "EXIF data here..."u8.ToArray();
+        using var inner = new MemoryStream(body);
+        using var combined = new PrefixedStream(prefix, inner);
+
+        var buffer = new byte[prefix.Length + body.Length];
+        var totalRead = await combined.ReadAsync(buffer);
+
+        Assert.Equal(prefix.Length + body.Length, totalRead);
+        Assert.Equal(prefix, buffer[..prefix.Length]);
+        Assert.Equal(body, buffer[prefix.Length..]);
+    }
+
+    [Fact]
+    public async Task PrefixedStream_partial_reads_work_correctly()
+    {
+        var prefix = new byte[] { 0x89, 0x50, 0x4E, 0x47 };
+        var body = new byte[] { 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D };
+        using var inner = new MemoryStream(body);
+        using var combined = new PrefixedStream(prefix, inner);
+
+        // Read only a few bytes at a time
+        var first = new byte[3];
+        var n1 = combined.Read(first, 0, 3);
+        Assert.Equal(3, n1);
+        Assert.Equal(new byte[] { 0x89, 0x50, 0x4E }, first);
+
+        var second = new byte[5];
+        var n2 = combined.Read(second, 0, 5);
+        Assert.Equal(5, n2);
+        Assert.Equal(new byte[] { 0x47, 0x0D, 0x0A, 0x1A, 0x0A }, second);
+    }
+
+    [Fact]
+    public async Task PrefixedStream_with_empty_prefix_passes_through()
+    {
+        var body = "hello"u8.ToArray();
+        using var inner = new MemoryStream(body);
+        using var combined = new PrefixedStream([], inner);
+
+        var buffer = new byte[5];
+        var n = await combined.ReadAsync(buffer);
+        Assert.Equal(5, n);
+        Assert.Equal("hello"u8.ToArray(), buffer);
     }
 }

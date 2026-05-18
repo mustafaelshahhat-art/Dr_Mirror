@@ -47,7 +47,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     queryKey: ['cart'],
     queryFn: () => cartApi.get(),
     enabled: isAuthed && !isBootstrapping,
-    staleTime: 30_000,
+    staleTime: 0,
   });
 
   // ------- Merge guest → server on login ------------------------------------

@@ -1,5 +1,6 @@
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using DrMirror.Api.Shared.ExternalServices;
 using Microsoft.Extensions.Options;
 
 namespace DrMirror.Api.Infrastructure.Storage;
@@ -59,7 +60,18 @@ public sealed class CloudinaryFileStorageService : IFileStorageService
             Overwrite = false,
         };
 
-        var result = await _cloudinary.UploadAsync(upload, ct);
+        using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        timeoutCts.CancelAfter(TimeSpan.FromSeconds(10));
+
+        UploadResult result;
+        try
+        {
+            result = await _cloudinary.UploadAsync(upload, timeoutCts.Token);
+        }
+        catch (OperationCanceledException ex) when (!ct.IsCancellationRequested)
+        {
+            throw new ExternalServiceUnavailableException("Cloudinary upload timed out after 10 seconds.", ex);
+        }
         if (result.Error is not null)
         {
             throw new InvalidOperationException(
@@ -93,8 +105,16 @@ public sealed class CloudinaryFileStorageService : IFileStorageService
             urlBuilder = urlBuilder.Type("authenticated").Signed(true);
         }
         var url = urlBuilder.BuildUrl(fileKey);
-        var http = _httpClientFactory.CreateClient();
-        var bytes = await http.GetByteArrayAsync(url, ct);
+        var http = _httpClientFactory.CreateClient(nameof(CloudinaryFileStorageService));
+        byte[] bytes;
+        try
+        {
+            bytes = await http.GetByteArrayAsync(url, ct);
+        }
+        catch (TaskCanceledException ex) when (!ct.IsCancellationRequested)
+        {
+            throw new ExternalServiceUnavailableException("Cloudinary file read timed out after 10 seconds.", ex);
+        }
         return new MemoryStream(bytes);
     }
 }

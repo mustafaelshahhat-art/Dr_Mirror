@@ -154,7 +154,7 @@ export function CatalogPage() {
           <div className="flex-1">
             <SearchInput value={filter.q ?? ''} onCommit={setQuery} />
           </div>
-          <SortSelect value={filter.sort ?? 'Newest'} onChange={setSort} />
+                    <SortSelect value={filter.sort!} onChange={setSort} />
         </div>
 
         {categoriesQuery.data ? (

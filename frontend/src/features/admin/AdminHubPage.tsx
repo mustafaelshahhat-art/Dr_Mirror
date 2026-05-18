@@ -4,6 +4,7 @@ import {
   ClipboardList,
   Inbox,
   Package,
+  ScrollText,
   Users,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -176,6 +177,7 @@ export function AdminHubPage() {
                 <QuickLink to="/admin/orders" icon={ClipboardList} label={t('admin.shell.nav.orders')} />
                 <QuickLink to="/admin/products" icon={Package} label={t('admin.shell.nav.products')} />
                 <QuickLink to="/admin/users" icon={Users} label={t('admin.shell.nav.users')} />
+                <QuickLink to="/admin/audit" icon={ScrollText} label={t('admin.shell.nav.audit')} />
               </div>
             </div>
           </div>

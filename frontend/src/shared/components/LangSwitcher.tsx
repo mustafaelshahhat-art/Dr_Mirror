@@ -24,7 +24,12 @@ export function LangSwitcher() {
       aria-label={t('header.switchLanguage')}
       className="font-medium"
     >
-      {next === 'en' ? 'EN' : 'العربية'}
+      {
+        // Locale display names are intentionally untranslated — users pick the
+        // language by reading it in its own script.
+        // eslint-disable-next-line i18next/no-literal-string
+        next === 'en' ? 'EN' : 'العربية'
+      }
     </Button>
   );
 }

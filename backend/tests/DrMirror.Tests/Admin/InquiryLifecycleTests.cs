@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -216,6 +217,7 @@ public class InquiryAdminAuthHandler : AuthenticationHandler<AuthenticationSchem
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, _caller.UserId.ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, _caller.UserId.ToString()),
             new Claim(ClaimTypes.Role, UserRoles.Admin),
         };
         var ticket = new AuthenticationTicket(

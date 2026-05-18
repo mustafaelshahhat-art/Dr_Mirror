@@ -39,4 +39,6 @@ public class PaymentProof
     public string? ReviewNote { get; set; }
 
     public DateTimeOffset UploadedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    public DateTimeOffset? FilePurgedAtUtc { get; set; }
 }

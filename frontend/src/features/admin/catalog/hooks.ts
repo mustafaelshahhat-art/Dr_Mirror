@@ -26,13 +26,15 @@ const KEYS = {
   paymentMethods: () => ['admin', 'payment-methods'] as const,
 };
 
+const ADMIN_STALE = 0;
+
 // ----- Categories ------------------------------------------------------------
 
 export function useAdminCategoriesQuery() {
   return useQuery<AdminCategoryDto[]>({
     queryKey: KEYS.categories(),
     queryFn: () => adminCatalogApi.listCategories(),
-    staleTime: 30_000,
+    staleTime: ADMIN_STALE,
   });
 }
 
@@ -40,7 +42,10 @@ export function useCreateCategoryMutation() {
   const qc = useQueryClient();
   return useMutation<AdminCategoryDto, Error, AdminCategoryUpsertRequest>({
     mutationFn: (body) => adminCatalogApi.createCategory(body),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: KEYS.categories() }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: KEYS.categories() });
+      void qc.invalidateQueries({ queryKey: ['catalog'] });
+    },
   });
 }
 
@@ -49,7 +54,10 @@ export function useUpdateCategoryMutation() {
   return useMutation<AdminCategoryDto, Error, { id: string; body: AdminCategoryUpsertRequest }>(
     {
       mutationFn: ({ id, body }) => adminCatalogApi.updateCategory(id, body),
-      onSuccess: () => void qc.invalidateQueries({ queryKey: KEYS.categories() }),
+      onSuccess: () => {
+        void qc.invalidateQueries({ queryKey: KEYS.categories() });
+        void qc.invalidateQueries({ queryKey: ['catalog'] });
+      },
     },
   );
 }
@@ -61,7 +69,10 @@ export function useToggleCategoryActiveMutation() {
       activate
         ? adminCatalogApi.activateCategory(id)
         : adminCatalogApi.deactivateCategory(id),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: KEYS.categories() }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: KEYS.categories() });
+      void qc.invalidateQueries({ queryKey: ['catalog'] });
+    },
   });
 }
 
@@ -71,7 +82,7 @@ export function useAdminProductsQuery(params: AdminProductsListParams = {}) {
   return useQuery<PagedResult<AdminProductSummaryDto>>({
     queryKey: KEYS.products(params),
     queryFn: () => adminCatalogApi.listProducts(params),
-    staleTime: 15_000,
+    staleTime: ADMIN_STALE,
   });
 }
 
@@ -80,7 +91,7 @@ export function useAdminProductQuery(id: string | undefined) {
     queryKey: KEYS.product(id ?? ''),
     queryFn: () => adminCatalogApi.getProduct(id!),
     enabled: Boolean(id),
-    staleTime: 10_000,
+    staleTime: ADMIN_STALE,
   });
 }
 
@@ -91,6 +102,7 @@ export function useCreateProductMutation() {
     onSuccess: (product) => {
       qc.setQueryData(KEYS.product(product.id), product);
       void qc.invalidateQueries({ queryKey: ['admin', 'products'], exact: false });
+      void qc.invalidateQueries({ queryKey: ['catalog'] });
     },
   });
 }
@@ -106,6 +118,7 @@ export function useUpdateProductMutation() {
     onSuccess: (product) => {
       qc.setQueryData(KEYS.product(product.id), product);
       void qc.invalidateQueries({ queryKey: ['admin', 'products'], exact: false });
+      void qc.invalidateQueries({ queryKey: ['catalog'] });
     },
   });
 }
@@ -118,6 +131,7 @@ export function useTogglePublishMutation() {
     onSuccess: (product) => {
       qc.setQueryData(KEYS.product(product.id), product);
       void qc.invalidateQueries({ queryKey: ['admin', 'products'], exact: false });
+      void qc.invalidateQueries({ queryKey: ['catalog'] });
     },
   });
 }
@@ -128,7 +142,10 @@ export function useCreateVariantMutation(productId: string) {
   const qc = useQueryClient();
   return useMutation<AdminProductVariantDto, Error, AdminVariantUpsertRequest>({
     mutationFn: (body) => adminCatalogApi.createVariant(productId, body),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: KEYS.product(productId) }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: KEYS.product(productId) });
+      void qc.invalidateQueries({ queryKey: ['catalog'] });
+    },
   });
 }
 
@@ -141,7 +158,10 @@ export function useUpdateVariantMutation(productId: string) {
   >({
     mutationFn: ({ variantId, body }) =>
       adminCatalogApi.updateVariant(productId, variantId, body),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: KEYS.product(productId) }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: KEYS.product(productId) });
+      void qc.invalidateQueries({ queryKey: ['catalog'] });
+    },
   });
 }
 
@@ -156,7 +176,10 @@ export function useToggleVariantActiveMutation(productId: string) {
       activate
         ? adminCatalogApi.activateVariant(productId, variantId)
         : adminCatalogApi.deactivateVariant(productId, variantId),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: KEYS.product(productId) }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: KEYS.product(productId) });
+      void qc.invalidateQueries({ queryKey: ['catalog'] });
+    },
   });
 }
 
@@ -166,7 +189,10 @@ export function useUploadImageMutation(productId: string) {
   const qc = useQueryClient();
   return useMutation<AdminProductImageDto, Error, File>({
     mutationFn: (file) => adminCatalogApi.uploadImage(productId, file),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: KEYS.product(productId) }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: KEYS.product(productId) });
+      void qc.invalidateQueries({ queryKey: ['catalog'] });
+    },
   });
 }
 
@@ -179,7 +205,10 @@ export function useUpdateImageMutation(productId: string) {
   >({
     mutationFn: ({ imageId, body }) =>
       adminCatalogApi.updateImage(productId, imageId, body),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: KEYS.product(productId) }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: KEYS.product(productId) });
+      void qc.invalidateQueries({ queryKey: ['catalog'] });
+    },
   });
 }
 
@@ -187,7 +216,10 @@ export function useDeleteImageMutation(productId: string) {
   const qc = useQueryClient();
   return useMutation<void, Error, string>({
     mutationFn: (imageId) => adminCatalogApi.deleteImage(productId, imageId),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: KEYS.product(productId) }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: KEYS.product(productId) });
+      void qc.invalidateQueries({ queryKey: ['catalog'] });
+    },
   });
 }
 
@@ -197,7 +229,7 @@ export function useAdminPaymentMethodsQuery() {
   return useQuery<AdminPaymentMethodDto[]>({
     queryKey: KEYS.paymentMethods(),
     queryFn: () => adminCatalogApi.listPaymentMethods(),
-    staleTime: 30_000,
+    staleTime: ADMIN_STALE,
   });
 }
 

@@ -1,6 +1,7 @@
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.Auditing;
 using DrMirror.Api.Shared.Slugs;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.EntityFrameworkCore;
@@ -94,6 +95,7 @@ public static class AdminCategoriesEndpoints
     private static async Task<IResult> Create(
         AdminCategoryUpsertRequest request,
         AppDbContext db,
+        IAdminAuditWriter audit,
         CancellationToken ct)
     {
         // Generate a stable slug from the English name, then make it unique
@@ -120,6 +122,7 @@ public static class AdminCategoriesEndpoints
         };
 
         db.Categories.Add(entity);
+        await audit.WriteAsync("Category.Create", "Category", entity.Id.ToString(), null, "Active", ct);
         await db.SaveChangesAsync(ct);
 
         return Results.Created($"/api/admin/categories/{entity.Id}", ToDto(entity, productCount: 0));
@@ -129,6 +132,7 @@ public static class AdminCategoriesEndpoints
         Guid id,
         AdminCategoryUpsertRequest request,
         AppDbContext db,
+        IAdminAuditWriter audit,
         CancellationToken ct)
     {
         var entity = await db.Categories
@@ -146,11 +150,12 @@ public static class AdminCategoriesEndpoints
         entity.DisplayOrder = request.DisplayOrder;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
 
+        await audit.WriteAsync("Category.Update", "Category", entity.Id.ToString(), null, null, ct);
         await db.SaveChangesAsync(ct);
         return Results.Ok(ToDto(entity));
     }
 
-    private static async Task<IResult> Deactivate(Guid id, AppDbContext db, CancellationToken ct)
+    private static async Task<IResult> Deactivate(Guid id, AppDbContext db, IAdminAuditWriter audit, CancellationToken ct)
     {
         var entity = await db.Categories
             .Include(c => c.Products)
@@ -174,12 +179,13 @@ public static class AdminCategoriesEndpoints
 
         entity.IsActive = false;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
+        await audit.WriteAsync("Category.Update", "Category", entity.Id.ToString(), "Active", "Inactive", ct);
         await db.SaveChangesAsync(ct);
 
         return Results.Ok(ToDto(entity));
     }
 
-    private static async Task<IResult> Activate(Guid id, AppDbContext db, CancellationToken ct)
+    private static async Task<IResult> Activate(Guid id, AppDbContext db, IAdminAuditWriter audit, CancellationToken ct)
     {
         var entity = await db.Categories
             .Include(c => c.Products)
@@ -191,6 +197,7 @@ public static class AdminCategoriesEndpoints
 
         entity.IsActive = true;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
+        await audit.WriteAsync("Category.Update", "Category", entity.Id.ToString(), "Inactive", "Active", ct);
         await db.SaveChangesAsync(ct);
 
         return Results.Ok(ToDto(entity));

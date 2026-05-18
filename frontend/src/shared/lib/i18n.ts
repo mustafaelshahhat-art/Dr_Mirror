@@ -10,6 +10,7 @@ import arCart from '../../locales/ar/cart.json';
 import arCatalog from '../../locales/ar/catalog.json';
 import arCheckout from '../../locales/ar/checkout.json';
 import arCommon from '../../locales/ar/common.json';
+import arErrors from '../../locales/ar/errors.json';
 import arGovernates from '../../locales/ar/governorates.json';
 import arInquiries from '../../locales/ar/inquiries.json';
 import arOrders from '../../locales/ar/orders.json';
@@ -21,6 +22,7 @@ import enCart from '../../locales/en/cart.json';
 import enCatalog from '../../locales/en/catalog.json';
 import enCheckout from '../../locales/en/checkout.json';
 import enCommon from '../../locales/en/common.json';
+import enErrors from '../../locales/en/errors.json';
 import enGovernates from '../../locales/en/governorates.json';
 import enInquiries from '../../locales/en/inquiries.json';
 import enOrders from '../../locales/en/orders.json';
@@ -43,6 +45,7 @@ void i18n
         catalog: arCatalog,
         cart: arCart,
         checkout: arCheckout,
+        errors: arErrors,
         orders: arOrders,
         admin: arAdmin,
         addresses: arAddresses,
@@ -56,6 +59,7 @@ void i18n
         catalog: enCatalog,
         cart: enCart,
         checkout: enCheckout,
+        errors: enErrors,
         orders: enOrders,
         admin: enAdmin,
         addresses: enAddresses,
@@ -68,7 +72,7 @@ void i18n
     // Flat key lookup: t('auth.signIn') reads from the 'auth' namespace.
     fallbackNS: 'common',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'catalog', 'cart', 'checkout', 'orders', 'admin', 'addresses', 'governorates', 'inquiries', 'account'],
+    ns: ['common', 'auth', 'catalog', 'cart', 'checkout', 'errors', 'orders', 'admin', 'addresses', 'governorates', 'inquiries', 'account'],
     // Allow t('auth.signIn') to resolve via nsSeparator on the key.
     nsSeparator: '.',
     interpolation: { escapeValue: false },

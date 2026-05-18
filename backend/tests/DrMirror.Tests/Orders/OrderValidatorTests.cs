@@ -61,6 +61,47 @@ public class OrderValidatorTests
         Assert.False(result.IsValid);
     }
 
+    // ----- SaveAsNewAddress + Label conditional rules --------------------------
+
+    [Fact]
+    public void CreateOrder_requires_label_when_saving_new_address()
+    {
+        var validator = new CreateOrderValidator();
+        var request = new CreateOrderRequest(
+            Guid.NewGuid(),
+            ValidAddress(),
+            BuyerAddressId: null,
+            SaveAsNewAddress: true,
+            Label: null,
+            BuyerNote: null);
+
+        var result = validator.Validate(request);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e =>
+            e.PropertyName == nameof(CreateOrderRequest.Label));
+    }
+
+    [Fact]
+    public void CreateOrder_requires_shipping_address_when_saving_new_address()
+    {
+        var validator = new CreateOrderValidator();
+        // BuyerAddressId is set, ShippingAddress is null, but SaveAsNewAddress is true.
+        var request = new CreateOrderRequest(
+            Guid.NewGuid(),
+            ShippingAddress: null,
+            BuyerAddressId: Guid.NewGuid(),
+            SaveAsNewAddress: true,
+            Label: "Home",
+            BuyerNote: null);
+
+        var result = validator.Validate(request);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e =>
+            e.PropertyName == nameof(CreateOrderRequest.ShippingAddress));
+    }
+
     // ----- ShippingAddress field validation ------------------------------------
 
     [Fact]

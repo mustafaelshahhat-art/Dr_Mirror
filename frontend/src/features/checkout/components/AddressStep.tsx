@@ -139,8 +139,10 @@ export function AddressStep({
           <div className="grid gap-4 sm:grid-cols-2">
             <GovernorateSelect
               label={t('checkout.address.governorate')}
+              // eslint-disable-next-line i18next/no-literal-string
               value={watch('address.governorate')}
               onChange={(slug) =>
+                // eslint-disable-next-line i18next/no-literal-string
                 setValue('address.governorate', slug, {
                   shouldValidate: true,
                   shouldDirty: true,

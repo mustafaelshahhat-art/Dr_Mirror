@@ -30,4 +30,16 @@ public static class RateLimitPolicies
     /// 120 requests per minute per authenticated user — fixed window.
     /// </summary>
     public const string AdminApi = "admin-api";
+
+    /// <summary>
+    /// Payment-proof upload — prevents abuse of the proof-submission endpoint.
+    /// 10 requests per 5 minutes per authenticated user — fixed window.
+    /// </summary>
+    public const string ProofUpload = "proof-upload";
+
+    /// <summary>
+    /// Payment-proof file read — prevents automated scraping of proof files.
+    /// 60 requests per minute per IP — sliding window.
+    /// </summary>
+    public const string ProofFileRead = "proof-file-read";
 }

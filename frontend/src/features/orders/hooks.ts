@@ -4,17 +4,18 @@ import type { PagedResult } from '../../shared/types/paged-result';
 import { ordersApi } from './api';
 import type {
   AppConfigDto,
+  PaymentProofUploadConfigDto,
+} from '../app-config/types';
+import type {
   CancelOrderRequest,
   CreateOrderRequest,
   OrderDetailDto,
   OrderSummaryDto,
   PaymentMethodDto,
-  PaymentProofUploadConfigDto,
 } from './types';
 
 const KEYS = {
   appConfig: () => ['app-config'] as const,
-  paymentProofUploadConfig: () => ['app-config', 'payment-proof-upload'] as const,
   paymentMethods: () => ['payment-methods'] as const,
   myOrders: (page: number, pageSize: number) =>
     ['orders', 'mine', { page, pageSize }] as const,
@@ -35,10 +36,11 @@ export function useAppConfigQuery() {
 }
 
 export function usePaymentProofUploadConfigQuery() {
-  return useQuery<PaymentProofUploadConfigDto>({
-    queryKey: KEYS.paymentProofUploadConfig(),
-    queryFn: () => ordersApi.getPaymentProofUploadConfig(),
+  return useQuery<AppConfigDto, Error, PaymentProofUploadConfigDto>({
+    queryKey: KEYS.appConfig(),
+    queryFn: () => ordersApi.getAppConfig(),
     staleTime: 10 * 60_000,
+    select: (data) => data.paymentProofUpload,
   });
 }
 
@@ -69,8 +71,8 @@ export function useMyOrderQuery(orderNumber: string | undefined) {
 
 export function useCreateOrderMutation() {
   const queryClient = useQueryClient();
-  return useMutation<OrderDetailDto, Error, CreateOrderRequest>({
-    mutationFn: (input) => ordersApi.createOrder(input),
+  return useMutation<OrderDetailDto, Error, { input: CreateOrderRequest; idempotencyKey?: string }>({
+    mutationFn: ({ input, idempotencyKey }) => ordersApi.createOrder(input, idempotencyKey),
     onSuccess: (order) => {
       // Checkout consumes the cart — invalidate so the mini-cart updates.
       void queryClient.invalidateQueries({ queryKey: ['cart'] });

@@ -37,6 +37,7 @@
     "subtitle_other": "{{count}} items · {{total}}",
     "buyerHeading": "Buyer",
     "buyerNoteHeading": "Buyer note",
+    "buyerNoteQuoted": "“{{note}}”",
     "itemsHeading": "Items",
     "shippingHeading": "Ship to",
     "proofsHeading": "Payment proofs",
@@ -306,6 +307,7 @@
       "paymentMethods": "Payment methods",
       "inquiries": "Inquiries",
       "users": "Users",
+      "audit": "Audit log",
       "groups": {
         "operations": "Operations",
         "catalog": "Catalog",
@@ -342,5 +344,25 @@
         "Buyer": "Buyer"
       }
     }
+  },
+  "audit": {
+    "title": "Admin audit log",
+    "subtitle": "Recent operator actions for orders, payments, stock, and users.",
+    "filters": {
+      "actor": "Actor",
+      "actionType": "Action type",
+      "target": "Target",
+      "from": "From",
+      "to": "To"
+    },
+    "columns": {
+      "timestamp": "Time",
+      "actor": "Actor",
+      "action": "Action",
+      "target": "Target",
+      "status": "Status"
+    },
+    "empty": "No audit entries yet.",
+    "errorLoad": "Couldn't load the audit log. Please try again."
   }
 }
