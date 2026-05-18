@@ -121,7 +121,15 @@ export function AdminCategoriesPage() {
           <p className="enter-fade-up text-sm text-default-500">{t('admin.catalog.categories.empty')}</p>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul
+          className="space-y-2"
+          aria-busy={
+            query.isFetching ||
+            createMutation.isPending ||
+            updateMutation.isPending ||
+            toggleMutation.isPending
+          }
+        >
           {categories.map((cat) => (
             <li key={cat.id}>
               {editingId === cat.id ? (

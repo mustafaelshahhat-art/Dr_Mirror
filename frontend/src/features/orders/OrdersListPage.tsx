@@ -77,7 +77,7 @@ export function OrdersListPage() {
           </LinkButton>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-2" aria-busy={query.isFetching}>
           {orders.map((order) => (
             <li key={order.id}>
               <Link

@@ -122,7 +122,15 @@ export function AddressBookPage() {
           <p className="enter-fade-up text-sm text-default-500">{t('addresses.empty')}</p>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul
+          className="space-y-2"
+          aria-busy={
+            query.isFetching ||
+            deleteMutation.isPending ||
+            setDefaultMutation.isPending ||
+            updateMutation.isPending
+          }
+        >
           {addresses.map((a) => (
             <li key={a.id}>
               {editingId === a.id ? (

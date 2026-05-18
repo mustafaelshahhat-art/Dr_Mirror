@@ -122,7 +122,7 @@ export function AdminProductsListPage() {
       ) : (
         <div className="space-y-4">
           <div className="overflow-hidden rounded-large border border-divider/60">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" aria-busy={products.isFetching}>
               <thead>
                 <tr className="bg-content2">
                   <th scope="col" className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">

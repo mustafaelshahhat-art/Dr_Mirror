@@ -127,7 +127,15 @@ export function AdminPaymentMethodsPage() {
           <p className="enter-fade-up text-sm text-default-500">{t('admin.payments.empty')}</p>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul
+          className="space-y-2"
+          aria-busy={
+            query.isFetching ||
+            createMutation.isPending ||
+            updateMutation.isPending ||
+            toggleMutation.isPending
+          }
+        >
           {methods.map((m) => (
             <li key={m.id}>
               {editingId === m.id ? (

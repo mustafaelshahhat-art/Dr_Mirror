@@ -4,7 +4,9 @@ import {
   type ReactNode,
 } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
+import { announce } from '../../shared/lib/live-announcer';
 import { useAuth } from '../auth/useAuth';
 
 import { cartApi } from './api';
@@ -35,6 +37,7 @@ import { useCartMerge } from './hooks/useCartMerge';
  * fire-and-forget — if it fails the guest cart stays so the buyer can retry.
  */
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const { user, isBootstrapping } = useAuth();
   const queryClient = useQueryClient();
   const isAuthed = Boolean(user);
@@ -60,22 +63,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
         productVariantId: input.productVariantId,
         quantity: input.quantity,
       }),
-    onSuccess: (data) => queryClient.setQueryData(['cart'], data),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['cart'], data);
+      announce(t('cart.addedToCart'));
+    },
   });
 
   const updateMutation = useMutation<CartDto, Error, { id: string; quantity: number }>({
     mutationFn: ({ id, quantity }) => cartApi.update(id, { quantity }),
-    onSuccess: (data) => queryClient.setQueryData(['cart'], data),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['cart'], data);
+      announce(t('cart.countSr', { count: data.totalQuantity }));
+    },
   });
 
   const removeMutation = useMutation<CartDto, Error, string>({
     mutationFn: (id) => cartApi.remove(id),
-    onSuccess: (data) => queryClient.setQueryData(['cart'], data),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['cart'], data);
+      announce(t('cart.line.remove'));
+    },
   });
 
   const clearMutation = useMutation<CartDto, Error, void>({
     mutationFn: () => cartApi.clear(),
-    onSuccess: (data) => queryClient.setQueryData(['cart'], data),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['cart'], data);
+      announce(t('cart.countSr', { count: 0 }));
+    },
   });
 
   const isMutating =
