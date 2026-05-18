@@ -102,3 +102,9 @@ test-results/
 /e2e/
 **/*.spec.ts-snapshots/
 **/*.test.ts-snapshots/
+
+# --- Screenshot capture baseline (external tool writes here) ---
+# Full-capture PNGs + report are produced by drmirror-screenshooter and
+# not tracked in this repo. Per-phase PNGs under phase-A/, phase-B/, ...
+# remain committable.
+docs/screenshots/uiux-pass/full-capture/
