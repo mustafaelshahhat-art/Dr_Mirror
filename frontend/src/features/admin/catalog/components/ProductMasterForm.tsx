@@ -165,7 +165,7 @@ export function ProductMasterForm({
           }))}
         />
         <div className="sm:col-span-2 flex gap-2 pt-1">
-          <Button type="submit" variant="primary" isDisabled={updateMutation.isPending}>
+          <Button type="submit" variant="primary" isPending={updateMutation.isPending}>
             {updateMutation.isPending
               ? t('admin.catalog.actions.saving')
               : t('admin.catalog.actions.save')}

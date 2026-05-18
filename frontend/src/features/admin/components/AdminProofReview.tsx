@@ -1,4 +1,4 @@
-import { Button, Modal, TextArea, useOverlayState } from '@heroui/react';
+import { Button, FieldError, Label, Modal, TextArea, TextField, useOverlayState } from '@heroui/react';
 import { Check, Download, X } from 'lucide-react';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
@@ -235,22 +235,19 @@ function ProofRow({
             <p className="text-xs font-medium text-foreground">
               {t('admin.proofs.approveConfirm')}
             </p>
-            <TextArea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={2}
-              maxLength={500}
-              fullWidth
-              placeholder={
-                t('admin.proofs.notePlaceholderOptional')
-              }
-              className="text-sm text-start"
-            />
-            {error ? (
-              <p role="alert" className="text-xs text-danger">
-                {error}
-              </p>
-            ) : null}
+            <TextField isInvalid={Boolean(error)} className="flex flex-col gap-1">
+              <Label className="sr-only">{t('admin.proofs.notePlaceholderOptional')}</Label>
+              <TextArea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={2}
+                maxLength={500}
+                fullWidth
+                placeholder={t('admin.proofs.notePlaceholderOptional')}
+                className="text-sm text-start"
+              />
+              {error ? <FieldError className="text-xs text-danger">{error}</FieldError> : null}
+            </TextField>
             <div className="flex gap-2">
               <Button
                 type="button"
@@ -304,20 +301,19 @@ function ProofRow({
                     <p className="text-sm font-medium">
                       {t('admin.proofs.rejectConfirm')}
                     </p>
-                    <TextArea
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      rows={3}
-                      maxLength={500}
-                      fullWidth
-                      placeholder={t('admin.proofs.notePlaceholderRequired')}
-                      className="text-sm text-start"
-                    />
-                    {error ? (
-                      <p role="alert" className="text-xs text-danger">
-                        {error}
-                      </p>
-                    ) : null}
+                    <TextField isInvalid={Boolean(error)} className="flex flex-col gap-1">
+                      <Label className="sr-only">{t('admin.proofs.notePlaceholderRequired')}</Label>
+                      <TextArea
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                        rows={3}
+                        maxLength={500}
+                        fullWidth
+                        placeholder={t('admin.proofs.notePlaceholderRequired')}
+                        className="text-sm text-start"
+                      />
+                      {error ? <FieldError className="text-xs text-danger">{error}</FieldError> : null}
+                    </TextField>
                   </Modal.Body>
                   <Modal.Footer>
                     <Button

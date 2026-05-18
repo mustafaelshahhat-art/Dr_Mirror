@@ -12,6 +12,7 @@ interface GovernorateSelectProps {
   /** Defaults to <c>checkout.address.governorate</c>; pass a custom key for
    *  the address-book context. */
   label?: string;
+  errorMessage?: string | null;
 }
 
 /**
@@ -27,6 +28,7 @@ export function GovernorateSelect({
   required,
   hideLabel,
   label,
+  errorMessage,
 }: GovernorateSelectProps) {
   const { t, i18n } = useTranslation();
 
@@ -47,6 +49,7 @@ export function GovernorateSelect({
       placeholder={t('governorates.selectPlaceholder')}
       isRequired={required}
       hideLabel={hideLabel}
+      errorMessage={errorMessage}
     />
   );
 }

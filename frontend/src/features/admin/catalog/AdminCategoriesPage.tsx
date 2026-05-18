@@ -288,7 +288,7 @@ function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
           className="tabular-nums"
         />
       </TextField>
-      <Button type="submit" variant="primary" size="sm" isDisabled={isPending}>
+      <Button type="submit" variant="primary" size="sm" isPending={isPending}>
         <span className="inline-flex items-center gap-1.5">
           <Plus className="size-4" aria-hidden />
           {isPending ? t('admin.catalog.actions.creating') : t('admin.catalog.actions.create')}
@@ -348,7 +348,7 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
           className="tabular-nums"
         />
       </TextField>
-      <Button type="submit" variant="primary" size="sm" isDisabled={isPending}>
+      <Button type="submit" variant="primary" size="sm" isPending={isPending}>
         {isPending ? t('admin.catalog.actions.saving') : t('admin.catalog.actions.save')}
       </Button>
       <Button type="button" variant="ghost" size="sm" onPress={onCancel} isDisabled={isPending}>

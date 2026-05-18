@@ -152,7 +152,7 @@ export function AdminProductCreatePage() {
         </div>
 
         <div className="flex gap-2">
-          <Button type="submit" variant="primary" isDisabled={createMutation.isPending}>
+          <Button type="submit" variant="primary" isPending={createMutation.isPending}>
             {createMutation.isPending
               ? t('admin.products.create.creating')
               : t('admin.products.create.submit')}

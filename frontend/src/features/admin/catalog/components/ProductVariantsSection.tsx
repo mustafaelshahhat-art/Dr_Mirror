@@ -227,7 +227,7 @@ function VariantForm({
       </div>
       {error ? <p className="text-xs text-danger">{error}</p> : null}
       <div className="flex gap-2">
-        <Button type="submit" variant="primary" size="sm" isDisabled={inFlight}>
+        <Button type="submit" variant="primary" size="sm" isPending={inFlight}>
           {inFlight
             ? t('admin.catalog.actions.saving')
             : mode === 'create'

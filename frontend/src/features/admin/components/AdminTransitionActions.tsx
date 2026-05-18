@@ -1,4 +1,4 @@
-import { Button, Modal, TextArea, useOverlayState } from '@heroui/react';
+import { Button, FieldError, Label, Modal, TextArea, TextField, useOverlayState } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -103,24 +103,27 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
               status: t(orderStatusTranslationKey(target)),
             })}
           </p>
-          <TextArea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            rows={2}
-            maxLength={500}
-            fullWidth
-            placeholder={
-              isCancelling
+          <TextField isInvalid={Boolean(error)} className="flex flex-col gap-1">
+            <Label className="sr-only">
+              {isCancelling
                 ? t('admin.transition.reasonPlaceholderRequired')
-                : t('admin.transition.reasonPlaceholderOptional')
-            }
-            className="text-sm text-start"
-          />
-          {error ? (
-            <p role="alert" className="text-xs text-danger">
-              {error}
-            </p>
-          ) : null}
+                : t('admin.transition.reasonPlaceholderOptional')}
+            </Label>
+            <TextArea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              rows={2}
+              maxLength={500}
+              fullWidth
+              placeholder={
+                isCancelling
+                  ? t('admin.transition.reasonPlaceholderRequired')
+                  : t('admin.transition.reasonPlaceholderOptional')
+              }
+              className="text-sm text-start"
+            />
+            {error ? <FieldError className="text-xs text-danger">{error}</FieldError> : null}
+          </TextField>
           <div className="flex gap-2">
             <Button
               type="button"
@@ -174,20 +177,19 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
                     </Modal.Heading>
                   </Modal.Header>
                   <Modal.Body>
-                    <TextArea
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                      rows={3}
-                      maxLength={500}
-                      fullWidth
-                      placeholder={t('admin.transition.reasonPlaceholderRequired')}
-                      className="text-sm text-start"
-                    />
-                    {error ? (
-                      <p role="alert" className="text-xs text-danger">
-                        {error}
-                      </p>
-                    ) : null}
+                    <TextField isInvalid={Boolean(error)} className="flex flex-col gap-1">
+                      <Label className="sr-only">{t('admin.transition.reasonPlaceholderRequired')}</Label>
+                      <TextArea
+                        value={reason}
+                        onChange={(e) => setReason(e.target.value)}
+                        rows={3}
+                        maxLength={500}
+                        fullWidth
+                        placeholder={t('admin.transition.reasonPlaceholderRequired')}
+                        className="text-sm text-start"
+                      />
+                      {error ? <FieldError className="text-xs text-danger">{error}</FieldError> : null}
+                    </TextField>
                   </Modal.Body>
                   <Modal.Footer>
                     <Button

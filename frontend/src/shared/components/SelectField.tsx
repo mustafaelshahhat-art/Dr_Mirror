@@ -1,4 +1,4 @@
-import { Label, ListBox, Select } from '@heroui/react';
+import { Description, FieldError, Label, ListBox, Select } from '@heroui/react';
 
 const EMPTY_OPTION_VALUE = '__empty__';
 
@@ -18,6 +18,8 @@ interface SelectFieldProps {
   isRequired?: boolean;
   hideLabel?: boolean;
   className?: string;
+  description?: string;
+  errorMessage?: string | null;
 }
 
 export function SelectField({
@@ -30,6 +32,8 @@ export function SelectField({
   isRequired,
   hideLabel,
   className,
+  description,
+  errorMessage,
 }: SelectFieldProps) {
   const renderedOptions = emptyLabel
     ? [{ value: EMPTY_OPTION_VALUE, label: emptyLabel }, ...options]
@@ -50,6 +54,7 @@ export function SelectField({
         onChange(String(next));
       }}
       isRequired={isRequired}
+      isInvalid={Boolean(errorMessage)}
       disabledKeys={disabledKeys.length ? disabledKeys : undefined}
       placeholder={placeholder}
       variant="secondary"
@@ -72,6 +77,12 @@ export function SelectField({
           ))}
         </ListBox>
       </Select.Popover>
+      {description ? (
+        <Description className="text-xs text-default-500">{description}</Description>
+      ) : null}
+      {errorMessage ? (
+        <FieldError className="text-xs text-danger">{errorMessage}</FieldError>
+      ) : null}
     </Select>
   );
 }
