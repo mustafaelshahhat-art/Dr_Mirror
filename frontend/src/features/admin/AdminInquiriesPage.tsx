@@ -37,7 +37,7 @@ export function AdminInquiriesPage() {
   });
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">{t('inquiries.admin.title')}</h1>
         <p className="text-sm text-default-500">{t('inquiries.admin.subtitle')}</p>
@@ -90,7 +90,7 @@ export function AdminInquiriesPage() {
         />
       ) : query.data?.items?.length ? (
         <div className="space-y-4">
-          <ul className="space-y-3">
+          <ul className="space-y-3" aria-busy={query.isFetching}>
             {query.data.items.map((inquiry) => (
               <li key={inquiry.id}>
                 <InquiryRow inquiry={inquiry} dateFmt={dateFmt} isAr={isAr ?? false} />
@@ -105,8 +105,8 @@ export function AdminInquiriesPage() {
         </div>
       ) : (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <MailOpen className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="text-sm text-default-500">{t('inquiries.admin.empty')}</p>
+          <MailOpen className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="enter-fade-up text-sm text-default-500">{t('inquiries.admin.empty')}</p>
         </div>
       )}
     </section>

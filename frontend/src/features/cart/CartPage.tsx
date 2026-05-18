@@ -27,7 +27,7 @@ export function CartPage() {
   const errorMessage = cart.error?.message;
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <Link
         to="/"
         className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
@@ -83,7 +83,10 @@ export function CartPage() {
           </div>
         </div>
       ) : hasItems ? (
-        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div
+          className="grid gap-6 lg:grid-cols-[1fr_320px]"
+          aria-busy={cart.isMutating}
+        >
           <div className="space-y-3">
             {cart.items.map((line) => (
               <CartLineRow

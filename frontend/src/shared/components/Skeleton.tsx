@@ -8,14 +8,15 @@
  * blocks into shapes that match real content rows so layout doesn't shift
  * when data arrives.
  */
-import type { HTMLAttributes } from 'react';
+import { Skeleton as HeroSkeleton } from '@heroui/react';
+import type { ComponentProps } from 'react';
 
-export function Skeleton({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
+export function Skeleton({ className, ...rest }: ComponentProps<typeof HeroSkeleton>) {
   return (
-    <div
+    <HeroSkeleton
       aria-hidden
       className={[
-        'rounded bg-default-200/60 motion-safe:animate-pulse',
+        'rounded-md bg-default-200/60 motion-safe:animate-pulse',
         className ?? '',
       ].join(' ')}
       {...rest}

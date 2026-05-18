@@ -47,6 +47,7 @@ export function AddressForm({
   const [notes, setNotes] = useState(initial?.notes ?? '');
   const [setDefault, setSetDefault] = useState(initial?.isDefault ?? Boolean(isFirstAddress));
   const [error, setError] = useState<string | null>(null);
+  const [governorateError, setGovernorateError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const setDefaultLocked = Boolean(isFirstAddress);
@@ -56,8 +57,9 @@ export function AddressForm({
       onSubmit={async (e) => {
         e.preventDefault();
         setError(null);
+        setGovernorateError(null);
         if (!governorate) {
-          setError(t('addresses.errors.governorateRequired'));
+          setGovernorateError(t('addresses.errors.governorateRequired'));
           return;
         }
         setSubmitting(true);
@@ -82,9 +84,9 @@ export function AddressForm({
           setSubmitting(false);
         }
       }}
-      className="space-y-4 rounded-large border border-divider/60 bg-content1 p-4"
+      className="cq space-y-4 rounded-large border border-divider/60 bg-content1 p-4"
     >
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 @lg:grid-cols-2">
         <Field
           label={t('addresses.fields.label')}
           value={label}
@@ -105,8 +107,12 @@ export function AddressForm({
         <GovernorateSelect
           label={t('addresses.fields.governorate')}
           value={governorate}
-          onChange={setGovernorate}
+          onChange={(next) => {
+            setGovernorate(next);
+            if (next) setGovernorateError(null);
+          }}
           required
+          errorMessage={governorateError}
         />
         <Field label={t('addresses.fields.city')} value={city} onChange={setCity} required maxLength={100} />
         <Field label={t('addresses.fields.streetAddress')} value={streetAddress} onChange={setStreetAddress} required maxLength={200} />
@@ -138,7 +144,7 @@ export function AddressForm({
       ) : null}
 
       <div className="flex gap-2">
-        <Button type="submit" variant="primary" isDisabled={submitting}>
+        <Button type="submit" variant="primary" isPending={submitting}>
           {submitting ? pendingLabel : submitLabel}
         </Button>
         <Button type="button" variant="ghost" onPress={onCancel} isDisabled={submitting}>

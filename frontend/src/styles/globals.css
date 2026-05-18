@@ -60,6 +60,10 @@
   --color-default-700: color-mix(in oklab, var(--muted) 50%, var(--foreground) 50%);
 }
 
+@custom-variant ar (&:where([dir="rtl"], [dir="rtl"] *));
+@custom-variant en (&:where([dir="ltr"], [dir="ltr"] *));
+@custom-variant dense (&:where(.density-dense, .density-dense *));
+
 @layer base {
   :root {
     /* Mixed-script stacks per A19: each stack lists BOTH families so Latin
@@ -99,6 +103,7 @@
     --accent: var(--brand);
     --accent-foreground: var(--brand-foreground);
     --focus: var(--brand);
+    accent-color: var(--brand);
   }
 
   html {
@@ -166,6 +171,52 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .cq {
+    container-type: inline-size;
+  }
+
+  .cq-card {
+    container-name: card;
+    container-type: inline-size;
+  }
+}
+
+@layer utilities {
+  @media (prefers-reduced-motion: no-preference) {
+    .enter-fade,
+    .enter-fade-up,
+    .enter-fade-down {
+      opacity: 1;
+      transform: translateY(0);
+      transition-property: opacity, transform;
+      transition-duration: 160ms;
+      transition-timing-function: ease-out;
+    }
+
+    .enter-fade {
+      @starting-style {
+        opacity: 0;
+        transform: translateY(0);
+      }
+    }
+
+    .enter-fade-up {
+      @starting-style {
+        opacity: 0;
+        transform: translateY(0.5rem);
+      }
+    }
+
+    .enter-fade-down {
+      @starting-style {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+      }
     }
   }
 }

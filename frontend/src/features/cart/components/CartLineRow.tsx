@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Button, Label, NumberField, Tooltip } from '@heroui/react';
 import { ImageOff, Minus, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -18,7 +18,7 @@ interface CartLineRowProps {
 }
 
 /**
- * One row in the cart — image, name, color + size, quantity stepper, line
+ * One row in the cart: image, name, color + size, quantity stepper, line
  * total, remove button. Works for both the drawer and the full /cart page;
  * the <c>variant</c> prop only tweaks spacing / image size.
  */
@@ -36,15 +36,13 @@ export function CartLineRow({
   const colorName = isAr ? line.colorNameAr : line.colorName;
   const isCompact = variant === 'compact';
 
-  const canIncrement =
-    line.quantity < MAX_QUANTITY_PER_LINE && line.quantity < line.variantStock;
-  const canDecrement = line.quantity > 1;
   const isUnavailable = !line.isAvailable;
+  const maxQuantity = Math.min(MAX_QUANTITY_PER_LINE, line.variantStock);
 
   return (
     <div
       className={[
-        'flex gap-3 rounded-medium border border-divider/60 bg-content1 p-3',
+        'cq flex flex-col gap-3 rounded-medium border border-divider/60 bg-content1 p-3 @sm:flex-row',
         isUnavailable ? 'opacity-60' : '',
       ].join(' ')}
     >
@@ -74,14 +72,14 @@ export function CartLineRow({
       </Link>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex flex-col gap-1 @sm:flex-row @sm:items-start @sm:justify-between @sm:gap-2">
           <Link
             to={`/products/${line.productSlug}`}
             className="line-clamp-2 text-sm font-medium leading-tight text-foreground hover:underline"
           >
             {name}
           </Link>
-          <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
+          <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground @sm:text-end">
             {formatCurrency(line.lineTotal, lang)}
           </span>
         </div>
@@ -111,49 +109,46 @@ export function CartLineRow({
           <p className="text-xs text-danger">{t('cart.line.unavailable')}</p>
         ) : null}
 
-        <div className="mt-1 flex items-center justify-between gap-2">
-          <div className="flex items-center rounded-medium border border-divider/60">
-            <Button
-              isIconOnly
-              variant="ghost"
-              size="sm"
-              onPress={() => onUpdate(line.quantity - 1)}
-              isDisabled={!canDecrement || isMutating}
-              aria-label={t('cart.line.decreaseQuantity')}
-              className="rounded-e-none"
-            >
-              <Minus className="size-3.5" aria-hidden />
-            </Button>
-            <span
-              className="min-w-8 px-1 text-center text-sm tabular-nums"
-              aria-live="polite"
-            >
-              {line.quantity}
-            </span>
-            <Button
-              isIconOnly
-              variant="ghost"
-              size="sm"
-              onPress={() => onUpdate(line.quantity + 1)}
-              isDisabled={!canIncrement || isMutating}
-              aria-label={t('cart.line.increaseQuantity')}
-              className="rounded-s-none"
-            >
-              <Plus className="size-3.5" aria-hidden />
-            </Button>
-          </div>
-
-          <Button
-            isIconOnly
-            variant="ghost"
-            size="sm"
-            onPress={onRemove}
-            isDisabled={isMutating}
-            aria-label={t('cart.line.remove')}
-            className="text-default-500 hover:text-danger"
+        <div className="mt-1 flex flex-col gap-2 @sm:flex-row @sm:items-center @sm:justify-between">
+          <NumberField
+            value={line.quantity}
+            minValue={1}
+            maxValue={maxQuantity}
+            step={1}
+            isDisabled={isMutating || isUnavailable}
+            onChange={(next) => {
+              if (Number.isFinite(next) && next !== line.quantity) onUpdate(next);
+            }}
+            variant="secondary"
+            className="w-full @sm:w-28"
+            aria-label={t('cart.line.increaseQuantity')}
           >
-            <Trash2 className="size-4" aria-hidden />
-          </Button>
+            <Label className="sr-only">{t('cart.line.increaseQuantity')}</Label>
+            <NumberField.Group>
+              <NumberField.DecrementButton aria-label={t('cart.line.decreaseQuantity')}>
+                <Minus className="size-3.5" aria-hidden />
+              </NumberField.DecrementButton>
+              <NumberField.Input className="tabular-nums" />
+              <NumberField.IncrementButton aria-label={t('cart.line.increaseQuantity')}>
+                <Plus className="size-3.5" aria-hidden />
+              </NumberField.IncrementButton>
+            </NumberField.Group>
+          </NumberField>
+
+          <Tooltip>
+            <Button
+              isIconOnly
+              variant="ghost"
+              size="sm"
+              onPress={onRemove}
+              isDisabled={isMutating}
+              aria-label={t('cart.line.remove')}
+              className="text-default-500 hover:text-danger self-start @sm:self-auto"
+            >
+              <Trash2 className="size-4" aria-hidden />
+            </Button>
+            <Tooltip.Content placement="top">{t('cart.line.remove')}</Tooltip.Content>
+          </Tooltip>
         </div>
       </div>
     </div>

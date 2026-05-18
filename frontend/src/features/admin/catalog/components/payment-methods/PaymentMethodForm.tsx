@@ -163,7 +163,7 @@ export function PaymentMethodForm(props: Props) {
       </div>
 
       <div className="flex gap-2">
-        <Button type="submit" variant="primary" size="sm" isDisabled={props.isPending}>
+        <Button type="submit" variant="primary" size="sm" isPending={props.isPending}>
           {props.isPending
             ? isCreate
               ? t('admin.catalog.actions.creating')

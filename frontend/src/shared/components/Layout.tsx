@@ -4,10 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { DowntimeBanner } from './DowntimeBanner';
 import { ForbiddenBanner } from './ForbiddenBanner';
 import { Header } from './Header';
+import { LiveRegion } from './LiveRegion';
 
 /**
  * Global app shell — Header + outlet for route content. Consistent gutter
- * scale per DESIGN_PRINCIPLES §2 (px-4 / md:px-6 / lg:px-8). One container,
+ * scale per DESIGN_PRINCIPLES section 2 (px-4 / md:px-6 / lg:px-8). One container,
  * no nested cards.
  */
 export function Layout() {
@@ -30,6 +31,7 @@ export function Layout() {
       <footer className="border-t border-divider/60 py-6 text-center text-xs text-muted">
         {t('common.footer.copyright', { year: new Date().getFullYear() })}
       </footer>
+      <LiveRegion />
     </div>
   );
 }

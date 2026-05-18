@@ -12,6 +12,13 @@ An online store for medical scrubs and uniforms, built for the Egyptian market. 
 ## Project structure
 
 ```
+backend/
+  src/DrMirror.Api/      ASP.NET Core 10 — vertical slices under /Features
+  tests/DrMirror.Tests/  xUnit
+frontend/
+  public/fonts/          Self-hosted WOFF2 variable fonts
+  src/                   App, providers, features, shared, locales, styles
+```
 
 ## Documentation
 
@@ -21,14 +28,6 @@ An online store for medical scrubs and uniforms, built for the Egyptian market. 
 - [Backup and Restore](docs/BACKUP_RESTORE.md)
 - [Threat Model](docs/THREAT_MODEL.md)
 - [Redesign Audit](docs/REDESIGN_AUDIT.md)
-
-backend/
-  src/DrMirror.Api/      ASP.NET Core 10 — vertical slices under /Features
-  tests/DrMirror.Tests/  xUnit
-frontend/
-  public/fonts/          Self-hosted WOFF2 variable fonts
-  src/                   App, providers, features, shared, locales, styles
-```
 
 ## Quick start
 

@@ -47,7 +47,7 @@ export function AdminHubPage() {
   const proofQueueCount = stats?.countsByStatus[ORDER_STATUSES.PendingPaymentReview] ?? 0;
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">{t('admin.hub.title')}</h1>
         <p className="text-sm text-default-500">{t('admin.hub.subtitle')}</p>
@@ -123,15 +123,17 @@ export function AdminHubPage() {
                   />
                 </span>
               </Link>
-              <dl className="divide-y divide-divider/60">
-                {KPI_STATUSES.map(({ key, status }) => (
-                  <StatusRow
-                    key={key}
-                    label={t(`admin.hub.kpis.${key}`)}
-                    value={stats.countsByStatus[status] ?? 0}
-                  />
-                ))}
-              </dl>
+              <div className="cq p-3">
+                <dl className="grid gap-2 @md:grid-cols-2 @lg:grid-cols-4">
+                  {KPI_STATUSES.map(({ key, status }) => (
+                    <StatusRow
+                      key={key}
+                      label={t(`admin.hub.kpis.${key}`)}
+                      value={stats.countsByStatus[status] ?? 0}
+                    />
+                  ))}
+                </dl>
+              </div>
             </div>
           </div>
 
@@ -142,11 +144,11 @@ export function AdminHubPage() {
                 <div className="h-32 animate-pulse rounded-large border border-divider/60 bg-content1" />
               ) : recentOrders.length === 0 ? (
                 <div className="rounded-large border border-divider/60 bg-content1 p-6 text-center">
-                  <Inbox className="mx-auto mb-2 size-6 text-default-400" aria-hidden />
-                  <p className="text-sm text-default-500">{t('admin.hub.recent.empty')}</p>
+                  <Inbox className="enter-fade-up mx-auto mb-2 size-6 text-default-400" aria-hidden />
+                  <p className="enter-fade-up text-sm text-default-500">{t('admin.hub.recent.empty')}</p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2" aria-busy={recentQuery.isFetching}>
                   {recentOrders.slice(0, 5).map((o) => (
                     <Link
                       key={o.orderNumber}
@@ -201,9 +203,9 @@ function StatusRow({
   value: number;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 px-4 py-3">
+    <div className="rounded-medium border border-divider/60 bg-content2/40 p-3">
       <dt className="text-sm text-default-500">{label}</dt>
-      <dd className="text-sm font-medium text-foreground tabular-nums">
+      <dd className="mt-1 text-sm font-medium text-foreground tabular-nums">
         {value}
       </dd>
     </div>

@@ -1,3 +1,4 @@
+import { Tooltip } from '@heroui/react';
 import { Package, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +31,7 @@ export function AdminProductsListPage() {
   const products = useAdminProductsQuery({ q: q || undefined, categoryId, gender, published, page });
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-8">
       <header className="flex items-center justify-between gap-3">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">
@@ -121,7 +122,7 @@ export function AdminProductsListPage() {
       ) : (
         <div className="space-y-4">
           <div className="overflow-hidden rounded-large border border-divider/60">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" aria-busy={products.isFetching}>
               <thead>
                 <tr className="bg-content2">
                   <th scope="col" className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">
@@ -179,14 +180,19 @@ export function AdminProductsListPage() {
                       {formatCurrency(p.price, lang)}
                     </td>
                     <td className="px-4 py-3 text-end">
-                      <LinkButton
-                        to={`/admin/products/${p.id}/edit`}
-                        aria-label={t('admin.catalog.actions.edit')}
-                        tone="outline"
-                        size="sm"
-                      >
-                        <Pencil className="size-4" aria-hidden />
-                      </LinkButton>
+                      <Tooltip delay={300} closeDelay={0}>
+                        <LinkButton
+                          to={`/admin/products/${p.id}/edit`}
+                          aria-label={t('admin.catalog.actions.edit')}
+                          tone="outline"
+                          size="sm"
+                        >
+                          <Pencil className="size-4" aria-hidden />
+                        </LinkButton>
+                        <Tooltip.Content placement="top">
+                          {t('admin.catalog.actions.edit')}
+                        </Tooltip.Content>
+                      </Tooltip>
                     </td>
                   </tr>
                 ))}

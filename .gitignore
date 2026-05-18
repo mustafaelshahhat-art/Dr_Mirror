@@ -91,3 +91,20 @@ design-system-migration-plan.md
 .opencode/commands/speckit.specify.md
 .opencode/commands/speckit.tasks.md
 .opencode/commands/speckit.taskstoissues.md
+
+# --- Browser automation guard (no Playwright/Cypress/etc. in this repo) ---
+# Screenshot capture is external — these patterns prevent accidental local
+# artifacts from being committed if an external tool is run from inside the
+# repo. The rule itself is documented in docs/screenshots/README.md.
+playwright.config.*
+playwright-report/
+test-results/
+/e2e/
+**/*.spec.ts-snapshots/
+**/*.test.ts-snapshots/
+
+# --- Screenshot capture baseline (external tool writes here) ---
+# Full-capture PNGs + report are produced by drmirror-screenshooter and
+# not tracked in this repo. Per-phase PNGs under phase-A/, phase-B/, ...
+# remain committable.
+docs/screenshots/uiux-pass/full-capture/

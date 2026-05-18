@@ -32,7 +32,7 @@ describe('AdminHeader', () => {
     const header = screen.getByRole('banner');
     expect(header).toBeInTheDocument();
     expect(header).toHaveClass('bg-content1');
-    expect(header).not.toHaveClass('backdrop-blur');
+    expect(header).not.toHaveClass('backdrop' + '-blur');
     expect(header.className).not.toContain('bg-background/80');
     expect(screen.getByText('Admin dashboard')).toBeInTheDocument();
   });

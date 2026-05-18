@@ -44,7 +44,7 @@ export function ForbiddenBanner() {
   return (
     <div
       role="alert"
-      className="flex items-center gap-2 border-b border-warning/30 bg-warning/10 px-4 py-2 text-sm text-warning"
+      className="enter-fade-down flex items-center gap-2 border-b border-warning/30 bg-warning/10 px-4 py-2 text-sm text-warning"
     >
       <AlertTriangle size={16} aria-hidden className="shrink-0" />
       <span className="flex-1">{msg}</span>

@@ -17,6 +17,7 @@ import { InquiryForm } from '../inquiries/components/InquiryForm';
 import { ColorPicker } from './components/ColorPicker';
 import { GenderChip } from './components/GenderChip';
 import { ProductImageGallery } from './components/ProductImageGallery';
+import { ProductInfoTabs } from './components/ProductInfoTabs';
 import { SizePicker } from './components/SizePicker';
 import {
   useLocalizedDescription,
@@ -83,7 +84,7 @@ export function ProductDetailPage() {
       );
     }
     return (
-      <div className="space-y-4 rounded-large border border-divider/60 bg-content1 p-10 text-center">
+      <div className="enter-fade-up space-y-4 rounded-large border border-divider/60 bg-content1 p-10 text-center">
         <PackageX className="mx-auto size-6 text-default-400" aria-hidden />
         <h1 className="text-lg font-semibold">
           {t('catalog.detail.notFoundTitle')}
@@ -101,7 +102,7 @@ export function ProductDetailPage() {
   }
 
   return (
-    <article className="space-y-6">
+    <article className="space-y-8">
       <Link
         to="/"
         className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
@@ -149,42 +150,29 @@ export function ProductDetailPage() {
             />
           ) : null}
 
-          <dl className="grid grid-cols-2 gap-3 rounded-large border border-divider/60 bg-content1 p-4 text-sm sm:grid-cols-3">
-            {product.brand ? (
-              <Field label={t('catalog.detail.brand')} value={product.brand} />
-            ) : null}
-            {product.material ? (
-              <Field label={t('catalog.detail.material')} value={product.material} />
-            ) : null}
-            {variantSelection.selectedVariant ? (
-              <Field
-                label={t('catalog.detail.skuVariant')}
-                value={variantSelection.selectedVariant.sku}
-              />
-            ) : product.sku ? (
-              <Field label={t('catalog.detail.sku')} value={product.sku} />
-            ) : null}
-            <Field
-              label={t('catalog.detail.availability')}
-              value={
-                variantSelection.selectedVariant
-                  ? variantSelection.selectedVariant.stock > 0
-                    ? t('catalog.detail.stockForVariant', {
-                        count: variantSelection.selectedVariant.stock,
-                        size: variantSelection.selectedVariant.size,
-                        color: isAr
-                          ? variantSelection.selectedVariant.colorNameAr
-                          : variantSelection.selectedVariant.colorName,
-                      })
-                    : t('catalog.detail.stockOut')
-                  : t('catalog.detail.pickVariant')
-              }
-            />
-          </dl>
-
-          <p className="whitespace-pre-line text-sm leading-relaxed text-default-700 dark:text-default-300">
-            {description}
-          </p>
+          <ProductInfoTabs
+            description={description}
+            brand={product.brand}
+            material={product.material}
+            sku={
+              variantSelection.selectedVariant?.sku ??
+              product.sku ??
+              null
+            }
+            availability={
+              variantSelection.selectedVariant
+                ? variantSelection.selectedVariant.stock > 0
+                  ? t('catalog.detail.stockForVariant', {
+                      count: variantSelection.selectedVariant.stock,
+                      size: variantSelection.selectedVariant.size,
+                      color: isAr
+                        ? variantSelection.selectedVariant.colorNameAr
+                        : variantSelection.selectedVariant.colorName,
+                    })
+                  : t('catalog.detail.stockOut')
+                : t('catalog.detail.pickVariant')
+            }
+          />
 
           {(() => {
             const v = variantSelection.selectedVariant;
@@ -314,11 +302,3 @@ export function ProductDetailPage() {
   );
 }
 
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className="text-xs uppercase tracking-wide text-default-500">{label}</dt>
-      <dd className="mt-0.5 text-sm font-medium text-foreground">{value}</dd>
-    </div>
-  );
-}

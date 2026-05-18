@@ -100,7 +100,7 @@ export function LoginPage() {
           type="submit"
           variant="primary"
           fullWidth
-          isDisabled={isSubmitting}
+          isPending={isSubmitting}
           className="mt-2"
         >
           {isSubmitting ? t('auth.signingIn') : t('auth.signIn')}

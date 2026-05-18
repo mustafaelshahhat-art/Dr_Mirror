@@ -29,7 +29,7 @@ export function OrdersListPage() {
 
   if (query.isLoading) {
     return (
-      <section className="space-y-5" aria-busy="true" aria-label={t('orders.list.loading')}>
+      <section className="space-y-8" aria-busy="true" aria-label={t('orders.list.loading')}>
         <header className="space-y-2">
           <Skeleton className="h-7 w-1/3" />
           <Skeleton className="h-4 w-2/3" />
@@ -58,7 +58,7 @@ export function OrdersListPage() {
   const orders = query.data?.items ?? [];
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">{t('orders.list.title')}</h1>
         <p className="text-sm text-default-500">{t('orders.list.subtitle')}</p>
@@ -66,9 +66,9 @@ export function OrdersListPage() {
 
       {orders.length === 0 ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Package className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <h2 className="text-base font-semibold">{t('orders.list.empty.title')}</h2>
-          <p className="mt-1 text-sm text-default-500">{t('orders.list.empty.subtitle')}</p>
+          <Package className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <h2 className="enter-fade-up text-base font-semibold">{t('orders.list.empty.title')}</h2>
+          <p className="enter-fade-up mt-1 text-sm text-default-500">{t('orders.list.empty.subtitle')}</p>
           <LinkButton
             to="/"
             className="mt-4"
@@ -77,7 +77,7 @@ export function OrdersListPage() {
           </LinkButton>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-2" aria-busy={query.isFetching}>
           {orders.map((order) => (
             <li key={order.id}>
               <Link

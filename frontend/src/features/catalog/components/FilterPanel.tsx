@@ -1,4 +1,4 @@
-import { Button, Input, Label, TextField } from '@heroui/react';
+import { Accordion, Button, Input, Label, TextField } from '@heroui/react';
 import type { KeyboardEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { SlidersHorizontal, X } from 'lucide-react';
@@ -45,6 +45,16 @@ export function FilterPanel({
     filter.minPrice !== undefined,
     filter.maxPrice !== undefined,
   ].filter(Boolean).length;
+
+  const defaultExpandedKeys = [
+    filter.gender !== undefined ? 'gender' : null,
+    filter.size ? 'size' : null,
+    filter.color ? 'color' : null,
+    filter.minPrice !== undefined || filter.maxPrice !== undefined ? 'price' : null,
+  ].filter((key): key is string => key !== null);
+  const expandedKeys = defaultExpandedKeys.length > 0
+    ? defaultExpandedKeys
+    : ['gender', 'size', 'color', 'price'];
 
   // Gender radiogroup: "all" + the three concrete genders, in DOM order.
   const genderOptions: (ProductGender | undefined)[] = [undefined, ...GENDERS];
@@ -110,86 +120,111 @@ export function FilterPanel({
       </div>
 
       {open ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-4">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Gender */}
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium text-default-500">{t('catalog.filters.genderLabel')}</p>
-              <div
-                className="flex flex-wrap gap-1.5"
-                role="radiogroup"
-                aria-label={t('catalog.filters.genderLabel')}
-                onKeyDown={handleGenderKeyDown}
-              >
-                <GenderPill
-                  label={t('catalog.filters.allGenders')}
-                  selected={filter.gender === undefined}
-                  tabIndex={genderIdx === 0 ? 0 : (genderIdx === -1 ? 0 : -1)}
-                  onClick={() => onGenderChange(undefined)}
+        <Accordion
+          allowsMultipleExpanded
+          defaultExpandedKeys={expandedKeys}
+          className="rounded-large border border-divider/60 bg-content1"
+        >
+          <Accordion.Item id="gender">
+            <Accordion.Heading>
+              <Accordion.Trigger>{t('catalog.filters.genderLabel')}</Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel>
+              <Accordion.Body className="pt-0">
+                <div
+                  className="flex flex-wrap gap-1.5"
+                  role="radiogroup"
+                  aria-label={t('catalog.filters.genderLabel')}
+                  onKeyDown={handleGenderKeyDown}
+                >
+                  <GenderPill
+                    label={t('catalog.filters.allGenders')}
+                    selected={filter.gender === undefined}
+                    tabIndex={genderIdx === 0 ? 0 : (genderIdx === -1 ? 0 : -1)}
+                    onClick={() => onGenderChange(undefined)}
+                  />
+                  {GENDERS.map((g, i) => {
+                    const isSel = filter.gender === g;
+                    return (
+                      <GenderPill
+                        key={g}
+                        label={t(genderTranslationKey(g))}
+                        selected={isSel}
+                        tabIndex={genderIdx === i + 1 ? 0 : -1}
+                        onClick={() => onGenderChange(filter.gender === g ? undefined : g)}
+                      />
+                    );
+                  })}
+                </div>
+              </Accordion.Body>
+            </Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item id="size">
+            <Accordion.Heading>
+              <Accordion.Trigger>{t('catalog.filters.sizeLabel')}</Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel>
+              <Accordion.Body className="pt-0">
+                <DebouncedInput
+                  label={t('catalog.filters.sizeLabel')}
+                  value={filter.size ?? ''}
+                  onCommit={onSizeChange}
+                  placeholder={t('catalog.filters.sizePlaceholder')}
                 />
-                {GENDERS.map((g, i) => {
-                  const isSel = filter.gender === g;
-                  return (
-                    <GenderPill
-                      key={g}
-                      label={t(genderTranslationKey(g))}
-                      selected={isSel}
-                      tabIndex={genderIdx === i + 1 ? 0 : -1}
-                      onClick={() => onGenderChange(filter.gender === g ? undefined : g)}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Size */}
-            <DebouncedInput
-              label={t('catalog.filters.sizeLabel')}
-              value={filter.size ?? ''}
-              onCommit={onSizeChange}
-              placeholder={t('catalog.filters.sizePlaceholder')}
-            />
-
-            {/* Color */}
-            <DebouncedInput
-              label={t('catalog.filters.colorLabel')}
-              value={filter.color ?? ''}
-              onCommit={onColorChange}
-              placeholder={t('catalog.filters.colorPlaceholder')}
-            />
-
-            {/* Price range */}
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium text-default-500">
+              </Accordion.Body>
+            </Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item id="color">
+            <Accordion.Heading>
+              <Accordion.Trigger>{t('catalog.filters.colorLabel')}</Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel>
+              <Accordion.Body className="pt-0">
+                <DebouncedInput
+                  label={t('catalog.filters.colorLabel')}
+                  value={filter.color ?? ''}
+                  onCommit={onColorChange}
+                  placeholder={t('catalog.filters.colorPlaceholder')}
+                />
+              </Accordion.Body>
+            </Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item id="price">
+            <Accordion.Heading>
+              <Accordion.Trigger>
                 {t('catalog.filters.minPriceLabel')} / {t('catalog.filters.maxPriceLabel')}
-              </p>
-              <div className="flex items-end gap-2">
-                <DebouncedInput
-                  hideLabel
-                  label={t('catalog.filters.minPriceLabel')}
-                  value={filter.minPrice !== undefined ? String(filter.minPrice) : ''}
-                  onCommit={onMinPriceChange}
-                  placeholder={t('catalog.filters.minPriceLabel')}
-                  type="number"
-                  min="0"
-                  className="flex-1"
-                />
-                {/* eslint-disable-next-line i18next/no-literal-string -- decorative en dash, same glyph in all locales */}
-<span className="pb-2 text-default-400" aria-hidden>–</span>
-                <DebouncedInput
-                  hideLabel
-                  label={t('catalog.filters.maxPriceLabel')}
-                  value={filter.maxPrice !== undefined ? String(filter.maxPrice) : ''}
-                  onCommit={onMaxPriceChange}
-                  placeholder={t('catalog.filters.maxPriceLabel')}
-                  type="number"
-                  min="0"
-                  className="flex-1"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+              </Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel>
+              <Accordion.Body className="pt-0">
+                <div className="flex items-end gap-2">
+                  <DebouncedInput
+                    hideLabel
+                    label={t('catalog.filters.minPriceLabel')}
+                    value={filter.minPrice !== undefined ? String(filter.minPrice) : ''}
+                    onCommit={onMinPriceChange}
+                    placeholder={t('catalog.filters.minPriceLabel')}
+                    type="number"
+                    min="0"
+                    className="flex-1"
+                  />
+                  {/* eslint-disable-next-line i18next/no-literal-string -- decorative en dash, same glyph in all locales */}
+                  <span className="pb-2 text-default-400" aria-hidden>–</span>
+                  <DebouncedInput
+                    hideLabel
+                    label={t('catalog.filters.maxPriceLabel')}
+                    value={filter.maxPrice !== undefined ? String(filter.maxPrice) : ''}
+                    onCommit={onMaxPriceChange}
+                    placeholder={t('catalog.filters.maxPriceLabel')}
+                    type="number"
+                    min="0"
+                    className="flex-1"
+                  />
+                </div>
+              </Accordion.Body>
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
       ) : null}
     </div>
   );
@@ -207,6 +242,7 @@ function GenderPill({
   tabIndex: number;
 }) {
   return (
+    // intentional: raw <button role="radio"> keeps the RAC radiogroup pattern per DESIGN.md.
     <button
       type="button"
       role="radio"
@@ -250,7 +286,7 @@ function DebouncedInput({
 }: DebouncedInputProps) {
   const [draft, setDraft] = useState(value);
 
-  // Sync external resets (e.g. clear-all sets filter.size to undefined → value='').
+  // Sync external resets (e.g. clear-all sets filter.size to undefined, value='').
   useEffect(() => {
     const h = window.setTimeout(() => setDraft(value), 0);
     return () => window.clearTimeout(h);

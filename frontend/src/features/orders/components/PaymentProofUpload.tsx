@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Button, ProgressBar } from '@heroui/react';
 import { UploadCloud } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -73,7 +73,7 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
     if (!selected) return;
     try {
       await upload.mutateAsync(selected);
-      // Reset local state on success — the mutation hook already invalidated.
+      // Reset local state on success; the mutation hook already invalidated.
       if (previewUrl) URL.revokeObjectURL(previewUrl);
       setPreviewUrl(null);
       setSelected(null);
@@ -107,7 +107,8 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
       >
         <UploadCloud className="size-5 text-default-500" aria-hidden />
         <span>{selected ? selected.name : t('orders.upload.pickFile')}</span>
-        {/* Documented exception (audit §1.8): HeroUI v3 has no native file-input
+        {/* intentional: HeroUI v3 has no file input; see DESIGN.md */}
+        {/* Documented exception (audit section 1.8): HeroUI v3 has no native file-input
             primitive. The visible affordance is the styled <label> above; the
             <input type="file"> is sr-only and only handles the OS file picker. */}
         <input
@@ -155,6 +156,18 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
           </Button>
         ) : null}
       </div>
+
+      {upload.isPending ? (
+        <ProgressBar
+          isIndeterminate
+          size="sm"
+          aria-label={t('orders.upload.uploading')}
+        >
+          <ProgressBar.Track>
+            <ProgressBar.Fill />
+          </ProgressBar.Track>
+        </ProgressBar>
+      ) : null}
     </section>
   );
 }

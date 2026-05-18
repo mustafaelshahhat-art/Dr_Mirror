@@ -1,4 +1,4 @@
-import { Button, Form } from '@heroui/react';
+import { Button, Form, Label, NumberField, Tooltip } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -111,9 +111,12 @@ function VariantRow({
         <span className="text-sm tabular-nums">
           {t('admin.products.variants.stock', { count: variant.stock })}
         </span>
-        <Button isIconOnly variant="ghost" size="md" onPress={onEdit} aria-label={t('admin.catalog.actions.edit')}>
-          <Pencil className="size-4" aria-hidden />
-        </Button>
+        <Tooltip>
+          <Button isIconOnly variant="ghost" size="md" onPress={onEdit} aria-label={t('admin.catalog.actions.edit')}>
+            <Pencil className="size-4" aria-hidden />
+          </Button>
+          <Tooltip.Content placement="top">{t('admin.catalog.actions.edit')}</Tooltip.Content>
+        </Tooltip>
         <Button
           variant="ghost"
           size="sm"
@@ -196,6 +199,7 @@ function VariantForm({
         <SimpleField label={t('admin.products.variants.colorNameAr')} value={colorNameAr} onChange={setColorNameAr} required maxLength={60} />
         <label className="space-y-1 text-sm">
           <span className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.variants.hex')}</span>
+          {/* intentional: HeroUI v3 has no color input — see DESIGN.md */}
           <input
             type="color"
             value={colorHex}
@@ -204,21 +208,26 @@ function VariantForm({
           />
         </label>
         <SimpleField label={t('admin.products.variants.sku')} value={sku} onChange={setSku} required maxLength={64} dir="ltr" />
-        <label className="space-y-1 text-sm">
-          <span className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.variants.stockLabel')}</span>
-          <input
-            type="number"
-            min={0}
-            max={1_000_000}
-            value={stock}
-            onChange={(e) => setStock(Number.parseInt(e.target.value, 10) || 0)}
-            className="w-full rounded-medium border border-divider bg-background px-3 py-1.5 text-sm tabular-nums"
-          />
-        </label>
+        <NumberField
+          value={stock}
+          minValue={0}
+          maxValue={1_000_000}
+          step={1}
+          onChange={(next) => setStock(next ?? 0)}
+          variant="secondary"
+          className="text-sm"
+        >
+          <Label className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.variants.stockLabel')}</Label>
+          <NumberField.Group>
+            <NumberField.DecrementButton />
+            <NumberField.Input className="tabular-nums" />
+            <NumberField.IncrementButton />
+          </NumberField.Group>
+        </NumberField>
       </div>
       {error ? <p className="text-xs text-danger">{error}</p> : null}
       <div className="flex gap-2">
-        <Button type="submit" variant="primary" size="sm" isDisabled={inFlight}>
+        <Button type="submit" variant="primary" size="sm" isPending={inFlight}>
           {inFlight
             ? t('admin.catalog.actions.saving')
             : mode === 'create'

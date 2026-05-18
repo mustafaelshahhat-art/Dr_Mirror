@@ -62,7 +62,7 @@ function LocaleScope({ children }: { children: ReactNode }) {
 }
 
 /**
- * Provider chain (per architectural plan §3.4, adjusted for HeroUI v3 / RAC):
+ * Provider chain (per architectural plan section 3.4, adjusted for HeroUI v3 / RAC):
  *   ThemeProvider (next-themes, owns html.class)
  *     → RouterProvider (React Aria — connects HeroUI Links to React Router)
  *       → QueryClientProvider

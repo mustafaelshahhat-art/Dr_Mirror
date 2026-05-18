@@ -34,7 +34,7 @@ export function AddressBookPage() {
 
   if (query.isLoading) {
     return (
-      <section className="space-y-5" aria-busy="true" aria-label={t('addresses.loading')}>
+      <section className="space-y-8" aria-busy="true" aria-label={t('addresses.loading')}>
         <header className="space-y-2">
           <Skeleton className="h-7 w-1/3" />
           <Skeleton className="h-4 w-2/3" />
@@ -52,7 +52,7 @@ export function AddressBookPage() {
 
   if (query.isError) {
     return (
-      <section className="space-y-5">
+      <section className="space-y-8">
         <Link
           to="/account"
           className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
@@ -77,7 +77,7 @@ export function AddressBookPage() {
   const isFirstAddress = addresses.length === 0;
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-8">
       <Link
         to="/account"
         className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
@@ -118,11 +118,19 @@ export function AddressBookPage() {
 
       {addresses.length === 0 && !creating ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <MapPin className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="text-sm text-default-500">{t('addresses.empty')}</p>
+          <MapPin className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="enter-fade-up text-sm text-default-500">{t('addresses.empty')}</p>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul
+          className="space-y-2"
+          aria-busy={
+            query.isFetching ||
+            deleteMutation.isPending ||
+            setDefaultMutation.isPending ||
+            updateMutation.isPending
+          }
+        >
           {addresses.map((a) => (
             <li key={a.id}>
               {editingId === a.id ? (

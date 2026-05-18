@@ -1,4 +1,4 @@
-import { Switch } from '@heroui/react';
+import { Switch, Tooltip } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { Users } from 'lucide-react';
 import { useState } from 'react';
@@ -24,7 +24,7 @@ export function AdminUsersPage() {
   });
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">{t('admin.users.title')}</h1>
         <p className="text-sm text-default-500">{t('admin.users.subtitle')}</p>
@@ -60,7 +60,7 @@ export function AdminUsersPage() {
       ) : query.data?.items?.length ? (
         <div className="space-y-4">
           <div className="overflow-x-auto rounded-large border border-divider/60">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" aria-busy={query.isFetching}>
               <thead>
                 <tr className="border-b border-divider/60 bg-content2 text-start">
                   <th scope="col" className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400">
@@ -89,8 +89,8 @@ export function AdminUsersPage() {
         </div>
       ) : (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Users className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="text-sm text-default-500">{t('admin.users.empty')}</p>
+          <Users className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="enter-fade-up text-sm text-default-500">{t('admin.users.empty')}</p>
         </div>
       )}
     </section>
@@ -137,27 +137,32 @@ function UserRow({
       <td className="px-4 py-3">
         <div className="space-y-2">
           <div className="flex flex-wrap gap-2">
-            {ALL_ROLES.map((role) => (
-              <Switch
-                key={role}
-                size="sm"
-                isSelected={user.roles.includes(role)}
-                isDisabled={updateRoles.isPending}
-                onChange={(enabled) => void toggleRole(role, enabled)}
-                className="items-center gap-1.5"
-                aria-label={t('admin.users.roles.toggle', {
-                  role: t(`admin.users.roles.names.${role}`),
-                  name: user.fullName,
-                })}
-              >
-                <Switch.Control>
-                  <Switch.Thumb />
-                </Switch.Control>
-                <Switch.Content className="text-xs font-medium">
-                  {t(`admin.users.roles.names.${role}`)}
-                </Switch.Content>
-              </Switch>
-            ))}
+            {ALL_ROLES.map((role) => {
+              const label = t('admin.users.roles.toggle', {
+                role: t(`admin.users.roles.names.${role}`),
+                name: user.fullName,
+              });
+              return (
+                <Tooltip key={role} delay={300} closeDelay={0}>
+                  <Switch
+                    size="sm"
+                    isSelected={user.roles.includes(role)}
+                    isDisabled={updateRoles.isPending}
+                    onChange={(enabled) => void toggleRole(role, enabled)}
+                    className="items-center gap-1.5"
+                    aria-label={label}
+                  >
+                    <Switch.Control>
+                      <Switch.Thumb />
+                    </Switch.Control>
+                    <Switch.Content className="text-xs font-medium">
+                      {t(`admin.users.roles.names.${role}`)}
+                    </Switch.Content>
+                  </Switch>
+                  <Tooltip.Content placement="top">{label}</Tooltip.Content>
+                </Tooltip>
+              );
+            })}
           </div>
           {error ? (
             <p role="alert" className="max-w-md text-xs text-danger">

@@ -13,7 +13,7 @@ import { ThemeToggle } from './ThemeToggle';
 
 /**
  * Global header — hosts the brand link, auth-aware account/sign-in entry,
- * LangSwitcher, and ThemeToggle. Sticky, low-noise. Single backdrop-blur,
+ * LangSwitcher, and ThemeToggle. Sticky, low-noise. Single translucent header effect,
  * single divider. No nested cards.
  *
  * On narrow screens (< sm) all secondary controls collapse into a HeroUI

@@ -33,7 +33,7 @@ export function AdminPaymentMethodsPage() {
   if (query.isLoading) {
     return (
       <section
-        className="space-y-5"
+        className="space-y-8"
         aria-busy="true"
         aria-label={t('admin.payments.loading')}
       >
@@ -54,7 +54,7 @@ export function AdminPaymentMethodsPage() {
 
   if (query.isError) {
     return (
-      <section className="space-y-5">
+      <section className="space-y-8">
         <header className="flex items-center justify-between gap-3">
           <div className="space-y-1">
             <h1 className="text-2xl font-semibold tracking-tight">{t('admin.payments.title')}</h1>
@@ -80,7 +80,7 @@ export function AdminPaymentMethodsPage() {
   }
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-8">
       <header className="flex items-center justify-between gap-3">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">{t('admin.payments.title')}</h1>
@@ -123,11 +123,19 @@ export function AdminPaymentMethodsPage() {
 
       {methods.length === 0 ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <CreditCard className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="text-sm text-default-500">{t('admin.payments.empty')}</p>
+          <CreditCard className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="enter-fade-up text-sm text-default-500">{t('admin.payments.empty')}</p>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul
+          className="space-y-2"
+          aria-busy={
+            query.isFetching ||
+            createMutation.isPending ||
+            updateMutation.isPending ||
+            toggleMutation.isPending
+          }
+        >
           {methods.map((m) => (
             <li key={m.id}>
               {editingId === m.id ? (

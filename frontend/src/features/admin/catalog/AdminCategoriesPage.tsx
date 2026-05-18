@@ -1,4 +1,4 @@
-import { Button, Form, Input, Label, TextField } from '@heroui/react';
+import { Button, Form, Input, Label, TextField, Tooltip } from '@heroui/react';
 import { isAxiosError } from 'axios';
 import { FolderTree, Pencil, Plus, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useState } from 'react';
@@ -30,7 +30,7 @@ export function AdminCategoriesPage() {
   if (query.isLoading) {
     return (
       <section
-        className="space-y-5"
+        className="space-y-8"
         aria-busy="true"
         aria-label={t('admin.catalog.loading')}
       >
@@ -63,7 +63,7 @@ export function AdminCategoriesPage() {
 
   if (query.isError) {
     return (
-      <section className="space-y-5">
+      <section className="space-y-8">
         <header className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">
             {t('admin.catalog.categories.title')}
@@ -84,7 +84,7 @@ export function AdminCategoriesPage() {
   const categories = query.data ?? [];
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-8">
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">
           {t('admin.catalog.categories.title')}
@@ -117,11 +117,19 @@ export function AdminCategoriesPage() {
 
       {categories.length === 0 ? (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <FolderTree className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="text-sm text-default-500">{t('admin.catalog.categories.empty')}</p>
+          <FolderTree className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
+          <p className="enter-fade-up text-sm text-default-500">{t('admin.catalog.categories.empty')}</p>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul
+          className="space-y-2"
+          aria-busy={
+            query.isFetching ||
+            createMutation.isPending ||
+            updateMutation.isPending ||
+            toggleMutation.isPending
+          }
+        >
           {categories.map((cat) => (
             <li key={cat.id}>
               {editingId === cat.id ? (
@@ -172,46 +180,56 @@ export function AdminCategoriesPage() {
                         ? t('admin.catalog.status.active')
                         : t('admin.catalog.status.inactive')}
                     </span>
-                    <Button
-                      isIconOnly
-                      variant="ghost"
-                      size="md"
-                      onPress={() => setEditingId(cat.id)}
-                      aria-label={t('admin.catalog.actions.edit')}
-                    >
-                      <Pencil className="size-4" aria-hidden />
-                    </Button>
-                    <Button
-                      isIconOnly
-                      variant="ghost"
-                      size="md"
-                      isDisabled={toggleMutation.isPending}
-                      onPress={async () => {
-                        setServerError(null);
-                        try {
-                          await toggleMutation.mutateAsync({
-                            id: cat.id,
-                            activate: !cat.isActive,
-                          });
-                        } catch (err) {
-                          const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
-                          setServerError(
-                            problem?.detail ?? problem?.title ?? t('admin.catalog.errors.unknown'),
-                          );
+                    <Tooltip>
+                      <Button
+                        isIconOnly
+                        variant="ghost"
+                        size="md"
+                        onPress={() => setEditingId(cat.id)}
+                        aria-label={t('admin.catalog.actions.edit')}
+                      >
+                        <Pencil className="size-4" aria-hidden />
+                      </Button>
+                      <Tooltip.Content placement="top">{t('admin.catalog.actions.edit')}</Tooltip.Content>
+                    </Tooltip>
+                    <Tooltip>
+                      <Button
+                        isIconOnly
+                        variant="ghost"
+                        size="md"
+                        isDisabled={toggleMutation.isPending}
+                        onPress={async () => {
+                          setServerError(null);
+                          try {
+                            await toggleMutation.mutateAsync({
+                              id: cat.id,
+                              activate: !cat.isActive,
+                            });
+                          } catch (err) {
+                            const problem = isAxiosError<ProblemDetails>(err) ? err.response?.data : undefined;
+                            setServerError(
+                              problem?.detail ?? problem?.title ?? t('admin.catalog.errors.unknown'),
+                            );
+                          }
+                        }}
+                        aria-label={
+                          cat.isActive
+                            ? t('admin.catalog.actions.deactivate')
+                            : t('admin.catalog.actions.activate')
                         }
-                      }}
-                      aria-label={
-                        cat.isActive
+                      >
+                        {cat.isActive ? (
+                          <ToggleRight className="size-4 text-success" aria-hidden />
+                        ) : (
+                          <ToggleLeft className="size-4 text-default-400" aria-hidden />
+                        )}
+                      </Button>
+                      <Tooltip.Content placement="top">
+                        {cat.isActive
                           ? t('admin.catalog.actions.deactivate')
-                          : t('admin.catalog.actions.activate')
-                      }
-                    >
-                      {cat.isActive ? (
-                        <ToggleRight className="size-4 text-success" aria-hidden />
-                      ) : (
-                        <ToggleLeft className="size-4 text-default-400" aria-hidden />
-                      )}
-                    </Button>
+                          : t('admin.catalog.actions.activate')}
+                      </Tooltip.Content>
+                    </Tooltip>
                   </div>
                 </div>
               )}
@@ -278,7 +296,7 @@ function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
           className="tabular-nums"
         />
       </TextField>
-      <Button type="submit" variant="primary" size="sm" isDisabled={isPending}>
+      <Button type="submit" variant="primary" size="sm" isPending={isPending}>
         <span className="inline-flex items-center gap-1.5">
           <Plus className="size-4" aria-hidden />
           {isPending ? t('admin.catalog.actions.creating') : t('admin.catalog.actions.create')}
@@ -338,7 +356,7 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
           className="tabular-nums"
         />
       </TextField>
-      <Button type="submit" variant="primary" size="sm" isDisabled={isPending}>
+      <Button type="submit" variant="primary" size="sm" isPending={isPending}>
         {isPending ? t('admin.catalog.actions.saving') : t('admin.catalog.actions.save')}
       </Button>
       <Button type="button" variant="ghost" size="sm" onPress={onCancel} isDisabled={isPending}>

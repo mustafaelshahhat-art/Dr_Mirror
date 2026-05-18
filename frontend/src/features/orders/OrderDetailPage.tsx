@@ -12,6 +12,8 @@ import {
   Skeleton,
 } from '../../shared/components/Skeleton';
 
+import { Snippet } from '../../shared/components/Snippet';
+
 import { CancelOrderButton } from './components/CancelOrderButton';
 import { OrderStatusBadge } from './components/OrderStatusBadge';
 import { OrderTimeline } from './components/OrderTimeline';
@@ -31,7 +33,7 @@ export function OrderDetailPage() {
   if (query.isLoading) {
     return (
       <section
-        className="space-y-6"
+        className="space-y-8"
         aria-busy="true"
         aria-label={t('orders.detail.loading')}
       >
@@ -68,7 +70,7 @@ export function OrderDetailPage() {
       );
     }
     return (
-      <div className="space-y-3 rounded-large border border-divider/60 bg-content1 p-10 text-center">
+      <div className="enter-fade-up space-y-3 rounded-large border border-divider/60 bg-content1 p-10 text-center">
         <h1 className="text-lg font-semibold">
           {t('orders.detail.notFoundTitle')}
         </h1>
@@ -96,7 +98,7 @@ export function OrderDetailPage() {
       order.status === ORDER_STATUSES.PendingPaymentReview);
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       <Link
         to="/account/orders"
         className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
@@ -107,7 +109,18 @@ export function OrderDetailPage() {
 
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">{order.orderNumber}</h1>
+          <div className="flex items-center gap-1.5">
+            <h1 className="text-2xl font-semibold tracking-tight">{order.orderNumber}</h1>
+            <Snippet
+              value={order.orderNumber}
+              aria-label={t('orders.paymentInstructions.copy')}
+              text={t('orders.paymentInstructions.copy')}
+              copiedText={t('orders.paymentInstructions.copied')}
+              tooltipPlacement="end"
+            >
+              <span className="sr-only" aria-hidden />
+            </Snippet>
+          </div>
           <p className="text-sm text-default-500">
             {t('orders.detail.subtitle', {
               count: order.items.length,
@@ -128,7 +141,7 @@ export function OrderDetailPage() {
             <PaymentProofsList orderNumber={order.orderNumber} proofs={order.paymentProofs} />
           ) : null}
 
-          <section aria-labelledby="items-heading" className="space-y-2">
+          <section aria-labelledby="items-heading" className="cq space-y-2">
             <h2 id="items-heading" className="text-sm font-semibold text-foreground">
               {t('orders.detail.itemsHeading')}
             </h2>
@@ -139,7 +152,7 @@ export function OrderDetailPage() {
                 return (
                   <li
                     key={item.id}
-                    className="flex gap-3 rounded-medium border border-divider/60 bg-content1 p-3"
+                    className="grid grid-cols-1 gap-3 rounded-medium border border-divider/60 bg-content1 p-3 @md:grid-cols-3 @md:items-start"
                   >
                     <Link
                       to={`/products/${item.productSlug}`}
@@ -189,7 +202,7 @@ export function OrderDetailPage() {
                         {item.sku}
                       </p>
                     </div>
-                    <span className="self-start text-sm font-semibold tabular-nums">
+                    <span className="text-sm font-semibold tabular-nums @md:text-end">
                       {formatCurrency(item.lineTotal, lang)}
                     </span>
                   </li>

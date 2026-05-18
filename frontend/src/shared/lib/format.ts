@@ -6,7 +6,7 @@ import type { AppLang } from './theme-storage';
 
 /**
  * All formatters here emit **Western digits (0–9)** regardless of locale
- * (per A18 / DESIGN_PRINCIPLES §3). Tabular alignment is enforced via the
+ * (per A18 / DESIGN_PRINCIPLES section 3). Tabular alignment is enforced via the
  * body's `font-variant-numeric: tabular-nums` rule in globals.css.
  *
  * If a future requirement reverses this decision, change `DIGIT_LOCALE` here.

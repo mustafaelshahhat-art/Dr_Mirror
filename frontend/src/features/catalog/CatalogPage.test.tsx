@@ -42,7 +42,7 @@ describe('CatalogPage — filter panel', () => {
     renderWithProviders(<CatalogPage />);
     const btn = await screen.findByRole('button', { name: /filters/i });
     await user.click(btn);
-    expect(screen.getByLabelText(/size/i)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /size/i })).toBeInTheDocument();
   });
 
   it('calls listProducts with gender param when a gender chip is selected', async () => {
