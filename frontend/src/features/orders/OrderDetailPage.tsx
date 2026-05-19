@@ -1,3 +1,4 @@
+import { Card } from '@heroui/react';
 import { ArrowLeft, ImageOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
@@ -150,61 +151,62 @@ export function OrderDetailPage() {
                 const name = isAr ? item.nameAr : item.nameEn;
                 const colorName = isAr ? item.colorNameAr : item.colorName;
                 return (
-                  <li
-                    key={item.id}
-                    className="grid grid-cols-1 gap-3 rounded-medium border border-divider/60 bg-content1 p-3 @md:grid-cols-3 @md:items-start"
-                  >
-                    <Link
-                      to={`/products/${item.productSlug}`}
-                      className="size-16 shrink-0 overflow-hidden rounded-medium bg-default-100"
-                    >
-                      {item.primaryImageUrl ? (
-                        <img
-                          src={item.primaryImageUrl}
-                          alt={name}
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div
-                          className="flex h-full w-full items-center justify-center text-default-400"
-                          role="img"
-                          aria-label={t('catalog.detail.noImage')}
+                  <li key={item.id}>
+                    <Card>
+                      <Card.Content className="grid grid-cols-1 gap-3 @md:grid-cols-3 @md:items-start">
+                        <Link
+                          to={`/products/${item.productSlug}`}
+                          className="size-16 shrink-0 overflow-hidden rounded-medium bg-default-100"
                         >
-                          <ImageOff className="size-5" aria-hidden />
+                          {item.primaryImageUrl ? (
+                            <img
+                              src={item.primaryImageUrl}
+                              alt={name}
+                              className="h-full w-full object-cover"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div
+                              className="flex h-full w-full items-center justify-center text-default-400"
+                              role="img"
+                              aria-label={t('catalog.detail.noImage')}
+                            >
+                              <ImageOff className="size-5" aria-hidden />
+                            </div>
+                          )}
+                        </Link>
+                        <div className="min-w-0 flex-1">
+                          <Link
+                            to={`/products/${item.productSlug}`}
+                            className="line-clamp-2 text-sm font-medium hover:underline"
+                          >
+                            {name}
+                          </Link>
+                          <p className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-default-500">
+                            <span className="inline-flex items-center gap-1.5">
+                              <span
+                                className="size-3 rounded-full ring-1 ring-default-200"
+                                style={{ backgroundColor: item.colorHex }}
+                                aria-hidden
+                              />
+                              {colorName}
+                            </span>
+                            <span aria-hidden>·</span>
+                            <span>
+                              {t('orders.detail.sizeLabel')} {item.size}
+                            </span>
+                            <span aria-hidden>·</span>
+                            <span>{t('common.quantityMultiplier', { count: item.quantity })}</span>
+                          </p>
+                          <p className="mt-0.5 text-xs font-mono uppercase tracking-wide text-default-400">
+                            {item.sku}
+                          </p>
                         </div>
-                      )}
-                    </Link>
-                    <div className="min-w-0 flex-1">
-                      <Link
-                        to={`/products/${item.productSlug}`}
-                        className="line-clamp-2 text-sm font-medium hover:underline"
-                      >
-                        {name}
-                      </Link>
-                      <p className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-default-500">
-                        <span className="inline-flex items-center gap-1.5">
-                          <span
-                            className="size-3 rounded-full ring-1 ring-default-200"
-                            style={{ backgroundColor: item.colorHex }}
-                            aria-hidden
-                          />
-                          {colorName}
+                        <span className="text-sm font-semibold tabular-nums @md:text-end">
+                          {formatCurrency(item.lineTotal, lang)}
                         </span>
-                        <span aria-hidden>·</span>
-                        <span>
-                          {t('orders.detail.sizeLabel')} {item.size}
-                        </span>
-                        <span aria-hidden>·</span>
-                        <span>{t('common.quantityMultiplier', { count: item.quantity })}</span>
-                      </p>
-                      <p className="mt-0.5 text-xs font-mono uppercase tracking-wide text-default-400">
-                        {item.sku}
-                      </p>
-                    </div>
-                    <span className="text-sm font-semibold tabular-nums @md:text-end">
-                      {formatCurrency(item.lineTotal, lang)}
-                    </span>
+                      </Card.Content>
+                    </Card>
                   </li>
                 );
               })}
@@ -215,82 +217,88 @@ export function OrderDetailPage() {
             <h2 id="address-heading" className="text-sm font-semibold text-foreground">
               {t('orders.detail.shippingHeading')}
             </h2>
-            <div className="rounded-medium border border-divider/60 bg-content1 p-3 text-sm leading-relaxed">
-              <p className="font-medium">{order.shippingAddress.recipientName}</p>
-              <p className="text-default-700 dark:text-default-300" dir="ltr">
-                {order.shippingAddress.phone}
-              </p>
-              <p className="mt-1 text-default-700 dark:text-default-300">
-                {order.shippingAddress.streetAddress}
-                {order.shippingAddress.apartment
-                  ? `, ${t('checkout.address.apartmentShort')} ${order.shippingAddress.apartment}`
-                  : ''}
-                {order.shippingAddress.floor
-                  ? `, ${t('checkout.address.floorShort')} ${order.shippingAddress.floor}`
-                  : ''}
-              </p>
-              <p className="text-default-700 dark:text-default-300">
-                {order.shippingAddress.city},{' '}
-                {t(
-                  `governorates.${order.shippingAddress.governorate}`,
-                  order.shippingAddress.governorate,
-                )}
-              </p>
-              {order.shippingAddress.landmark ? (
-                <p className="mt-1 text-xs text-default-500">
-                  {t('checkout.address.landmark')}: {order.shippingAddress.landmark}
+            <Card>
+              <Card.Content className="text-sm leading-relaxed">
+                <p className="font-medium">{order.shippingAddress.recipientName}</p>
+                <p className="text-default-700 dark:text-default-300" dir="ltr">
+                  {order.shippingAddress.phone}
                 </p>
-              ) : null}
-              {order.shippingAddress.notes ? (
-                <p className="mt-1 text-xs italic text-default-500">
-                  {order.shippingAddress.notes}
+                <p className="mt-1 text-default-700 dark:text-default-300">
+                  {order.shippingAddress.streetAddress}
+                  {order.shippingAddress.apartment
+                    ? `, ${t('checkout.address.apartmentShort')} ${order.shippingAddress.apartment}`
+                    : ''}
+                  {order.shippingAddress.floor
+                    ? `, ${t('checkout.address.floorShort')} ${order.shippingAddress.floor}`
+                    : ''}
                 </p>
-              ) : null}
-            </div>
+                <p className="text-default-700 dark:text-default-300">
+                  {order.shippingAddress.city},{' '}
+                  {t(
+                    `governorates.${order.shippingAddress.governorate}`,
+                    order.shippingAddress.governorate,
+                  )}
+                </p>
+                {order.shippingAddress.landmark ? (
+                  <p className="mt-1 text-xs text-default-500">
+                    {t('checkout.address.landmark')}: {order.shippingAddress.landmark}
+                  </p>
+                ) : null}
+                {order.shippingAddress.notes ? (
+                  <p className="mt-1 text-xs italic text-default-500">
+                    {order.shippingAddress.notes}
+                  </p>
+                ) : null}
+              </Card.Content>
+            </Card>
           </section>
 
           <CancelOrderButton order={order} />
         </div>
 
-        <aside className="h-fit space-y-4 rounded-large border border-divider/60 bg-content1 p-4 lg:sticky lg:top-20">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
-            {t('orders.detail.summary')}
-          </h2>
-          <dl className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-default-500">{t('orders.detail.subTotal')}</dt>
-              <dd className="tabular-nums">{formatCurrency(order.subTotal, lang)}</dd>
+        <Card className="h-fit lg:sticky lg:top-20">
+          <Card.Header>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
+              {t('orders.detail.summary')}
+            </h2>
+          </Card.Header>
+          <Card.Content className="space-y-4">
+            <dl className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <dt className="text-default-500">{t('orders.detail.subTotal')}</dt>
+                <dd className="tabular-nums">{formatCurrency(order.subTotal, lang)}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-default-500">{t('orders.detail.shipping')}</dt>
+                <dd className="tabular-nums">
+                  {order.shippingFee > 0
+                    ? formatCurrency(order.shippingFee, lang)
+                    : t('orders.detail.freeShipping')}
+                </dd>
+              </div>
+              <div className="flex justify-between border-t border-divider/60 pt-2 text-base font-semibold">
+                <dt>{t('orders.detail.total')}</dt>
+                <dd className="tabular-nums">{formatCurrency(order.total, lang)}</dd>
+              </div>
+            </dl>
+            <div className="border-t border-divider/60 pt-3">
+              <h3 className="text-xs uppercase tracking-wide text-default-500">
+                {t('orders.detail.paymentMethod')}
+              </h3>
+              <p className="mt-1 text-sm font-medium">
+                {isAr ? order.paymentMethodNameAr : order.paymentMethodNameEn}
+              </p>
             </div>
-            <div className="flex justify-between">
-              <dt className="text-default-500">{t('orders.detail.shipping')}</dt>
-              <dd className="tabular-nums">
-                {order.shippingFee > 0
-                  ? formatCurrency(order.shippingFee, lang)
-                  : t('orders.detail.freeShipping')}
-              </dd>
+            <div className="border-t border-divider/60 pt-3">
+              <h3 className="text-xs uppercase tracking-wide text-default-500">
+                {t('orders.detail.timeline')}
+              </h3>
+              <div className="mt-2">
+                <OrderTimeline order={order} />
+              </div>
             </div>
-            <div className="flex justify-between border-t border-divider/60 pt-2 text-base font-semibold">
-              <dt>{t('orders.detail.total')}</dt>
-              <dd className="tabular-nums">{formatCurrency(order.total, lang)}</dd>
-            </div>
-          </dl>
-          <div className="border-t border-divider/60 pt-3">
-            <h3 className="text-xs uppercase tracking-wide text-default-500">
-              {t('orders.detail.paymentMethod')}
-            </h3>
-            <p className="mt-1 text-sm font-medium">
-              {isAr ? order.paymentMethodNameAr : order.paymentMethodNameEn}
-            </p>
-          </div>
-          <div className="border-t border-divider/60 pt-3">
-            <h3 className="text-xs uppercase tracking-wide text-default-500">
-              {t('orders.detail.timeline')}
-            </h3>
-            <div className="mt-2">
-              <OrderTimeline order={order} />
-            </div>
-          </div>
-        </aside>
+          </Card.Content>
+        </Card>
       </div>
     </section>
   );

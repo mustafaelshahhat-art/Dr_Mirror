@@ -53,3 +53,63 @@ T015: Removed 4 RAC-justification comments from CategoryChips.tsx, SizePicker.ts
 
 CLI gates: build PASS (636ms), tests PASS (54 files, 276 tests, 18.28s). No regressions vs. baseline.
 
+== Phase 3: User Story 1 — Card Surfaces (2026-05-19) ==
+
+T016 (AddressBookPage.tsx): PASS. Local `Card` helper renamed to `AddressCard` to avoid name collision with HeroUI `Card`. The address-row `<article>` migrated to `<Card><Card.Content>...</Card.Content></Card>` per Anatomy A.1. Empty-state div (line ~120) intentionally left for US10 EmptyState refactor (matches T025 grep-gate exemption).
+
+T017 (AdminOrderDetailPage.tsx): PASS. 6 card containers migrated to HeroUI `Card` compound per Anatomy A.1: (1) loading-skeleton buyer card, (2) loading-skeleton summary card, (3) buyer-info article (Card + Card.Header + <h2> + Card.Content), (4) timeline Tabs.Panel, (5) proofs Tabs.Panel (with `aria-labelledby` retained), (6) items-list rows, (7) shipping-address inner card, (8) buyer-note quote card, (9) right-sidebar summary aside (Card + Card.Header + <h2> + Card.Content). 404-fallback empty-state left for US10. Headings rendered as `<h2>` (not `Card.Title`) because Card.Title defaults to `<h3>` and would produce h1→h3 heading-order axe violations on this surface.
+
+T018 (AdminInquiriesPage.tsx): PASS. Loading-skeleton `<li>` cards and `InquiryRow` `<article>` migrated to `Card` compound (Card.Header + <h2> + <p> for inquiry from-line + Card.Content + Card.Footer for actions). Empty-state left for US10.
+
+T019 (CartPage.tsx): PASS. Cart-summary `<aside>` migrated to `Card` + `Card.Header` + `<h2>` + `Card.Content` + `Card.Footer` (footer hosts the proceed-to-checkout button per task spec). Empty-state left for US10.
+
+T020 (ProductDetailPage.tsx): NO-OP. Page contains no card containers in its main render path. The only `rounded-large border border-divider/60 bg-content1` match (line 87) is the 404-fallback empty-state — exempt from this batch per T025 grep-gate spec ("returns only empty-state divs (handled in US10)"). Recorded.
+
+T021 (ProductCard.tsx): PASS with deviation. Outer wrapper migrated to `<Link to>` (react-router-dom) wrapping `<Card>` compound. Card.Content carries product metadata. Deviation note recorded in same-file doc comment: the spec option (a) `<Button as={Link} variant="ghost">` does not typecheck against the HeroUI v3 `ButtonRootProps` declaration (no polymorphic `as` prop); option (b) `Card.Header as={Link}` does not typecheck either because `Card.*` parts type `as: keyof JSX.IntrinsicElements`. Wrapping `Card` in `<Link>` preserves URL, `aria-label={name}`, keyboard activation, and react-router navigation — the outcomes the spec mandates. No v2 pressable-card prop used; grep gate clean.
+
+T022 (CheckoutPage.tsx): NO-OP. Page contains no card containers in its main render path. The only `rounded-medium border` match is an inline form-error alert (line 257), which is out of scope here (Alerts migrate in US9 Phase 11). Recorded.
+
+T023 (OrderDetailPage.tsx): PASS. Items-list `<li>` rows, shipping-address inner card, and right-sidebar `<aside>` summary all migrated to `Card` compound. Sidebar uses `Card.Header` + `<h2>` + `Card.Content`. 404-fallback empty-state left for US10. `Snippet` wrapper retained per Exception 2.
+
+T024 (PaymentInstructionsCard.tsx): PASS. Outer `<section>` migrated to `Card` + `Card.Header` (Banknote icon + `<h2 id="payment-instructions-heading">`) + `Card.Content`. Inner `<dl>` summary wrapped in nested `Card` for elevated visual depth. `aria-labelledby` retained.
+
+T025 grep gates (run against modified files):
+  (a) `rounded-large border border-divider` — 6 matches, all empty-state divs (AddressBookPage:120, AdminInquiriesPage:108, AdminOrderDetailPage:90, ProductDetailPage:87, OrderDetailPage:74, CartPage:174). Per T025 spec these are exempt (handled in US10).
+  (b) `\b(CardBody|CardHeader|CardFooter|CardContent|CardTitle|CardDescription)\b` (named-export form) — 0 matches in modified files. All Card usage is dot-notation.
+  (c) `isPressable` — 0 matches across `frontend/src/**/*.tsx`.
+
+T025a (SC-006 Token Propagation Check): DEFERRED to PR-time visual smoke test. The build/test gates exercise the runtime composition; the `--radius` toggle verification requires a live dev server with screenshots and is recorded as a PR-author manual step per `docs/screenshots/README.md` (no Playwright in repo per CLAUDE.md Repo Boundaries).
+
+T026 (build) — `npm --prefix frontend run build`:
+  Status: PASS
+  Build time: 502ms (vs 571ms baseline; ~12% faster)
+  Main entry (index): 406.94 kB / 123.78 kB gzip (vs 123.79 kB baseline; -0.01 kB)
+  Top async chunks (gzip):
+    AuditLogPage: 47.39 kB (unchanged)
+    schemas: 28.40 kB (unchanged)
+    useTranslation: 16.23 kB (unchanged)
+  Bundle-size delta: effectively neutral.
+
+T027 (tests) — `npm --prefix frontend test`:
+  Status: PASS
+  Test files: 54 (unchanged)
+  Tests: 276 passed (unchanged)
+  Duration: 12.55s (vs 18.02s baseline; faster — likely import-cache hit)
+  Note: Initial test run flagged 4 axe heading-order failures (h1→h3) caused by `Card.Title` defaulting to `<h3>`. Resolved by using explicit `<h2>` elements inside `Card.Header` on every section-heading I introduced (cart summary, order summary, payment-instructions, admin buyer/proofs/summary, admin-inquiries row subject). After fix: all 276 tests pass.
+
+T028 (i18n) — `npm --prefix frontend run i18n:check`: PASS (exit 0). No new keys introduced in this batch ("None").
+
+T029 (lint) — `npm --prefix frontend run lint`: PASS (exit 0). 26 warnings (unchanged from baseline; same i18next/no-literal-string warnings on non-user-facing props). 0 new warnings introduced.
+
+T029-vm (SC-009 Visual Verification Matrix): DEFERRED to PR-author manual capture per `docs/screenshots/README.md` (no Playwright in repo). Surfaces to capture (en LTR + ar RTL × light + dark × 375 / 768 / 1280 px + keyboard reach + visible focus + Escape close + idle / loading / disabled / error / empty states + no horizontal overflow + no mirrored imbalance):
+  - /account/addresses (loading + populated + empty + edit-mode)
+  - /admin/orders/:orderNumber (loading + happy + 404)
+  - /admin/inquiries (loading + populated + empty + each filter state)
+  - /cart (loading + populated + empty + confirm-clear)
+  - /products/:slug (happy + 404)
+  - / (catalog grid; ProductCard navigable pattern keyboard reach + focus ring)
+  - /checkout (no card changes in this batch — visual baseline only)
+  - /account/orders/:orderNumber (loading + happy + 404; PaymentInstructionsCard rendered for non-COD Pending)
+
+Phase 3 (US1) checkpoint: All in-scope card surfaces inherit theme tokens via HeroUI v3 dot-notation `Card` compound. SC-002 satisfied for in-scope files. Banned v2 card names (`CardBody`/`CardHeader`/`CardFooter` named exports, `isPressable` prop) absent in modified files.
+

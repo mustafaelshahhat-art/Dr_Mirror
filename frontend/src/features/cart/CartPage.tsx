@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Button, Card } from '@heroui/react';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -134,35 +134,41 @@ export function CartPage() {
             </div>
           </div>
 
-          <aside className="h-fit space-y-4 rounded-large border border-divider/60 bg-content1 p-4 lg:sticky lg:top-20">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
-              {t('cart.summary')}
-            </h2>
-            <dl className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-default-500">{t('cart.subTotal')}</dt>
-                <dd className="tabular-nums">{formatCurrency(cart.subTotal, lang)}</dd>
+          <Card className="h-fit lg:sticky lg:top-20">
+            <Card.Header>
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
+                {t('cart.summary')}
+              </h2>
+            </Card.Header>
+            <Card.Content className="space-y-4">
+              <dl className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <dt className="text-default-500">{t('cart.subTotal')}</dt>
+                  <dd className="tabular-nums">{formatCurrency(cart.subTotal, lang)}</dd>
+                </div>
+                <div className="flex justify-between text-xs text-default-500">
+                  <dt>{t('cart.shippingNote')}</dt>
+                  <dd>{t('cart.calculatedAtCheckout')}</dd>
+                </div>
+              </dl>
+              <div className="border-t border-divider/60 pt-3">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-sm text-default-500">{t('cart.estimatedTotal')}</span>
+                  <span className="text-lg font-semibold tabular-nums text-foreground">
+                    {formatCurrency(cart.subTotal, lang)}
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between text-xs text-default-500">
-                <dt>{t('cart.shippingNote')}</dt>
-                <dd>{t('cart.calculatedAtCheckout')}</dd>
-              </div>
-            </dl>
-            <div className="border-t border-divider/60 pt-3">
-              <div className="flex items-baseline justify-between">
-                <span className="text-sm text-default-500">{t('cart.estimatedTotal')}</span>
-                <span className="text-lg font-semibold tabular-nums text-foreground">
-                  {formatCurrency(cart.subTotal, lang)}
-                </span>
-              </div>
-            </div>
-            <LinkButton
-              to="/checkout"
-              fullWidth
-            >
-              {t('cart.proceedToCheckout')}
-            </LinkButton>
-          </aside>
+            </Card.Content>
+            <Card.Footer>
+              <LinkButton
+                to="/checkout"
+                fullWidth
+              >
+                {t('cart.proceedToCheckout')}
+              </LinkButton>
+            </Card.Footer>
+          </Card>
         </div>
       ) : (
         <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">

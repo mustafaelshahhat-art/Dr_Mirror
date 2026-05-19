@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Button, Card } from '@heroui/react';
 import { ArrowLeft, MapPin, Pencil, Plus, Star, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -145,7 +145,7 @@ export function AddressBookPage() {
                   }}
                 />
               ) : (
-                <Card
+                <AddressCard
                   address={a}
                   onEdit={() => setEditingId(a.id)}
                   onDelete={() => void deleteMutation.mutateAsync(a.id)}
@@ -164,7 +164,7 @@ export function AddressBookPage() {
   );
 }
 
-function Card({
+function AddressCard({
   address: a,
   onEdit,
   onDelete,
@@ -180,79 +180,81 @@ function Card({
   const { t } = useTranslation();
   const localizedGovernorate = t(`governorates.${a.governorate}`, a.governorate);
   return (
-    <article
+    <Card
       className={[
-        'rounded-medium border bg-content1 p-4 transition-colors',
+        'transition-colors',
         a.isDefault ? 'border-primary/40' : 'border-divider/60',
       ].join(' ')}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 space-y-1">
-          <div className="flex items-center gap-2">
-            <h2 className="text-sm font-semibold">{a.label}</h2>
-            {a.isDefault ? (
-              <span className="inline-flex items-center gap-1 rounded-medium border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                <Star className="size-3" aria-hidden />
-                {t('addresses.defaultBadge')}
-              </span>
+      <Card.Content>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 space-y-1">
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-semibold">{a.label}</h2>
+              {a.isDefault ? (
+                <span className="inline-flex items-center gap-1 rounded-medium border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                  <Star className="size-3" aria-hidden />
+                  {t('addresses.defaultBadge')}
+                </span>
+              ) : null}
+            </div>
+            <p className="text-sm font-medium text-foreground">{a.recipientName}</p>
+            <p className="font-mono text-xs text-default-500" dir="ltr">
+              {a.phone}
+            </p>
+            <p className="text-sm text-default-700 dark:text-default-300">
+              {a.streetAddress}
+              {a.apartment ? `, ${t('addresses.apartmentShort')} ${a.apartment}` : ''}
+              {a.floor ? `, ${t('addresses.floorShort')} ${a.floor}` : ''}
+            </p>
+            <p className="text-sm text-default-700 dark:text-default-300">
+              {a.city}, {localizedGovernorate}
+            </p>
+            {a.landmark ? (
+              <p className="text-xs text-default-500">
+                {t('addresses.landmark')}: {a.landmark}
+              </p>
+            ) : null}
+            {a.notes ? (
+              <p className="text-xs italic text-default-500">{a.notes}</p>
             ) : null}
           </div>
-          <p className="text-sm font-medium text-foreground">{a.recipientName}</p>
-          <p className="font-mono text-xs text-default-500" dir="ltr">
-            {a.phone}
-          </p>
-          <p className="text-sm text-default-700 dark:text-default-300">
-            {a.streetAddress}
-            {a.apartment ? `, ${t('addresses.apartmentShort')} ${a.apartment}` : ''}
-            {a.floor ? `, ${t('addresses.floorShort')} ${a.floor}` : ''}
-          </p>
-          <p className="text-sm text-default-700 dark:text-default-300">
-            {a.city}, {localizedGovernorate}
-          </p>
-          {a.landmark ? (
-            <p className="text-xs text-default-500">
-              {t('addresses.landmark')}: {a.landmark}
-            </p>
-          ) : null}
-          {a.notes ? (
-            <p className="text-xs italic text-default-500">{a.notes}</p>
-          ) : null}
-        </div>
-        <div className="flex shrink-0 flex-col gap-1.5">
-          <Button
-            isIconOnly
-            variant="ghost"
-            size="md"
-            onPress={onEdit}
-            aria-label={t('addresses.actions.edit')}
-          >
-            <Pencil className="size-4" aria-hidden />
-          </Button>
-          {!a.isDefault ? (
+          <div className="flex shrink-0 flex-col gap-1.5">
             <Button
               isIconOnly
               variant="ghost"
               size="md"
-              onPress={onSetDefault}
-              isDisabled={isMutating}
-              aria-label={t('addresses.actions.setDefault')}
+              onPress={onEdit}
+              aria-label={t('addresses.actions.edit')}
             >
-              <Star className="size-4" aria-hidden />
+              <Pencil className="size-4" aria-hidden />
             </Button>
-          ) : null}
-          <Button
-            isIconOnly
-            variant="ghost"
-            size="md"
-            onPress={onDelete}
-            isDisabled={isMutating}
-            aria-label={t('addresses.actions.delete')}
-            className="text-default-500 hover:text-danger"
-          >
-            <Trash2 className="size-4" aria-hidden />
-          </Button>
+            {!a.isDefault ? (
+              <Button
+                isIconOnly
+                variant="ghost"
+                size="md"
+                onPress={onSetDefault}
+                isDisabled={isMutating}
+                aria-label={t('addresses.actions.setDefault')}
+              >
+                <Star className="size-4" aria-hidden />
+              </Button>
+            ) : null}
+            <Button
+              isIconOnly
+              variant="ghost"
+              size="md"
+              onPress={onDelete}
+              isDisabled={isMutating}
+              aria-label={t('addresses.actions.delete')}
+              className="text-default-500 hover:text-danger"
+            >
+              <Trash2 className="size-4" aria-hidden />
+            </Button>
+          </div>
         </div>
-      </div>
-    </article>
+      </Card.Content>
+    </Card>
   );
 }
