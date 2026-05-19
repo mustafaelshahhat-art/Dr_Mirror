@@ -93,8 +93,8 @@ function Pill({
       onClick={onClick}
       className={
         selected
-          ? 'shrink-0 rounded-medium bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-          : 'shrink-0 rounded-medium border border-divider/60 bg-content1 px-3 py-1.5 text-xs font-medium text-default-700 transition-colors hover:border-default-400 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-default-300'
+          ? 'shrink-0 rounded-full bg-brand px-3.5 py-1.5 text-xs font-semibold text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand'
+          : 'shrink-0 rounded-full border border-divider/60 bg-surface px-3.5 py-1.5 text-xs font-medium text-default-700 transition-colors hover:border-brand/40 hover:bg-brand/5 hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand dark:text-default-300 dark:hover:border-brand/30 dark:hover:bg-brand/10'
       }
     >
       {children}

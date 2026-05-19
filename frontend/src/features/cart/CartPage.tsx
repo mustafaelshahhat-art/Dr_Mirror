@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Heading, Paragraph, Separator } from '@heroui/react';
+import { Alert, Button, Card, Separator } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
@@ -38,11 +38,11 @@ export function CartPage() {
         {t('cart.backToCatalog')}
       </Link>
 
-      <header className="space-y-1">
-        <Heading className="text-2xl font-semibold tracking-tight">{t('cart.title')}</Heading>
-        <Paragraph className="text-sm text-default-500">
+      <header className="page-header">
+        <h1 className="page-title">{t('cart.title')}</h1>
+        <p className="page-subtitle">
           {t('cart.subtitle', { count: cart.totalQuantity })}
-        </Paragraph>
+        </p>
       </header>
 
       {mergeError ? (
@@ -134,35 +134,33 @@ export function CartPage() {
             </div>
           </div>
 
-          <Card className="h-fit lg:sticky lg:top-20">
-            <Card.Header>
-              <Heading level={2} className="text-sm font-semibold uppercase tracking-wide text-default-600">
+          <Card className="h-fit border border-divider/60 shadow-sm lg:sticky lg:top-20">
+            <Card.Header className="border-b border-divider/40 px-5 pb-3 pt-5">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
                 {t('cart.summary')}
-              </Heading>
+              </h2>
             </Card.Header>
-            <Card.Content className="space-y-4">
+            <Card.Content className="space-y-4 px-5 py-4">
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <dt className="text-default-500">{t('cart.subTotal')}</dt>
+                  <dt className="text-muted">{t('cart.subTotal')}</dt>
                   <dd className="tabular-nums">{formatCurrency(cart.subTotal, lang)}</dd>
                 </div>
-                <div className="flex justify-between text-xs text-default-500">
+                <div className="flex justify-between text-xs text-muted">
                   <dt>{t('cart.shippingNote')}</dt>
                   <dd>{t('cart.calculatedAtCheckout')}</dd>
                 </div>
               </dl>
               {/* Separator per Anatomy A.21; maps border-t border-divider purely-visual separator */}
               <Separator />
-              <div className="pt-3">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-default-500">{t('cart.estimatedTotal')}</span>
-                  <span className="text-lg font-semibold tabular-nums text-foreground">
-                    {formatCurrency(cart.subTotal, lang)}
-                  </span>
-                </div>
+              <div className="flex items-baseline justify-between pt-1">
+                <span className="text-sm font-medium text-muted">{t('cart.estimatedTotal')}</span>
+                <span className="text-xl font-bold tabular-nums text-foreground">
+                  {formatCurrency(cart.subTotal, lang)}
+                </span>
               </div>
             </Card.Content>
-            <Card.Footer>
+            <Card.Footer className="px-5 pb-5 pt-1">
               <Link
                 to="/checkout"
                 className={buttonVariants({ variant: 'primary', fullWidth: true })}

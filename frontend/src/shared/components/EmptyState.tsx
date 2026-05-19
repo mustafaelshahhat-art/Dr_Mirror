@@ -22,15 +22,17 @@ export function EmptyState({
   action,
 }: EmptyStateProps) {
   return (
-    <Card variant="transparent" className="py-16">
-      <Card.Content className="flex flex-col items-center gap-3 text-center">
-        <Icon className="size-12 text-default-300" aria-hidden />
-        <div className="space-y-1">
-          <Heading level={2} className="text-base font-medium text-foreground">{title}</Heading>
-          {subtitle && <Paragraph className="text-sm text-default-500">{subtitle}</Paragraph>}
+    <Card variant="transparent" className="py-14 sm:py-16">
+      <Card.Content className="flex flex-col items-center gap-4 text-center">
+        <div className="flex size-16 items-center justify-center rounded-2xl bg-default-100 dark:bg-default-50/5">
+          <Icon className="size-8 text-default-400" aria-hidden />
+        </div>
+        <div className="space-y-1.5">
+          <Heading level={2} className="text-base font-semibold text-foreground">{title}</Heading>
+          {subtitle && <Paragraph className="mx-auto max-w-xs text-sm leading-relaxed text-muted">{subtitle}</Paragraph>}
         </div>
         {action && (
-          <Button variant="primary" onPress={action.onPress}>
+          <Button variant="primary" onPress={action.onPress} className="mt-1">
             {action.label}
           </Button>
         )}

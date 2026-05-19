@@ -25,11 +25,18 @@ export function Layout() {
       <DowntimeBanner />
       <ForbiddenBanner />
       <Header />
-      <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 md:px-6 lg:px-8">
+      <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 md:px-6 md:py-10 lg:px-8">
         <Outlet />
       </main>
-      <footer className="border-t border-divider/60 py-6 text-center text-xs text-muted">
-        {t('common.footer.copyright', { year: new Date().getFullYear() })}
+      <footer className="border-t border-divider/60 bg-surface-secondary/40">
+        <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row md:px-6 lg:px-8">
+          <span className="text-sm font-semibold tracking-tight text-foreground/70">
+            {t('appName')}
+          </span>
+          <p className="text-xs text-muted">
+            {t('common.footer.copyright', { year: new Date().getFullYear() })}
+          </p>
+        </div>
       </footer>
       <LiveRegion />
     </div>

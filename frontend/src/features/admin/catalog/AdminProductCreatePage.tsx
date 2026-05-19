@@ -72,9 +72,9 @@ export function AdminProductCreatePage() {
         {t('admin.products.create.back')}
       </Link>
 
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('admin.products.create.title')}</h1>
-        <p className="text-sm text-default-500">{t('admin.products.create.subtitle')}</p>
+      <header className="page-header">
+        <h1 className="page-title">{t('admin.products.create.title')}</h1>
+        <p className="page-subtitle">{t('admin.products.create.subtitle')}</p>
       </header>
 
       <Form

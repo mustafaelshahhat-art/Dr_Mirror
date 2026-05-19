@@ -64,13 +64,9 @@ export function AdminCategoriesPage() {
   if (query.isError) {
     return (
       <section className="space-y-8">
-        <header className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {t('admin.catalog.categories.title')}
-          </h1>
-          <p className="text-sm text-default-500">
-            {t('admin.catalog.categories.subtitle')}
-          </p>
+        <header className="page-header">
+          <h1 className="page-title">{t('admin.catalog.categories.title')}</h1>
+          <p className="page-subtitle">{t('admin.catalog.categories.subtitle')}</p>
         </header>
         <QueryErrorState
           message={t('admin.catalog.categories.errorLoad')}
@@ -85,13 +81,9 @@ export function AdminCategoriesPage() {
 
   return (
     <section className="space-y-8">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t('admin.catalog.categories.title')}
-        </h1>
-        <p className="text-sm text-default-500">
-          {t('admin.catalog.categories.subtitle')}
-        </p>
+      <header className="page-header">
+        <h1 className="page-title">{t('admin.catalog.categories.title')}</h1>
+        <p className="page-subtitle">{t('admin.catalog.categories.subtitle')}</p>
       </header>
 
       <CreateCategoryForm

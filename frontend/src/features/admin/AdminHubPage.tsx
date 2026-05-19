@@ -52,9 +52,9 @@ export function AdminHubPage() {
 
   return (
     <section className="space-y-8">
-      <header className="space-y-1">
-        <Heading className="text-2xl font-semibold tracking-tight">{t('admin.hub.title')}</Heading>
-        <p className="text-sm text-default-500">{t('admin.hub.subtitle')}</p>
+      <header className="page-header">
+        <h1 className="page-title">{t('admin.hub.title')}</h1>
+        <p className="page-subtitle">{t('admin.hub.subtitle')}</p>
       </header>
 
       {statsQuery.isLoading ? (
@@ -141,26 +141,30 @@ export function AdminHubPage() {
             </div>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+          <div className="grid gap-6 lg:grid-cols-[1fr_260px]">
             <div className="space-y-3">
-              <Heading level={2} className="text-base font-semibold">{t('admin.hub.recent.heading')}</Heading>
+              <Heading level={2} className="text-sm font-semibold uppercase tracking-wide text-muted">{t('admin.hub.recent.heading')}</Heading>
               {recentQuery.isLoading ? (
                 <Skeleton className="h-32 rounded-large" />
               ) : recentOrders.length === 0 ? (
                 <EmptyState icon={Inbox} title={t('admin.hub.recent.empty')} />
               ) : (
-                <div className="space-y-2" aria-busy={recentQuery.isFetching}>
-                  {recentOrders.slice(0, 5).map((o) => (
+                <div className="content-surface overflow-hidden" aria-busy={recentQuery.isFetching}>
+                  {recentOrders.slice(0, 5).map((o, idx) => (
                     <Link
                       key={o.orderNumber}
                       to={`/admin/orders/${o.orderNumber}`}
-                      className="flex items-center justify-between rounded-medium border border-divider/60 bg-content1 px-4 py-3 text-sm transition-colors hover:bg-content2"
+                      className={[
+                        'flex items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-content2',
+                        idx > 0 ? 'border-t border-divider/40' : '',
+                      ].join(' ')}
                     >
                       <span className="font-medium text-foreground">
                         {o.orderNumber}
                       </span>
-                      <span className="tabular-nums text-default-500">
+                      <span className="flex items-center gap-2 tabular-nums text-muted">
                         {t('admin.list.itemCount', { count: o.itemCount })}
+                        <ChevronRight className="size-3.5 text-default-300 rtl:rotate-180" aria-hidden />
                       </span>
                     </Link>
                   ))}
@@ -168,15 +172,16 @@ export function AdminHubPage() {
               )}
               <Link
                 to="/admin/orders"
-                className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
               >
                 {t('admin.hub.recent.viewAll')}
+                <ChevronRight className="size-3.5 rtl:rotate-180" aria-hidden />
               </Link>
             </div>
 
             <div className="space-y-3">
-              <Heading level={2} className="text-base font-semibold">{t('admin.hub.quickLinks')}</Heading>
-              <div className="space-y-2">
+              <Heading level={2} className="text-sm font-semibold uppercase tracking-wide text-muted">{t('admin.hub.quickLinks')}</Heading>
+              <div className="flex flex-col gap-1.5">
                 <QuickLink to="/admin/orders" icon={ClipboardList} label={t('admin.shell.nav.orders')} />
                 <QuickLink to="/admin/products" icon={Package} label={t('admin.shell.nav.products')} />
                 <QuickLink to="/admin/users" icon={Users} label={t('admin.shell.nav.users')} />
@@ -204,11 +209,9 @@ function StatusRow({
   value: number;
 }) {
   return (
-    <div className="rounded-medium border border-divider/60 bg-content2/40 p-3">
-      <dt className="text-sm text-default-500">{label}</dt>
-      <dd className="mt-1 text-sm font-medium text-foreground tabular-nums">
-        {value}
-      </dd>
+    <div className="stat-card">
+      <dt className="stat-label">{label}</dt>
+      <dd className="stat-value-sm">{value}</dd>
     </div>
   );
 }

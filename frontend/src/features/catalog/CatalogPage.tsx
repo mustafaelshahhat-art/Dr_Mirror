@@ -132,18 +132,17 @@ export function CatalogPage() {
 
   return (
     <div className="space-y-8">
-      {/* Storefront hero — restrained: kicker pill (bone) + tagline as the
-          page's single display heading, no gradient or hero image. Sits at
-          most two screen rows so the catalog stays one scroll away. */}
-      <section className="relative -mx-4 border-b border-divider/60 px-4 py-10 md:-mx-6 md:px-6 md:py-12 lg:-mx-8 lg:px-8 lg:py-14">
+      {/* Storefront hero — restrained: kicker pill + tagline. Full-bleed band.
+          No gradient. Typography is the hero; catalog follows immediately. */}
+      <section className="hero-band">
         <div className="space-y-3">
-          <span className="inline-flex items-center rounded-medium bg-bone px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground/80">
+          <span className="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand">
             {t('appName')}
           </span>
-          <h1 className="max-w-2xl text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+          <h1 className="max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
             {t('tagline')}
           </h1>
-          <p className="max-w-prose text-sm text-default-500 md:text-base">
+          <p className="max-w-prose text-sm leading-relaxed text-muted md:text-base">
             {t('catalog.subtitle')}
           </p>
         </div>
@@ -154,7 +153,7 @@ export function CatalogPage() {
           <div className="flex-1">
             <SearchInput value={filter.q ?? ''} onCommit={setQuery} />
           </div>
-                    <SortSelect value={filter.sort!} onChange={setSort} />
+          <SortSelect value={filter.sort!} onChange={setSort} />
         </div>
 
         {categoriesQuery.data ? (
@@ -185,12 +184,12 @@ export function CatalogPage() {
           onRetry={() => void productsQuery.refetch()}
         />
       ) : items.length === 0 ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <SearchX className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
+        <div className="content-surface py-16 text-center">
+          <SearchX className="enter-fade-up mx-auto mb-4 size-10 text-default-300" aria-hidden />
           <p className="enter-fade-up text-base font-semibold text-foreground">{t('catalog.empty.title')}</p>
-          <p className="enter-fade-up mt-1 text-sm text-default-500">{t('catalog.empty.subtitle')}</p>
+          <p className="enter-fade-up mt-1.5 text-sm text-muted">{t('catalog.empty.subtitle')}</p>
           {hasActiveFilters ? (
-            <Button variant="primary" size="sm" onPress={clearAllFilters} className="mt-4">
+            <Button variant="primary" size="sm" onPress={clearAllFilters} className="mt-5">
               {t('catalog.empty.clearFilters')}
             </Button>
           ) : null}

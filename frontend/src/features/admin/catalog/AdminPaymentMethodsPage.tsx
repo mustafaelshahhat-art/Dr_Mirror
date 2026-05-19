@@ -34,9 +34,9 @@ export function AdminPaymentMethodsPage() {
         aria-busy="true"
         aria-label={t('admin.payments.loading')}
       >
-        <header className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">{t('admin.payments.title')}</h1>
-          <p className="text-sm text-default-500">{t('admin.payments.subtitle')}</p>
+        <header className="page-header">
+          <h1 className="page-title">{t('admin.payments.title')}</h1>
+          <p className="page-subtitle">{t('admin.payments.subtitle')}</p>
         </header>
         <ul className="space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -52,10 +52,10 @@ export function AdminPaymentMethodsPage() {
   if (query.isError) {
     return (
       <section className="space-y-8">
-        <header className="flex items-center justify-between gap-3">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">{t('admin.payments.title')}</h1>
-            <p className="text-sm text-default-500">{t('admin.payments.subtitle')}</p>
+        <header className="flex flex-wrap items-start justify-between gap-3">
+          <div className="page-header">
+            <h1 className="page-title">{t('admin.payments.title')}</h1>
+            <p className="page-subtitle">{t('admin.payments.subtitle')}</p>
           </div>
         </header>
         <QueryErrorState
@@ -71,10 +71,10 @@ export function AdminPaymentMethodsPage() {
 
   return (
     <section className="space-y-8">
-      <header className="flex items-center justify-between gap-3">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">{t('admin.payments.title')}</h1>
-          <p className="text-sm text-default-500">{t('admin.payments.subtitle')}</p>
+      <header className="flex flex-wrap items-start justify-between gap-3 sm:items-end">
+        <div className="page-header">
+          <h1 className="page-title">{t('admin.payments.title')}</h1>
+          <p className="page-subtitle">{t('admin.payments.subtitle')}</p>
         </div>
         {!creating ? (
           <Button variant="primary" size="sm" onPress={() => setCreating(true)}>

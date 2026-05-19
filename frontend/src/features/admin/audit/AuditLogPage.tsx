@@ -1,6 +1,6 @@
 import type { DateValue } from '@internationalized/date';
 import { parseDate } from '@internationalized/date';
-import { Calendar, DateField, DatePicker, Heading, Label, ListBox, Paragraph, Select, Table } from '@heroui/react';
+import { Calendar, DateField, DatePicker, Label, ListBox, Select, Table } from '@heroui/react';
 import { ScrollText } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -44,9 +44,9 @@ export function AuditLogPage() {
 
   return (
     <section className="space-y-8">
-      <header className="space-y-1">
-        <Heading className="text-2xl font-semibold tracking-tight">{t('admin.audit.title')}</Heading>
-        <Paragraph className="text-sm text-default-500">{t('admin.audit.subtitle')}</Paragraph>
+      <header className="page-header">
+        <h1 className="page-title">{t('admin.audit.title')}</h1>
+        <p className="page-subtitle">{t('admin.audit.subtitle')}</p>
       </header>
 
       <div className="flex flex-wrap items-end gap-3">

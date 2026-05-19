@@ -1,4 +1,4 @@
-import { Heading, Paragraph, Table, Tooltip } from '@heroui/react';
+import { Table, Tooltip } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { Package, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -35,11 +35,9 @@ export function AdminProductsListPage() {
   return (
     <section className="space-y-8">
       <header className="flex items-center justify-between gap-3">
-        <div className="space-y-1">
-          <Heading className="text-2xl font-semibold tracking-tight">
-            {t('admin.products.list.title')}
-          </Heading>
-          <Paragraph className="text-sm text-default-500">{t('admin.products.list.subtitle')}</Paragraph>
+        <div className="page-header">
+          <h1 className="page-title">{t('admin.products.list.title')}</h1>
+          <p className="page-subtitle">{t('admin.products.list.subtitle')}</p>
         </div>
         <Link
           to="/admin/products/new"

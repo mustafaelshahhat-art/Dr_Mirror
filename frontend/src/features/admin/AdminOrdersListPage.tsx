@@ -1,4 +1,4 @@
-import { Heading, Paragraph, Table } from '@heroui/react';
+import { Table } from '@heroui/react';
 import { Package } from 'lucide-react';
 import { EmptyState } from '../../shared/components/EmptyState';
 import { useState } from 'react';
@@ -39,12 +39,10 @@ export function AdminOrdersListPage() {
 
   return (
     <section className="space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div className="space-y-1">
-          <Heading className="text-2xl font-semibold tracking-tight">
-            {t('admin.list.title')}
-          </Heading>
-          <Paragraph className="text-sm text-default-500">{t('admin.list.subtitle')}</Paragraph>
+      <header className="flex flex-wrap items-start justify-between gap-3 sm:items-end">
+        <div className="page-header">
+          <h1 className="page-title">{t('admin.list.title')}</h1>
+          <p className="page-subtitle">{t('admin.list.subtitle')}</p>
         </div>
         <StatusFilterDropdown
           value={statusFilter}

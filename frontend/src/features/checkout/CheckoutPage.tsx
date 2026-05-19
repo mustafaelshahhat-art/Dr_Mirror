@@ -1,4 +1,4 @@
-import { Alert, Button, Form, Heading, Paragraph, ProgressBar } from '@heroui/react';
+import { Alert, Button, Form, ProgressBar } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -225,9 +225,9 @@ function CheckoutBody() {
         {t('checkout.backToCart')}
       </Link>
 
-      <header className="space-y-1">
-        <Heading className="text-2xl font-semibold tracking-tight">{t('checkout.title')}</Heading>
-        <Paragraph className="text-sm text-default-500">{t('checkout.subtitle')}</Paragraph>
+      <header className="page-header">
+        <h1 className="page-title">{t('checkout.title')}</h1>
+        <p className="page-subtitle">{t('checkout.subtitle')}</p>
       </header>
 
       <div className="space-y-3">

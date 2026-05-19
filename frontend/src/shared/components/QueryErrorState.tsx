@@ -12,15 +12,15 @@ export function QueryErrorState({ message, retryLabel, onRetry }: QueryErrorStat
     <Alert
       status="danger"
       role="alert"
-      className="enter-fade"
+      className="enter-fade rounded-large"
     >
       <Alert.Indicator>
-        <AlertCircle size={16} aria-hidden className="shrink-0" />
+        <AlertCircle size={16} aria-hidden className="mt-0.5 shrink-0" />
       </Alert.Indicator>
-      <Alert.Content>
-        <Alert.Description>{message}</Alert.Description>
+      <Alert.Content className="flex-1">
+        <Alert.Description className="text-sm">{message}</Alert.Description>
       </Alert.Content>
-      <Button variant="ghost" size="sm" onPress={onRetry} className="shrink-0 text-danger">
+      <Button variant="ghost" size="sm" onPress={onRetry} className="shrink-0 self-center text-danger">
         {retryLabel}
       </Button>
     </Alert>

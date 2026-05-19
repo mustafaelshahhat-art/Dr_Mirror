@@ -44,9 +44,9 @@ function Inner({ product }: { product: AdminProductDetailDto }) {
         {t('admin.products.edit.back')}
       </Link>
 
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{product.nameEn}</h1>
-        <p className="text-xs text-default-500" dir="ltr">
+      <header className="page-header">
+        <h1 className="page-title">{product.nameEn}</h1>
+        <p className="page-subtitle" dir="ltr">
           /{product.slug}
         </p>
       </header>

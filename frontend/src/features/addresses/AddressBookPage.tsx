@@ -60,9 +60,9 @@ export function AddressBookPage() {
           <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
           {t('addresses.backToAccount')}
         </Link>
-        <header className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">{t('addresses.title')}</h1>
-          <p className="text-sm text-default-500">{t('addresses.subtitle')}</p>
+        <header className="page-header">
+          <h1 className="page-title">{t('addresses.title')}</h1>
+          <p className="page-subtitle">{t('addresses.subtitle')}</p>
         </header>
         <QueryErrorState
           message={t('addresses.errors.unknown')}
@@ -86,12 +86,10 @@ export function AddressBookPage() {
         {t('addresses.backToAccount')}
       </Link>
 
-      <header className="flex items-center justify-between gap-3">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {t('addresses.title')}
-          </h1>
-          <p className="text-sm text-default-500">{t('addresses.subtitle')}</p>
+      <header className="flex flex-wrap items-start justify-between gap-3 sm:items-end">
+        <div className="page-header">
+          <h1 className="page-title">{t('addresses.title')}</h1>
+          <p className="page-subtitle">{t('addresses.subtitle')}</p>
         </div>
         {!creating && !isFirstAddress ? (
           <Button variant="primary" size="sm" onPress={() => setCreating(true)}>

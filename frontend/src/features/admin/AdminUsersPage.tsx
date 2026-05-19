@@ -1,4 +1,4 @@
-import { Heading, Paragraph, Switch, Table, Tooltip } from '@heroui/react';
+import { Switch, Table, Tooltip } from '@heroui/react';
 import { Users } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,9 +24,9 @@ export function AdminUsersPage() {
 
   return (
     <section className="space-y-8">
-      <header className="space-y-1">
-        <Heading className="text-2xl font-semibold tracking-tight">{t('admin.users.title')}</Heading>
-        <Paragraph className="text-sm text-default-500">{t('admin.users.subtitle')}</Paragraph>
+      <header className="page-header">
+        <h1 className="page-title">{t('admin.users.title')}</h1>
+        <p className="page-subtitle">{t('admin.users.subtitle')}</p>
       </header>
 
       <div className="max-w-sm">

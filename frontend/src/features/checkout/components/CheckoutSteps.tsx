@@ -14,30 +14,30 @@ export function CheckoutSteps({ current }: { current: CheckoutStep }) {
   const currentIndex = ORDER.indexOf(current);
 
   return (
-    <ol className="flex w-full items-center gap-2">
+    <ol className="flex w-full items-center gap-1 sm:gap-2">
       {ORDER.map((step, idx) => {
         const reached = idx <= currentIndex;
         const isLast = idx === ORDER.length - 1;
         const completed = idx < currentIndex;
         return (
-          <li key={step} className="flex flex-1 items-center gap-2">
+          <li key={step} className="flex flex-1 items-center gap-1.5 sm:gap-2">
             <span
               aria-current={idx === currentIndex ? 'step' : undefined}
               className={[
-                'flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold tabular-nums',
+                'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold sm:size-7',
                 completed
-                  ? 'border-success bg-success text-success-foreground'
+                  ? 'bg-success text-success-foreground'
                   : reached
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-divider bg-content1 text-default-500',
+                    ? 'bg-brand text-white'
+                    : 'border border-divider bg-surface text-muted',
               ].join(' ')}
             >
-              {completed ? <Check className="size-3.5" aria-hidden /> : idx + 1}
+              {completed ? <Check className="size-3" aria-hidden /> : idx + 1}
             </span>
             <span
               className={[
-                'text-xs font-medium',
-                reached ? 'text-foreground' : 'text-default-500',
+                'hidden text-xs font-medium sm:block',
+                reached ? 'text-foreground' : 'text-muted',
               ].join(' ')}
             >
               {t(`checkout.steps.${step}`)}
@@ -47,7 +47,7 @@ export function CheckoutSteps({ current }: { current: CheckoutStep }) {
                 aria-hidden
                 className={[
                   'h-px flex-1',
-                  idx < currentIndex ? 'bg-success/50' : 'bg-divider',
+                  idx < currentIndex ? 'bg-success/40' : 'bg-divider/60',
                 ].join(' ')}
               />
             ) : null}

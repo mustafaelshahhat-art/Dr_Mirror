@@ -1,4 +1,4 @@
-import { Button, Card, Chip, Heading, Paragraph } from '@heroui/react';
+import { Button, Card, Chip } from '@heroui/react';
 import { EmptyState } from '../../shared/components/EmptyState';
 import { buttonVariants } from '@heroui/styles';
 import { Mail, MailOpen } from 'lucide-react';
@@ -39,9 +39,9 @@ export function AdminInquiriesPage() {
 
   return (
     <section className="space-y-8">
-      <header className="space-y-1">
-        <Heading className="text-2xl font-semibold tracking-tight">{t('inquiries.admin.title')}</Heading>
-        <Paragraph className="text-sm text-default-500">{t('inquiries.admin.subtitle')}</Paragraph>
+      <header className="page-header">
+        <h1 className="page-title">{t('inquiries.admin.title')}</h1>
+        <p className="page-subtitle">{t('inquiries.admin.subtitle')}</p>
       </header>
 
       <div className="flex flex-wrap gap-2" role="group" aria-label={t('inquiries.admin.filterLabel')}>

@@ -1,4 +1,3 @@
-import { Heading, Paragraph } from '@heroui/react';
 import { useState } from 'react';
 import { Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -61,9 +60,9 @@ export function OrdersListPage() {
 
   return (
     <section className="space-y-8">
-      <header className="space-y-1">
-        <Heading className="text-2xl font-semibold tracking-tight">{t('orders.list.title')}</Heading>
-        <Paragraph className="text-sm text-default-500">{t('orders.list.subtitle')}</Paragraph>
+      <header className="page-header">
+        <h1 className="page-title">{t('orders.list.title')}</h1>
+        <p className="page-subtitle">{t('orders.list.subtitle')}</p>
       </header>
 
       {orders.length === 0 ? (
@@ -74,25 +73,25 @@ export function OrdersListPage() {
           action={{ label: t('orders.list.empty.cta'), onPress: () => void navigate('/') }}
         />
       ) : (
-        <ul className="space-y-2" aria-busy={query.isFetching}>
-          {orders.map((order) => (
-            <li key={order.id}>
+        <ul className="content-surface overflow-hidden" aria-busy={query.isFetching}>
+          {orders.map((order, idx) => (
+            <li key={order.id} className={idx > 0 ? 'border-t border-divider/40' : ''}>
               <Link
                 to={`/account/orders/${encodeURIComponent(order.orderNumber)}`}
-                className="flex items-center justify-between gap-3 rounded-medium border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
+                className="flex items-center justify-between gap-3 px-4 py-3.5 transition-colors hover:bg-surface-secondary sm:px-5"
               >
                 <div className="min-w-0 space-y-1">
                   <p className="text-sm font-semibold text-foreground">
                     {order.orderNumber}
                   </p>
-                  <p className="text-xs text-default-500 tabular-nums">
+                  <p className="text-xs tabular-nums text-muted">
                     {dateFmt.format(new Date(order.createdAt))} ·{' '}
                     {t('orders.list.itemCount', { count: order.itemCount })}
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   <OrderStatusBadge status={order.status} />
-                  <span className="text-sm font-semibold tabular-nums">
+                  <span className="text-sm font-bold tabular-nums text-foreground">
                     {formatCurrency(order.total, lang)}
                   </span>
                 </div>

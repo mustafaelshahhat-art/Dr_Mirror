@@ -18,7 +18,7 @@ export function AdminSidebar({
 
   return (
     <>
-      <div className="hidden w-56 flex-col border-e border-divider/60 bg-content1 md:flex">
+      <div className="hidden w-60 flex-col border-e border-divider/50 bg-surface md:flex">
         <SidebarNav label={t('admin.shell.navTitle')} onClose={onClose} />
       </div>
 
@@ -94,14 +94,14 @@ function NavItem({
       onClick={onClick}
       className={({ isActive }) =>
         [
-          'flex items-center gap-2 rounded-medium px-3 py-2 text-sm transition-colors motion-reduce:transition-none',
+          'flex items-center gap-2.5 rounded-medium px-3 py-2 text-sm font-medium transition-colors motion-reduce:transition-none',
           isActive
-            ? 'bg-primary/10 font-medium text-primary'
-            : 'text-default-600 hover:bg-default-100 dark:text-default-400 dark:hover:bg-default-50/5',
+            ? 'bg-brand/10 text-brand dark:bg-brand/15 dark:text-brand'
+            : 'text-default-600 hover:bg-default-100 hover:text-foreground dark:text-default-400 dark:hover:bg-default-50/5 dark:hover:text-foreground',
         ].join(' ')
       }
     >
-      <Icon size={16} aria-hidden />
+      <Icon size={15} aria-hidden />
       <span>{label}</span>
     </NavLink>
   );
