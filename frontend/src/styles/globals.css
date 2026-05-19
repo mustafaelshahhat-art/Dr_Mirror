@@ -317,6 +317,18 @@
     padding-inline: 1rem;
     padding-block: 2.5rem;
     overflow: hidden;
+    /* Default: plain surface */
+  }
+  /* Tinted variant — subtle brand wash gives the hero visual identity */
+  .hero-band--tinted {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5rem;
+    background-color: color-mix(in oklab, var(--brand) 5%, var(--background));
+  }
+  .dark .hero-band--tinted {
+    background-color: color-mix(in oklab, var(--brand) 8%, var(--background));
   }
   @media (min-width: 768px) {
     .hero-band {

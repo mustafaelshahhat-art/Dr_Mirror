@@ -34,6 +34,7 @@
   },
   "line": {
     "sizeLabel": "المقاس",
+    "quantityLabel": "الكمية",
     "increaseQuantity": "زيادة الكمية",
     "decreaseQuantity": "إنقاص الكمية",
     "remove": "إزالة المنتج",

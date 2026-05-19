@@ -1,6 +1,6 @@
 import { Button, Input } from '@heroui/react';
 import { Search, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { type KeyboardEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface SearchInputProps {
@@ -13,7 +13,8 @@ interface SearchInputProps {
 /**
  * Debounced search box. The internal state mirrors the URL on first render
  * (so refreshes preserve the typed query) and on every external change. The
- * onCommit callback fires `debounceMs` after the user stops typing.
+ * onCommit callback fires `debounceMs` after the user stops typing, or
+ * immediately when the user presses Enter.
  */
 export function SearchInput({ value, onCommit, debounceMs = 350 }: SearchInputProps) {
   const { t } = useTranslation();
@@ -30,6 +31,19 @@ export function SearchInput({ value, onCommit, debounceMs = 350 }: SearchInputPr
     return () => window.clearTimeout(handle);
   }, [draft, value, onCommit, debounceMs]);
 
+  // Immediate commit on Enter — no waiting for the debounce.
+  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      onCommit(draft);
+    }
+  }
+
+  function handleClear() {
+    setDraft('');
+    onCommit('');
+  }
+
   return (
     <div className="relative w-full">
       <Search
@@ -40,22 +54,22 @@ export function SearchInput({ value, onCommit, debounceMs = 350 }: SearchInputPr
         type="search"
         value={draft}
         onChange={(e) => setDraft((e.target as HTMLInputElement).value)}
+        onKeyDown={handleKeyDown}
         placeholder={t('catalog.search.placeholder')}
         aria-label={t('catalog.search.label')}
-        className="ps-9 pe-9"
+        className="ps-9 pe-10"
       />
       {draft.length > 0 ? (
+        /* Touch target: size-8 button keeps the icon small but expands the hit area
+           to ~32px — combined with the input's padding this meets mobile expectations. */
         <Button
           type="button"
           isIconOnly
           variant="ghost"
           size="sm"
           aria-label={t('catalog.search.clear')}
-          onPress={() => {
-            setDraft('');
-            onCommit('');
-          }}
-          className="absolute end-2 top-1/2 size-6 min-w-0 -translate-y-1/2 text-default-500 hover:text-foreground"
+          onPress={handleClear}
+          className="absolute end-1 top-1/2 size-8 min-w-0 -translate-y-1/2 text-default-500 hover:text-foreground"
         >
           <X className="size-3.5" aria-hidden />
         </Button>

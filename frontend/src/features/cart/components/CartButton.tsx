@@ -14,12 +14,19 @@ import { CartLineRow } from './CartLineRow';
 /**
  * Header cart entry-point — icon + count badge + drawer with the live cart
  * contents and sub-total. The drawer slides in from the trailing screen edge
- * (right in LTR, left in RTL).
+ * (right in LTR, left in RTL) — opposite side from the navigation drawer.
+ *
+ * Empty-state includes an icon, copy, and a "Browse catalog" CTA that closes
+ * the drawer and navigates to the catalog root.
+ *
+ * Safe-area-inset is applied to the drawer footer so the CTA is not obscured
+ * by iPhone notch / Android gesture nav.
  */
 export function CartButton() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const isRtl = i18n.dir(lang) === 'rtl';
+  // Cart is a TRAILING edge drawer — opposite of the navigation drawer.
   const placement = isRtl ? 'left' : 'right';
   const badgePlacement = isRtl ? 'top-left' : 'top-right';
   const { cart, updateQuantity, removeItem } = useCart();
@@ -37,6 +44,8 @@ export function CartButton() {
       aria-label={t('cart.openLabel')}
       isIconOnly
       onPress={() => setIsOpen(true)}
+      /* Minimum 44px touch target on mobile */
+      className="size-11 min-w-0"
     >
       <ShoppingBag className="size-5" aria-hidden />
       <span className="sr-only">
@@ -60,70 +69,91 @@ export function CartButton() {
       )}
 
       <Drawer isOpen={isOpen} onOpenChange={setIsOpen}>
+        {/* bg-foreground/40 gives a semi-transparent scrim so the page behind
+            remains partially visible — not fully blacked out. */}
+        <Drawer.Backdrop className="bg-foreground/40">
+          <Drawer.Content placement={placement} className="w-full max-w-md">
+            <Drawer.Dialog className="flex h-full flex-col">
+              <Drawer.Header className="border-b border-divider/60 px-4 py-3">
+                <Drawer.Heading className="text-base font-semibold">
+                  {t('cart.title')}
+                </Drawer.Heading>
+                <p className="mt-0.5 text-xs text-default-500">
+                  {t('cart.subtitle', { count: cart.totalQuantity })}
+                </p>
+              </Drawer.Header>
 
-      <Drawer.Backdrop>
-        <Drawer.Content placement={placement} className="w-full max-w-md">
-          <Drawer.Dialog className="flex h-full flex-col">
-            <Drawer.Header className="border-b border-divider/60 px-4 py-3">
-              <Drawer.Heading className="text-base font-semibold">
-                {t('cart.title')}
-              </Drawer.Heading>
-              <p className="mt-0.5 text-xs text-default-500">
-                {t('cart.subtitle', { count: cart.totalQuantity })}
-              </p>
-            </Drawer.Header>
+              <Drawer.Body className="flex-1 overflow-y-auto px-4 py-3">
+                {cart.isLoading ? (
+                  <div className="flex h-32 items-center justify-center text-sm text-default-500">
+                    {t('cart.loading')}
+                  </div>
+                ) : hasItems ? (
+                  <div className="space-y-3">
+                    {visibleItems.map((line) => (
+                      <CartLineRow
+                        key={line.id}
+                        line={line}
+                        onUpdate={(q) => void updateQuantity(line, q)}
+                        onRemove={() => void removeItem(line)}
+                        isMutating={cart.isMutating}
+                        variant="compact"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  /* Empty state — icon + copy + CTA */
+                  <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+                    <div className="flex size-16 items-center justify-center rounded-2xl bg-default-100 dark:bg-default-50/5">
+                      <ShoppingBag className="size-8 text-default-400" aria-hidden />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-foreground">{t('cart.empty.title')}</p>
+                      <p className="text-xs text-default-500">{t('cart.empty.subtitle')}</p>
+                    </div>
+                    <Link
+                      to="/"
+                      onClick={() => setIsOpen(false)}
+                      className={buttonVariants({ variant: 'primary', size: 'sm' })}
+                    >
+                      {t('cart.empty.cta')}
+                    </Link>
+                  </div>
+                )}
+              </Drawer.Body>
 
-            <Drawer.Body className="flex-1 overflow-y-auto px-4 py-3">
-              {cart.isLoading ? (
-                <div className="flex h-32 items-center justify-center text-sm text-default-500">
-                  {t('cart.loading')}
+              <Drawer.Footer
+                className="border-t border-divider/60 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3"
+              >
+                <div className="mb-3 flex items-baseline justify-between text-sm">
+                  <span className="text-default-500">{t('cart.subTotal')}</span>
+                  <span className="text-base font-semibold tabular-nums text-foreground">
+                    {formatCurrency(cart.subTotal, lang)}
+                  </span>
                 </div>
-              ) : hasItems ? (
-                <div className="space-y-3">
-                  {visibleItems.map((line) => (
-                    <CartLineRow
-                      key={line.id}
-                      line={line}
-                      onUpdate={(q) => void updateQuantity(line, q)}
-                      onRemove={() => void removeItem(line)}
-                      isMutating={cart.isMutating}
-                      variant="compact"
-                    />
-                  ))}
+                <div className="flex gap-2">
+                  {/* Use a proper Button with onPress instead of Drawer.CloseTrigger
+                      to avoid raw class-string styling and keep design-system consistency.
+                      We already control isOpen manually, so no nested-button issue arises. */}
+                  <Button
+                    variant="secondary"
+                    className="flex-1"
+                    onPress={() => setIsOpen(false)}
+                  >
+                    {t('cart.continueShopping')}
+                  </Button>
+                  <Link
+                    to="/cart"
+                    onClick={() => setIsOpen(false)}
+                    className={`${buttonVariants({ variant: 'primary' })} flex-1`}
+                  >
+                    {t('cart.viewCart')}
+                  </Link>
                 </div>
-              ) : (
-                <div className="flex h-48 flex-col items-center justify-center gap-2 text-center">
-                  <p className="text-sm font-medium text-foreground">{t('cart.empty.title')}</p>
-                  <p className="text-xs text-default-500">{t('cart.empty.subtitle')}</p>
-                </div>
-              )}
-            </Drawer.Body>
-
-            <Drawer.Footer className="border-t border-divider/60 px-4 py-3">
-              <div className="mb-3 flex items-baseline justify-between text-sm">
-                <span className="text-default-500">{t('cart.subTotal')}</span>
-                <span className="text-base font-semibold tabular-nums text-foreground">
-                  {formatCurrency(cart.subTotal, lang)}
-                </span>
-              </div>
-              <div className="flex gap-2">
-                {/* CloseTrigger renders its own native button — we style it
-                    directly rather than nesting another <Button> inside, which
-                    would produce invalid nested-buttons markup. */}
-                <Drawer.CloseTrigger className="inline-flex flex-1 items-center justify-center rounded-medium border border-divider bg-content1 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-default-100">
-                  {t('cart.continueShopping')}
-                </Drawer.CloseTrigger>
-                <Link
-                  to="/cart"
-                  className={`${buttonVariants({ variant: 'primary', fullWidth: true })} flex-1`}
-                >
-                  {t('cart.viewCart')}
-                </Link>
-              </div>
-            </Drawer.Footer>
-          </Drawer.Dialog>
-        </Drawer.Content>
-      </Drawer.Backdrop>
+              </Drawer.Footer>
+            </Drawer.Dialog>
+          </Drawer.Content>
+        </Drawer.Backdrop>
       </Drawer>
     </>
   );

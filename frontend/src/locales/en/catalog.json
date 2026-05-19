@@ -3,7 +3,8 @@
   "subtitle": "Scrubs, lab coats, and surgical wear crafted for healthcare professionals.",
   "search": {
     "label": "Search products",
-    "placeholder": "Search by name, brand, or SKU...",
+    "placeholder": "Search products...",
+    "placeholderFull": "Search by name, brand, or SKU...",
     "clear": "Clear search"
   },
   "sort": {
@@ -27,6 +28,7 @@
     "colorPlaceholder": "e.g. blue",
     "minPriceLabel": "Min (EGP)",
     "maxPriceLabel": "Max (EGP)",
+    "priceRangeLabel": "Price range",
     "active_one": "1 active",
     "active_other": "{{count}} active"
   },
@@ -38,7 +40,15 @@
   "list": {
     "soldOut": "Sold out",
     "sizesAvailable_one": "1 size",
-    "sizesAvailable_other": "{{count}} sizes"
+    "sizesAvailable_other": "{{count}} sizes",
+    "viewDetails": "View details",
+    "productListingLabel": "Product listing"
+  },
+  "trust": {
+    "fabric": "Premium fabrics",
+    "sizes": "XS – 4XL range",
+    "exchange": "Easy exchange",
+    "delivery": "Cairo delivery"
   },
   "empty": {
     "title": "No products match your filters",

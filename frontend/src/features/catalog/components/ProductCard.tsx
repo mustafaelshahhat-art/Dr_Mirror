@@ -1,5 +1,5 @@
 import { Card } from '@heroui/react';
-import { Package } from 'lucide-react';
+import { ArrowRight, Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -13,26 +13,16 @@ import { GenderChip } from './GenderChip';
 
 /**
  * One tile in the apparel catalog grid. Anchored on the product slug so the
- * URL is the canonical reference. Shows the brand, price, gender chip,
- * available colour swatches, and the count of available sizes.
+ * URL is the canonical reference.
  *
- * Long names line-clamped at 2; price line uses tabular-nums so a column
- * of cards aligns vertically.
+ * CTA pattern: the entire card is a navigable Link, so keyboard and touch
+ * users can activate it. A visible "View details →" hint is always shown
+ * on mobile (no hover) and revealed on hover on desktop. No nested buttons
+ * are used — the Link is the sole interactive element.
  *
  * Navigable card pattern (per data-model.md Anatomy A.1):
  * `<Link>` (react-router-dom) wraps the `<Card>` to provide the navigable
- * surface, focus ring, and keyboard activation. The HeroUI v3 `Card`
- * compound owns the visual chrome (border/radius/surface tokens) so theme
- * tokens propagate.
- *
- * Deviation note (recorded for the PR audit): the spec option (a)
- * `<Button as={Link} variant="ghost">` does not typecheck against the v3
- * Button typed declaration (no polymorphic `as` prop in the declared
- * `ButtonRootProps`); option (b) `Card.Header as={Link}` does not
- * typecheck either (Card.* parts accept `as: keyof JSX.IntrinsicElements`,
- * not arbitrary components). Wrapping `Card` in `<Link>` preserves URL,
- * `aria-label`, keyboard activation, and react-router navigation — the
- * outcomes the spec mandates. No v2 pressable-card prop is used.
+ * surface, focus ring, and keyboard activation.
  */
 export function ProductCard({ product }: { product: ProductSummaryDto }) {
   const { t, i18n } = useTranslation();
@@ -48,7 +38,7 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
       aria-label={name}
       className="cq-card group block h-full rounded-large focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <Card className="flex h-full flex-col overflow-hidden border border-divider/50 transition-all duration-200 hover:border-divider hover:shadow-medium dark:hover:shadow-none">
+      <Card className="flex h-full flex-col overflow-hidden border border-divider/50 transition-all duration-200 hover:border-brand/30 hover:shadow-medium dark:hover:shadow-none">
         {/* Image container */}
         <div className="relative aspect-[4/5] w-full overflow-hidden bg-surface-secondary">
           {product.primaryImageUrl ? (
@@ -69,9 +59,15 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
               {t('catalog.list.soldOut')}
             </span>
           ) : null}
+          {/* Desktop hover overlay — subtle brand tint with CTA */}
+          <div className="pointer-events-none absolute inset-0 hidden items-end justify-end p-3 sm:flex">
+            <span className="translate-y-1 rounded-full bg-brand/90 px-3 py-1 text-xs font-semibold text-white opacity-0 shadow-sm backdrop-blur-sm transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+              {t('catalog.list.viewDetails')}
+            </span>
+          </div>
         </div>
 
-        <Card.Content className="flex flex-1 flex-col gap-2.5 p-3 sm:p-4">
+        <Card.Content className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
           {/* Category + gender row */}
           <div className="flex items-center justify-between gap-2">
             <span className="truncate text-xs uppercase tracking-wider text-muted">{categoryName}</span>
@@ -83,8 +79,9 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
             {name}
           </h3>
 
+          {/* Brand — slightly more visible than muted */}
           {product.brand ? (
-            <span className="text-xs text-muted">{product.brand}</span>
+            <span className="text-xs font-medium text-default-600 dark:text-default-400">{product.brand}</span>
           ) : null}
 
           {product.availableColors.length > 0 ? (
@@ -97,10 +94,19 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
               {formatCurrency(product.price, lang)}
             </span>
             {sizeCount > 0 ? (
-              <span className="text-xs tabular-nums text-muted @md:text-end">
+              <span className="text-xs font-medium tabular-nums text-default-600 dark:text-default-400 @md:text-end">
                 {t('catalog.list.sizesAvailable', { count: sizeCount })}
               </span>
             ) : null}
+          </div>
+
+          {/* Mobile CTA — always visible; no hover on touch screens.
+              Hidden on sm+ where the image overlay CTA is used instead. */}
+          <div className="flex items-center justify-end gap-1 pt-1 sm:hidden">
+            <span className="text-xs font-semibold text-brand">
+              {t('catalog.list.viewDetails')}
+            </span>
+            <ArrowRight className="size-3 text-brand rtl:rotate-180" aria-hidden />
           </div>
         </Card.Content>
       </Card>

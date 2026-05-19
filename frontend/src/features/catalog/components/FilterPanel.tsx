@@ -1,6 +1,6 @@
 import { Accordion, Button, Chip, Input, Label, TextField, Toolbar } from '@heroui/react';
 import type { KeyboardEvent } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -30,13 +30,25 @@ export function FilterPanel({
 }: FilterPanelProps) {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() === 'rtl';
-  const [open, setOpen] = useState(
+
+  const hasActiveAdvancedFilters =
     filter.gender !== undefined ||
     Boolean(filter.size) ||
     Boolean(filter.color) ||
     filter.minPrice !== undefined ||
-    filter.maxPrice !== undefined,
-  );
+    filter.maxPrice !== undefined;
+
+  // Panel starts open if filters are active in the URL.
+  const [open, setOpen] = useState(hasActiveAdvancedFilters);
+
+  // Sync with URL changes (back/forward navigation): auto-open when active
+  // filters are present. Intentionally does NOT auto-close when filters are
+  // cleared — the user can manually toggle.
+  useEffect(() => {
+    if (hasActiveAdvancedFilters) {
+      setOpen(true);
+    }
+  }, [hasActiveAdvancedFilters]);
 
   const activeCount = [
     filter.gender !== undefined,
@@ -85,18 +97,19 @@ export function FilterPanel({
   return (
     <div className="space-y-3">
       <Toolbar aria-label={t('catalog.filters.label')} className="flex items-center gap-2">
+        {/* Filters button — uses `secondary` variant for more visual presence */}
         <Button
           type="button"
-          variant="ghost"
+          variant="secondary"
           size="sm"
           onPress={() => setOpen((v) => !v)}
           aria-expanded={open}
-          className="border border-divider/60 bg-content1 hover:bg-content2 text-default-700 dark:text-default-300 text-xs font-medium"
+          className="border border-divider/60 text-sm font-medium"
         >
           <span className="inline-flex items-center gap-1.5">
             <SlidersHorizontal className="size-3.5" aria-hidden />
             {open ? t('catalog.filters.hide') : t('catalog.filters.label')}
-            {activeCount > 0 && !open ? (
+            {activeCount > 0 ? (
               <Chip color="accent" variant="primary" size="sm">
                 <Chip.Label>{activeCount}</Chip.Label>
               </Chip>
@@ -192,9 +205,8 @@ export function FilterPanel({
           </Accordion.Item>
           <Accordion.Item id="price">
             <Accordion.Heading>
-              <Accordion.Trigger>
-                {t('catalog.filters.minPriceLabel')} / {t('catalog.filters.maxPriceLabel')}
-              </Accordion.Trigger>
+              {/* Single i18n key — no inline slash separator */}
+              <Accordion.Trigger>{t('catalog.filters.priceRangeLabel')}</Accordion.Trigger>
             </Accordion.Heading>
             <Accordion.Panel>
               <Accordion.Body className="pt-0">
@@ -284,6 +296,7 @@ function DebouncedInput({
   min,
   hideLabel,
 }: DebouncedInputProps) {
+  const id = useId();
   const [draft, setDraft] = useState(value);
 
   // Sync external resets (e.g. clear-all sets filter.size to undefined, value='').
@@ -300,10 +313,15 @@ function DebouncedInput({
 
   return (
     <TextField className={`flex flex-col gap-1.5 ${className ?? ''}`}>
-      <Label className={hideLabel ? 'sr-only' : 'text-xs font-medium text-default-500'}>
+      {/* Explicit id/htmlFor ensures label-input association independent of HeroUI compound context */}
+      <Label
+        htmlFor={id}
+        className={hideLabel ? 'sr-only' : 'text-xs font-medium text-default-500'}
+      >
         {label}
       </Label>
       <Input
+        id={id}
         type={type}
         value={draft}
         onChange={(e) => setDraft((e.target as HTMLInputElement).value)}

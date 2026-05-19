@@ -1,4 +1,5 @@
 import { Button } from '@heroui/react';
+import { Package2, RefreshCw, Ruler, Truck } from 'lucide-react';
 import { SearchX } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +18,14 @@ import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 const VALID_SORTS: ProductSort[] = ['Newest', 'PriceAsc', 'PriceDesc', 'NameAsc'];
 const PAGE_SIZE = 24;
+
+/** Trust strip icon+label pairs — neutral retail trust signals for medical apparel. */
+const TRUST_ITEMS = [
+  { icon: Package2, key: 'fabric' },
+  { icon: Ruler,    key: 'sizes' },
+  { icon: RefreshCw, key: 'exchange' },
+  { icon: Truck,    key: 'delivery' },
+] as const;
 
 export function CatalogPage() {
   const { t } = useTranslation();
@@ -132,11 +141,15 @@ export function CatalogPage() {
 
   return (
     <div className="space-y-8">
-      {/* Storefront hero — restrained: kicker pill + tagline. Full-bleed band.
-          No gradient. Typography is the hero; catalog follows immediately. */}
-      <section className="hero-band">
+      {/* ── Hero band ───────────────────────────────────────────────────────
+          Full-bleed tinted band. Brand color wash provides visual identity
+          without heavy illustration; catalog follows immediately. */}
+      <section
+        className="hero-band hero-band--tinted"
+        aria-label={t('catalog.title')}
+      >
         <div className="space-y-3">
-          <span className="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand">
+          <span className="inline-flex items-center rounded-full bg-brand/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand dark:bg-brand/20">
             {t('appName')}
           </span>
           <h1 className="max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
@@ -146,9 +159,28 @@ export function CatalogPage() {
             {t('catalog.subtitle')}
           </p>
         </div>
+
+        {/* Trust strip — inline with hero on md+, below on mobile */}
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 md:mt-0 md:ms-auto md:max-w-xs">
+          {TRUST_ITEMS.map(({ icon: Icon, key }) => (
+            <div
+              key={key}
+              className="flex flex-col items-start gap-1.5 rounded-large border border-brand/20 bg-brand/5 px-3 py-2.5 dark:bg-brand/10"
+            >
+              <Icon className="size-4 text-brand" aria-hidden />
+              <span className="text-xs font-medium leading-tight text-foreground">
+                {t(`catalog.trust.${key}`)}
+              </span>
+            </div>
+          ))}
+        </div>
       </section>
 
-      <section className="flex flex-col gap-4">
+      {/* ── Search / Sort / Category / Filters ─────────────────────────── */}
+      <section
+        className="flex flex-col gap-4"
+        aria-label={t('catalog.filters.label')}
+      >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="flex-1">
             <SearchInput value={filter.q ?? ''} onCommit={setQuery} />
@@ -175,6 +207,7 @@ export function CatalogPage() {
         />
       </section>
 
+      {/* ── Product listing ─────────────────────────────────────────────── */}
       {isInitialLoad ? (
         <ProductGridSkeleton />
       ) : productsQuery.isError ? (
@@ -195,9 +228,11 @@ export function CatalogPage() {
           ) : null}
         </div>
       ) : (
+        /* eslint-disable-next-line i18next/no-literal-string -- aria-label is set dynamically below */
         <div
           className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
           aria-busy={productsQuery.isFetching}
+          aria-label={t('catalog.list.productListingLabel')}
         >
           {items.map((p) => (
             <ProductCard key={p.id} product={p} />

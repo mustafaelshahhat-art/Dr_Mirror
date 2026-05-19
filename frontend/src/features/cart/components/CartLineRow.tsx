@@ -121,9 +121,9 @@ export function CartLineRow({
             }}
             variant="secondary"
             className="w-full @sm:w-28"
-            aria-label={t('cart.line.increaseQuantity')}
+            aria-label={t('cart.line.quantityLabel')}
           >
-            <Label className="sr-only">{t('cart.line.increaseQuantity')}</Label>
+            <Label className="sr-only">{t('cart.line.quantityLabel')}</Label>
             <NumberField.Group>
               <NumberField.DecrementButton aria-label={t('cart.line.decreaseQuantity')}>
                 <Minus className="size-3.5" aria-hidden />
