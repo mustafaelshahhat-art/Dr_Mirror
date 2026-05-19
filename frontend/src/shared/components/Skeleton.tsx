@@ -88,25 +88,6 @@ export function AddressCardSkeleton() {
   );
 }
 
-/**
- * Generic table-row skeleton for admin tables. Renders one `<tr>` with `cols`
- * cells; widths cycle through a varied set so a stack of these doesn't look
- * like a single column of identical rectangles. The first cell is wider to
- * mimic the leading name/identifier column most admin tables use.
- */
-export function TableRowSkeleton({ cols = 4 }: { cols?: number }) {
-  const widths = ['w-40', 'w-24', 'w-20', 'w-16', 'w-28', 'w-12'];
-  return (
-    <tr className="border-b border-divider/60 last:border-b-0">
-      {Array.from({ length: cols }).map((_, i) => (
-        <td key={i} className="px-4 py-3">
-          <Skeleton className={`h-4 ${widths[i % widths.length]}`} />
-        </td>
-      ))}
-    </tr>
-  );
-}
-
 /** Label + value pair used in detail panels (e.g. admin order detail). */
 export function DetailFieldSkeleton({ valueClass = 'w-48' }: { valueClass?: string }) {
   return (
