@@ -68,7 +68,7 @@ progress.txt
 .claude/
 .devin/
 .opencode/
-# .specify/ — tracked for constitution & project memory
+.specify/
 .windsurf/
 __pycache__/
 *.pyc
