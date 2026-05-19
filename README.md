@@ -34,12 +34,6 @@ frontend/
     styles/              globals.css — OKLCH palette, font-face, HeroUI v3 aliases
 ```
 
-## Documentation
-
-- [Agent Guide](AGENTS.md) — conventions, commands, and constraints for AI coding agents
-- [Claude Guide](CLAUDE.md) — same content with repo-boundary rules for Claude
-- [Constitution](.specify/memory/constitution.md) — non-negotiable governance principles (v1.1.1)
-
 ## Quick start
 
 **Backend**
@@ -163,5 +157,3 @@ Current focus is Phase 004 — UI/UX Excellence Pass.
 5. **Verify:** Check `<backend_url>/api/health` and attempt to log in with the seeded admin credentials.
 
 ---
-
-Agent conventions, stack constraints, and UI system discipline live in [AGENTS.md](AGENTS.md). Governance principles and non-negotiable rules live in [.specify/memory/constitution.md](.specify/memory/constitution.md).
