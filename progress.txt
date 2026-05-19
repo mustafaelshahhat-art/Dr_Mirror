@@ -503,3 +503,128 @@ Re-run gates after fixes:
   tests: PASS — 276/276. No regressions.
   i18n: PASS (exit 0). No new keys introduced.
   lint: PASS (exit 0). 31 warnings (unchanged). 0 errors.
+
+== Phase 10: User Story 8 — Pagination (2026-05-19) ==
+
+T141 (CatalogPage.tsx): PASS. Replaced `import { PaginationBar } from
+  './components/PaginationBar'` with `import { PaginationControls } from
+  '../../shared/components/PaginationControls'`. The `<PaginationBar>` usage
+  (which accepted page / totalPages / totalCount / onPageChange) was replaced
+  with a wrapper `<div className="flex flex-col items-center gap-3
+  sm:flex-row sm:justify-between">` containing:
+    (1) a `<p className="text-xs text-default-500 tabular-nums">` sibling
+        carrying the results-count summary via `t('catalog.pagination.results',
+        { count: productsQuery.data.totalCount })` — i18n key already exists
+        in both locales (ar + en), no new keys introduced.
+    (2) `<PaginationControls page={…} totalPages={…} onPageChange={setPage} />`
+        per Anatomy A.4. `PaginationControls` returns null when totalPages <= 1,
+        so the summary `<p>` is the only visible element on single-page result
+        sets. Props `page` / `totalPages` / `onPageChange` preserved as
+        required by the shim's public-props contract.
+
+T142 (delete PaginationBar.tsx): PASS. File
+  `frontend/src/features/catalog/components/PaginationBar.tsx` removed.
+  No other consumers existed (grep confirmed 0 references outside the
+  deleted file prior to T141's import swap).
+
+T143 (US8 grep gate): PASS.
+  `Select-String -Path "frontend/src/**/*.tsx","frontend/src/**/*.ts"
+  -Pattern "PaginationBar" -SimpleMatch` → 0 matches.
+
+T144 (build + tests + i18n + lint):
+  build: PASS (502ms, 425.59 kB / 129.65 kB gzip — delta vs. Phase 8
+    review-fix baseline 129.49 kB: +0.16 kB gzip, negligible; within ±5%).
+    Note: `PaginationBar` chunk eliminated; `PaginationControls` chunk
+    (4.26 kB / 1.47 kB gzip) consolidated from the shared bundle.
+  tests: PASS — 276/276 (second run; first run had a transient Vitest
+    worker-exit error in checkout.error.test.tsx — process crash, not an
+    assertion failure; pre-existing environment flakiness, unrelated to
+    Phase 10 changes; confirmed clean on re-run).
+  i18n: PASS (exit 0). No new keys introduced. The orphaned
+    catalog.pagination.{label,previous,next,pageOf} keys from the deleted
+    PaginationBar remain in the locale files (orphaned but harmless; the
+    i18n:check script validates referenced-key parity, not unused-key
+    presence).
+  lint: PASS (exit 0). 31 warnings (unchanged from Phase 8 baseline).
+    0 errors introduced.
+
+T144-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual
+  capture per `docs/screenshots/README.md`. Surfaces to capture (en LTR +
+  ar RTL × light + dark × 375 / 768 / 1280 px):
+  - / (catalog page) — first-page state (pagination hidden when 1 page),
+    mid-page state (pagination visible with ellipsis), last-page state,
+    results-count summary text alignment at each breakpoint, RTL arrow
+    direction on Pagination.Previous / Pagination.Next.
+
+Phase 10 (US8) automated checkpoint: `PaginationBar.tsx` deleted. Catalog
+pagination routed through `PaginationControls` (HeroUI `Pagination` compound
+per Anatomy A.4). Banned name `PaginationBar` absent from implementation.
+T141–T144 marked complete in tasks.md; T144-vm remains open until manual
+visual verification is recorded.
+
+== Phase 11 (US9) + Phase 12 (US10) checkpoint — 2026-05-19 ==
+
+Phase 11 — Alert + Toast migrations:
+  T145-T150: DowntimeBanner, ForbiddenBanner, QueryErrorState → HeroUI Alert
+    compound (status="danger"/"warning", Alert.Indicator, Alert.Content,
+    Alert.Title, Alert.Description). ProductMasterForm transient saved banner
+    → toast.success(). InquiryForm success section, CheckoutPage form error,
+    LoginPage/RegisterPage serverError, CartPage merge/cart error,
+    PaymentMethodSection load error → HeroUI Alert compounds.
+
+Phase 12 — EmptyState, Typography, AlertDialog, primitive sweep:
+  T151: EmptyState.tsx refactored to HeroUI v3 Approved Composition Component
+    (Card + Card.Content + Lucide icon + Heading(level=2) + Paragraph + Button).
+    No EmptyState import from @heroui/react (v3 has no such primitive).
+  T152-T156a: Inline empty-state divs replaced with <EmptyState> shim in
+    AdminOrdersListPage, AdminUsersPage, AdminProductsListPage, AuditLogPage,
+    AdminInquiriesPage, OrdersListPage, CartPage, CheckoutEmptyState,
+    AdminHubPage (bonus).
+  T156b: Hand-styled h1/h2/h3 migrated to Heading/Paragraph per A.24 in all
+    modified files. AdminInquiriesPage Card.Title used for card-internal h2.
+    heading-order a11y violations fixed (level=2 for section headings).
+  T156d-g: CancelOrderButton, AdminProofReview, AdminTransitionActions → AlertDialog
+    per A.6 (confirm/destroy). ProductImagesSection + ProductMasterForm unpublish
+    Modal also migrated to AlertDialog. No delete confirmation in AdminPaymentMethodsPage.
+  T156h: Generic editing modals (address editor, product create form) verified to
+    stay on Modal per A.5. All Modal.Backdrop/Modal.Dialog usages eliminated.
+  T157: No animate-spin found — gate passes.
+  T158: PaymentProofFilePreview, ProductGridSkeleton, AdminHubPage animate-pulse
+    divs replaced with HeroUI Skeleton shim per A.20.
+  T159: title= audit — ColorSwatchRow + PaymentProofFilePreview have aria-label
+    as accessible name; title= is decorative tooltip only (rationale recorded).
+    ColorPicker is RAC Exception 1 (Phase 12b). No Tooltip conversion needed.
+  T160: No img.rounded-full found. No Avatar migration needed.
+  T161: No custom switch widgets. AdminUsersPage already uses HeroUI Switch.
+  T162: No raw <input type="checkbox">. Zero matches.
+  T163: No collapsible groups in AdminSidebar.
+  T164: AdminHeader already uses HeroUI Breadcrumbs. AdminOrderDetailPage
+    back-to-list is simple navigation — kept as <Link> per task rationale.
+
+T165 Acceptance Gates (all PASS):
+  <table>  → 0 (all uppercase HeroUI Table)
+  <hr>     → 0 (comment-only false positive eliminated)
+  <dialog> → 0
+  <input> (non-file) → 0 (Exception 3 only: PaymentProofUpload, ProductImagesSection)
+  <select> → 0
+  <textarea> → 0
+  framer-motion → 0
+  Banned v2 names (\bCardBody|...|Navbar...\b) → 0 (comment reworded in Header.tsx)
+  Alert.Icon → 0
+  \bTextarea\b → 0
+  isPressable → 0
+  EmptyState from @heroui/react → 0
+  Hand-styled h1/h2/h3 in modified files → 0
+
+T166: build → PASS. index bundle: 427.33 kB / 129.96 kB gzip (stable vs baseline).
+T167: tests → PASS. 276/276 (54 files) at ~12s.
+T168: i18n:check → PASS. lint → PASS (0 errors, 41 warnings, all pre-existing).
+
+T168-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual
+  capture per docs/screenshots/README.md. Surfaces: every empty-state surface,
+  every AlertDialog (cancel order, reject proof, transition cancel, delete image,
+  unpublish product), typography-migrated headings, Skeleton loading states.
+
+Registered exceptions (unchanged): Snippet (Exception 2), native <input type="file">
+  (Exception 3: PaymentProofUpload.tsx, ProductImagesSection.tsx).
+Phase 12b (RAC role="radio" → ToggleButtonGroup) remains open.

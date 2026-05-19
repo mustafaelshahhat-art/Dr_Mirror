@@ -1,4 +1,4 @@
-import { Switch, Table, Tooltip } from '@heroui/react';
+import { Heading, Paragraph, Switch, Table, Tooltip } from '@heroui/react';
 import { Users } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import { TableRowSkeleton, TableSkeletonHeader } from '../../shared/components/T
 import { ALL_ROLES, type AdminUserDto, type UserRole } from './users/types';
 import { useAdminUsersQuery, useUpdateUserRolesMutation } from './users/hooks';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
+import { EmptyState } from '../../shared/components/EmptyState';
 
 export function AdminUsersPage() {
   const { t } = useTranslation();
@@ -24,8 +25,8 @@ export function AdminUsersPage() {
   return (
     <section className="space-y-8">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('admin.users.title')}</h1>
-        <p className="text-sm text-default-500">{t('admin.users.subtitle')}</p>
+        <Heading className="text-2xl font-semibold tracking-tight">{t('admin.users.title')}</Heading>
+        <Paragraph className="text-sm text-default-500">{t('admin.users.subtitle')}</Paragraph>
       </header>
 
       <div className="max-w-sm">
@@ -85,10 +86,7 @@ export function AdminUsersPage() {
           />
         </div>
       ) : (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Users className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="enter-fade-up text-sm text-default-500">{t('admin.users.empty')}</p>
-        </div>
+        <EmptyState icon={Users} title={t('admin.users.empty')} />
       )}
     </section>
   );

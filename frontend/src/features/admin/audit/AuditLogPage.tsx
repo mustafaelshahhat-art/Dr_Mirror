@@ -1,12 +1,13 @@
 import type { DateValue } from '@internationalized/date';
 import { parseDate } from '@internationalized/date';
-import { Calendar, DateField, DatePicker, Label, ListBox, Select, Table } from '@heroui/react';
+import { Calendar, DateField, DatePicker, Heading, Label, ListBox, Paragraph, Select, Table } from '@heroui/react';
 import { ScrollText } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PaginationControls } from '../../../shared/components/PaginationControls';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
+import { EmptyState } from '../../../shared/components/EmptyState';
 import { TableRowSkeleton, TableSkeletonHeader } from '../../../shared/components/TableRowSkeleton';
 import { useAuditLogs } from './hooks';
 
@@ -44,8 +45,8 @@ export function AuditLogPage() {
   return (
     <section className="space-y-8">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('admin.audit.title')}</h1>
-        <p className="text-sm text-default-500">{t('admin.audit.subtitle')}</p>
+        <Heading className="text-2xl font-semibold tracking-tight">{t('admin.audit.title')}</Heading>
+        <Paragraph className="text-sm text-default-500">{t('admin.audit.subtitle')}</Paragraph>
       </header>
 
       <div className="flex flex-wrap items-end gap-3">
@@ -161,10 +162,7 @@ export function AuditLogPage() {
           />
         </div>
       ) : (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <ScrollText className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="enter-fade-up text-sm text-default-500">{t('admin.audit.empty')}</p>
-        </div>
+        <EmptyState icon={ScrollText} title={t('admin.audit.empty')} />
       )}
     </section>
   );

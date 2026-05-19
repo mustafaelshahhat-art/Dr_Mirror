@@ -1,4 +1,4 @@
-import { Button, FieldError, Label, Modal, TextArea, TextField, Toolbar, useOverlayState } from '@heroui/react';
+import { AlertDialog, Button, FieldError, Label, TextArea, TextField, Toolbar, useOverlayState } from '@heroui/react';
 import { Check, Download, X } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -275,9 +275,10 @@ function ProofRow({
           </div>
         ) : null
       ) : null}
-      <Modal>
-        <Modal.Backdrop
+      <AlertDialog>
+        <AlertDialog.Backdrop
           isOpen={rejectState.isOpen}
+          isDismissable={false}
           onOpenChange={(open) => {
             rejectState.setOpen(open);
             if (!open && !inFlight) {
@@ -287,14 +288,14 @@ function ProofRow({
             }
           }}
         >
-          <Modal.Container size="sm">
-            <Modal.Dialog>
+          <AlertDialog.Container size="sm">
+            <AlertDialog.Dialog>
               {({ close }) => (
                 <>
-                  <Modal.Header>
-                    <Modal.Heading>{t('admin.proofs.reject')}</Modal.Heading>
-                  </Modal.Header>
-                  <Modal.Body>
+                  <AlertDialog.Header>
+                    <AlertDialog.Heading>{t('admin.proofs.reject')}</AlertDialog.Heading>
+                  </AlertDialog.Header>
+                  <AlertDialog.Body className="space-y-2">
                     <p className="text-sm font-medium">
                       {t('admin.proofs.rejectConfirm')}
                     </p>
@@ -311,8 +312,8 @@ function ProofRow({
                       />
                       {error ? <FieldError className="text-xs text-danger">{error}</FieldError> : null}
                     </TextField>
-                  </Modal.Body>
-                  <Modal.Footer>
+                  </AlertDialog.Body>
+                  <AlertDialog.Footer>
                     <Button
                       type="button"
                       variant="ghost"
@@ -333,13 +334,13 @@ function ProofRow({
                         ? t('admin.proofs.submitting')
                         : t('admin.proofs.confirm')}
                     </Button>
-                  </Modal.Footer>
+                  </AlertDialog.Footer>
                 </>
               )}
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
+            </AlertDialog.Dialog>
+          </AlertDialog.Container>
+        </AlertDialog.Backdrop>
+      </AlertDialog>
     </div>
   );
 }

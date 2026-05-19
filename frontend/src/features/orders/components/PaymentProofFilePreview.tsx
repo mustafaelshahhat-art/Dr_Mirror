@@ -1,6 +1,8 @@
 import { ImageOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import { Skeleton } from '../../../shared/components/Skeleton';
+
 import { ordersApi } from '../api';
 import type { PaymentProofDto } from '../types';
 
@@ -77,7 +79,8 @@ export function PaymentProofFilePreview({
 
   if (file.status === 'loading') {
     return (
-      <div className={`${className} animate-pulse bg-default-100`} role="status">
+      <div role="status" className={className}>
+        <Skeleton className="h-full w-full rounded-none" />
         <span className="sr-only">{labels.loading}</span>
       </div>
     );

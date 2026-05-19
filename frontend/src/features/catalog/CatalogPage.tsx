@@ -6,7 +6,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { CategoryChips } from './components/CategoryChips';
 import { FilterPanel } from './components/FilterPanel';
-import { PaginationBar } from './components/PaginationBar';
+import { PaginationControls } from '../../shared/components/PaginationControls';
 import { ProductCard } from './components/ProductCard';
 import { ProductGridSkeleton } from './components/ProductGridSkeleton';
 import { SearchInput } from './components/SearchInput';
@@ -207,12 +207,16 @@ export function CatalogPage() {
       )}
 
       {productsQuery.data ? (
-        <PaginationBar
-          page={productsQuery.data.page}
-          totalPages={productsQuery.data.totalPages}
-          totalCount={productsQuery.data.totalCount}
-          onPageChange={setPage}
-        />
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+          <p className="text-xs text-default-500 tabular-nums">
+            {t('catalog.pagination.results', { count: productsQuery.data.totalCount })}
+          </p>
+          <PaginationControls
+            page={productsQuery.data.page}
+            totalPages={productsQuery.data.totalPages}
+            onPageChange={setPage}
+          />
+        </div>
       ) : null}
     </div>
   );

@@ -1,6 +1,5 @@
-import { Button, FieldError, Form, Label, Modal, NumberField, useOverlayState } from '@heroui/react';
+import { AlertDialog, Button, FieldError, Form, Heading, Label, NumberField, toast, useOverlayState } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -43,7 +42,6 @@ export function ProductMasterForm({
   const publishMutation = useTogglePublishMutation();
   const unpublishState = useOverlayState({ defaultOpen: false });
 
-  const [saved, setSaved] = useState(false);
   const {
     control,
     handleSubmit,
@@ -65,18 +63,12 @@ export function ProductMasterForm({
   });
   const error = (message?: string) => (message ? t(message) : null);
 
-  useEffect(() => {
-    if (!saved) return;
-    const id = window.setTimeout(() => setSaved(false), 1500);
-    return () => window.clearTimeout(id);
-  }, [saved]);
-
   return (
     <article className="rounded-large border border-divider/60 bg-content1 p-4">
       <header className="mb-3 flex flex-wrap items-center justify-between gap-2">
         {hideTitle ? <span aria-hidden /> : (
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">{product.nameEn}</h1>
+            <Heading className="text-xl font-semibold tracking-tight">{product.nameEn}</Heading>
             <p className="text-xs text-default-500" dir="ltr">
               /{product.slug}
             </p>
@@ -118,12 +110,6 @@ export function ProductMasterForm({
         </div>
       </header>
 
-      {saved ? (
-        <div className="enter-fade mb-3 rounded-medium border border-success/30 bg-success/10 p-3 text-sm text-success">
-          {t('admin.products.edit.savedToast')}
-        </div>
-      ) : null}
-
       <Form
         onSubmit={handleSubmit(async (values) => {
           try {
@@ -142,7 +128,7 @@ export function ProductMasterForm({
                 categoryId: values.categoryId,
               },
             });
-            setSaved(true);
+            toast.success(t('admin.products.edit.savedToast'));
           } catch {
             // Toast emitted by mutation onError.
           }
@@ -222,19 +208,20 @@ export function ProductMasterForm({
           </Button>
         </div>
       </Form>
-      <Modal>
-        <Modal.Backdrop
+      <AlertDialog>
+        <AlertDialog.Backdrop
           isOpen={unpublishState.isOpen}
+          isDismissable={false}
           onOpenChange={unpublishState.setOpen}
         >
-          <Modal.Container size="xs">
-            <Modal.Dialog>
+          <AlertDialog.Container size="xs">
+            <AlertDialog.Dialog>
               {({ close }) => (
                 <>
-                  <Modal.Header>
-                    <Modal.Heading>{t('admin.products.actions.unpublish')}</Modal.Heading>
-                  </Modal.Header>
-                  <Modal.Footer>
+                  <AlertDialog.Header>
+                    <AlertDialog.Heading>{t('admin.products.actions.unpublish')}</AlertDialog.Heading>
+                  </AlertDialog.Header>
+                  <AlertDialog.Footer>
                     <Button variant="ghost" onPress={close}>
                       {t('admin.catalog.actions.cancel')}
                     </Button>
@@ -253,13 +240,13 @@ export function ProductMasterForm({
                     >
                       {t('admin.transition.confirm')}
                     </Button>
-                  </Modal.Footer>
+                  </AlertDialog.Footer>
                 </>
               )}
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
+            </AlertDialog.Dialog>
+          </AlertDialog.Container>
+        </AlertDialog.Backdrop>
+      </AlertDialog>
     </article>
   );
 }

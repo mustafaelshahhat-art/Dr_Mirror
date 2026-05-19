@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Alert, Button } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { CloudOff, X } from 'lucide-react';
 
@@ -12,18 +12,20 @@ export function DowntimeBanner() {
   if (!isDowntime) return null;
 
   return (
-    <div
+    <Alert
+      status="danger"
       role="alert"
-      className="enter-fade-down flex items-center gap-2 border-b border-danger/30 bg-danger/10 px-4 py-2 text-sm text-danger"
+      className="enter-fade-down rounded-none border-0 border-b border-danger/30 px-4 py-2 text-sm"
     >
-      <CloudOff size={16} aria-hidden className="shrink-0" />
-      <span className="flex-1">
-        <span className="font-medium">{t('errors.downtime.title')}</span>
-        {' '}
-        {t('errors.downtime.detail')}
-        {' '}
-        <ContactSupportLink />
-      </span>
+      <Alert.Indicator>
+        <CloudOff size={16} aria-hidden className="shrink-0" />
+      </Alert.Indicator>
+      <Alert.Content>
+        <Alert.Title>{t('errors.downtime.title')}</Alert.Title>
+        <Alert.Description>
+          {t('errors.downtime.detail')} <ContactSupportLink />
+        </Alert.Description>
+      </Alert.Content>
       <Button
         isIconOnly
         variant="ghost"
@@ -34,6 +36,6 @@ export function DowntimeBanner() {
       >
         <X size={14} aria-hidden />
       </Button>
-    </div>
+    </Alert>
   );
 }

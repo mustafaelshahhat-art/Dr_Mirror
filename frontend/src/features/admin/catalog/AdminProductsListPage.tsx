@@ -1,4 +1,4 @@
-import { Table, Tooltip } from '@heroui/react';
+import { Heading, Paragraph, Table, Tooltip } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { Package, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -17,6 +17,7 @@ import { TableRowSkeleton, TableSkeletonHeader } from '../../../shared/component
 import { formatCurrency } from '../../../shared/lib/format';
 import type { AppLang } from '../../../shared/lib/theme-storage';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
+import { EmptyState } from '../../../shared/components/EmptyState';
 
 export function AdminProductsListPage() {
   const { t, i18n } = useTranslation();
@@ -35,10 +36,10 @@ export function AdminProductsListPage() {
     <section className="space-y-8">
       <header className="flex items-center justify-between gap-3">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <Heading className="text-2xl font-semibold tracking-tight">
             {t('admin.products.list.title')}
-          </h1>
-          <p className="text-sm text-default-500">{t('admin.products.list.subtitle')}</p>
+          </Heading>
+          <Paragraph className="text-sm text-default-500">{t('admin.products.list.subtitle')}</Paragraph>
         </div>
         <Link
           to="/admin/products/new"
@@ -118,10 +119,7 @@ export function AdminProductsListPage() {
           onRetry={() => void products.refetch()}
         />
       ) : (products.data?.items ?? []).length === 0 ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Package className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="text-sm text-default-500">{t('admin.products.list.empty')}</p>
-        </div>
+        <EmptyState icon={Package} title={t('admin.products.list.empty')} />
       ) : (
         <div className="space-y-4">
           <Table className="rounded-large border border-divider/60">

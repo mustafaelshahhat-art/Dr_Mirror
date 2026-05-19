@@ -22,7 +22,7 @@ import { ThemeToggle } from './ThemeToggle';
  * Approved Composition Component (per data-model.md § Approved Composition Components):
  * composes Surface (Anatomy A.21) + Button (Anatomy A.14) + Drawer (Anatomy A.7) +
  * Link (Anatomy A.23) + Separator.
- * HeroUI v3 ships no Navbar primitive; composition is the v3-idiomatic answer (research §1).
+ * HeroUI v3 ships no dedicated nav-bar primitive; composition is the v3-idiomatic answer (research §1).
  * Surface uses variant="transparent" so the design's translucent backdrop-blur effect
  * (bg-background/80 + backdrop-blur) is preserved; the <header> wrapper is a pure
  * semantic landmark with no token classes (permitted by FR-018 / T136).

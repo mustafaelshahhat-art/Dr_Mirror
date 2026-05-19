@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Form } from '@heroui/react';
+import { Alert, Button, Form } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { isAxiosError } from 'axios';
@@ -65,12 +65,11 @@ export function RegisterPage() {
     >
       <Form onSubmit={onSubmit} className="flex flex-col gap-4">
         {serverError ? (
-          <div
-            role="alert"
-            className="rounded-medium border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
-          >
-            {serverError}
-          </div>
+          <Alert status="danger" role="alert">
+            <Alert.Content>
+              <Alert.Description>{serverError}</Alert.Description>
+            </Alert.Content>
+          </Alert>
         ) : null}
 
         <FormField

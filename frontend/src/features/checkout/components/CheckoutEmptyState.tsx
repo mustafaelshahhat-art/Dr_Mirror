@@ -1,6 +1,7 @@
-import { buttonVariants } from '@heroui/styles';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+import { EmptyState } from '../../../shared/components/EmptyState';
 
 /**
  * Shown when the buyer reaches /checkout with an empty cart — usually
@@ -9,13 +10,12 @@ import { Link } from 'react-router-dom';
  */
 export function CheckoutEmptyState() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
-    <div className="space-y-3 rounded-large border border-divider/60 bg-content1 p-10 text-center">
-      <h1 className="text-lg font-semibold">{t('checkout.empty.title')}</h1>
-      <p className="text-sm text-default-500">{t('checkout.empty.subtitle')}</p>
-      <Link to="/" className={buttonVariants({ variant: 'primary' })}>
-        {t('checkout.empty.cta')}
-      </Link>
-    </div>
+    <EmptyState
+      title={t('checkout.empty.title')}
+      subtitle={t('checkout.empty.subtitle')}
+      action={{ label: t('checkout.empty.cta'), onPress: () => void navigate('/') }}
+    />
   );
 }

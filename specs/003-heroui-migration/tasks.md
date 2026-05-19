@@ -356,17 +356,13 @@ Documented exception: native `<input type="file">` (Exception 3).
 
 **Goal**: Delete custom `PaginationBar.tsx` and route `CatalogPage` to the existing `PaginationControls` shim (a thin Approved Composition Component over the HeroUI v3 `Pagination` compound per Anatomy A.4: `Pagination.Content` / `Pagination.Item` / `Pagination.Link` / `Pagination.Previous` / `Pagination.Next` / `Pagination.Ellipsis` / optional `Pagination.Summary`). **Banned**: `PaginationBar` name in implementation after deletion.
 
-**Independent Test**: Catalog renders HeroUI `<Pagination>` compound (via `PaginationControls`) when `totalPages > 1`. RTL arrow directions follow `<html dir="rtl">` correctly (HeroUI handles this via React Aria). `PaginationBar.tsx` no longer exists.
-
-- [ ] T141 [US8] Update `frontend/src/features/catalog/CatalogPage.tsx` to import `PaginationControls` from `frontend/src/shared/components/PaginationControls.tsx`; preserve `page` / `totalPages` / `onPageChange` props and the "X results" summary text adjacent to `PaginationControls`. The summary text MAY use HeroUI `Pagination.Summary` if the shim exposes it; otherwise a HeroUI `<Typography>` sibling carrying the count is acceptable.
-- [ ] T142 [US8] Delete `frontend/src/features/catalog/components/PaginationBar.tsx` (per `data-model.md` آ§ Deleted Files).
-- [ ] T143 [US8] Run US8 grep gate: `Select-String -Path "frontend/src/**/*.tsx","frontend/src/**/*.ts" -Pattern "PaginationBar" -SimpleMatch` â†’ zero matches; record in PR.
-- [ ] T144 [US8] Run `npm --prefix frontend run build`, `npm --prefix frontend test`, `npm --prefix frontend run i18n:check`, `npm --prefix frontend run lint` â€” all must pass; if a `CatalogPage` test asserts on `PaginationBar` text, update it to assert on the new `PaginationControls`-emitted DOM (this is one of the few places a test update is permitted, per the public-contract-change rule).
+- [X] T141 [US8] Update `frontend/src/features/catalog/CatalogPage.tsx` to import `PaginationControls` from `frontend/src/shared/components/PaginationControls.tsx`; preserve `page` / `totalPages` / `onPageChange` props and the "X results" summary text adjacent to `PaginationControls`. The summary text MAY use HeroUI `Pagination.Summary` if the shim exposes it; otherwise a HeroUI `<Typography>` sibling carrying the count is acceptable.
+- [X] T142 [US8] Delete `frontend/src/features/catalog/components/PaginationBar.tsx` (per `data-model.md` آ§ Deleted Files).
+- [X] T143 [US8] Run US8 grep gate: `Select-String -Path "frontend/src/**/*.tsx","frontend/src/**/*.ts" -Pattern "PaginationBar" -SimpleMatch` â†’ zero matches; record in PR.
+- [X] T144 [US8] Run `npm --prefix frontend run build`, `npm --prefix frontend test`, `npm --prefix frontend run i18n:check`, `npm --prefix frontend run lint` â€” all must pass; if a `CatalogPage` test asserts on `PaginationBar` text, update it to assert on the new `PaginationControls`-emitted DOM (this is one of the few places a test update is permitted, per the public-contract-change rule).
 - [ ] T144-vm [US8] **SC-009 Visual Verification Matrix** for the catalog pagination surface (en LTR + ar RTL أ— light + dark أ— 375/768/1280 + first/middle/last page states + disabled state when only one page + RTL arrow direction). Record per-state result table in PR.
 
 **Checkpoint**: `PaginationBar.tsx` deleted. All pagination via HeroUI `Pagination` compound consumed through `PaginationControls`.
-
----
 
 ## Phase 11: User Story 9 â€” Alerts, Banners & Toast Audit (Priority: P3)
 

@@ -1,5 +1,6 @@
-import { Table } from '@heroui/react';
+import { Heading, Paragraph, Table } from '@heroui/react';
 import { Package } from 'lucide-react';
+import { EmptyState } from '../../shared/components/EmptyState';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -40,10 +41,10 @@ export function AdminOrdersListPage() {
     <section className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <Heading className="text-2xl font-semibold tracking-tight">
             {t('admin.list.title')}
-          </h1>
-          <p className="text-sm text-default-500">{t('admin.list.subtitle')}</p>
+          </Heading>
+          <Paragraph className="text-sm text-default-500">{t('admin.list.subtitle')}</Paragraph>
         </div>
         <StatusFilterDropdown
           value={statusFilter}
@@ -75,15 +76,13 @@ export function AdminOrdersListPage() {
           onRetry={() => void query.refetch()}
         />
       ) : !query.data?.items || query.data.items.length === 0 ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Package className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <h2 className="text-base font-semibold">{t('admin.list.empty.title')}</h2>
-          <p className="mt-1 text-sm text-default-500">
-            {statusFilter !== undefined
-              ? t('admin.list.empty.subtitleFiltered')
-              : t('admin.list.empty.subtitle')}
-          </p>
-        </div>
+        <EmptyState
+          icon={Package}
+          title={t('admin.list.empty.title')}
+          subtitle={statusFilter !== undefined
+            ? t('admin.list.empty.subtitleFiltered')
+            : t('admin.list.empty.subtitle')}
+        />
       ) : (
         <>
           {query.data && query.data.totalCount > 0 ? (

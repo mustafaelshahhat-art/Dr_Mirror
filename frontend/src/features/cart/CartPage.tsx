@@ -1,13 +1,14 @@
-import { Button, Card, Separator } from '@heroui/react';
+import { Alert, Button, Card, Heading, Paragraph, Separator } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { CartLineSkeleton } from '../../shared/components/Skeleton';
+import { EmptyState } from '../../shared/components/EmptyState';
 
 import { CartLineRow } from './components/CartLineRow';
 import { useCart } from './useCart';
@@ -18,6 +19,7 @@ import { useCart } from './useCart';
  * the same view shape.
  */
 export function CartPage() {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const { cart, updateQuantity, removeItem, clear, mergeError, retryMerge } = useCart();
@@ -37,18 +39,17 @@ export function CartPage() {
       </Link>
 
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('cart.title')}</h1>
-        <p className="text-sm text-default-500">
+        <Heading className="text-2xl font-semibold tracking-tight">{t('cart.title')}</Heading>
+        <Paragraph className="text-sm text-default-500">
           {t('cart.subtitle', { count: cart.totalQuantity })}
-        </p>
+        </Paragraph>
       </header>
 
       {mergeError ? (
-        <div
-          role="alert"
-          className="flex items-start justify-between gap-3 rounded-medium border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
-        >
-          <span>{mergeError}</span>
+        <Alert status="danger" role="alert">
+          <Alert.Content>
+            <Alert.Description>{mergeError}</Alert.Description>
+          </Alert.Content>
           <Button
             variant="ghost"
             size="sm"
@@ -57,16 +58,15 @@ export function CartPage() {
           >
             {t('cart.retryMerge')}
           </Button>
-        </div>
+        </Alert>
       ) : null}
 
       {errorMessage ? (
-        <div
-          role="alert"
-          className="rounded-medium border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
-        >
-          {errorMessage}
-        </div>
+        <Alert status="danger" role="alert">
+          <Alert.Content>
+            <Alert.Description>{errorMessage}</Alert.Description>
+          </Alert.Content>
+        </Alert>
       ) : null}
 
       {cart.isLoading ? (
@@ -136,9 +136,9 @@ export function CartPage() {
 
           <Card className="h-fit lg:sticky lg:top-20">
             <Card.Header>
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
+              <Heading level={2} className="text-sm font-semibold uppercase tracking-wide text-default-600">
                 {t('cart.summary')}
-              </h2>
+              </Heading>
             </Card.Header>
             <Card.Content className="space-y-4">
               <dl className="space-y-2 text-sm">
@@ -173,17 +173,12 @@ export function CartPage() {
           </Card>
         </div>
       ) : (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <ShoppingBag className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <h2 className="text-base font-semibold">{t('cart.empty.title')}</h2>
-          <p className="mt-1 text-sm text-default-500">{t('cart.empty.subtitle')}</p>
-          <Link
-            to="/"
-            className={`${buttonVariants({ variant: 'primary' })} mt-4`}
-          >
-            {t('cart.empty.cta')}
-          </Link>
-        </div>
+        <EmptyState
+          icon={ShoppingBag}
+          title={t('cart.empty.title')}
+          subtitle={t('cart.empty.subtitle')}
+          action={{ label: t('cart.empty.cta'), onPress: () => void navigate('/') }}
+        />
       )}
     </section>
   );

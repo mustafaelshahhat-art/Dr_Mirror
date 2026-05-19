@@ -1,4 +1,5 @@
-import { Button, Card, Chip } from '@heroui/react';
+import { Button, Card, Chip, Heading, Paragraph } from '@heroui/react';
+import { EmptyState } from '../../shared/components/EmptyState';
 import { buttonVariants } from '@heroui/styles';
 import { Mail, MailOpen } from 'lucide-react';
 import { useState } from 'react';
@@ -39,8 +40,8 @@ export function AdminInquiriesPage() {
   return (
     <section className="space-y-8">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('inquiries.admin.title')}</h1>
-        <p className="text-sm text-default-500">{t('inquiries.admin.subtitle')}</p>
+        <Heading className="text-2xl font-semibold tracking-tight">{t('inquiries.admin.title')}</Heading>
+        <Paragraph className="text-sm text-default-500">{t('inquiries.admin.subtitle')}</Paragraph>
       </header>
 
       <div className="flex flex-wrap gap-2" role="group" aria-label={t('inquiries.admin.filterLabel')}>
@@ -105,10 +106,7 @@ export function AdminInquiriesPage() {
           />
         </div>
       ) : (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <MailOpen className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="enter-fade-up text-sm text-default-500">{t('inquiries.admin.empty')}</p>
-        </div>
+        <EmptyState icon={MailOpen} title={t('inquiries.admin.empty')} />
       )}
     </section>
   );
@@ -164,14 +162,14 @@ function InquiryRow({
               })}
             </span>
           </div>
-          <h2
+          <Card.Title
             className={[
               'mt-1 line-clamp-1 text-sm text-foreground',
               isNew ? 'font-semibold' : 'font-medium',
             ].join(' ')}
           >
             {inquiry.subject}
-          </h2>
+          </Card.Title>
           <p className="mt-0.5 text-xs text-default-500">
             {t('inquiries.admin.from')}: <span className="font-medium text-foreground">{inquiry.fullName}</span>{' '}
             <a

@@ -1,13 +1,14 @@
+import { Heading, Paragraph } from '@heroui/react';
 import { useState } from 'react';
-import { buttonVariants } from '@heroui/styles';
 import { Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
+import { EmptyState } from '../../shared/components/EmptyState';
 import { OrderRowSkeleton, Skeleton } from '../../shared/components/Skeleton';
 
 import { OrderStatusBadge } from './components/OrderStatusBadge';
@@ -18,6 +19,7 @@ import { useMyOrdersQuery } from './hooks';
  * links to the order detail page. Empty state nudges back to the catalog.
  */
 export function OrdersListPage() {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const [page, setPage] = useState(1);
@@ -60,22 +62,17 @@ export function OrdersListPage() {
   return (
     <section className="space-y-8">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('orders.list.title')}</h1>
-        <p className="text-sm text-default-500">{t('orders.list.subtitle')}</p>
+        <Heading className="text-2xl font-semibold tracking-tight">{t('orders.list.title')}</Heading>
+        <Paragraph className="text-sm text-default-500">{t('orders.list.subtitle')}</Paragraph>
       </header>
 
       {orders.length === 0 ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Package className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <h2 className="enter-fade-up text-base font-semibold">{t('orders.list.empty.title')}</h2>
-          <p className="enter-fade-up mt-1 text-sm text-default-500">{t('orders.list.empty.subtitle')}</p>
-          <Link
-            to="/"
-            className={`${buttonVariants({ variant: 'primary' })} mt-4`}
-          >
-            {t('orders.list.empty.cta')}
-          </Link>
-        </div>
+        <EmptyState
+          icon={Package}
+          title={t('orders.list.empty.title')}
+          subtitle={t('orders.list.empty.subtitle')}
+          action={{ label: t('orders.list.empty.cta'), onPress: () => void navigate('/') }}
+        />
       ) : (
         <ul className="space-y-2" aria-busy={query.isFetching}>
           {orders.map((order) => (

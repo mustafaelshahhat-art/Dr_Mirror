@@ -1,3 +1,4 @@
+import { Heading } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 import {
   ChevronRight,
@@ -9,6 +10,8 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+
+import { EmptyState } from '../../shared/components/EmptyState';
 
 import { useAuth } from '../auth/useAuth';
 import type { OrderStatus } from '../orders/types';
@@ -50,7 +53,7 @@ export function AdminHubPage() {
   return (
     <section className="space-y-8">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('admin.hub.title')}</h1>
+        <Heading className="text-2xl font-semibold tracking-tight">{t('admin.hub.title')}</Heading>
         <p className="text-sm text-default-500">{t('admin.hub.subtitle')}</p>
       </header>
 
@@ -140,14 +143,11 @@ export function AdminHubPage() {
 
           <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
             <div className="space-y-3">
-              <h2 className="text-base font-semibold">{t('admin.hub.recent.heading')}</h2>
+              <Heading level={2} className="text-base font-semibold">{t('admin.hub.recent.heading')}</Heading>
               {recentQuery.isLoading ? (
-                <div className="h-32 animate-pulse rounded-large border border-divider/60 bg-content1" />
+                <Skeleton className="h-32 rounded-large" />
               ) : recentOrders.length === 0 ? (
-                <div className="rounded-large border border-divider/60 bg-content1 p-6 text-center">
-                  <Inbox className="enter-fade-up mx-auto mb-2 size-6 text-default-400" aria-hidden />
-                  <p className="enter-fade-up text-sm text-default-500">{t('admin.hub.recent.empty')}</p>
-                </div>
+                <EmptyState icon={Inbox} title={t('admin.hub.recent.empty')} />
               ) : (
                 <div className="space-y-2" aria-busy={recentQuery.isFetching}>
                   {recentOrders.slice(0, 5).map((o) => (
@@ -175,7 +175,7 @@ export function AdminHubPage() {
             </div>
 
             <div className="space-y-3">
-              <h2 className="text-base font-semibold">{t('admin.hub.quickLinks')}</h2>
+              <Heading level={2} className="text-base font-semibold">{t('admin.hub.quickLinks')}</Heading>
               <div className="space-y-2">
                 <QuickLink to="/admin/orders" icon={ClipboardList} label={t('admin.shell.nav.orders')} />
                 <QuickLink to="/admin/products" icon={Package} label={t('admin.shell.nav.products')} />

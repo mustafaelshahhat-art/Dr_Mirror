@@ -1,4 +1,4 @@
-import { Button, Form, ProgressBar } from '@heroui/react';
+import { Alert, Button, Form, Heading, Paragraph, ProgressBar } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -226,8 +226,8 @@ function CheckoutBody() {
       </Link>
 
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('checkout.title')}</h1>
-        <p className="text-sm text-default-500">{t('checkout.subtitle')}</p>
+        <Heading className="text-2xl font-semibold tracking-tight">{t('checkout.title')}</Heading>
+        <Paragraph className="text-sm text-default-500">{t('checkout.subtitle')}</Paragraph>
       </header>
 
       <div className="space-y-3">
@@ -252,12 +252,11 @@ function CheckoutBody() {
       >
         <div className="space-y-4">
           {formError ? (
-            <div
-              role="alert"
-              className="rounded-medium border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
-            >
-              {formError}
-            </div>
+            <Alert status="danger" role="alert">
+              <Alert.Content>
+                <Alert.Description>{formError}</Alert.Description>
+              </Alert.Content>
+            </Alert>
           ) : null}
 
           {step === 'address' ? (
