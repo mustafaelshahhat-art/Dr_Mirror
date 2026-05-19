@@ -2,7 +2,6 @@ import { Table } from '@heroui/react';
 
 import { Skeleton } from './Skeleton';
 
-const tableSkeletonAnimation = 'shimmer' as const;
 
 /**
  * Generic table-row skeleton for admin tables. Composes HeroUI Table + Skeleton
@@ -15,7 +14,7 @@ export function TableRowSkeleton({ cols = 4 }: { cols?: number }) {
     <Table.Row className="border-b border-divider/60 last:border-b-0">
       {Array.from({ length: cols }).map((_, i) => (
         <Table.Cell key={i} className="px-4 py-3">
-          <Skeleton className={`h-4 ${widths[i % widths.length]} rounded-lg`} animationType={tableSkeletonAnimation} />
+          <Skeleton className={`h-4 ${widths[i % widths.length]} rounded-lg`} />
         </Table.Cell>
       ))}
     </Table.Row>

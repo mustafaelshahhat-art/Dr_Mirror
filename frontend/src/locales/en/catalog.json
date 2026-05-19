@@ -1,6 +1,16 @@
 {
   "title": "Premium medical apparel",
   "subtitle": "Scrubs, lab coats, and surgical wear crafted for healthcare professionals.",
+  "hero": {
+    "eyebrow": "Dr. Mirror",
+    "title": "Premium medical apparel",
+    "subtitle": "Scrubs, lab coats, and surgical wear crafted for healthcare professionals."
+  },
+  "badge": {
+    "new": "New",
+    "lowStock": "Low stock",
+    "soldOut": "Sold out"
+  },
   "search": {
     "label": "Search products",
     "placeholder": "Search products...",
@@ -39,6 +49,7 @@
   },
   "list": {
     "soldOut": "Sold out",
+    "addToCart": "Add to cart",
     "sizesAvailable_one": "1 size",
     "sizesAvailable_other": "{{count}} sizes",
     "viewDetails": "View details",

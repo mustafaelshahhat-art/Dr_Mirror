@@ -34,42 +34,33 @@ export function ShellPage() {
   const createdAt = user.createdAt ? dateFmt.format(new Date(user.createdAt)) : null;
   const orders = ordersQuery.data?.items ?? [];
 
+  const initials = user.fullName
+    .split(' ')
+    .slice(0, 2)
+    .map((n) => n[0]?.toUpperCase() ?? '')
+    .join('');
+
   return (
     <div className="space-y-8">
-      <section className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t('account.welcome', { name: user.fullName })}
-        </h1>
-        <p className="max-w-prose text-sm text-default-500">
-          {t('account.subtitle')}
-        </p>
-      </section>
-
-      <section className="content-surface p-6">
-        <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div>
-            <dt className="text-xs uppercase tracking-wide text-default-500">
-              {t('account.fields.fullName')}
-            </dt>
-            <dd className="mt-1 text-sm font-medium">{user.fullName}</dd>
-          </div>
-          <div>
-            <dt className="text-xs uppercase tracking-wide text-default-500">
-              {t('account.fields.email')}
-            </dt>
-            <dd className="mt-1 text-sm font-medium" dir="ltr">{user.email}</dd>
-          </div>
+      {/* Account identity header */}
+      <section className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-6">
+        <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-lg font-bold text-brand">
+          {initials}
+        </div>
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold tracking-tight">
+            {t('account.welcome', { name: user.fullName })}
+          </h1>
+          <p className="mt-0.5 text-sm text-muted">{user.email}</p>
           {createdAt ? (
-            <div>
-              <dt className="text-xs uppercase tracking-wide text-default-500">
-                {t('account.memberSince')}
-              </dt>
-              <dd className="mt-1 text-sm font-medium">{createdAt}</dd>
-            </div>
+            <p className="mt-0.5 text-xs text-default-400">
+              {t('account.account.memberSince', { date: createdAt })}
+            </p>
           ) : null}
-        </dl>
+        </div>
       </section>
 
+      {/* Navigation rail */}
       <section aria-labelledby="quick-links" className="grid gap-3 sm:grid-cols-2">
         <h2 id="quick-links" className="sr-only">
           {t('account.quickLinks')}

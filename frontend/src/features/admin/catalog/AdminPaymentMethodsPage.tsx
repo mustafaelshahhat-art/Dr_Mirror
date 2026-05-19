@@ -3,6 +3,7 @@ import { CreditCard, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { PageHeader } from '../../../shared/components/PageHeader';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { PaymentMethodTileSkeleton } from '../../../shared/components/Skeleton';
 
@@ -34,10 +35,7 @@ export function AdminPaymentMethodsPage() {
         aria-busy="true"
         aria-label={t('admin.payments.loading')}
       >
-        <header className="page-header">
-          <h1 className="page-title">{t('admin.payments.title')}</h1>
-          <p className="page-subtitle">{t('admin.payments.subtitle')}</p>
-        </header>
+        <PageHeader title={t('admin.payments.title')} subtitle={t('admin.payments.subtitle')} />
         <ul className="space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (
             <li key={i}>
@@ -52,12 +50,7 @@ export function AdminPaymentMethodsPage() {
   if (query.isError) {
     return (
       <section className="space-y-8">
-        <header className="flex flex-wrap items-start justify-between gap-3">
-          <div className="page-header">
-            <h1 className="page-title">{t('admin.payments.title')}</h1>
-            <p className="page-subtitle">{t('admin.payments.subtitle')}</p>
-          </div>
-        </header>
+        <PageHeader title={t('admin.payments.title')} subtitle={t('admin.payments.subtitle')} />
         <QueryErrorState
           message={t('admin.payments.errorLoad')}
           retryLabel={t('admin.query.retry')}
@@ -71,20 +64,20 @@ export function AdminPaymentMethodsPage() {
 
   return (
     <section className="space-y-8">
-      <header className="flex flex-wrap items-start justify-between gap-3 sm:items-end">
-        <div className="page-header">
-          <h1 className="page-title">{t('admin.payments.title')}</h1>
-          <p className="page-subtitle">{t('admin.payments.subtitle')}</p>
-        </div>
-        {!creating ? (
-          <Button variant="primary" size="sm" onPress={() => setCreating(true)}>
-            <span className="inline-flex items-center gap-1.5">
-              <Plus className="size-4" aria-hidden />
-              {t('admin.payments.actions.new')}
-            </span>
-          </Button>
-        ) : null}
-      </header>
+      <PageHeader
+        title={t('admin.payments.title')}
+        subtitle={t('admin.payments.subtitle')}
+        action={
+          !creating ? (
+            <Button variant="primary" size="sm" onPress={() => setCreating(true)}>
+              <span className="inline-flex items-center gap-1.5">
+                <Plus className="size-4" aria-hidden />
+                {t('admin.payments.actions.new')}
+              </span>
+            </Button>
+          ) : undefined
+        }
+      />
 
       {creating ? (
         // eslint-disable-next-line i18next/no-literal-string -- programmatic form mode, not user copy

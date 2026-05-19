@@ -78,7 +78,25 @@
     "account": "Account",
     "support": "Support & contact",
     "supportLine": "Reach us via our contact page for questions about orders, sizing, or returns.",
-    "contactPage": "Open a support inquiry"
+    "contactPage": "Open a support inquiry",
+    "shop": {
+      "title": "Shop"
+    },
+    "accountNav": {
+      "title": "Account"
+    }
+  },
+  "payment": {
+    "cod": { "label": "Cash on delivery" },
+    "instapay": { "label": "Instapay" },
+    "wallet": { "label": "Mobile wallet" }
+  },
+  "governorateCaption": "We deliver to all 27 governorates.",
+  "trust": {
+    "cod": "Cash on delivery",
+    "instapay": "Instapay & Wallet",
+    "governorates": "All 27 governorates",
+    "returns": "Easy returns"
   },
   "quantityMultiplier": "× {{count}}",
   "dismiss": "Dismiss",

@@ -6,6 +6,8 @@ import { Link, useParams } from 'react-router-dom';
 import { useAdminProductQuery } from './hooks';
 import type { AdminProductDetailDto } from './types';
 
+import { PageHeader } from '../../../shared/components/PageHeader';
+
 import { ProductImagesSection } from './components/ProductImagesSection';
 import { ProductMasterForm } from './components/ProductMasterForm';
 import { ProductVariantsSection } from './components/ProductVariantsSection';
@@ -41,12 +43,7 @@ function Inner({ product }: { product: AdminProductDetailDto }) {
         {t('admin.products.edit.back')}
       </Link>
 
-      <header className="page-header">
-        <h1 className="page-title">{product.nameEn}</h1>
-        <p className="page-subtitle" dir="ltr">
-          /{product.slug}
-        </p>
-      </header>
+      <PageHeader title={product.nameEn} subtitle={`/${product.slug}`} />
 
       <Tabs variant="secondary" className="space-y-4">
         <Tabs.ListContainer>

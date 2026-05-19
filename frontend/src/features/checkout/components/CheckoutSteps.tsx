@@ -26,10 +26,10 @@ export function CheckoutSteps({ current }: { current: CheckoutStep }) {
               className={[
                 'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold sm:size-7',
                 completed
-                  ? 'bg-success text-success-foreground'
+                  ? 'bg-brand text-brand-foreground'
                   : reached
-                    ? 'bg-brand text-white'
-                    : 'border border-divider bg-surface text-muted',
+                    ? 'bg-brand text-brand-foreground'
+                    : 'bg-default-200 text-muted',
               ].join(' ')}
             >
               {completed ? <Check className="size-3" aria-hidden /> : idx + 1}

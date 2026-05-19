@@ -379,6 +379,20 @@
       "rejected": "مرفوض"
     }
   },
+  "sidebar": {
+    "section": {
+      "shop": "المتجر",
+      "orders": "الطلبات",
+      "catalog": "الكتالوج",
+      "settings": "الإعدادات"
+    }
+  },
+  "proofReview": {
+    "toggle": {
+      "fit": "احتواء",
+      "fill": "تعبئة"
+    }
+  },
   "shell": {
     "breadcrumbs": "مسار التنقل",
     "navTitle": "التنقل",

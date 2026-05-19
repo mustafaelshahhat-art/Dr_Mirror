@@ -63,9 +63,9 @@ export function AddressStep({
                     value={a.id}
                     className={({ isFocusVisible, isSelected }) => [
                       'cursor-pointer rounded-medium border p-3 text-start transition-colors',
-                      isFocusVisible ? 'outline outline-2 outline-offset-2 outline-primary' : '',
+                      isFocusVisible ? 'outline outline-2 outline-offset-2 outline-brand' : '',
                       isSelected
-                        ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                        ? 'border-brand bg-brand-subtle'
                         : 'border-divider bg-content1 hover:bg-content2',
                     ].filter(Boolean).join(' ')}
                   >

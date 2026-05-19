@@ -2,6 +2,7 @@
 // HeroUI v3 ships no EmptyState primitive; this file is the Approved Composition Component.
 import { Button, Card, Heading, Paragraph } from '@heroui/react';
 import { Inbox, type LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 interface EmptyStateAction {
   label: string;
@@ -13,6 +14,7 @@ interface EmptyStateProps {
   title: string;
   subtitle?: string;
   action?: EmptyStateAction;
+  secondaryAction?: ReactNode;
 }
 
 export function EmptyState({
@@ -20,21 +22,27 @@ export function EmptyState({
   title,
   subtitle,
   action,
+  secondaryAction,
 }: EmptyStateProps) {
   return (
     <Card variant="transparent" className="py-14 sm:py-16">
       <Card.Content className="flex flex-col items-center gap-4 text-center">
-        <div className="enter-fade-up flex size-16 items-center justify-center rounded-2xl bg-default-100 dark:bg-default-50/5">
-          <Icon className="size-8 text-default-400" aria-hidden />
+        <div className="enter-fade-up flex size-16 items-center justify-center rounded-2xl bg-brand-subtle">
+          <Icon className="size-7 text-brand" aria-hidden />
         </div>
         <div className="enter-fade-up space-y-1.5">
           <Heading level={2} className="text-base font-semibold text-foreground">{title}</Heading>
           {subtitle && <Paragraph className="mx-auto max-w-xs text-sm leading-relaxed text-muted">{subtitle}</Paragraph>}
         </div>
-        {action && (
-          <Button variant="primary" onPress={action.onPress} className="mt-1">
-            {action.label}
-          </Button>
+        {(action || secondaryAction) && (
+          <div className="mt-1 flex flex-wrap justify-center gap-2">
+            {action && (
+              <Button variant="primary" onPress={action.onPress}>
+                {action.label}
+              </Button>
+            )}
+            {secondaryAction}
+          </div>
         )}
       </Card.Content>
     </Card>

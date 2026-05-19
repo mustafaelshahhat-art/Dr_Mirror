@@ -22,6 +22,7 @@ import { ReviewStep } from './components/ReviewStep';
 import { checkoutSchema, type CheckoutForm } from './schemas';
 
 import { FormField } from '../auth/components/FormField';
+import { PageHeader } from '../../shared/components/PageHeader';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import {
   CartLineSkeleton,
@@ -222,10 +223,7 @@ function CheckoutBody() {
         {t('checkout.backToCart')}
       </Link>
 
-      <header className="page-header">
-        <h1 className="page-title">{t('checkout.title')}</h1>
-        <p className="page-subtitle">{t('checkout.subtitle')}</p>
-      </header>
+      <PageHeader title={t('checkout.title')} subtitle={t('checkout.subtitle')} />
 
       <div className="space-y-3">
         <ProgressBar
@@ -234,10 +232,9 @@ function CheckoutBody() {
           maxValue={3}
           aria-label={t('checkout.title')}
           size="sm"
-          color="accent"
         >
-          <ProgressBar.Track className="h-1 bg-primary/10">
-            <ProgressBar.Fill />
+          <ProgressBar.Track className="h-1.5 rounded-full bg-default-200">
+            <ProgressBar.Fill className="bg-brand" />
           </ProgressBar.Track>
         </ProgressBar>
         <CheckoutSteps current={step} />

@@ -76,6 +76,7 @@ export function RegisterPage() {
           name="fullName"
           control={control}
           label={t('auth.fullName')}
+          description={t('auth.fullNameHint')}
           autoComplete="name"
           isRequired
           variant="bordered"

@@ -1,6 +1,6 @@
 import { Button, Drawer, Link, Separator, Surface } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
-import { LogOut, Menu, Plus, ShoppingBag, User as UserIcon } from 'lucide-react';
+import { LogOut, Menu, ShoppingBag, User as UserIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { useAuth } from '../../features/auth/useAuth';
 import { CartButton } from '../../features/cart/components/CartButton';
 import { useCart } from '../../features/cart/useCart';
 
+import { BrandMark } from './BrandMark';
 import { LangSwitcher } from './LangSwitcher';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -49,13 +50,7 @@ export function Header() {
             href="/"
             className="flex items-center gap-2 text-base font-bold tracking-tight transition-opacity hover:opacity-75 sm:text-lg"
           >
-            {/* Medical cross brand mark */}
-            <span
-              className="flex size-7 items-center justify-center rounded-md bg-brand text-white"
-              aria-hidden
-            >
-              <Plus className="size-4" />
-            </span>
+            <BrandMark size={20} />
             {t('appName')}
           </Link>
 
@@ -150,12 +145,7 @@ export function Header() {
                   onPress={() => setMenuOpen(false)}
                   className="flex items-center gap-2 text-sm font-bold tracking-tight"
                 >
-                  <span
-                    className="flex size-6 items-center justify-center rounded-md bg-brand text-white"
-                    aria-hidden
-                  >
-                    <Plus className="size-3.5" />
-                  </span>
+                  <BrandMark size={16} />
                   {t('appName')}
                 </Link>
                 <Drawer.CloseTrigger aria-label={t('common.dismiss')} />

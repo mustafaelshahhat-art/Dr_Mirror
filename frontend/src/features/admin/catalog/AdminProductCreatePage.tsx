@@ -10,6 +10,7 @@ import type { ProductGender } from '../../catalog/types';
 import { useAdminCategoriesQuery, useCreateProductMutation } from './hooks';
 
 import { Field, TextAreaField } from '../../../shared/components/Field';
+import { PageHeader } from '../../../shared/components/PageHeader';
 import { SelectField } from '../../../shared/components/SelectField';
 import { Skeleton } from '../../../shared/components/Skeleton';
 
@@ -69,10 +70,7 @@ export function AdminProductCreatePage() {
         {t('admin.products.create.back')}
       </Link>
 
-      <header className="page-header">
-        <h1 className="page-title">{t('admin.products.create.title')}</h1>
-        <p className="page-subtitle">{t('admin.products.create.subtitle')}</p>
-      </header>
+      <PageHeader title={t('admin.products.create.title')} subtitle={t('admin.products.create.subtitle')} />
 
       <Form
         onSubmit={async (e) => {

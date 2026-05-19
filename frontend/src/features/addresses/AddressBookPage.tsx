@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
+import { PageHeader } from '../../shared/components/PageHeader';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { AddressCardSkeleton, Skeleton } from '../../shared/components/Skeleton';
 import { AddressForm } from './components/AddressForm';
@@ -57,10 +58,7 @@ export function AddressBookPage() {
           <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
           {t('addresses.backToAccount')}
         </Link>
-        <header className="page-header">
-          <h1 className="page-title">{t('addresses.title')}</h1>
-          <p className="page-subtitle">{t('addresses.subtitle')}</p>
-        </header>
+        <PageHeader title={t('addresses.title')} subtitle={t('addresses.subtitle')} />
         <QueryErrorState
           message={t('addresses.errors.unknown')}
           retryLabel={t('common.query.retry')}
@@ -80,20 +78,20 @@ export function AddressBookPage() {
         {t('addresses.backToAccount')}
       </Link>
 
-      <header className="flex flex-wrap items-start justify-between gap-3 sm:items-end">
-        <div className="page-header">
-          <h1 className="page-title">{t('addresses.title')}</h1>
-          <p className="page-subtitle">{t('addresses.subtitle')}</p>
-        </div>
-        {!creating && !isFirstAddress ? (
-          <Button variant="primary" size="sm" onPress={() => setCreating(true)}>
-            <span className="inline-flex items-center gap-1.5">
-              <Plus className="size-4" aria-hidden />
-              {t('addresses.actions.add')}
-            </span>
-          </Button>
-        ) : null}
-      </header>
+      <PageHeader
+        title={t('addresses.title')}
+        subtitle={t('addresses.subtitle')}
+        action={
+          !creating && !isFirstAddress ? (
+            <Button variant="primary" size="sm" onPress={() => setCreating(true)}>
+              <span className="inline-flex items-center gap-1.5">
+                <Plus className="size-4" aria-hidden />
+                {t('addresses.actions.add')}
+              </span>
+            </Button>
+          ) : undefined
+        }
+      />
 
       {(creating || isFirstAddress) ? (
         <AddressForm

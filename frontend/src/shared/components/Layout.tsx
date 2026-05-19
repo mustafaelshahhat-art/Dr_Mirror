@@ -1,8 +1,9 @@
 import { Separator } from '@heroui/react';
-import { Plus } from 'lucide-react';
+import { Banknote, Smartphone, Wallet } from 'lucide-react';
 import { Link, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+import { BrandMark } from './BrandMark';
 import { DowntimeBanner } from './DowntimeBanner';
 import { ForbiddenBanner } from './ForbiddenBanner';
 import { Header } from './Header';
@@ -31,64 +32,75 @@ export function Layout() {
         <Outlet />
       </main>
 
-      <footer className="border-t border-divider/60 bg-surface-secondary/40" aria-label={t('common.footer.quickLinks')}>
+      <footer className="border-t border-border/60 bg-surface-secondary/40" aria-label={t('common.footer.quickLinks')}>
         <div className="mx-auto w-full max-w-7xl px-4 md:px-6 lg:px-8">
-          {/* Main footer grid */}
-          <div className="grid grid-cols-1 gap-8 py-10 sm:grid-cols-2 lg:grid-cols-3">
+          {/* 4-column grid: Brand · Shop · Account · Support */}
+          <div className="grid grid-cols-1 gap-8 py-10 sm:grid-cols-2 lg:grid-cols-4">
             {/* Brand column */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <span
-                  className="flex size-6 items-center justify-center rounded-md bg-brand text-white"
-                  aria-hidden
-                >
-                  <Plus className="size-3.5" />
-                </span>
-                <span className="text-sm font-bold tracking-tight text-foreground">
-                  {t('appName')}
-                </span>
-              </div>
+            <div className="space-y-4">
+              <span className="inline-flex items-center gap-2 text-sm font-bold tracking-tight">
+                <BrandMark size={20} />
+                {t('appName')}
+              </span>
               <p className="max-w-xs text-xs leading-relaxed text-muted">
                 {t('common.footer.tagline')}
               </p>
+              {/* Payment affordances row */}
+              <div className="flex flex-wrap gap-x-4 gap-y-2">
+                <span className="flex items-center gap-1.5 text-xs text-muted">
+                  <Banknote className="size-4 shrink-0" aria-hidden />
+                  {t('common.payment.cod.label')}
+                </span>
+                <span className="flex items-center gap-1.5 text-xs text-muted">
+                  <Smartphone className="size-4 shrink-0" aria-hidden />
+                  {t('common.payment.instapay.label')}
+                </span>
+                <span className="flex items-center gap-1.5 text-xs text-muted">
+                  <Wallet className="size-4 shrink-0" aria-hidden />
+                  {t('common.payment.wallet.label')}
+                </span>
+              </div>
+              <p className="text-xs text-muted">{t('common.governorateCaption')}</p>
             </div>
 
-            {/* Quick links column */}
+            {/* Shop column */}
             <div className="space-y-3">
               <h2 className="text-xs font-semibold uppercase tracking-wider text-foreground/70">
-                {t('common.footer.quickLinks')}
+                {t('common.footer.shop.title')}
               </h2>
               <ul className="space-y-2" role="list">
                 <li>
-                  <Link
-                    to="/"
-                    className="text-sm text-muted transition-colors hover:text-foreground"
-                  >
+                  <Link to="/" className="text-sm text-muted transition-colors hover:text-foreground">
                     {t('common.footer.browseCatalog')}
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to="/cart"
-                    className="text-sm text-muted transition-colors hover:text-foreground"
-                  >
+                  <Link to="/cart" className="text-sm text-muted transition-colors hover:text-foreground">
                     {t('common.footer.cart')}
                   </Link>
                 </li>
+              </ul>
+            </div>
+
+            {/* Account column */}
+            <div className="space-y-3">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-foreground/70">
+                {t('common.footer.accountNav.title')}
+              </h2>
+              <ul className="space-y-2" role="list">
                 <li>
-                  <Link
-                    to="/account/orders"
-                    className="text-sm text-muted transition-colors hover:text-foreground"
-                  >
-                    {t('common.footer.account')}
+                  <Link to="/account/orders" className="text-sm text-muted transition-colors hover:text-foreground">
+                    {t('account.myOrders.title')}
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to="/inquiries"
-                    className="text-sm text-muted transition-colors hover:text-foreground"
-                  >
-                    {t('common.footer.contact')}
+                  <Link to="/account/addresses" className="text-sm text-muted transition-colors hover:text-foreground">
+                    {t('account.addresses.title')}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/account" className="text-sm text-muted transition-colors hover:text-foreground">
+                    {t('common.footer.account')}
                   </Link>
                 </li>
               </ul>
@@ -106,15 +118,15 @@ export function Layout() {
                 to="/inquiries"
                 className="inline-flex text-sm font-medium text-brand transition-opacity hover:opacity-80"
               >
-                {t('common.footer.contactPage')} →
+                {t('common.footer.contactPage')}
               </Link>
             </div>
           </div>
 
           <Separator orientation="horizontal" />
 
-          {/* Bottom strip */}
-          <div className="flex flex-col items-center justify-between gap-3 py-5 sm:flex-row">
+          {/* Copyright row */}
+          <div className="py-5 text-center">
             <p className="text-xs text-muted">
               {t('common.footer.copyright', { year: new Date().getFullYear() })}
             </p>

@@ -81,7 +81,25 @@
     "account": "الحساب",
     "support": "الدعم والتواصل",
     "supportLine": "تواصل معنا عبر صفحة الاستفسارات لأي سؤال عن الطلبات أو المقاسات أو الإرجاع.",
-    "contactPage": "فتح استفسار"
+    "contactPage": "فتح استفسار",
+    "shop": {
+      "title": "تسوّق"
+    },
+    "accountNav": {
+      "title": "الحساب"
+    }
+  },
+  "payment": {
+    "cod": { "label": "الدفع عند الاستلام" },
+    "instapay": { "label": "إنستاباي" },
+    "wallet": { "label": "المحفظة الإلكترونية" }
+  },
+  "governorateCaption": "نوصل إلى جميع المحافظات الـ 27",
+  "trust": {
+    "cod": "الدفع عند الاستلام",
+    "instapay": "إنستاباي والمحفظة",
+    "governorates": "جميع المحافظات الـ 27",
+    "returns": "إرجاع سهل"
   },
   "quantityMultiplier": "× {{count}}",
   "dismiss": "إغلاق",

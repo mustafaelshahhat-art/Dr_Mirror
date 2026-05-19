@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
+import { PageHeader } from '../../../shared/components/PageHeader';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { Skeleton } from '../../../shared/components/Skeleton';
 
@@ -64,10 +65,7 @@ export function AdminCategoriesPage() {
   if (query.isError) {
     return (
       <section className="space-y-8">
-        <header className="page-header">
-          <h1 className="page-title">{t('admin.catalog.categories.title')}</h1>
-          <p className="page-subtitle">{t('admin.catalog.categories.subtitle')}</p>
-        </header>
+        <PageHeader title={t('admin.catalog.categories.title')} subtitle={t('admin.catalog.categories.subtitle')} />
         <QueryErrorState
           message={t('admin.catalog.categories.errorLoad')}
           retryLabel={t('admin.query.retry')}
@@ -81,10 +79,7 @@ export function AdminCategoriesPage() {
 
   return (
     <section className="space-y-8">
-      <header className="page-header">
-        <h1 className="page-title">{t('admin.catalog.categories.title')}</h1>
-        <p className="page-subtitle">{t('admin.catalog.categories.subtitle')}</p>
-      </header>
+      <PageHeader title={t('admin.catalog.categories.title')} subtitle={t('admin.catalog.categories.subtitle')} />
 
       <CreateCategoryForm
         onSubmit={async (body) => {

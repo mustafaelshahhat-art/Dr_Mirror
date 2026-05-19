@@ -8,20 +8,45 @@
  * blocks into shapes that match real content rows so layout doesn't shift
  * when data arrives.
  */
-import { Separator, Skeleton as HeroSkeleton } from '@heroui/react';
-import type { ComponentProps } from 'react';
+import { Separator } from '@heroui/react';
+import type { CSSProperties } from 'react';
 
-export function Skeleton({ className, ...rest }: ComponentProps<typeof HeroSkeleton>) {
-  return (
-    <HeroSkeleton
-      aria-hidden
-      className={[
-        'rounded-medium bg-default-200/60 motion-safe:animate-pulse',
-        className ?? '',
-      ].join(' ')}
-      {...rest}
-    />
-  );
+export interface SkeletonProps {
+  width?: string;
+  height?: string;
+  radius?: 'sm' | 'md' | 'lg' | 'full';
+  static?: boolean;
+  className?: string;
+}
+
+const RADIUS_CLASS: Record<NonNullable<SkeletonProps['radius']>, string> = {
+  sm: 'rounded-sm',
+  md: 'rounded-md',
+  lg: 'rounded-lg',
+  full: 'rounded-full',
+};
+
+export function Skeleton({
+  width,
+  height,
+  radius = 'md',
+  static: isStatic = false,
+  className,
+}: SkeletonProps) {
+  const style: CSSProperties = {};
+  if (width) style.width = width;
+  if (height) style.height = height;
+
+  const classes = [
+    'skeleton-base',
+    !isStatic && 'skeleton-shimmer',
+    RADIUS_CLASS[radius],
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  return <div aria-hidden className={classes} style={style} />;
 }
 
 /** Narrow row used for cart lines, mini-cart, and order rows. */

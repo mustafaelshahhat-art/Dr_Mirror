@@ -11,6 +11,7 @@ import type { ProductGender } from '../../catalog/types';
 
 import { useAdminCategoriesQuery, useAdminProductsQuery } from './hooks';
 
+import { PageHeader } from '../../../shared/components/PageHeader';
 import { PaginationControls } from '../../../shared/components/PaginationControls';
 import { SelectField } from '../../../shared/components/SelectField';
 import { TableRowSkeleton, TableSkeletonHeader } from '../../../shared/components/TableRowSkeleton';
@@ -34,19 +35,16 @@ export function AdminProductsListPage() {
 
   return (
     <section className="space-y-8">
-      <header className="flex items-center justify-between gap-3">
-        <div className="page-header">
-          <h1 className="page-title">{t('admin.products.list.title')}</h1>
-          <p className="page-subtitle">{t('admin.products.list.subtitle')}</p>
-        </div>
-        <Link
-          to="/admin/products/new"
-          className={buttonVariants({ variant: 'primary', size: 'sm' })}
-        >
-          <Plus className="size-4" aria-hidden />
-          {t('admin.products.list.new')}
-        </Link>
-      </header>
+      <PageHeader
+        title={t('admin.products.list.title')}
+        subtitle={t('admin.products.list.subtitle')}
+        action={
+          <Link to="/admin/products/new" className={buttonVariants({ variant: 'primary', size: 'sm' })}>
+            <Plus className="size-4" aria-hidden />
+            {t('admin.products.list.new')}
+          </Link>
+        }
+      />
 
       <div className="grid gap-2 sm:grid-cols-[1fr_12rem_10rem_10rem]">
         <SearchInput

@@ -9,6 +9,7 @@ import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { CartLineSkeleton } from '../../shared/components/Skeleton';
 import { EmptyState } from '../../shared/components/EmptyState';
+import { PageHeader } from '../../shared/components/PageHeader';
 
 import { CartLineRow } from './components/CartLineRow';
 import { useCart } from './useCart';
@@ -35,12 +36,10 @@ export function CartPage() {
         {t('cart.backToCatalog')}
       </Link>
 
-      <header className="page-header">
-        <h1 className="page-title">{t('cart.title')}</h1>
-        <p className="page-subtitle">
-          {t('cart.subtitle', { count: cart.totalQuantity })}
-        </p>
-      </header>
+      <PageHeader
+        title={t('cart.title')}
+        subtitle={t('cart.subtitle', { count: cart.totalQuantity })}
+      />
 
       {mergeError ? (
         <Alert status="danger" role="alert">
@@ -84,7 +83,7 @@ export function CartPage() {
           className="grid gap-6 lg:grid-cols-[1fr_320px]"
           aria-busy={cart.isMutating}
         >
-          <div className="space-y-3">
+          <div className="space-y-4">
             {cart.items.map((line) => (
               <CartLineRow
                 key={line.id}

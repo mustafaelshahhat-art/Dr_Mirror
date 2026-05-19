@@ -1,5 +1,7 @@
 import { Heading } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
+import { PageHeader } from '../../shared/components/PageHeader';
+import { Stat } from '../../shared/components/Stat';
 import {
   ChevronRight,
   ClipboardList,
@@ -52,10 +54,7 @@ export function AdminHubPage() {
 
   return (
     <section className="space-y-8">
-      <header className="page-header">
-        <h1 className="page-title">{t('admin.hub.title')}</h1>
-        <p className="page-subtitle">{t('admin.hub.subtitle')}</p>
-      </header>
+      <PageHeader title={t('admin.hub.title')} subtitle={t('admin.hub.subtitle')} />
 
       {statsQuery.isLoading ? (
         <div className="space-y-6" aria-busy="true" aria-label={t('admin.hub.subtitle')}>
@@ -128,20 +127,21 @@ export function AdminHubPage() {
                 </span>
               </Link>
               <div className="cq p-3">
-                <dl className="grid gap-2 @md:grid-cols-2 @lg:grid-cols-4">
+                <div className="grid gap-2 @md:grid-cols-2 @lg:grid-cols-4">
                   {KPI_STATUSES.map(({ key, status }) => (
-                    <StatusRow
+                    <Stat
                       key={key}
                       label={t(`admin.hub.kpis.${key}`)}
-                      value={stats.countsByStatus[status] ?? 0}
+                      value={String(stats.countsByStatus[status] ?? 0)}
+                      size="sm"
                     />
                   ))}
-                </dl>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[1fr_260px]">
+          <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
             <div className="space-y-3">
               <Heading level={2} className="text-sm font-semibold uppercase tracking-wide text-muted">{t('admin.hub.recent.heading')}</Heading>
               {recentQuery.isLoading ? (
@@ -198,21 +198,6 @@ export function AdminHubPage() {
         </span>
       </div>
     </section>
-  );
-}
-
-function StatusRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: number;
-}) {
-  return (
-    <div className="stat-card">
-      <dt className="stat-label">{label}</dt>
-      <dd className="stat-value-sm">{value}</dd>
-    </div>
   );
 }
 

@@ -10,6 +10,7 @@ import { ORDER_STATUSES, type OrderStatus } from '../orders/types';
 
 import { StatusFilterDropdown } from './components/StatusFilterDropdown';
 import { useAdminOrdersQuery } from './hooks';
+import { PageHeader } from '../../shared/components/PageHeader';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 import { formatCurrency } from '../../shared/lib/format';
@@ -39,20 +40,20 @@ export function AdminOrdersListPage() {
 
   return (
     <section className="space-y-8">
-      <header className="flex flex-wrap items-start justify-between gap-3 sm:items-end">
-        <div className="page-header">
-          <h1 className="page-title">{t('admin.list.title')}</h1>
-          <p className="page-subtitle">{t('admin.list.subtitle')}</p>
-        </div>
-        <StatusFilterDropdown
-          value={statusFilter}
-          onChange={(next) => {
-            setStatusFilter(next);
-            setPage(1);
-            setSearchParams(next === undefined ? {} : { status: String(next) });
-          }}
-        />
-      </header>
+      <PageHeader
+        title={t('admin.list.title')}
+        subtitle={t('admin.list.subtitle')}
+        action={
+          <StatusFilterDropdown
+            value={statusFilter}
+            onChange={(next) => {
+              setStatusFilter(next);
+              setPage(1);
+              setSearchParams(next === undefined ? {} : { status: String(next) });
+            }}
+          />
+        }
+      />
 
       {query.isLoading ? (
         <Table className="rounded-large border border-divider/60">

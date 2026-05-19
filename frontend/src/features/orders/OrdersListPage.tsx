@@ -8,6 +8,7 @@ import type { AppLang } from '../../shared/lib/theme-storage';
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { EmptyState } from '../../shared/components/EmptyState';
+import { PageHeader } from '../../shared/components/PageHeader';
 import { OrderRowSkeleton, Skeleton } from '../../shared/components/Skeleton';
 
 import { OrderStatusBadge } from './components/OrderStatusBadge';
@@ -60,10 +61,7 @@ export function OrdersListPage() {
 
   return (
     <section className="space-y-8">
-      <header className="page-header">
-        <h1 className="page-title">{t('orders.list.title')}</h1>
-        <p className="page-subtitle">{t('orders.list.subtitle')}</p>
-      </header>
+      <PageHeader title={t('orders.list.title')} subtitle={t('orders.list.subtitle')} />
 
       {orders.length === 0 ? (
         <EmptyState
@@ -78,22 +76,29 @@ export function OrdersListPage() {
             <li key={order.id} className={idx > 0 ? 'border-t border-divider/40' : ''}>
               <Link
                 to={`/account/orders/${encodeURIComponent(order.orderNumber)}`}
-                className="flex items-center justify-between gap-3 px-4 py-3.5 transition-colors hover:bg-surface-secondary sm:px-5"
+                className="flex flex-col gap-1 px-4 py-3.5 transition-colors hover:bg-surface-secondary sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-5"
               >
-                <div className="min-w-0 space-y-1">
+                <div className="flex items-center justify-between gap-2 sm:min-w-0">
                   <p className="text-sm font-semibold text-foreground">
                     {order.orderNumber}
                   </p>
+                  <span className="shrink-0 sm:hidden">
+                    <OrderStatusBadge status={order.status} />
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-3 sm:justify-end">
                   <p className="text-xs tabular-nums text-muted">
                     {dateFmt.format(new Date(order.createdAt))} ·{' '}
                     {t('orders.list.itemCount', { count: order.itemCount })}
                   </p>
-                </div>
-                <div className="flex shrink-0 items-center gap-3">
-                  <OrderStatusBadge status={order.status} />
-                  <span className="text-sm font-bold tabular-nums text-foreground">
-                    {formatCurrency(order.total, lang)}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="hidden shrink-0 sm:block">
+                      <OrderStatusBadge status={order.status} />
+                    </span>
+                    <span className="text-sm font-bold tabular-nums text-foreground">
+                      {formatCurrency(order.total, lang)}
+                    </span>
+                  </div>
                 </div>
               </Link>
             </li>

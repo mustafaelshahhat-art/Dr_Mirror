@@ -1,7 +1,11 @@
 import { Drawer } from '@heroui/react';
+import { LogOut } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { LucideIcon } from 'lucide-react';
+
+import { useAuth } from '../../../features/auth/useAuth';
+import { BrandMark } from '../../../shared/components/BrandMark';
 
 import { ADMIN_DRAWER_HEIGHT_CLASS, ADMIN_HEADER_OFFSET_CLASS } from './adminShellTokens';
 import { ADMIN_NAV_GROUPS } from '../adminNav';
@@ -16,10 +20,44 @@ export function AdminSidebar({
   const { t, i18n } = useTranslation();
   const placement = i18n.dir() === 'rtl' ? 'right' : 'left';
 
+  const { user, logout } = useAuth();
+  const initials = (user?.fullName ?? '')
+    .split(' ')
+    .slice(0, 2)
+    .map((n) => n[0]?.toUpperCase() ?? '')
+    .join('');
+
   return (
     <>
-      <div className="hidden w-60 flex-col border-e border-divider/50 bg-surface md:flex">
+      <div className="hidden w-60 flex-col border-e border-border/50 bg-surface md:flex">
+        {/* Sidebar header — BrandMark + product name */}
+        <div className="flex items-center gap-2 border-b border-border/40 px-4 py-3.5">
+          <BrandMark size={20} title="Dr Mirror" />
+          <span className="text-sm font-bold tracking-tight">{t('appName')}</span>
+        </div>
         <SidebarNav label={t('admin.shell.navTitle')} onClose={onClose} />
+        {/* Identity footer */}
+        {user && (
+          <div className="border-t border-border/40 px-3 py-3">
+            <div className="flex items-center gap-2.5">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-xs font-bold text-brand">
+                {initials}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-medium text-foreground">{user.fullName}</p>
+                <p className="truncate text-xs text-muted" dir="ltr">{user.email}</p>
+              </div>
+              <button
+                type="button"
+                aria-label={t('admin.shell.accountMenu.signOut')}
+                onClick={() => void logout()}
+                className="flex size-7 shrink-0 items-center justify-center rounded-medium text-muted transition-colors hover:text-danger"
+              >
+                <LogOut className="size-3.5" aria-hidden />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <Drawer isOpen={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
@@ -96,7 +134,7 @@ function NavItem({
         [
           'flex items-center gap-2.5 rounded-medium px-3 py-2 text-sm font-medium transition-colors motion-reduce:transition-none',
           isActive
-            ? 'bg-brand/10 text-brand dark:bg-brand/15 dark:text-brand'
+            ? 'relative bg-brand-subtle text-brand before:absolute before:start-0 before:top-1 before:h-[calc(100%-8px)] before:w-[3px] before:rounded-e-full before:bg-brand'
             : 'text-default-600 hover:bg-default-100 hover:text-foreground dark:text-default-400 dark:hover:bg-default-50/5 dark:hover:text-foreground',
         ].join(' ')
       }

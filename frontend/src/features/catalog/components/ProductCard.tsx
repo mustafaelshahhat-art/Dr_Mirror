@@ -1,5 +1,5 @@
-import { Card } from '@heroui/react';
-import { ArrowRight, Package } from 'lucide-react';
+import { Chip, Card } from '@heroui/react';
+import { Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -31,6 +31,10 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
   const categoryName = useLocalizedField(product.category);
   const sizeCount = product.availableSizes.length;
   const isSoldOut = product.totalStock <= 0;
+  const isLowStock = !isSoldOut && product.totalStock <= 5;
+
+  type BadgeKey = 'soldOut' | 'lowStock' | null;
+  const badge: BadgeKey = isSoldOut ? 'soldOut' : isLowStock ? 'lowStock' : null;
 
   return (
     <Link
@@ -50,21 +54,22 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
               className="h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover:scale-[1.03]"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-default-300 dark:text-default-600">
+            <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-surface-secondary text-default-300 dark:text-default-600">
               <Package className="size-10" aria-hidden />
+              <span className="text-xs text-muted">{t('catalog.detail.noImage')}</span>
             </div>
           )}
-          {isSoldOut ? (
-            <span className="absolute start-2 top-2 inline-flex items-center rounded-full bg-foreground/80 px-2.5 py-0.5 text-xs font-medium tracking-wide text-background backdrop-blur-sm">
-              {t('catalog.list.soldOut')}
-            </span>
+          {badge ? (
+            <div className="absolute end-2 top-2">
+              <Chip
+                color={badge === 'soldOut' ? 'default' : 'warning'}
+                variant="soft"
+                size="sm"
+              >
+                <Chip.Label>{t(`catalog.badge.${badge}`)}</Chip.Label>
+              </Chip>
+            </div>
           ) : null}
-          {/* Desktop hover overlay — subtle brand tint with CTA */}
-          <div className="pointer-events-none absolute inset-0 hidden items-end justify-end p-3 sm:flex">
-            <span className="translate-y-1 rounded-full bg-brand/90 px-3 py-1 text-xs font-semibold text-white opacity-0 shadow-sm backdrop-blur-sm transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
-              {t('catalog.list.viewDetails')}
-            </span>
-          </div>
         </div>
 
         <Card.Content className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
@@ -75,7 +80,7 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
           </div>
 
           {/* Product name */}
-          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground sm:text-base">
+          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground underline-offset-2 group-hover:underline sm:text-base">
             {name}
           </h3>
 
@@ -100,14 +105,6 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
             ) : null}
           </div>
 
-          {/* Mobile CTA — always visible; no hover on touch screens.
-              Hidden on sm+ where the image overlay CTA is used instead. */}
-          <div className="flex items-center justify-end gap-1 pt-1 sm:hidden">
-            <span className="text-xs font-semibold text-brand">
-              {t('catalog.list.viewDetails')}
-            </span>
-            <ArrowRight className="size-3 text-brand rtl:rotate-180" aria-hidden />
-          </div>
         </Card.Content>
       </Card>
     </Link>
