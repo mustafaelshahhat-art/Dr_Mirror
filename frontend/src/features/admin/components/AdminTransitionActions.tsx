@@ -1,4 +1,4 @@
-import { Button, FieldError, Label, Modal, TextArea, TextField, useOverlayState } from '@heroui/react';
+import { AlertDialog, Button, FieldError, Heading, Label, TextArea, TextField, Toolbar, useOverlayState } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -59,13 +59,13 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
   return (
     <section
       aria-labelledby="transition-heading"
-      className="space-y-3 rounded-large border border-divider/60 bg-content1 p-4"
+      className="content-surface space-y-3 p-4"
     >
-      <h2 id="transition-heading" className="text-sm font-semibold text-foreground">
+      <Heading level={2} id="transition-heading" className="text-sm font-semibold text-foreground">
         {t('admin.transition.heading')}
-      </h2>
+      </Heading>
 
-      <div className="flex flex-wrap gap-2">
+      <Toolbar aria-label={t('admin.transition.heading')} className="flex flex-wrap gap-2">
         {order.allowedNextStatesForAdmin.map((status) => {
           const isCancel = status === ORDER_STATUSES.Cancelled;
           const isActive = status === target;
@@ -91,7 +91,7 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
             </Button>
           );
         })}
-      </div>
+      </Toolbar>
 
       {target !== null && !isCancelling ? (
         <div className="space-y-2 rounded-medium border border-divider/60 bg-content2 p-3">
@@ -150,9 +150,10 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
         </div>
       ) : null}
 
-      <Modal>
-        <Modal.Backdrop
+      <AlertDialog>
+        <AlertDialog.Backdrop
           isOpen={cancelState.isOpen}
+          isDismissable={false}
           onOpenChange={(open) => {
             cancelState.setOpen(open);
             if (!open && !transition.isPending) {
@@ -162,18 +163,18 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
             }
           }}
         >
-          <Modal.Container size="sm">
-            <Modal.Dialog>
+          <AlertDialog.Container size="sm">
+            <AlertDialog.Dialog>
               {({ close }) => (
                 <>
-                  <Modal.Header>
-                    <Modal.Heading>
+                  <AlertDialog.Header>
+                    <AlertDialog.Heading>
                       {t('admin.transition.confirmHeading', {
                         status: t(orderStatusTranslationKey(ORDER_STATUSES.Cancelled)),
                       })}
-                    </Modal.Heading>
-                  </Modal.Header>
-                  <Modal.Body>
+                    </AlertDialog.Heading>
+                  </AlertDialog.Header>
+                  <AlertDialog.Body>
                     <TextField isInvalid={Boolean(error)} className="flex flex-col gap-1">
                       <Label className="sr-only">{t('admin.transition.reasonPlaceholderRequired')}</Label>
                       <TextArea
@@ -187,8 +188,8 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
                       />
                       {error ? <FieldError className="text-xs text-danger">{error}</FieldError> : null}
                     </TextField>
-                  </Modal.Body>
-                  <Modal.Footer>
+                  </AlertDialog.Body>
+                  <AlertDialog.Footer>
                     <Button
                       type="button"
                       variant="ghost"
@@ -209,13 +210,13 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
                         ? t('admin.transition.submitting')
                         : t('admin.transition.confirm')}
                     </Button>
-                  </Modal.Footer>
+                  </AlertDialog.Footer>
                 </>
               )}
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
+            </AlertDialog.Dialog>
+          </AlertDialog.Container>
+        </AlertDialog.Backdrop>
+      </AlertDialog>
     </section>
   );
 }

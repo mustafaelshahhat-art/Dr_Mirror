@@ -43,7 +43,7 @@ export function AdminCategoriesPage() {
           {Array.from({ length: 4 }).map((_, i) => (
             <li
               key={i}
-              className="flex items-center justify-between rounded-medium border border-divider/60 bg-content1 p-3"
+              className="flex items-center justify-between rounded-large border border-divider/60 bg-surface p-3"
             >
               <div className="space-y-2">
                 <Skeleton className="h-4 w-32" />
@@ -64,13 +64,9 @@ export function AdminCategoriesPage() {
   if (query.isError) {
     return (
       <section className="space-y-8">
-        <header className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {t('admin.catalog.categories.title')}
-          </h1>
-          <p className="text-sm text-default-500">
-            {t('admin.catalog.categories.subtitle')}
-          </p>
+        <header className="page-header">
+          <h1 className="page-title">{t('admin.catalog.categories.title')}</h1>
+          <p className="page-subtitle">{t('admin.catalog.categories.subtitle')}</p>
         </header>
         <QueryErrorState
           message={t('admin.catalog.categories.errorLoad')}
@@ -85,13 +81,9 @@ export function AdminCategoriesPage() {
 
   return (
     <section className="space-y-8">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t('admin.catalog.categories.title')}
-        </h1>
-        <p className="text-sm text-default-500">
-          {t('admin.catalog.categories.subtitle')}
-        </p>
+      <header className="page-header">
+        <h1 className="page-title">{t('admin.catalog.categories.title')}</h1>
+        <p className="page-subtitle">{t('admin.catalog.categories.subtitle')}</p>
       </header>
 
       <CreateCategoryForm
@@ -108,7 +100,7 @@ export function AdminCategoriesPage() {
       />
 
       {categories.length === 0 ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
+        <div className="content-surface p-10 text-center">
           <FolderTree className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
           <p className="enter-fade-up text-sm text-default-500">{t('admin.catalog.categories.empty')}</p>
         </div>
@@ -141,7 +133,7 @@ export function AdminCategoriesPage() {
                   isPending={updateMutation.isPending}
                 />
               ) : (
-                <div className="flex flex-col gap-2 rounded-medium border border-divider/60 bg-content1 p-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="content-surface flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0 space-y-0.5">
                     <p className="text-sm font-semibold text-foreground">
                       {isAr ? cat.nameAr : cat.nameEn}
@@ -264,7 +256,7 @@ function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
           reset();
         }
       })}
-      className="flex flex-col gap-3 rounded-large border border-divider/60 bg-content1 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto] sm:items-end"
+      className="content-surface flex flex-col gap-3 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto] sm:items-end"
     >
       <TextField isRequired isInvalid={Boolean(errors.nameAr)} className="flex flex-col gap-1">
         <Label className="text-xs uppercase tracking-wide text-default-500">
@@ -338,7 +330,7 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
           displayOrder: values.displayOrder,
         });
       })}
-      className="flex flex-col gap-3 rounded-medium border border-primary/40 bg-primary/5 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto_auto] sm:items-end"
+      className="flex flex-col gap-3 rounded-large border border-primary/30 bg-primary/5 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto_auto] sm:items-end"
     >
       <TextField isRequired isInvalid={Boolean(errors.nameAr)} className="flex flex-col gap-1">
         <Label className="text-xs uppercase tracking-wide text-default-500">

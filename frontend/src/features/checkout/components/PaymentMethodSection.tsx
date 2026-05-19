@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import { Alert, Button } from '@heroui/react';
 import { CreditCard } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -55,11 +55,10 @@ export function PaymentMethodSection({
 
   if (query.isError) {
     return (
-      <div
-        role="alert"
-        className="flex items-start justify-between gap-3 rounded-medium border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
-      >
-        <span>{t('checkout.payment.errorLoad')}</span>
+      <Alert status="danger" role="alert">
+        <Alert.Content>
+          <Alert.Description>{t('checkout.payment.errorLoad')}</Alert.Description>
+        </Alert.Content>
         <Button
           variant="ghost"
           size="sm"
@@ -68,7 +67,7 @@ export function PaymentMethodSection({
         >
           {t('checkout.payment.retry')}
         </Button>
-      </div>
+      </Alert>
     );
   }
 

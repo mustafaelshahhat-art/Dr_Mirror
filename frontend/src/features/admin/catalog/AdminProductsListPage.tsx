@@ -1,7 +1,9 @@
-import { Tooltip } from '@heroui/react';
+import { Table, Tooltip } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 import { Package, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 import { SearchInput } from '../../catalog/components/SearchInput';
 import { genderTranslationKey } from '../../catalog/hooks';
@@ -9,13 +11,13 @@ import type { ProductGender } from '../../catalog/types';
 
 import { useAdminCategoriesQuery, useAdminProductsQuery } from './hooks';
 
-import { LinkButton } from '../../../shared/components/LinkButton';
 import { PaginationControls } from '../../../shared/components/PaginationControls';
 import { SelectField } from '../../../shared/components/SelectField';
-import { TableRowSkeleton } from '../../../shared/components/Skeleton';
+import { TableRowSkeleton, TableSkeletonHeader } from '../../../shared/components/TableRowSkeleton';
 import { formatCurrency } from '../../../shared/lib/format';
 import type { AppLang } from '../../../shared/lib/theme-storage';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
+import { EmptyState } from '../../../shared/components/EmptyState';
 
 export function AdminProductsListPage() {
   const { t, i18n } = useTranslation();
@@ -33,16 +35,17 @@ export function AdminProductsListPage() {
   return (
     <section className="space-y-8">
       <header className="flex items-center justify-between gap-3">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {t('admin.products.list.title')}
-          </h1>
-          <p className="text-sm text-default-500">{t('admin.products.list.subtitle')}</p>
+        <div className="page-header">
+          <h1 className="page-title">{t('admin.products.list.title')}</h1>
+          <p className="page-subtitle">{t('admin.products.list.subtitle')}</p>
         </div>
-        <LinkButton to="/admin/products/new" size="sm">
+        <Link
+          to="/admin/products/new"
+          className={buttonVariants({ variant: 'primary', size: 'sm' })}
+        >
           <Plus className="size-4" aria-hidden />
           {t('admin.products.list.new')}
-        </LinkButton>
+        </Link>
       </header>
 
       <div className="grid gap-2 sm:grid-cols-[1fr_12rem_10rem_10rem]">
@@ -95,19 +98,18 @@ export function AdminProductsListPage() {
       </div>
 
       {products.isLoading ? (
-        <div
-          className="overflow-hidden rounded-large border border-divider/60"
-          aria-busy="true"
-          aria-label={t('admin.products.list.loading')}
-        >
-          <table className="w-full text-sm">
-            <tbody>
-              {Array.from({ length: 8 }).map((_, i) => (
-                <TableRowSkeleton key={i} cols={6} />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table className="rounded-large border border-divider/60">
+          <Table.ScrollContainer>
+            <Table.Content aria-label={t('admin.products.list.loading')} aria-busy={true}>
+              <TableSkeletonHeader cols={6} label={t('admin.products.list.loading')} />
+              <Table.Body>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <TableRowSkeleton key={i} cols={6} />
+                ))}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
+        </Table>
       ) : products.isError ? (
         <QueryErrorState
           message={t('admin.products.list.errorLoad')}
@@ -115,90 +117,86 @@ export function AdminProductsListPage() {
           onRetry={() => void products.refetch()}
         />
       ) : (products.data?.items ?? []).length === 0 ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Package className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="text-sm text-default-500">{t('admin.products.list.empty')}</p>
-        </div>
+        <EmptyState icon={Package} title={t('admin.products.list.empty')} />
       ) : (
         <div className="space-y-4">
-          <div className="overflow-hidden rounded-large border border-divider/60">
-            <table className="w-full text-sm" aria-busy={products.isFetching}>
-              <thead>
-                <tr className="bg-content2">
-                  <th scope="col" className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">
+          <Table className="rounded-large border border-divider/60">
+            <Table.ScrollContainer>
+              <Table.Content aria-label={t('admin.products.list.title')} aria-busy={products.isFetching}>
+                <Table.Header>
+                  <Table.Column isRowHeader className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">
                     {t('admin.products.fields.nameEn')}
-                  </th>
-                  <th scope="col" className="hidden px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400 md:table-cell">
+                  </Table.Column>
+                  <Table.Column className="hidden px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400 md:table-cell">
                     {t('admin.products.fields.category')}
-                  </th>
-                  <th scope="col" className="hidden px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400 lg:table-cell">
+                  </Table.Column>
+                  <Table.Column className="hidden px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400 lg:table-cell">
                     {t('admin.products.fields.gender')}
-                  </th>
-                  <th scope="col" className="hidden px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400 sm:table-cell">
+                  </Table.Column>
+                  <Table.Column className="hidden px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400 sm:table-cell">
                     {t('admin.products.variants.stockLabel')}
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">
+                  </Table.Column>
+                  <Table.Column className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">
                     {t('admin.list.status')}
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-end text-xs font-medium uppercase tracking-wide text-default-400">
+                  </Table.Column>
+                  <Table.Column className="px-4 py-3 text-end text-xs font-medium uppercase tracking-wide text-default-400">
                     {t('admin.products.fields.price')}
-                  </th>
-                  <th scope="col" className="w-12 px-4 py-3" aria-hidden />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-divider/60">
-                {(products.data?.items ?? []).map((p) => (
-                  <tr key={p.id} className="bg-content1 transition-colors hover:bg-content2">
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-foreground">{isAr ? p.nameAr : p.nameEn}</p>
-                      <p className="text-xs text-default-500" dir="ltr">/{p.slug}</p>
-                    </td>
-                    <td className="hidden px-4 py-3 text-default-500 md:table-cell">
-                      {isAr ? p.categoryNameAr : p.categoryNameEn}
-                    </td>
-                    <td className="hidden px-4 py-3 text-default-500 lg:table-cell">
-                      {t(genderTranslationKey(p.gender))}
-                    </td>
-                    <td className="hidden px-4 py-3 tabular-nums text-default-500 sm:table-cell">
-                      {t('admin.products.list.totalStock', { count: p.totalStock })}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={[
-                          'inline-flex items-center rounded-medium border px-2 py-0.5 text-xs font-medium leading-none',
-                          p.isPublished
-                            ? 'border-success/30 bg-success/15 text-success'
-                            : 'border-warning/30 bg-warning/15 text-warning',
-                        ].join(' ')}
-                      >
-                        {p.isPublished
-                          ? t('admin.products.list.published')
-                          : t('admin.products.list.draft')}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-end tabular-nums font-medium">
-                      {formatCurrency(p.price, lang)}
-                    </td>
-                    <td className="px-4 py-3 text-end">
-                      <Tooltip delay={300} closeDelay={0}>
-                        <LinkButton
-                          to={`/admin/products/${p.id}/edit`}
-                          aria-label={t('admin.catalog.actions.edit')}
-                          tone="outline"
-                          size="sm"
+                  </Table.Column>
+                  <Table.Column className="w-12 px-4 py-3" aria-label={t('admin.catalog.actions.edit')} />
+                </Table.Header>
+                <Table.Body className="divide-y divide-divider/60">
+                  {(products.data?.items ?? []).map((p) => (
+                    <Table.Row key={p.id} className="bg-content1 transition-colors hover:bg-content2">
+                      <Table.Cell className="px-4 py-3">
+                        <p className="font-medium text-foreground">{isAr ? p.nameAr : p.nameEn}</p>
+                        <p className="text-xs text-default-500" dir="ltr">/{p.slug}</p>
+                      </Table.Cell>
+                      <Table.Cell className="hidden px-4 py-3 text-default-500 md:table-cell">
+                        {isAr ? p.categoryNameAr : p.categoryNameEn}
+                      </Table.Cell>
+                      <Table.Cell className="hidden px-4 py-3 text-default-500 lg:table-cell">
+                        {t(genderTranslationKey(p.gender))}
+                      </Table.Cell>
+                      <Table.Cell className="hidden px-4 py-3 tabular-nums text-default-500 sm:table-cell">
+                        {t('admin.products.list.totalStock', { count: p.totalStock })}
+                      </Table.Cell>
+                      <Table.Cell className="px-4 py-3">
+                        <span
+                          className={[
+                            'inline-flex items-center rounded-medium border px-2 py-0.5 text-xs font-medium leading-none',
+                            p.isPublished
+                              ? 'border-success/30 bg-success/15 text-success'
+                              : 'border-warning/30 bg-warning/15 text-warning',
+                          ].join(' ')}
                         >
-                          <Pencil className="size-4" aria-hidden />
-                        </LinkButton>
-                        <Tooltip.Content placement="top">
-                          {t('admin.catalog.actions.edit')}
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                          {p.isPublished
+                            ? t('admin.products.list.published')
+                            : t('admin.products.list.draft')}
+                        </span>
+                      </Table.Cell>
+                      <Table.Cell className="px-4 py-3 text-end tabular-nums font-medium">
+                        {formatCurrency(p.price, lang)}
+                      </Table.Cell>
+                      <Table.Cell className="px-4 py-3 text-end">
+                        <Tooltip delay={300} closeDelay={0}>
+                          <Link
+                            to={`/admin/products/${p.id}/edit`}
+                            aria-label={t('admin.catalog.actions.edit')}
+                            className={buttonVariants({ variant: 'outline', size: 'sm', isIconOnly: true })}
+                          >
+                            <Pencil className="size-4" aria-hidden />
+                          </Link>
+                          <Tooltip.Content placement="top">
+                            {t('admin.catalog.actions.edit')}
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table.Content>
+            </Table.ScrollContainer>
+          </Table>
           <PaginationControls
             page={page}
             totalPages={products.data?.totalPages ?? 1}

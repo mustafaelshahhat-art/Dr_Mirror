@@ -1,4 +1,6 @@
-import { Button } from '@heroui/react';
+import { Button, Card, Chip } from '@heroui/react';
+import { EmptyState } from '../../shared/components/EmptyState';
+import { buttonVariants } from '@heroui/styles';
 import { Mail, MailOpen } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +16,6 @@ import {
   useMarkInquiryRespondedMutation,
 } from '../inquiries/hooks';
 import { PaginationControls } from '../../shared/components/PaginationControls';
-import { AnchorButton } from '../../shared/components/LinkButton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { Skeleton } from '../../shared/components/Skeleton';
 
@@ -38,9 +39,9 @@ export function AdminInquiriesPage() {
 
   return (
     <section className="space-y-8">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('inquiries.admin.title')}</h1>
-        <p className="text-sm text-default-500">{t('inquiries.admin.subtitle')}</p>
+      <header className="page-header">
+        <h1 className="page-title">{t('inquiries.admin.title')}</h1>
+        <p className="page-subtitle">{t('inquiries.admin.subtitle')}</p>
       </header>
 
       <div className="flex flex-wrap gap-2" role="group" aria-label={t('inquiries.admin.filterLabel')}>
@@ -69,16 +70,17 @@ export function AdminInquiriesPage() {
       {query.isLoading ? (
         <ul className="space-y-3" aria-busy="true" aria-label={t('inquiries.admin.loading')}>
           {Array.from({ length: 4 }).map((_, i) => (
-            <li
-              key={i}
-              className="space-y-3 rounded-large border border-divider/60 bg-content1 p-4"
-            >
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-5 w-16 rounded-medium" />
-                <Skeleton className="h-3 w-32" />
-              </div>
-              <Skeleton className="h-4 w-2/3" />
-              <Skeleton className="h-3 w-1/2" />
+            <li key={i}>
+              <Card>
+                <Card.Content className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-5 w-16 rounded-medium" />
+                    <Skeleton className="h-3 w-32" />
+                  </div>
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-3 w-1/2" />
+                </Card.Content>
+              </Card>
             </li>
           ))}
         </ul>
@@ -104,10 +106,7 @@ export function AdminInquiriesPage() {
           />
         </div>
       ) : (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <MailOpen className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="enter-fade-up text-sm text-default-500">{t('inquiries.admin.empty')}</p>
-        </div>
+        <EmptyState icon={MailOpen} title={t('inquiries.admin.empty')} />
       )}
     </section>
   );
@@ -152,8 +151,8 @@ function InquiryRow({
   const replyHref = `mailto:${inquiry.email}?subject=${encodeURIComponent(`Re: ${inquiry.subject}`)}`;
 
   return (
-    <article className="space-y-3 rounded-large border border-divider/60 bg-content1 p-4">
-      <header className="flex flex-wrap items-start justify-between gap-2">
+    <Card>
+      <Card.Header className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <StatusBadge status={inquiry.status} />
@@ -163,14 +162,14 @@ function InquiryRow({
               })}
             </span>
           </div>
-          <h2
+          <Card.Title
             className={[
               'mt-1 line-clamp-1 text-sm text-foreground',
               isNew ? 'font-semibold' : 'font-medium',
             ].join(' ')}
           >
             {inquiry.subject}
-          </h2>
+          </Card.Title>
           <p className="mt-0.5 text-xs text-default-500">
             {t('inquiries.admin.from')}: <span className="font-medium text-foreground">{inquiry.fullName}</span>{' '}
             <a
@@ -188,89 +187,93 @@ function InquiryRow({
             ) : null}
           </p>
         </div>
-      </header>
+      </Card.Header>
 
-      <div className="flex flex-wrap items-center gap-2 text-xs text-default-500">
-        {productName ? (
-          <span className="rounded-medium bg-content2 px-2 py-0.5">
-            {t('inquiries.admin.productLabel')}: <span className="font-medium text-foreground">{productName}</span>
-          </span>
-        ) : (
-          <span className="rounded-medium bg-content2 px-2 py-0.5">
-            {t('inquiries.admin.generalLabel')}
-          </span>
-        )}
-      </div>
+      <Card.Content className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-default-500">
+          {productName ? (
+            <span className="rounded-medium bg-content2 px-2 py-0.5">
+              {t('inquiries.admin.productLabel')}: <span className="font-medium text-foreground">{productName}</span>
+            </span>
+          ) : (
+            <span className="rounded-medium bg-content2 px-2 py-0.5">
+              {t('inquiries.admin.generalLabel')}
+            </span>
+          )}
+        </div>
 
-      <p className="whitespace-pre-line rounded-medium bg-content2 px-3 py-2 text-sm leading-relaxed text-foreground">
-        {inquiry.message}
-      </p>
-
-      {inquiry.readAt ? (
-        <p className="text-xs text-default-500">
-          {t('inquiries.admin.readAt', {
-            when: dateFmt.format(new Date(inquiry.readAt)),
-            by: inquiry.readByUserName ?? '',
-          })}
+        <p className="whitespace-pre-line rounded-medium bg-content2 px-3 py-2 text-sm leading-relaxed text-foreground">
+          {inquiry.message}
         </p>
-      ) : null}
 
-      {inquiry.respondedAt ? (
-        <p className="text-xs text-default-500">
-          {t('inquiries.admin.respondedAt', {
-            when: dateFmt.format(new Date(inquiry.respondedAt)),
-            by: inquiry.respondedByUserName ?? '',
-          })}
-        </p>
-      ) : null}
+        {inquiry.readAt ? (
+          <p className="text-xs text-default-500">
+            {t('inquiries.admin.readAt', {
+              when: dateFmt.format(new Date(inquiry.readAt)),
+              by: inquiry.readByUserName ?? '',
+            })}
+          </p>
+        ) : null}
 
-      <div className="flex flex-wrap gap-2">
-        <AnchorButton
-          href={replyHref}
-          size="sm"
-        >
-          <Mail className="size-4" aria-hidden />
-          {t('inquiries.admin.replyByEmail')}
-        </AnchorButton>
-        {isNew ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            isDisabled={markRead.isPending}
-            onPress={() => markRead.mutate(inquiry.id)}
-          >
-            {markRead.isPending
-              ? t('inquiries.admin.marking')
-              : t('inquiries.admin.markRead')}
-          </Button>
+        {inquiry.respondedAt ? (
+          <p className="text-xs text-default-500">
+            {t('inquiries.admin.respondedAt', {
+              when: dateFmt.format(new Date(inquiry.respondedAt)),
+              by: inquiry.respondedByUserName ?? '',
+            })}
+          </p>
         ) : null}
-        {isRead ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            isDisabled={markResponded.isPending}
-            onPress={() => markResponded.mutate(inquiry.id)}
+      </Card.Content>
+
+      <Card.Footer>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={replyHref}
+            className={buttonVariants({ variant: 'primary', size: 'sm' })}
           >
-            {markResponded.isPending
-              ? t('inquiries.admin.markingResponded')
-              : t('inquiries.admin.markResponded')}
-          </Button>
-        ) : null}
-      </div>
-    </article>
+            <Mail className="size-4" aria-hidden />
+            {t('inquiries.admin.replyByEmail')}
+          </a>
+          {isNew ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              isDisabled={markRead.isPending}
+              onPress={() => markRead.mutate(inquiry.id)}
+            >
+              {markRead.isPending
+                ? t('inquiries.admin.marking')
+                : t('inquiries.admin.markRead')}
+            </Button>
+          ) : null}
+          {isRead ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              isDisabled={markResponded.isPending}
+              onPress={() => markResponded.mutate(inquiry.id)}
+            >
+              {markResponded.isPending
+                ? t('inquiries.admin.markingResponded')
+                : t('inquiries.admin.markResponded')}
+            </Button>
+          ) : null}
+        </div>
+      </Card.Footer>
+    </Card>
   );
 }
 
 function StatusBadge({ status }: { status: InquiryStatus }) {
   const { t } = useTranslation();
-  const classes =
+  const color: 'warning' | 'success' | 'default' =
     status === INQUIRY_STATUS.New
-      ? 'bg-warning/15 text-warning border-warning/30'
+      ? 'warning'
       : status === INQUIRY_STATUS.Responded
-        ? 'bg-success/15 text-success border-success/30'
-        : 'bg-content2 text-default-500 border-divider/60';
+        ? 'success'
+        : 'default';
 
   const label =
     status === INQUIRY_STATUS.New
@@ -280,13 +283,8 @@ function StatusBadge({ status }: { status: InquiryStatus }) {
         : t('inquiries.admin.status.read');
 
   return (
-    <span
-      className={[
-        'inline-flex items-center rounded-medium border px-2 py-0.5 text-xs font-medium leading-none',
-        classes,
-      ].join(' ')}
-    >
-      {label}
-    </span>
+    <Chip color={color} variant="soft" size="sm">
+      <Chip.Label>{label}</Chip.Label>
+    </Chip>
   );
 }

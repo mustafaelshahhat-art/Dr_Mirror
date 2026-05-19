@@ -1,4 +1,5 @@
 import { Button, Form } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +11,6 @@ import { useAdminCategoriesQuery, useCreateProductMutation } from './hooks';
 
 import { Field, TextAreaField } from '../../../shared/components/Field';
 import { SelectField } from '../../../shared/components/SelectField';
-import { LinkButton } from '../../../shared/components/LinkButton';
 import { Skeleton } from '../../../shared/components/Skeleton';
 
 export function AdminProductCreatePage() {
@@ -42,7 +42,7 @@ export function AdminProductCreatePage() {
           <Skeleton className="h-7 w-1/3" />
           <Skeleton className="h-4 w-2/3" />
         </header>
-        <div className="space-y-4 rounded-large border border-divider/60 bg-content1 p-4">
+        <div className="content-surface space-y-4 p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="space-y-2">
@@ -64,17 +64,14 @@ export function AdminProductCreatePage() {
 
   return (
     <section className="space-y-8">
-      <Link
-        to="/admin/products"
-        className="inline-flex items-center gap-1.5 text-sm text-default-500 hover:text-foreground"
-      >
+      <Link to="/admin/products" className="back-link">
         <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
         {t('admin.products.create.back')}
       </Link>
 
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('admin.products.create.title')}</h1>
-        <p className="text-sm text-default-500">{t('admin.products.create.subtitle')}</p>
+      <header className="page-header">
+        <h1 className="page-title">{t('admin.products.create.title')}</h1>
+        <p className="page-subtitle">{t('admin.products.create.subtitle')}</p>
       </header>
 
       <Form
@@ -98,7 +95,7 @@ export function AdminProductCreatePage() {
             // Toast emitted by mutation onError.
           }
         }}
-        className="space-y-4 rounded-large border border-divider/60 bg-content1 p-4"
+        className="content-surface space-y-4 p-4"
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label={t('admin.products.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={200} />
@@ -144,12 +141,12 @@ export function AdminProductCreatePage() {
               ? t('admin.products.create.creating')
               : t('admin.products.create.submit')}
           </Button>
-          <LinkButton
+          <Link
             to="/admin/products"
-            tone="outline"
+            className={buttonVariants({ variant: 'outline' })}
           >
             {t('admin.catalog.actions.cancel')}
-          </LinkButton>
+          </Link>
         </div>
       </Form>
     </section>

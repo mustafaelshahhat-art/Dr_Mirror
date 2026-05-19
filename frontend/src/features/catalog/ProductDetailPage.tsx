@@ -1,4 +1,5 @@
 import { Button } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, Check, MessageSquare, PackageX, ShoppingBag } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +9,6 @@ import { useCart } from '../cart/useCart';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
-import { LinkButton } from '../../shared/components/LinkButton';
 import { ProductDetailSkeleton } from '../../shared/components/Skeleton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
@@ -84,7 +84,7 @@ export function ProductDetailPage() {
       );
     }
     return (
-      <div className="enter-fade-up space-y-4 rounded-large border border-divider/60 bg-content1 p-10 text-center">
+      <div className="enter-fade-up content-surface space-y-4 p-10 text-center">
         <PackageX className="mx-auto size-6 text-default-400" aria-hidden />
         <h1 className="text-lg font-semibold">
           {t('catalog.detail.notFoundTitle')}
@@ -92,21 +92,19 @@ export function ProductDetailPage() {
         <p className="text-sm text-default-500">
           {t('catalog.detail.notFoundSubtitle')}
         </p>
-        <LinkButton
+        <Link
           to="/"
+          className={buttonVariants({ variant: 'primary' })}
         >
           {t('catalog.detail.backToCatalog')}
-        </LinkButton>
+        </Link>
       </div>
     );
   }
 
   return (
     <article className="space-y-8">
-      <Link
-        to="/"
-        className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
-      >
+      <Link to="/" className="back-link">
         <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
         {t('catalog.detail.backToCatalog')}
       </Link>

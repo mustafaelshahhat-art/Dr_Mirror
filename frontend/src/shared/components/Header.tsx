@@ -1,148 +1,247 @@
-import { Button, Drawer } from '@heroui/react';
-import { LogOut, Menu, User as UserIcon } from 'lucide-react';
+import { Button, Drawer, Link, Separator, Surface } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
+import { LogOut, Menu, Plus, ShoppingBag, User as UserIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { useAuth } from '../../features/auth/useAuth';
 import { CartButton } from '../../features/cart/components/CartButton';
+import { useCart } from '../../features/cart/useCart';
 
 import { LangSwitcher } from './LangSwitcher';
-import { LinkButton } from './LinkButton';
 import { ThemeToggle } from './ThemeToggle';
 
 /**
  * Global header — hosts the brand link, auth-aware account/sign-in entry,
- * LangSwitcher, and ThemeToggle. Sticky, low-noise. Single translucent header effect,
- * single divider. No nested cards.
+ * LangSwitcher, ThemeToggle, and CartButton. Sticky, low-noise.
  *
  * On narrow screens (< sm) all secondary controls collapse into a HeroUI
- * Drawer reached via a single hamburger button — the visible row stays at
- * brand + cart + menu, comfortably 44 px tap targets even in Arabic.
+ * Drawer reached via a single hamburger button. The visible row stays at
+ * brand + cart + menu with comfortable 44 px touch targets.
+ *
+ * Mobile nav drawer opens from the LEADING edge (right in RTL, left in LTR)
+ * which is the universal convention for navigation drawers. The cart drawer
+ * remains on the TRAILING edge so the two never clash.
+ *
+ * Approved Composition Component: Surface + Button + Drawer + Link + Separator.
  */
 export function Header() {
   const { t, i18n } = useTranslation();
   const { user, logout, isBootstrapping, isAdmin } = useAuth();
+  const { cart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
-  const placement = i18n.dir() === 'rtl' ? 'left' : 'right';
+
+  // Navigation drawer: leading edge (left in LTR, right in RTL)
+  const navPlacement = i18n.dir() === 'rtl' ? 'right' : 'left';
 
   if (isAdmin) return null;
-  return (
-    <header className="sticky top-0 z-40 border-b border-divider/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-3 px-4 md:px-6 lg:px-8">
-        <Link
-          to="/"
-          className="text-base font-semibold tracking-tight transition-opacity hover:opacity-80"
-        >
-          {t('appName')}
-        </Link>
 
-        {/* Desktop row — unchanged density, every control visible. */}
-        <div className="hidden items-center gap-1 sm:flex">
+  return (
+    <header role="banner">
+      <Surface
+        variant="transparent"
+        className="sticky top-0 z-40 border-b border-divider/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70"
+      >
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 md:px-6 lg:px-8">
+          {/* Brand */}
           <Link
-            to="/inquiries"
-            className="me-1 rounded-medium px-3 py-1.5 text-sm text-default-700 transition-colors hover:bg-default-100 dark:text-default-300"
+            href="/"
+            className="flex items-center gap-2 text-base font-bold tracking-tight transition-opacity hover:opacity-75 sm:text-lg"
           >
-            {t('header.contact')}
+            {/* Medical cross brand mark */}
+            <span
+              className="flex size-7 items-center justify-center rounded-md bg-brand text-white"
+              aria-hidden
+            >
+              <Plus className="size-4" />
+            </span>
+            {t('appName')}
           </Link>
 
-          {!isBootstrapping && user ? (
-            <>
-              <Link
-                to="/account"
-                className="me-2 rounded-medium px-3 py-1.5 text-sm text-default-700 transition-colors hover:bg-default-100 dark:text-default-300"
-              >
-                {user.fullName}
-              </Link>
-              <Button
-                variant="ghost"
-                size="sm"
-                onPress={() => void logout()}
-                aria-label={t('auth.signOut')}
-              >
-                {t('auth.signOut')}
-              </Button>
-            </>
-          ) : null}
-
-          {!isBootstrapping && !user ? (
-            <LinkButton to="/login" size="sm" className="me-2">
-              {t('header.signIn')}
-            </LinkButton>
-          ) : null}
-
-          <CartButton />
-          <LangSwitcher />
-          <ThemeToggle />
-        </div>
-
-        {/* Mobile row — only brand + cart + hamburger stay visible. */}
-        <div className="flex items-center gap-1 sm:hidden">
-          <CartButton />
-          <Button
-            variant="ghost"
-            size="sm"
-            isIconOnly
-            aria-label={t('header.openMenu')}
-            onPress={() => setMenuOpen(true)}
+          {/* Desktop row */}
+          <nav
+            aria-label={t('header.menuLabel')}
+            className="hidden items-center gap-1 sm:flex"
           >
-            <Menu className="size-5" aria-hidden />
-          </Button>
-        </div>
-      </div>
+            <Link
+              href="/"
+              className="rounded-medium px-3 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-foreground dark:text-default-300 dark:hover:bg-default-50/10"
+            >
+              {t('header.catalog')}
+            </Link>
 
+            <Link
+              href="/inquiries"
+              className="rounded-medium px-3 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-foreground dark:text-default-300 dark:hover:bg-default-50/10"
+            >
+              {t('header.contact')}
+            </Link>
+
+            <Separator orientation="vertical" className="mx-1 h-5" />
+
+            {!isBootstrapping && user ? (
+              <>
+                <Link
+                  href="/account"
+                  className="flex items-center gap-1.5 rounded-medium px-3 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-foreground dark:text-default-300 dark:hover:bg-default-50/10"
+                >
+                  <UserIcon className="size-4 shrink-0" aria-hidden />
+                  <span className="max-w-28 truncate">{user.fullName}</span>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onPress={() => void logout()}
+                  aria-label={t('auth.signOut')}
+                  className="text-default-600 dark:text-default-400"
+                >
+                  {t('auth.signOut')}
+                </Button>
+              </>
+            ) : null}
+
+            {!isBootstrapping && !user ? (
+              <Link
+                href="/login"
+                className={`${buttonVariants({ variant: 'primary', size: 'sm' })} ms-1`}
+              >
+                {t('header.signIn')}
+              </Link>
+            ) : null}
+
+            <div className="ms-1 flex items-center gap-1">
+              <CartButton />
+              <LangSwitcher />
+              <ThemeToggle />
+            </div>
+          </nav>
+
+          {/* Mobile row — brand + cart + hamburger. All 44 px touch targets. */}
+          <div className="flex items-center gap-2 sm:hidden">
+            <CartButton />
+            <Button
+              variant="ghost"
+              size="sm"
+              isIconOnly
+              aria-label={t('header.openMenu')}
+              aria-expanded={menuOpen}
+              onPress={() => setMenuOpen(true)}
+              className="size-11 min-w-0"
+            >
+              <Menu className="size-5" aria-hidden />
+            </Button>
+          </div>
+        </div>
+      </Surface>
+
+      {/* Mobile navigation drawer — leading edge (left/LTR, right/RTL).
+          Sibling of Surface to keep the portal outside the sticky stacking context. */}
       <Drawer isOpen={menuOpen} onOpenChange={setMenuOpen}>
-        <Drawer.Backdrop>
-          <Drawer.Content placement={placement} className="w-full max-w-sm">
+        <Drawer.Backdrop className="bg-foreground/40">
+          <Drawer.Content
+            placement={navPlacement}
+            className="w-72 max-w-[85vw]"
+          >
             <Drawer.Dialog className="flex h-full flex-col">
-              <Drawer.Header className="border-b border-divider/60 px-4 py-3">
-                <Drawer.Heading className="text-base font-semibold">
+              <Drawer.Header className="flex items-center justify-between gap-2 border-b border-divider/60 px-4 py-4">
+                <Link
+                  href="/"
+                  onPress={() => setMenuOpen(false)}
+                  className="flex items-center gap-2 text-sm font-bold tracking-tight"
+                >
+                  <span
+                    className="flex size-6 items-center justify-center rounded-md bg-brand text-white"
+                    aria-hidden
+                  >
+                    <Plus className="size-3.5" />
+                  </span>
                   {t('appName')}
-                </Drawer.Heading>
-                <p className="mt-0.5 text-xs text-default-500">{t('header.menuSubtitle')}</p>
+                </Link>
+                <Drawer.CloseTrigger aria-label={t('common.dismiss')} />
               </Drawer.Header>
 
-              <Drawer.Body className="flex-1 overflow-y-auto px-2 py-3">
-                <nav aria-label={t('header.menuLabel')} className="flex flex-col gap-1">
-                  <Link
+              <Drawer.Body className="flex-1 overflow-y-auto px-3 py-4">
+                {/* Navigation links */}
+                <nav aria-label={t('header.menuLabel')} className="space-y-0.5">
+                  <RouterLink
+                    to="/"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex min-h-11 items-center gap-3 rounded-medium px-3 py-2.5 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 dark:text-default-300 dark:hover:bg-default-50/10"
+                  >
+                    {t('header.catalog')}
+                  </RouterLink>
+
+                  <RouterLink
                     to="/inquiries"
                     onClick={() => setMenuOpen(false)}
-                    className="flex min-h-11 items-center rounded-medium px-3 py-2 text-sm text-default-700 transition-colors hover:bg-default-100 dark:text-default-300"
+                    className="flex min-h-11 items-center gap-3 rounded-medium px-3 py-2.5 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 dark:text-default-300 dark:hover:bg-default-50/10"
                   >
                     {t('header.contact')}
-                  </Link>
+                  </RouterLink>
+
                   {!isBootstrapping && user ? (
-                    <Link
-                      to="/account"
-                      onClick={() => setMenuOpen(false)}
-                      className="flex min-h-11 items-center gap-2 rounded-medium px-3 py-2 text-sm text-default-700 transition-colors hover:bg-default-100 dark:text-default-300"
-                    >
-                      <UserIcon className="size-4" aria-hidden />
-                      <span className="truncate">{user.fullName}</span>
-                    </Link>
+                    <>
+                      <RouterLink
+                        to="/account"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex min-h-11 items-center gap-3 rounded-medium px-3 py-2.5 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 dark:text-default-300 dark:hover:bg-default-50/10"
+                      >
+                        <UserIcon className="size-4 shrink-0" aria-hidden />
+                        <span className="truncate">{user.fullName}</span>
+                      </RouterLink>
+                      <RouterLink
+                        to="/account/orders"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex min-h-11 items-center gap-3 rounded-medium px-3 py-2.5 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 dark:text-default-300 dark:hover:bg-default-50/10"
+                      >
+                        {t('header.myOrders')}
+                      </RouterLink>
+                    </>
                   ) : null}
+
                   {!isBootstrapping && !user ? (
-                    <Link
+                    <RouterLink
                       to="/login"
                       onClick={() => setMenuOpen(false)}
-                      className="flex min-h-11 items-center rounded-medium px-3 py-2 text-sm text-default-700 transition-colors hover:bg-default-100 dark:text-default-300"
+                      className="flex min-h-11 items-center gap-3 rounded-medium px-3 py-2.5 text-sm font-medium text-brand transition-colors hover:bg-brand/5"
                     >
                       {t('header.signIn')}
-                    </Link>
+                    </RouterLink>
                   ) : null}
                 </nav>
 
-                <hr className="my-3 border-divider/60" />
+                <Separator orientation="horizontal" className="my-4" />
 
-                <div className="space-y-2 px-1">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs uppercase tracking-wide text-default-500">
+                {/* Cart shortcut */}
+                <RouterLink
+                  to="/cart"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex min-h-11 items-center justify-between gap-3 rounded-medium px-3 py-2.5 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 dark:text-default-300 dark:hover:bg-default-50/10"
+                >
+                  <span className="flex items-center gap-3">
+                    <ShoppingBag className="size-4 shrink-0" aria-hidden />
+                    {t('header.cartCount', { count: cart.totalQuantity })}
+                  </span>
+                  {cart.totalQuantity > 0 ? (
+                    <span className="flex size-5 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-white tabular-nums">
+                      {cart.totalQuantity > 99 ? '99+' : cart.totalQuantity}
+                    </span>
+                  ) : null}
+                </RouterLink>
+
+                <Separator orientation="horizontal" className="my-4" />
+
+                {/* Utility controls */}
+                <div className="space-y-1 px-1">
+                  <div className="flex min-h-11 items-center justify-between gap-3 rounded-medium px-2 py-1">
+                    <span className="text-xs font-medium uppercase tracking-wide text-default-500">
                       {t('header.switchLanguage')}
                     </span>
                     <LangSwitcher />
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs uppercase tracking-wide text-default-500">
+                  <div className="flex min-h-11 items-center justify-between gap-3 rounded-medium px-2 py-1">
+                    <span className="text-xs font-medium uppercase tracking-wide text-default-500">
                       {t('header.switchTheme')}
                     </span>
                     <ThemeToggle />
@@ -151,7 +250,7 @@ export function Header() {
               </Drawer.Body>
 
               {!isBootstrapping && user ? (
-                <Drawer.Footer className="border-t border-divider/60 px-4 py-3">
+                <Drawer.Footer className="border-t border-divider/60 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3">
                   <Button
                     variant="ghost"
                     fullWidth
@@ -160,6 +259,7 @@ export function Header() {
                       void logout();
                     }}
                     aria-label={t('auth.signOut')}
+                    className="text-default-600 dark:text-default-400"
                   >
                     <span className="inline-flex items-center gap-2">
                       <LogOut className="size-4 rtl:rotate-180" aria-hidden />

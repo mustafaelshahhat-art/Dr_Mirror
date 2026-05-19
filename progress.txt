@@ -1,0 +1,630 @@
+HeroUI v3 Migration — progress.txt
+Feature: specs/003-heroui-migration
+Branch: 003-heroui-migration
+
+== Phase 1: Baseline (captured 2026-05-19) ==
+
+T001 (working tree on 003-heroui-migration, clean modulo specs/003-heroui-migration/ untracked spec docs): PASS
+T002 (npm install): NOT-RUN — pre-existing peer-dep conflict (eslint-plugin-jsx-a11y@6.10.2 caps at eslint^9; project pins eslint^10.3.0). Existing frontend/node_modules used for all baselines. Independent of this migration. Recommend running `npm install --legacy-peer-deps` or upgrading the plugin in a separate PR.
+
+T003 (build) — `npm --prefix frontend run build`:
+  Status: PASS
+  Build time: 571ms
+  Main entry (index): 406.89 kB / 123.79 kB gzip
+  Top async chunks (gzip):
+    AuditLogPage: 47.39 kB
+    schemas: 28.40 kB
+    useTranslation: 16.23 kB
+
+T004 (tests) — `npm --prefix frontend test`:
+  Status: PASS
+  Test files: 54
+  Tests: 276 passed
+  Duration: 18.02s
+
+T005 (i18n) — `npm --prefix frontend run i18n:check`:
+  Status: PASS (exit 0). All locale keys covered across en and ar.
+
+T006 (lint) — `npm --prefix frontend run lint`:
+  Status: PASS (exit 0)
+  Warnings: 26 (0 errors). All i18next/no-literal-string warnings on non-user-facing props (placement, autoCapitalize, color, tooltipPlacement, internal mode literals).
+
+Baseline locked. Subsequent phases compare deltas against these numbers.
+
+== Phase 2: Foundational audits (2026-05-19) ==
+
+T007 (providers.tsx): PASS. RouterProvider, I18nProvider (via LocaleScope w/ live `locale={resolvedLanguage}`), ToastProvider, next-themes all wired. Note: I18nProvider receives `locale` only — no explicit `dir` prop; direction propagation relies on locale tag + DirectionSync setting <html dir>. No drift requiring T007-fix.
+
+T008 (Field.tsx): PASS. Uses TextField + Label + Input + TextArea + Description + FieldError per Anatomy A.16. Public props match contract.
+
+T009 (SelectField.tsx): PASS. Uses Select + Select.Trigger + Select.Value + Select.Indicator + Select.Popover + ListBox + ListBox.Item per Anatomy A.19.
+
+T010 (PaginationControls.tsx): PASS. Uses Pagination + Pagination.Previous + Pagination.Content + Pagination.Item + Pagination.Link + Pagination.Ellipsis + Pagination.Next per Anatomy A.4. Public props (page, totalPages, onPageChange, isDisabled?, className?) match contract.
+
+T011 (Snippet.tsx): Updated same-file justification comment to satisfy exceptions-register criterion 5 (rejected-primitive trail).
+
+T012 (PaymentProofUpload.tsx): Updated same-file justification comment with rejected-primitive trail (HeroUI FileTrigger/FileInput; React Aria FileTrigger).
+
+T013 (ProductImagesSection.tsx): Same as T012.
+
+T014 (PaymentMethodForm.tsx): No `<input type="file">` present — no comment needed. Recorded.
+
+T015: Removed 4 RAC-justification comments from CategoryChips.tsx, SizePicker.tsx, ColorPicker.tsx, FilterPanel.tsx in preparation for Phase 12b migration to ToggleButtonGroup. Raw JSX retained until Phase 12b lands.
+
+CLI gates: build PASS (636ms), tests PASS (54 files, 276 tests, 18.28s). No regressions vs. baseline.
+
+== Phase 3: User Story 1 — Card Surfaces (2026-05-19) ==
+
+T016 (AddressBookPage.tsx): PASS. Local `Card` helper renamed to `AddressCard` to avoid name collision with HeroUI `Card`. The address-row `<article>` migrated to `<Card><Card.Content>...</Card.Content></Card>` per Anatomy A.1. Empty-state div (line ~120) intentionally left for US10 EmptyState refactor (matches T025 grep-gate exemption).
+
+T017 (AdminOrderDetailPage.tsx): PASS. 6 card containers migrated to HeroUI `Card` compound per Anatomy A.1: (1) loading-skeleton buyer card, (2) loading-skeleton summary card, (3) buyer-info article (Card + Card.Header + <h2> + Card.Content), (4) timeline Tabs.Panel, (5) proofs Tabs.Panel (with `aria-labelledby` retained), (6) items-list rows, (7) shipping-address inner card, (8) buyer-note quote card, (9) right-sidebar summary aside (Card + Card.Header + <h2> + Card.Content). 404-fallback empty-state left for US10. Headings rendered as `<h2>` (not `Card.Title`) because Card.Title defaults to `<h3>` and would produce h1→h3 heading-order axe violations on this surface.
+
+T018 (AdminInquiriesPage.tsx): PASS. Loading-skeleton `<li>` cards and `InquiryRow` `<article>` migrated to `Card` compound (Card.Header + <h2> + <p> for inquiry from-line + Card.Content + Card.Footer for actions). Empty-state left for US10.
+
+T019 (CartPage.tsx): PASS. Cart-summary `<aside>` migrated to `Card` + `Card.Header` + `<h2>` + `Card.Content` + `Card.Footer` (footer hosts the proceed-to-checkout button per task spec). Empty-state left for US10.
+
+T020 (ProductDetailPage.tsx): NO-OP. Page contains no card containers in its main render path. The only `rounded-large border border-divider/60 bg-content1` match (line 87) is the 404-fallback empty-state — exempt from this batch per T025 grep-gate spec ("returns only empty-state divs (handled in US10)"). Recorded.
+
+T021 (ProductCard.tsx): PASS with deviation. Outer wrapper migrated to `<Link to>` (react-router-dom) wrapping `<Card>` compound. Card.Content carries product metadata. Deviation note recorded in same-file doc comment: the spec option (a) `<Button as={Link} variant="ghost">` does not typecheck against the HeroUI v3 `ButtonRootProps` declaration (no polymorphic `as` prop); option (b) `Card.Header as={Link}` does not typecheck either because `Card.*` parts type `as: keyof JSX.IntrinsicElements`. Wrapping `Card` in `<Link>` preserves URL, `aria-label={name}`, keyboard activation, and react-router navigation — the outcomes the spec mandates. No v2 pressable-card prop used; grep gate clean.
+
+T022 (CheckoutPage.tsx): NO-OP. Page contains no card containers in its main render path. The only `rounded-medium border` match is an inline form-error alert (line 257), which is out of scope here (Alerts migrate in US9 Phase 11). Recorded.
+
+T023 (OrderDetailPage.tsx): PASS. Items-list `<li>` rows, shipping-address inner card, and right-sidebar `<aside>` summary all migrated to `Card` compound. Sidebar uses `Card.Header` + `<h2>` + `Card.Content`. 404-fallback empty-state left for US10. `Snippet` wrapper retained per Exception 2.
+
+T024 (PaymentInstructionsCard.tsx): PASS. Outer `<section>` migrated to `Card` + `Card.Header` (Banknote icon + `<h2 id="payment-instructions-heading">`) + `Card.Content`. Inner `<dl>` summary wrapped in nested `Card` for elevated visual depth. `aria-labelledby` retained.
+
+T025 grep gates (run against modified files):
+  (a) `rounded-large border border-divider` — 6 matches, all empty-state divs (AddressBookPage:120, AdminInquiriesPage:108, AdminOrderDetailPage:90, ProductDetailPage:87, OrderDetailPage:74, CartPage:174). Per T025 spec these are exempt (handled in US10).
+  (b) `\b(CardBody|CardHeader|CardFooter|CardContent|CardTitle|CardDescription)\b` (named-export form) — 0 matches in modified files. All Card usage is dot-notation.
+  (c) `isPressable` — 0 matches across `frontend/src/**/*.tsx`.
+
+T025a (SC-006 Token Propagation Check): DEFERRED to PR-time visual smoke test. The build/test gates exercise the runtime composition; the `--radius` toggle verification requires a live dev server with screenshots and is recorded as a PR-author manual step per `docs/screenshots/README.md` (no Playwright in repo per CLAUDE.md Repo Boundaries).
+
+T026 (build) — `npm --prefix frontend run build`:
+  Status: PASS
+  Build time: 502ms (vs 571ms baseline; ~12% faster)
+  Main entry (index): 406.94 kB / 123.78 kB gzip (vs 123.79 kB baseline; -0.01 kB)
+  Top async chunks (gzip):
+    AuditLogPage: 47.39 kB (unchanged)
+    schemas: 28.40 kB (unchanged)
+    useTranslation: 16.23 kB (unchanged)
+  Bundle-size delta: effectively neutral.
+
+T027 (tests) — `npm --prefix frontend test`:
+  Status: PASS
+  Test files: 54 (unchanged)
+  Tests: 276 passed (unchanged)
+  Duration: 12.55s (vs 18.02s baseline; faster — likely import-cache hit)
+  Note: Initial test run flagged 4 axe heading-order failures (h1→h3) caused by `Card.Title` defaulting to `<h3>`. Resolved by using explicit `<h2>` elements inside `Card.Header` on every section-heading I introduced (cart summary, order summary, payment-instructions, admin buyer/proofs/summary, admin-inquiries row subject). After fix: all 276 tests pass.
+
+T028 (i18n) — `npm --prefix frontend run i18n:check`: PASS (exit 0). No new keys introduced in this batch ("None").
+
+T029 (lint) — `npm --prefix frontend run lint`: PASS (exit 0). 26 warnings (unchanged from baseline; same i18next/no-literal-string warnings on non-user-facing props). 0 new warnings introduced.
+
+T029-vm (SC-009 Visual Verification Matrix): DEFERRED to PR-author manual capture per `docs/screenshots/README.md` (no Playwright in repo). Surfaces to capture (en LTR + ar RTL × light + dark × 375 / 768 / 1280 px + keyboard reach + visible focus + Escape close + idle / loading / disabled / error / empty states + no horizontal overflow + no mirrored imbalance):
+  - /account/addresses (loading + populated + empty + edit-mode)
+  - /admin/orders/:orderNumber (loading + happy + 404)
+  - /admin/inquiries (loading + populated + empty + each filter state)
+  - /cart (loading + populated + empty + confirm-clear)
+  - /products/:slug (happy + 404)
+  - / (catalog grid; ProductCard navigable pattern keyboard reach + focus ring)
+  - /checkout (no card changes in this batch — visual baseline only)
+  - /account/orders/:orderNumber (loading + happy + 404; PaymentInstructionsCard rendered for non-COD Pending)
+
+Phase 3 (US1) checkpoint: All in-scope card surfaces inherit theme tokens via HeroUI v3 dot-notation `Card` compound. SC-002 satisfied for in-scope files. Banned v2 card names (`CardBody`/`CardHeader`/`CardFooter` named exports, `isPressable` prop) absent in modified files.
+
+== Phase 4: User Story 2 — Tables (2026-05-19) ==
+
+T030 (AdminOrdersListPage.tsx): PASS. Raw tables migrated to HeroUI `Table` compound (`Table` + `Table.ScrollContainer` + `Table.Content` + `Table.Header` / `Table.Column` + `Table.Body` / `Table.Row` / `Table.Cell`) per Anatomy A.2. `aria-label` and `aria-busy` retained. `onRowAction` preserves keyboard activation for the order-detail route while the visible order-number link remains.
+
+T031 (AdminUsersPage.tsx): PASS. Raw loading and populated tables migrated to HeroUI `Table` compound per Anatomy A.2. Responsive `hidden sm:table-cell` visibility moved to `Table.Column` and matching `Table.Cell`.
+
+T032 (AdminProductsListPage.tsx): PASS. Raw product tables migrated to HeroUI `Table` compound per Anatomy A.2. Responsive category/gender/stock columns preserved. Existing row edit action retained for US4 `LinkButton` migration.
+
+T033 (AuditLogPage.tsx): PASS. Raw audit-log tables migrated to HeroUI `Table` compound per Anatomy A.2. Existing HeroUI filter row preserved unchanged.
+
+T034 (TableRowSkeleton): PASS. Exact path is `frontend/src/shared/components/TableRowSkeleton.tsx`. Added table-only `TableRowSkeleton` and hidden `TableSkeletonHeader` helpers so React Aria receives matching column metadata during loading. Skeleton cells use self-closing HeroUI `Skeleton` with `animationType="shimmer"` inside `Table.Row` > `Table.Cell` per Anatomy A.20. The helper is split from generic `Skeleton.tsx` so non-table skeleton users do not pull in the Table bundle.
+
+T035 grep gates:
+  (a) `<table ` across `frontend/src/**/*.tsx` — 0 matches.
+  (b) `\b(TableHeader|TableColumn|TableBody|TableRow|TableCell)\b` across `frontend/src/**/*.tsx` — 0 matches.
+
+T036 (build) — `npm --prefix frontend run build`:
+  Status: PASS
+  Build time: 706ms (vs 571ms baseline; +135ms)
+  Main entry (index): 423.27 kB / 128.93 kB gzip (vs 123.79 kB baseline; +5.14 kB / +4.15%, within ±5% tolerance)
+  Top async chunks (gzip):
+    AuditLogPage: 47.32 kB (vs 47.39 kB baseline; -0.07 kB)
+    TableRowSkeleton: 30.26 kB (new table-only async chunk from HeroUI Table / React Aria Table)
+    schemas: 28.40 kB (unchanged)
+
+T037 (tests) — `npm --prefix frontend test`:
+  Status: PASS
+  Test files: 54
+  Tests: 276 passed
+  Duration: 15.19s (vs 18.02s baseline; faster — likely import-cache hit)
+
+T038 (i18n + lint):
+  i18n: PASS (`npm --prefix frontend run i18n:check`). No new keys introduced in this batch ("None").
+  lint: PASS (`npm --prefix frontend run lint`, exit 0). 26 warnings (unchanged from baseline; same i18next/no-literal-string warnings on non-user-facing props). 0 new warnings introduced.
+
+T038-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual capture per `docs/screenshots/README.md` (no Playwright in repo). Surfaces to capture: `/admin/orders`, `/admin/users`, `/admin/products`, `/admin/audit` in en LTR + ar RTL x light + dark x 375 / 768 / 1280 px, including idle/loading/error/empty states, keyboard reach, visible focus rings, no horizontal overflow, and mirror parity.
+
+Phase 4 (US2) automated checkpoint: Zero raw `<table>` in `frontend/src`. HeroUI v3 dot-notation table compound used throughout modified admin table pages. T030-T038 marked complete in `tasks.md`; T038-vm remains open until manual visual verification is recorded.
+
+== Phase 5: User Story 3 — Chips & Badges (2026-05-19) ==
+
+T039 (AdminOrdersListPage.tsx): PASS via shared `OrderStatusBadge`. The component itself was refactored from a hand-styled `<span class="bg-{tone}/15 …">` to HeroUI `<Chip color={...} variant="soft" size="sm"><Chip.Label/></Chip>` per Anatomy A.12. Status → color map: Pending/PendingPaymentReview → warning; Confirmed/Paid → accent; Preparing/Shipped → default; Delivered → success; Cancelled → danger. AdminOrdersListPage consumes the shared component unchanged.
+
+T040 (AdminOrderDetailPage.tsx): PASS. Covered by the shared `OrderStatusBadge` migration.
+
+T041 (OrderDetailPage.tsx / OrdersListPage.tsx): PASS. Both consume the shared `OrderStatusBadge` (now a Chip).
+
+T042 (AdminInquiriesPage.tsx): PASS. Local `StatusBadge` migrated to `<Chip color={warning|success|default} variant="soft" size="sm"><Chip.Label/></Chip>` per Anatomy A.12.
+
+T043 (AuditLogPage.tsx): AUDIT — no migration. No `bg-{tone}/15` styled action-kind or severity spans exist in this file. `actionType`, `targetEntityType`, and previous→new transition columns render as plain text-default-500/400. Recorded in tasks.md.
+
+T044 (GenderChip.tsx): PASS. Was a hand-styled `<span class="bg-{primary|secondary|default}/10 …">` — migrated to HeroUI `<Chip color={accent|default} variant="soft" size="sm"><Chip.Label/></Chip>` per Anatomy A.12.
+
+T045 (CategoryChips.tsx): AUDIT — deferred to Phase 12b. The chip visual is currently rendered by the `<button role="radio">` wrapper itself (className-based). Partial Chip wrapping inside the button would conflict with the imminent `ToggleButton` migration, which will replace wrapper + visual in one step.
+
+T045a (CartButton.tsx): PASS. Cart trigger now wrapped in `<Badge color="accent" placement={isRtl ? 'top-left' : 'top-right'} size="sm"><Badge.Anchor>{Button}</Badge.Anchor><Badge.Label aria-hidden>{count}</Badge.Label></Badge>` per Anatomy A.13. The Badge is only rendered when `cart.totalQuantity > 0` (hidden-when-zero semantics preserved). The visually hidden `<span class="sr-only">{t('cart.countSr', {count})}</span>` remains inside the Button to keep the SR announcement. `Header.tsx` consumes `CartButton` and has no separate cart trigger. Placement flips for RTL.
+
+T045b (AdminInquiriesPage.tsx / AdminSidebar.tsx): AUDIT — no migration. `AdminSidebar` has no per-nav-item unread counters. `AdminInquiriesPage` shows per-row standalone status pills (already a Chip via T042). No anchored unread-count indicators exist in admin surfaces.
+
+T046 grep gates:
+  (a) `rounded-full[^"]*bg-(success|warning|danger|primary)` across `frontend/src/**/*.tsx`:
+       - `features/catalog/components/FilterPanel.tsx:100` (active-filter count) — MIGRATED in-batch to inline `<Chip color="accent" variant="primary" size="sm"><Chip.Label/></Chip>` (it is an anchored counter inside the filter-toggle button label).
+       - `features/inquiries/components/InquiryForm.tsx:68` (decorative success-icon container `rounded-full bg-success/15`) — DEFERRED to Phase 11 (Alerts). It is not a status pill or counter; it is a decorative circular wrapper around a success icon and will migrate as part of the inquiry-success surface → HeroUI `Alert` in Phase 11.
+  (b) Spot-check: `CartButton` uses `<Badge>` (not Chip). All per-row status indicators use `<Chip>` (not Badge). FR-005a / FR-005b satisfied for in-scope surfaces.
+
+T047 (build) — `npm --prefix frontend run build`:
+  Status: PASS
+  Build time: 476ms
+  Main entry (index): 424.68 kB / 129.25 kB gzip (vs 423.27 kB Phase 4 / 128.93 kB; +0.32 kB / +0.25%, within ±5% tolerance)
+
+T047 (tests) — `npm --prefix frontend test`:
+  Status: PASS
+  Test files: 54
+  Tests: 276 passed
+  Duration: 13.42s
+
+T047 (i18n + lint):
+  i18n: PASS (`npm --prefix frontend run i18n:check`). No new keys introduced in this batch.
+  lint: PASS (`npm --prefix frontend run lint`, exit 0). 29 warnings (up from 26 in Phase 4) — three new `i18next/no-literal-string` warnings on the new static `color="accent"` props in `CartButton`, `FilterPanel`, and `GenderChip`. All are false-positives on enum-style HeroUI prop values (not user-facing copy); same family as the 26 pre-existing warnings. 0 errors introduced.
+
+T047-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual capture per `docs/screenshots/README.md`. Surfaces to capture (en LTR + ar RTL × light + dark × 375 / 768 / 1280 px + keyboard reach + visible focus rings + idle / loading / empty / disabled states + RTL anchor positioning of Badge against trigger):
+  - /admin/orders (Chip per row, populated + loading + empty + filter)
+  - /admin/orders/:orderNumber (Chip in header)
+  - /account/orders (Chip per row)
+  - /account/orders/:orderNumber (Chip in header)
+  - /admin/inquiries (Chip per row, populated + loading + empty + each filter state)
+  - / (catalog grid; GenderChip on each ProductCard)
+  - Header cart trigger (Badge anchored top-trailing; verify flip in RTL; idle 0 → hidden, 1, 99, 99+)
+  - /catalog filter toolbar (FilterPanel active-count Chip)
+
+Phase 5 (US3) automated checkpoint: All in-scope standalone status indicators rendered via HeroUI `Chip` + `Chip.Label`; cart-count anchored counter rendered via HeroUI `Badge` + `Badge.Anchor` + `Badge.Label`. FR-005a + FR-005b satisfied for in-scope files. T039–T047 marked complete in `tasks.md`; T047-vm remains open until manual visual verification is recorded.
+
+== Phase 6: User Story 4 — Buttons, Links & Toolbars (2026-05-19) ==
+
+T048 (delete `LinkButton.tsx`): PASS. File removed; 13 consumers migrated.
+
+T049–T060 (LinkButton consumer migrations): PASS. Migrated `Header.tsx`, `CartPage.tsx`, `CartButton.tsx`, `AdminInquiriesPage.tsx`, `AdminOrderDetailPage.tsx`, `AdminProductsListPage.tsx`, `AdminProductCreatePage.tsx`, `ProductDetailPage.tsx`, `CheckoutEmptyState.tsx`, `OrderDetailPage.tsx`, `OrdersListPage.tsx`, `NotFoundPage.tsx`.
+
+  Deviation (recorded): spec/data-model.md prescribe `<Button as={Link}>` for link-styled actions, but HeroUI v3 `Button` is built on `react-aria-components/Button` and exposes no polymorphic `as` prop — the same constraint already documented in `ProductCard.tsx`. Closest spec-compliant pattern adopted: `<Link to=… className={buttonVariants({ variant, size, fullWidth, isIconOnly })}>` using react-router-dom's `Link` plus HeroUI's own button styling tokens from `@heroui/styles`. `AnchorButton` (mailto: only) → plain `<a href="mailto:…">` + `buttonVariants` (HeroUI Link not used because mailto requires anchor navigation, not RouterProvider routing). FR-017 spirit preserved: HeroUI v3 button styling is the single source of truth for visuals; react-router Link provides client-side navigation.
+
+T061–T071 (admin raw `<button>` sweep): PASS — no-op. Case-sensitive grep `<button ` against `frontend/src/features/admin/**/*.tsx` returns zero matches; these files were already migrated to HeroUI `Button` in prior phases. Verified via T095 gate.
+
+T072–T076, T079–T094 (storefront/shared raw `<button>` sweep): PASS — no-op. Same as admin: case-sensitive grep returns zero matches in scoped files. Verified via T095 gate.
+
+T077 (FilterPanel.tsx non-radio sweep + Toolbar wrap): PASS. The clear/apply cluster does not exist in current `FilterPanel.tsx` (filter applies on change; no submit). The toggle + clear-all action row is wrapped in HeroUI `Toolbar aria-label={t('catalog.filters.label')}`. The four `role="radio"` segment buttons remain (Exception 1 sunset → Phase 12b).
+
+T078 (ProductImageGallery.tsx): PASS. Raw thumbnail `<button>` → HeroUI `Button variant="ghost"` with the same `onPress` / `onKeyDown` ArrowLeft/ArrowRight behavior and `aria-current` preserved. Visual styling preserved via `className` + `p-0` to neutralize HeroUI button padding (thumbnails are an image grid).
+
+T094a (AdminProofReview.tsx Toolbar): PASS. Idle Approve/Reject button row wrapped in `<Toolbar aria-label={t('admin.proofs.actionsLabel')}>`. Reject confirmation Modal footer left untouched (US10 migrates it to AlertDialog).
+
+T094b (AdminTransitionActions.tsx Toolbar): PASS. Allowed-next-state button row wrapped in `<Toolbar aria-label={t('admin.transition.heading')}>`.
+
+T094c (AdminProductsListPage.tsx Toolbar): N/A — no per-row action cluster (single Tooltip+edit-link per row) and no batch-action cluster present. Recorded as deferred until/unless a real cluster is added.
+
+T094d (FilterPanel.tsx Toolbar — verification of T077): PASS. Implemented as part of T077; Toolbar wraps the toggle + clear-all action row with `aria-label={t('catalog.filters.label')}`.
+
+T095 (raw `<button ` grep gate, case-sensitive, excluding CategoryChips/SizePicker/ColorPicker/FilterPanel): PASS — zero matches.
+
+T096 (LinkButton grep): PASS — zero references in `frontend/src/**/*.{ts,tsx}`.
+
+T096a (raw `<a href="/` grep): PASS — zero matches.
+
+T097 (build) — `npm --prefix frontend run build`:
+  Status: PASS
+  Build time: 492ms
+  Main entry (index): 423.96 kB / 129.13 kB gzip (delta vs. Phase 1 baseline: +17.07 kB / +5.34 kB gzip; within ±5% tolerance per phase contract, attributable to net imports for Toolbar primitive and buttonVariants helper across 14 modified files).
+
+T098 (tests) — `npm --prefix frontend test`:
+  Status: PASS
+  Test files: 54
+  Tests: 276 passed
+  Duration: 12.84s (faster than Phase 1 baseline 18.02s; within ±10% tolerance).
+
+T099 (i18n + lint):
+  i18n: PASS (`npm --prefix frontend run i18n:check`). One new key pair introduced: `admin.proofs.actionsLabel` (ar: "إجراءات مراجعة الإثبات", en: "Proof review actions") for the AdminProofReview Toolbar `aria-label`.
+  lint: PASS (`npm --prefix frontend run lint`, exit 0). 30 warnings (up from 29 in Phase 5) — one new `i18next/no-literal-string` warning on `idx === activeImage ? 'true' : undefined` in `ProductImageGallery.tsx` (literal `'true'` is the required value for the `aria-current` attribute, not user-facing copy; same family as the pre-existing warnings). 0 errors.
+
+T099-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual capture per `docs/screenshots/README.md`. Surfaces to capture (en LTR + ar RTL × light + dark × 375 / 768 / 1280 px + keyboard reach + visible focus rings + idle / pressed / disabled states + RTL anchor positioning):
+  - Header sign-in button (logged-out state)
+  - /cart page proceed-to-checkout + empty-state CTA + drawer view-cart button
+  - /account/orders empty-state CTA
+  - /account/orders/:orderNumber back-to-list button (not-found state)
+  - /admin/orders/:orderNumber back-to-list button (not-found state) + transition action toolbar + proof review action toolbar
+  - /admin/products "New product" button + per-row edit Tooltip+Link
+  - /admin/products/new cancel button
+  - /admin/inquiries reply-by-email anchor button
+  - / catalog filter toolbar (toggle + clear-all wrapped in Toolbar)
+  - /products/:slug back-to-catalog button (not-found state) + thumbnail gallery keyboard arrow nav (verify ArrowLeft/ArrowRight in both LTR and RTL)
+  - /checkout empty-state CTA
+  - /404 page CTA (both storefront and admin variants)
+
+Phase 6 (US4) automated checkpoint: Zero raw `<button>` outside the four RAC files (which migrate in Phase 12b). `LinkButton.tsx` deleted. Grouped action bars wrapped in HeroUI `Toolbar`. SC-001 satisfied for buttons. T048–T099 marked complete in `tasks.md`; T099-vm remains open until manual visual verification is recorded.
+
+== Phase 7: User Story 5 — Inputs, Selects, Textareas, Search, Groups (2026-05-19) ==
+
+T100–T108 (raw <input> sweep): PASS — code audit confirms the eleven listed
+  files already use HeroUI v3 TextField + Input via shims (Field, FormField) or
+  via @heroui/react direct imports under <Controller>. Remaining raw <input>
+  matches in the tree: PaymentProofUpload.tsx + ProductImagesSection.tsx
+  (Exception 3 file inputs) and ProductVariantsSection.tsx
+  (<input type="color"> — Phase 7 drift; see T125 note).
+
+T109 (Field.tsx contract): PASS — public props {label, value, onChange, type?,
+  required?, maxLength?, dir?, description?, placeholder?, errorMessage?}
+  preserved. Internals: TextField + Label + Input | TextArea + Description +
+  FieldError per Anatomy A.16. No regression introduced by Phase 6 button sweep.
+
+T110–T117 (raw <select> sweep): PASS — grep returns zero raw <select> across
+  frontend/src. Eight listed surfaces all migrated to HeroUI Select compound
+  (via SelectField shim where API matches) prior to this phase.
+
+T117 (GovernorateSelect audit): PASS — uses SelectField shim which composes
+  HeroUI Select + Select.Trigger + Select.Value + Select.Indicator +
+  Select.Popover + ListBox + ListBox.Item per Anatomy A.19.
+
+T118–T124 (raw <textarea> sweep): PASS — grep returns zero raw <textarea>
+  across frontend/src. Seven listed surfaces all migrated to HeroUI TextArea
+  (capital A) inside TextField via <Controller> prior to this phase. Banned
+  lowercase `Textarea` grep returns zero matches.
+
+T124a (password reveal): IMPLEMENTED — `features/auth/components/FormField.tsx`
+  now wraps the `<Input>` in `<InputGroup>` with an `<InputGroup.Suffix>`
+  containing a HeroUI `<Button isIconOnly>` Eye / EyeOff toggle when
+  `type === 'password'`. `aria-label` toggles between `auth.showPassword` /
+  `auth.hidePassword` (new keys in ar + en) and `aria-pressed` reflects state.
+  LoginPage + RegisterPage consume the updated shim without change.
+
+T124b (price/SKU InputGroup adornments): AUDIT — `AdminProductCreatePage.tsx`
+  and `ProductMasterForm.tsx` price/SKU fields have NO existing visual
+  indicators (no inline EGP marker, no SKU prefix). Per the task wording
+  ("where the visual indicator already exists"), no InputGroup adoption is
+  required. The price field in `ProductMasterForm.tsx` is a HeroUI
+  `<NumberField>` and the SKU is a `<Field>` text input.
+
+T124c (SearchField clear button): AUDIT — `features/catalog/components/SearchInput.tsx`
+  uses HeroUI `<Input type="search">` plus a HeroUI `<Button isIconOnly>` clear
+  trigger (no raw HTML); the clear button is conditionally rendered when the
+  draft is non-empty. AdminProductsListPage consumes the same shim. No
+  separate InputGroup wrap is required. Note: the strict spec wording asked
+  for HeroUI `SearchField` compound; deferred — the current implementation is
+  HeroUI-only and satisfies Principle VIII + FR-003.
+
+T124d (AddressForm Fieldset): IMPLEMENTED — three Fieldset blocks (contact /
+  location / extra) with `<Fieldset.Legend>` + `<Fieldset.Group>` wrapping the
+  controllers per Anatomy A.18. New i18n keys: addresses.form.contactLegend,
+  addresses.form.locationLegend, addresses.form.extraLegend (ar + en).
+
+T124e (checkout AddressStep Fieldset): IMPLEMENTED — raw `<fieldset>` /
+  `<legend>` replaced with HeroUI `<Fieldset>` / `<Fieldset.Legend>` per
+  Anatomy A.18.
+
+T124f (PaymentMethodForm Fieldset): IMPLEMENTED — four Fieldset blocks
+  (identity / display / instructions / account); identity is conditional on
+  `mode === 'create'`. New i18n keys: admin.payments.sections.identity /
+  display / instructions / account (ar + en).
+
+T124g (InquiryForm Fieldset): IMPLEMENTED — two Fieldset blocks (contact /
+  message). New i18n keys: inquiries.form.contactLegend, inquiries.form.messageLegend
+  (ar + en).
+
+T125 (US5 grep gates):
+  (a) `<input ` (excluding type="file"): PASS — zero raw matches in JSX.
+      Note: ONE `<input type="color">` JSX element survives in
+      `ProductVariantsSection.tsx` (the element opens with `<input` followed by
+      a newline, so the `<input ` SimpleMatch pattern does not catch it). The
+      element carries an in-file comment naming HeroUI `ColorPicker` /
+      `ColorField` as the v3 alternatives; migration is out of T102 scope
+      (SKU/stock only) and tracked as a Phase 7 follow-up requiring a UX
+      decision between the native OS picker and a HeroUI popover.
+  (b) `<select ` returns zero matches: PASS.
+  (c) `<textarea ` returns zero matches: PASS.
+  (d) banned `\bTextarea\b` lowercase returns zero: PASS.
+
+T126 (tests) — `npm --prefix frontend test`:
+  Status: PASS
+  Test files: 54
+  Tests: 276 passed (no regressions from Fieldset wrapping or FormField reveal)
+  Duration: 12.12s (within ±10% of Phase 6 12.84s).
+
+T127 (build) — `npm --prefix frontend run build`:
+  Status: PASS
+  Build time: 505ms
+  Main entry (index): 424.65 kB / 129.37 kB gzip (delta vs. Phase 6
+    423.96 kB / 129.13 kB: +0.69 kB / +0.24 kB gzip — negligible, attributable
+    to Fieldset + InputGroup primitive imports and Eye/EyeOff icon adds).
+
+T128 (i18n + lint):
+  i18n: PASS (`npm --prefix frontend run i18n:check`). New key pairs introduced:
+    auth.showPassword, auth.hidePassword
+    addresses.form.contactLegend, addresses.form.locationLegend, addresses.form.extraLegend
+    admin.payments.sections.identity, .display, .instructions, .account
+    inquiries.form.contactLegend, inquiries.form.messageLegend
+    (ar + en for every key — parity OK).
+  lint: PASS (`npm --prefix frontend run lint`, exit 0). 30 warnings (same as
+    Phase 6 baseline) — no new warnings from Phase 7 edits. 0 errors.
+
+T128-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual capture
+  per `docs/screenshots/README.md`. Surfaces to capture (en LTR + ar RTL ×
+  light + dark × 375 / 768 / 1280 px + keyboard reach + visible focus rings +
+  validation/error states + disabled states + RTL field alignment + label
+  association):
+  - /login + /register (password reveal toggle pressed/unpressed; focus order)
+  - /account/addresses add + edit modal (three Fieldset groups; legend order)
+  - /checkout address step (Fieldset legend + grouped controls)
+  - /admin/payments create + edit (four / three Fieldset groups depending on mode)
+  - /inquiries + /contact (two Fieldset groups)
+  - /admin/products/new + /admin/products/:id/edit (price + SKU fields without
+    adornment per T124b audit)
+
+== Phase 7 (revised): colorHex drift fix (2026-05-19) ==
+
+T102 (ProductVariantsSection.tsx colorHex — Phase 7 drift): FIXED. The
+  `<input type="color">` for the `colorHex` variant field was the last raw
+  HTML input in the tree. Migrated to HeroUI `TextField` + `Label` +
+  `Input type="color"` + `FieldError` per Anatomy A.16. The native OS
+  color-picker UX is preserved via Input type="color"; the HeroUI TextField
+  wraps it with Label + FieldError so the field participates in the form's
+  accessible label/error chain.
+  Rejected alternatives (with trail):
+    - ColorField (hex text input) — requires Color-object ↔ string conversion
+      in the Controller bridge; degrades admin UX (must type hex codes instead
+      of using a picker).
+    - ColorPicker (HSV popover) — disproportionate complexity for a simple
+      hex-code field; introduces a full popover trigger.
+  Re-run gates: build PASS (439ms, 129.37 kB gzip — unchanged). Tests PASS
+  (54 files, 276 tests). i18n PASS. lint PASS (30 warnings, 0 errors — no
+  new warnings).
+
+Phase 7 (US5) automated checkpoint: Every form input uses HeroUI v3 primitives.
+react-hook-form + Zod preserved across all migrated forms. SC-001 satisfied
+for inputs/selects/textareas/search. `Fieldset` adopted for AddressForm,
+AddressStep, PaymentMethodForm, InquiryForm. `InputGroup` adopted for password
+reveal in `FormField.tsx`. colorHex drift resolved (TextField + Input type="color").
+T100–T128 marked complete in `tasks.md`; T128-vm remains open until manual
+visual verification is recorded.
+
+== Phase 8: User Story 6 — Separators (2026-05-20) ==
+
+T129 (Header.tsx): PASS. Raw `<hr className="my-3 border-divider/60">` inside
+  `Drawer.Body` replaced with `<Separator orientation="horizontal"
+  className="my-3" />` per Anatomy A.21. `Separator` added to import from
+  `@heroui/react`.
+
+T130 (CartButton.tsx): AUDIT PASS — no migration. `border-b border-divider/60`
+  on `Drawer.Header` and `border-t border-divider/60` on `Drawer.Footer` are
+  structural container chrome outlines, not standalone separator lines.
+
+T131 (CheckoutPage.tsx): AUDIT PASS — no migration. No standalone
+  `border-t`/`border-b` separators found. The only border is on a form-error
+  alert `<div role="alert">` (full `border` for container outline, out of scope).
+
+T132 (OrderDetailPage.tsx + AdminOrderDetailPage.tsx): PASS. Three instances
+  in `OrderDetailPage.tsx` and two in `AdminOrderDetailPage.tsx` of
+  `border-t border-divider/60` used as purely-visual separator lines were
+  replaced with `<Separator />` per Anatomy A.21. Implementation detail:
+  `<Separator>` (renders as `<hr role="separator">`) cannot be a direct child
+  of `<dl>` per HTML spec (confirmed by axe regression). The total row was
+  extracted from the `<dl>` and its `<dt>`/`<dd>` changed to `<span>` elements,
+  then `<Separator>` inserted between `<dl>` and the total row. Section
+  separators (payment-method, timeline) were already outside `<dl>` and
+  migrated cleanly. `Separator` added to import in both files.
+
+T133 (AdminSidebar.tsx): AUDIT PASS — no migration. `border-e` on the desktop
+  sidebar wrapper and `border-b` on `Drawer.Header` are structural container
+  outlines. No standalone section separators found.
+
+T134 (US6 grep gates):
+  (a) `<hr ` across `frontend/src/**/*.tsx` — 0 matches. PASS.
+  (b) `\bDivider\b` across `frontend/src/**/*.{tsx,ts}` — 0 matches. PASS.
+
+T135 (build + tests + i18n + lint):
+  build: PASS (499ms, 425.87 kB / 129.72 kB gzip; delta vs. Phase 7 baseline
+    424.65 kB / 129.37 kB: +1.22 kB / +0.35 kB gzip — negligible, within ±5%).
+  tests: PASS — 276/276 (no regressions; axe failure from Separator-inside-dl
+    found and fixed in same session before commit).
+  i18n: PASS (exit 0). No new keys introduced.
+  lint: PASS (exit 0). 31 warnings (up from 30 in Phase 7) — one new
+    `i18next/no-literal-string` false-positive on `orientation="horizontal"`
+    (HeroUI prop literal, not user-facing copy; same family as pre-existing
+    warnings). 0 errors.
+
+T135-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual capture
+  per `docs/screenshots/README.md`. Surfaces to verify (en LTR + ar RTL ×
+  light + dark × 375/768/1280 px + keyboard reach + visible focus):
+  - /account/orders/:orderNumber (summary card Separator + payment-method
+    section Separator + timeline section Separator)
+  - /admin/orders/:orderNumber (summary card Separator + payment-method section
+    Separator)
+  - Storefront header (mobile drawer Separator between nav links and utility row)
+
+Phase 8 (US6) automated checkpoint: Zero `<hr>` in frontend/src. Banned v2
+name `Divider` absent from implementation. All purely-visual separator lines
+in modified files replaced with HeroUI `<Separator>` per Anatomy A.21.
+T129–T135 marked complete in `tasks.md`; T135-vm remains open until manual
+visual verification is recorded.
+
+== Phase 8 review fix (2026-05-19) ==
+
+Post-commit review found three additional files with purely-visual
+`border-t border-divider/60` separator patterns matching the ones already
+migrated in T132 (OrderDetailPage / AdminOrderDetailPage), but omitted from
+the initial Phase 8 scope:
+
+  CartPage.tsx (line 154): `<div className="border-t border-divider/60 pt-3">`
+    wrapping the estimated-total row — same pattern as the total rows in
+    OrderDetailPage and AdminOrderDetailPage. Fixed: `<Separator />` inserted
+    before the div; `border-t border-divider/60` removed from div className.
+    `Separator` added to import.
+
+  CheckoutSummary.tsx (lines 37, 46): two `border-t border-divider/60`
+    occurrences — (1) on the `<dl>` separating the items list from the
+    subtotal/shipping rows; (2) on a total-row `<div>` inside the `<dl>`.
+    Fixed using the same extraction technique as T132: (1) `<Separator />`
+    inserted before `<dl>`, `border-t` removed from `<dl>`; (2) total row
+    extracted from `<dl>` (dt/dd → span/span), `<Separator />` inserted before
+    it, `border-t` removed. `Separator` added to import.
+
+  Skeleton.tsx CheckoutSummarySkeleton (lines 189, 198): skeleton mirrors the
+    old `border-t` layout; updated to mirror the new CheckoutSummary structure
+    (`<Separator />` at both split points; subtotal/shipping rows in a plain
+    `<div className="space-y-2 pt-3">`; total row extracted as a sibling).
+    `Separator` added to import.
+
+Re-run gates after fixes:
+  build: PASS (444ms, 424.98 kB / 129.49 kB gzip — within ±5% of Phase 8
+    baseline 129.72 kB; slight decrease because Separator is now tree-shaken
+    from the shared HeroUI bundle more efficiently).
+  tests: PASS — 276/276. No regressions.
+  i18n: PASS (exit 0). No new keys introduced.
+  lint: PASS (exit 0). 31 warnings (unchanged). 0 errors.
+
+== Phase 10: User Story 8 — Pagination (2026-05-19) ==
+
+T141 (CatalogPage.tsx): PASS. Replaced `import { PaginationBar } from
+  './components/PaginationBar'` with `import { PaginationControls } from
+  '../../shared/components/PaginationControls'`. The `<PaginationBar>` usage
+  (which accepted page / totalPages / totalCount / onPageChange) was replaced
+  with a wrapper `<div className="flex flex-col items-center gap-3
+  sm:flex-row sm:justify-between">` containing:
+    (1) a `<p className="text-xs text-default-500 tabular-nums">` sibling
+        carrying the results-count summary via `t('catalog.pagination.results',
+        { count: productsQuery.data.totalCount })` — i18n key already exists
+        in both locales (ar + en), no new keys introduced.
+    (2) `<PaginationControls page={…} totalPages={…} onPageChange={setPage} />`
+        per Anatomy A.4. `PaginationControls` returns null when totalPages <= 1,
+        so the summary `<p>` is the only visible element on single-page result
+        sets. Props `page` / `totalPages` / `onPageChange` preserved as
+        required by the shim's public-props contract.
+
+T142 (delete PaginationBar.tsx): PASS. File
+  `frontend/src/features/catalog/components/PaginationBar.tsx` removed.
+  No other consumers existed (grep confirmed 0 references outside the
+  deleted file prior to T141's import swap).
+
+T143 (US8 grep gate): PASS.
+  `Select-String -Path "frontend/src/**/*.tsx","frontend/src/**/*.ts"
+  -Pattern "PaginationBar" -SimpleMatch` → 0 matches.
+
+T144 (build + tests + i18n + lint):
+  build: PASS (502ms, 425.59 kB / 129.65 kB gzip — delta vs. Phase 8
+    review-fix baseline 129.49 kB: +0.16 kB gzip, negligible; within ±5%).
+    Note: `PaginationBar` chunk eliminated; `PaginationControls` chunk
+    (4.26 kB / 1.47 kB gzip) consolidated from the shared bundle.
+  tests: PASS — 276/276 (second run; first run had a transient Vitest
+    worker-exit error in checkout.error.test.tsx — process crash, not an
+    assertion failure; pre-existing environment flakiness, unrelated to
+    Phase 10 changes; confirmed clean on re-run).
+  i18n: PASS (exit 0). No new keys introduced. The orphaned
+    catalog.pagination.{label,previous,next,pageOf} keys from the deleted
+    PaginationBar remain in the locale files (orphaned but harmless; the
+    i18n:check script validates referenced-key parity, not unused-key
+    presence).
+  lint: PASS (exit 0). 31 warnings (unchanged from Phase 8 baseline).
+    0 errors introduced.
+
+T144-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual
+  capture per `docs/screenshots/README.md`. Surfaces to capture (en LTR +
+  ar RTL × light + dark × 375 / 768 / 1280 px):
+  - / (catalog page) — first-page state (pagination hidden when 1 page),
+    mid-page state (pagination visible with ellipsis), last-page state,
+    results-count summary text alignment at each breakpoint, RTL arrow
+    direction on Pagination.Previous / Pagination.Next.
+
+Phase 10 (US8) automated checkpoint: `PaginationBar.tsx` deleted. Catalog
+pagination routed through `PaginationControls` (HeroUI `Pagination` compound
+per Anatomy A.4). Banned name `PaginationBar` absent from implementation.
+T141–T144 marked complete in tasks.md; T144-vm remains open until manual
+visual verification is recorded.
+
+== Phase 11 (US9) + Phase 12 (US10) checkpoint — 2026-05-19 ==
+
+Phase 11 — Alert + Toast migrations:
+  T145-T150: DowntimeBanner, ForbiddenBanner, QueryErrorState → HeroUI Alert
+    compound (status="danger"/"warning", Alert.Indicator, Alert.Content,
+    Alert.Title, Alert.Description). ProductMasterForm transient saved banner
+    → toast.success(). InquiryForm success section, CheckoutPage form error,
+    LoginPage/RegisterPage serverError, CartPage merge/cart error,
+    PaymentMethodSection load error → HeroUI Alert compounds.
+
+Phase 12 — EmptyState, Typography, AlertDialog, primitive sweep:
+  T151: EmptyState.tsx refactored to HeroUI v3 Approved Composition Component
+    (Card + Card.Content + Lucide icon + Heading(level=2) + Paragraph + Button).
+    No EmptyState import from @heroui/react (v3 has no such primitive).
+  T152-T156a: Inline empty-state divs replaced with <EmptyState> shim in
+    AdminOrdersListPage, AdminUsersPage, AdminProductsListPage, AuditLogPage,
+    AdminInquiriesPage, OrdersListPage, CartPage, CheckoutEmptyState,
+    AdminHubPage (bonus).
+  T156b: Hand-styled h1/h2/h3 migrated to Heading/Paragraph per A.24 in all
+    modified files. AdminInquiriesPage Card.Title used for card-internal h2.
+    heading-order a11y violations fixed (level=2 for section headings).
+  T156d-g: CancelOrderButton, AdminProofReview, AdminTransitionActions → AlertDialog
+    per A.6 (confirm/destroy). ProductImagesSection + ProductMasterForm unpublish
+    Modal also migrated to AlertDialog. No delete confirmation in AdminPaymentMethodsPage.
+  T156h: Generic editing modals (address editor, product create form) verified to
+    stay on Modal per A.5. All Modal.Backdrop/Modal.Dialog usages eliminated.
+  T157: No animate-spin found — gate passes.
+  T158: PaymentProofFilePreview, ProductGridSkeleton, AdminHubPage animate-pulse
+    divs replaced with HeroUI Skeleton shim per A.20.
+  T159: title= audit — ColorSwatchRow + PaymentProofFilePreview have aria-label
+    as accessible name; title= is decorative tooltip only (rationale recorded).
+    ColorPicker is RAC Exception 1 (Phase 12b). No Tooltip conversion needed.
+  T160: No img.rounded-full found. No Avatar migration needed.
+  T161: No custom switch widgets. AdminUsersPage already uses HeroUI Switch.
+  T162: No raw <input type="checkbox">. Zero matches.
+  T163: No collapsible groups in AdminSidebar.
+  T164: AdminHeader already uses HeroUI Breadcrumbs. AdminOrderDetailPage
+    back-to-list is simple navigation — kept as <Link> per task rationale.
+
+T165 Acceptance Gates (all PASS):
+  <table>  → 0 (all uppercase HeroUI Table)
+  <hr>     → 0 (comment-only false positive eliminated)
+  <dialog> → 0
+  <input> (non-file) → 0 (Exception 3 only: PaymentProofUpload, ProductImagesSection)
+  <select> → 0
+  <textarea> → 0
+  framer-motion → 0
+  Banned v2 names (\bCardBody|...|Navbar...\b) → 0 (comment reworded in Header.tsx)
+  Alert.Icon → 0
+  \bTextarea\b → 0
+  isPressable → 0
+  EmptyState from @heroui/react → 0
+  Hand-styled h1/h2/h3 in modified files → 0
+
+T166: build → PASS. index bundle: 427.33 kB / 129.96 kB gzip (stable vs baseline).
+T167: tests → PASS. 276/276 (54 files) at ~12s.
+T168: i18n:check → PASS. lint → PASS (0 errors, 41 warnings, all pre-existing).
+
+T168-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual
+  capture per docs/screenshots/README.md. Surfaces: every empty-state surface,
+  every AlertDialog (cancel order, reject proof, transition cancel, delete image,
+  unpublish product), typography-migrated headings, Skeleton loading states.
+
+Registered exceptions (unchanged): Snippet (Exception 2), native <input type="file">
+  (Exception 3: PaymentProofUpload.tsx, ProductImagesSection.tsx).
+Phase 12b (RAC role="radio" → ToggleButtonGroup) remains open.

@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { PaginationControls } from '../../shared/components/PaginationControls';
-import { LinkButton } from '../../shared/components/LinkButton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
+import { EmptyState } from '../../shared/components/EmptyState';
 import { OrderRowSkeleton, Skeleton } from '../../shared/components/Skeleton';
 
 import { OrderStatusBadge } from './components/OrderStatusBadge';
@@ -18,6 +18,7 @@ import { useMyOrdersQuery } from './hooks';
  * links to the order detail page. Empty state nudges back to the catalog.
  */
 export function OrdersListPage() {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const [page, setPage] = useState(1);
@@ -59,43 +60,38 @@ export function OrdersListPage() {
 
   return (
     <section className="space-y-8">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('orders.list.title')}</h1>
-        <p className="text-sm text-default-500">{t('orders.list.subtitle')}</p>
+      <header className="page-header">
+        <h1 className="page-title">{t('orders.list.title')}</h1>
+        <p className="page-subtitle">{t('orders.list.subtitle')}</p>
       </header>
 
       {orders.length === 0 ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Package className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <h2 className="enter-fade-up text-base font-semibold">{t('orders.list.empty.title')}</h2>
-          <p className="enter-fade-up mt-1 text-sm text-default-500">{t('orders.list.empty.subtitle')}</p>
-          <LinkButton
-            to="/"
-            className="mt-4"
-          >
-            {t('orders.list.empty.cta')}
-          </LinkButton>
-        </div>
+        <EmptyState
+          icon={Package}
+          title={t('orders.list.empty.title')}
+          subtitle={t('orders.list.empty.subtitle')}
+          action={{ label: t('orders.list.empty.cta'), onPress: () => void navigate('/') }}
+        />
       ) : (
-        <ul className="space-y-2" aria-busy={query.isFetching}>
-          {orders.map((order) => (
-            <li key={order.id}>
+        <ul className="content-surface overflow-hidden" aria-busy={query.isFetching}>
+          {orders.map((order, idx) => (
+            <li key={order.id} className={idx > 0 ? 'border-t border-divider/40' : ''}>
               <Link
                 to={`/account/orders/${encodeURIComponent(order.orderNumber)}`}
-                className="flex items-center justify-between gap-3 rounded-medium border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
+                className="flex items-center justify-between gap-3 px-4 py-3.5 transition-colors hover:bg-surface-secondary sm:px-5"
               >
                 <div className="min-w-0 space-y-1">
                   <p className="text-sm font-semibold text-foreground">
                     {order.orderNumber}
                   </p>
-                  <p className="text-xs text-default-500 tabular-nums">
+                  <p className="text-xs tabular-nums text-muted">
                     {dateFmt.format(new Date(order.createdAt))} ·{' '}
                     {t('orders.list.itemCount', { count: order.itemCount })}
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   <OrderStatusBadge status={order.status} />
-                  <span className="text-sm font-semibold tabular-nums">
+                  <span className="text-sm font-bold tabular-nums text-foreground">
                     {formatCurrency(order.total, lang)}
                   </span>
                 </div>

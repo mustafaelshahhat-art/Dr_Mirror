@@ -1,5 +1,5 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react';
-import { Button } from '@heroui/react';
+import { Alert, Button } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { AlertTriangle, X } from 'lucide-react';
@@ -42,12 +42,17 @@ export function ForbiddenBanner() {
   if (!msg) return null;
 
   return (
-    <div
+    <Alert
+      status="warning"
       role="alert"
-      className="enter-fade-down flex items-center gap-2 border-b border-warning/30 bg-warning/10 px-4 py-2 text-sm text-warning"
+      className="enter-fade-down rounded-none border-0 border-b border-warning/30 px-4 py-2 text-sm"
     >
-      <AlertTriangle size={16} aria-hidden className="shrink-0" />
-      <span className="flex-1">{msg}</span>
+      <Alert.Indicator>
+        <AlertTriangle size={16} aria-hidden className="shrink-0" />
+      </Alert.Indicator>
+      <Alert.Content>
+        <Alert.Description>{msg}</Alert.Description>
+      </Alert.Content>
       <Button
         isIconOnly
         variant="ghost"
@@ -58,6 +63,6 @@ export function ForbiddenBanner() {
       >
         <X size={14} aria-hidden />
       </Button>
-    </div>
+    </Alert>
   );
 }

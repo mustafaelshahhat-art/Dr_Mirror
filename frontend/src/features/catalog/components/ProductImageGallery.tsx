@@ -1,3 +1,4 @@
+import { Button } from '@heroui/react';
 import { ImageOff } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -52,15 +53,15 @@ export function ProductImageGallery({ images, productName }: Props) {
           aria-label={t('catalog.detail.galleryAria', { product: productName })}
         >
           {images.map((img, idx) => (
-            <button
+            <Button
               key={img.id}
-              type="button"
+              variant="ghost"
               aria-current={idx === activeImage ? 'true' : undefined}
               aria-label={t('catalog.detail.galleryThumbAria', {
                 index: idx + 1,
                 total: images.length,
               })}
-              onClick={() => setActiveImage(idx)}
+              onPress={() => setActiveImage(idx)}
               onKeyDown={(e) => {
                 if (e.key === 'ArrowRight') {
                   e.preventDefault();
@@ -76,8 +77,8 @@ export function ProductImageGallery({ images, productName }: Props) {
               }}
               className={
                 idx === activeImage
-                  ? 'h-16 w-20 shrink-0 overflow-hidden rounded-medium ring-2 ring-primary'
-                  : 'h-16 w-20 shrink-0 overflow-hidden rounded-medium border border-divider/60 transition-shadow hover:ring-1 hover:ring-default-300'
+                  ? 'h-16 w-20 shrink-0 overflow-hidden rounded-medium ring-2 ring-primary p-0'
+                  : 'h-16 w-20 shrink-0 overflow-hidden rounded-medium border border-divider/60 transition-shadow hover:ring-1 hover:ring-default-300 p-0'
               }
             >
               <img
@@ -89,7 +90,7 @@ export function ProductImageGallery({ images, productName }: Props) {
                 decoding="async"
                 className="h-full w-full object-cover"
               />
-            </button>
+            </Button>
           ))}
         </div>
       ) : null}

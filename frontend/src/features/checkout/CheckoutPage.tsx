@@ -1,4 +1,4 @@
-import { Button, Form, ProgressBar } from '@heroui/react';
+import { Alert, Button, Form, ProgressBar } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -217,17 +217,14 @@ function CheckoutBody() {
 
   return (
     <section className="space-y-8">
-      <Link
-        to="/cart"
-        className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
-      >
+      <Link to="/cart" className="back-link">
         <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
         {t('checkout.backToCart')}
       </Link>
 
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('checkout.title')}</h1>
-        <p className="text-sm text-default-500">{t('checkout.subtitle')}</p>
+      <header className="page-header">
+        <h1 className="page-title">{t('checkout.title')}</h1>
+        <p className="page-subtitle">{t('checkout.subtitle')}</p>
       </header>
 
       <div className="space-y-3">
@@ -252,12 +249,11 @@ function CheckoutBody() {
       >
         <div className="space-y-4">
           {formError ? (
-            <div
-              role="alert"
-              className="rounded-medium border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
-            >
-              {formError}
-            </div>
+            <Alert status="danger" role="alert">
+              <Alert.Content>
+                <Alert.Description>{formError}</Alert.Description>
+              </Alert.Content>
+            </Alert>
           ) : null}
 
           {step === 'address' ? (

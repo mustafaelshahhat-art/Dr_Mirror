@@ -30,7 +30,7 @@ export function ProductInfoTabs({
 
   return (
     <div className="space-y-4">
-      <dl className="grid grid-cols-2 gap-3 rounded-large border border-divider/60 bg-content1 p-4 text-sm sm:grid-cols-3">
+      <dl className="content-surface grid grid-cols-2 gap-3 p-4 text-sm sm:grid-cols-3">
         {brand ? <SpecField label={t('catalog.detail.brand')} value={brand} /> : null}
         {material ? <SpecField label={t('catalog.detail.material')} value={material} /> : null}
         {sku ? <SpecField label={t('catalog.detail.skuVariant')} value={sku} /> : null}

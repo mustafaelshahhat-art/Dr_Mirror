@@ -8,6 +8,11 @@
   "apartmentShort": "شقة",
   "floorShort": "دور",
   "landmark": "علامة مميزة",
+  "form": {
+    "contactLegend": "بيانات التواصل",
+    "locationLegend": "بيانات الموقع",
+    "extraLegend": "تفاصيل التوصيل"
+  },
   "actions": {
     "add": "إضافة عنوان",
     "create": "حفظ العنوان",

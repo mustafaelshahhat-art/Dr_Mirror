@@ -1,3 +1,4 @@
+import { Separator } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
 import type { CartItemDto } from '../../cart/types';
@@ -14,7 +15,7 @@ export function CheckoutSummary({ items, subTotal, lang }: Props) {
   const { t } = useTranslation();
 
   return (
-    <aside className="h-fit space-y-4 rounded-large border border-divider/60 bg-content1 p-4 lg:sticky lg:top-20">
+    <aside className="content-surface h-fit space-y-4 p-4 lg:sticky lg:top-20">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
         {t('checkout.summary.heading')}
       </h2>
@@ -34,7 +35,9 @@ export function CheckoutSummary({ items, subTotal, lang }: Props) {
           );
         })}
       </ul>
-      <dl className="space-y-1 border-t border-divider/60 pt-3 text-sm">
+      {/* Separator per Anatomy A.21; maps border-t border-divider purely-visual separator */}
+      <Separator />
+      <dl className="space-y-1 pt-3 text-sm">
         <div className="flex justify-between">
           <dt className="text-default-500">{t('checkout.summary.subTotal')}</dt>
           <dd className="tabular-nums">{formatCurrency(subTotal, lang)}</dd>
@@ -43,11 +46,13 @@ export function CheckoutSummary({ items, subTotal, lang }: Props) {
           <dt className="text-default-500">{t('checkout.summary.shipping')}</dt>
           <dd className="tabular-nums">{t('checkout.summary.shippingFreeM3')}</dd>
         </div>
-        <div className="mt-2 flex justify-between border-t border-divider/60 pt-2 text-base font-semibold">
-          <dt>{t('checkout.summary.total')}</dt>
-          <dd className="tabular-nums">{formatCurrency(subTotal, lang)}</dd>
-        </div>
       </dl>
+      {/* Separator per Anatomy A.21; Separator cannot be a direct child of <dl> (HTML spec) */}
+      <Separator />
+      <div className="mt-2 flex justify-between pt-2 text-base font-semibold">
+        <span>{t('checkout.summary.total')}</span>
+        <span className="tabular-nums">{formatCurrency(subTotal, lang)}</span>
+      </div>
     </aside>
   );
 }

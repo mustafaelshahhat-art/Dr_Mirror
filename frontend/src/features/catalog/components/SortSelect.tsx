@@ -8,6 +8,11 @@ const OPTIONS: ProductSort[] = ['Newest', 'PriceAsc', 'PriceDesc', 'NameAsc'];
 /**
  * HeroUI Select for product sorting. The HeroUI Select inherits direction from
  * the I18nProvider so the popover and caret flip automatically in Arabic.
+ *
+ * Fixed w-44 keeps the control from ballooning on wide viewports.
+ * The visible label is hidden (hideLabel) so the sort row stays single-line
+ * and vertically aligned with the search input; the label is still announced
+ * to assistive technology via the SelectField's sr-only Label element.
  */
 export function SortSelect({
   value,
@@ -20,13 +25,14 @@ export function SortSelect({
   return (
     <SelectField
       label={t('catalog.sort.label')}
+      hideLabel
       value={value}
       onChange={(v) => {
         if (!v) return;
         onChange(v as ProductSort);
       }}
       options={OPTIONS.map((opt) => ({ value: opt, label: t(`catalog.sort.${opt}`) }))}
-      className="min-w-48"
+      className="w-44 shrink-0"
     />
   );
 }

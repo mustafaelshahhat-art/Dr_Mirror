@@ -3,7 +3,8 @@
   "subtitle": "سكرب طبي، روب مختبر، وملابس جراحية مصممة لمهنيي الرعاية الصحية.",
   "search": {
     "label": "البحث في المنتجات",
-    "placeholder": "ابحث بالاسم أو الماركة أو الكود...",
+    "placeholder": "ابحث في المنتجات...",
+    "placeholderFull": "ابحث بالاسم أو الماركة أو الكود...",
     "clear": "مسح البحث"
   },
   "sort": {
@@ -27,6 +28,7 @@
     "colorPlaceholder": "مثال: أزرق",
     "minPriceLabel": "الحد الأدنى (جنيه)",
     "maxPriceLabel": "الحد الأقصى (جنيه)",
+    "priceRangeLabel": "نطاق السعر",
     "active_one": "تصفية واحدة",
     "active_few": "{{count}} تصفيات",
     "active_many": "{{count}} تصفية",
@@ -42,7 +44,15 @@
     "sizesAvailable_one": "مقاس واحد",
     "sizesAvailable_few": "{{count}} مقاسات",
     "sizesAvailable_many": "{{count}} مقاساً",
-    "sizesAvailable_other": "{{count}} مقاسات"
+    "sizesAvailable_other": "{{count}} مقاسات",
+    "viewDetails": "عرض التفاصيل",
+    "productListingLabel": "قائمة المنتجات"
+  },
+  "trust": {
+    "fabric": "خامات راقية",
+    "sizes": "مقاسات XS – 4XL",
+    "exchange": "استبدال سهل",
+    "delivery": "توصيل لكل القاهرة"
   },
   "empty": {
     "title": "لا توجد منتجات تطابق التصفية",

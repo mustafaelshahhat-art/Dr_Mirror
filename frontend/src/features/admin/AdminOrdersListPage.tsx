@@ -1,7 +1,9 @@
+import { Table } from '@heroui/react';
 import { Package } from 'lucide-react';
+import { EmptyState } from '../../shared/components/EmptyState';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { OrderStatusBadge } from '../orders/components/OrderStatusBadge';
 import { ORDER_STATUSES, type OrderStatus } from '../orders/types';
@@ -13,7 +15,7 @@ import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { PaginationControls } from '../../shared/components/PaginationControls';
-import { TableRowSkeleton } from '../../shared/components/Skeleton';
+import { TableRowSkeleton, TableSkeletonHeader } from '../../shared/components/TableRowSkeleton';
 
 /**
  * Admin's order queue at <c>/admin/orders</c>. Filterable by status; lists
@@ -24,6 +26,7 @@ export function AdminOrdersListPage() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const isAr = lang === 'ar';
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [statusFilter, setStatusFilter] = useState<OrderStatus | undefined>(() => parseStatusFilter(searchParams.get('status')));
   const [page, setPage] = useState(1);
@@ -36,12 +39,10 @@ export function AdminOrdersListPage() {
 
   return (
     <section className="space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {t('admin.list.title')}
-          </h1>
-          <p className="text-sm text-default-500">{t('admin.list.subtitle')}</p>
+      <header className="flex flex-wrap items-start justify-between gap-3 sm:items-end">
+        <div className="page-header">
+          <h1 className="page-title">{t('admin.list.title')}</h1>
+          <p className="page-subtitle">{t('admin.list.subtitle')}</p>
         </div>
         <StatusFilterDropdown
           value={statusFilter}
@@ -54,19 +55,18 @@ export function AdminOrdersListPage() {
       </header>
 
       {query.isLoading ? (
-        <div
-          className="overflow-hidden rounded-large border border-divider/60"
-          aria-busy="true"
-          aria-label={t('admin.list.loading')}
-        >
-          <table className="w-full text-sm">
-            <tbody>
-              {Array.from({ length: 8 }).map((_, i) => (
-                <TableRowSkeleton key={i} cols={5} />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table className="rounded-large border border-divider/60">
+          <Table.ScrollContainer>
+            <Table.Content aria-label={t('admin.list.loading')} aria-busy={true}>
+              <TableSkeletonHeader cols={5} label={t('admin.list.loading')} />
+              <Table.Body>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <TableRowSkeleton key={i} cols={5} />
+                ))}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
+        </Table>
       ) : query.isError ? (
         <QueryErrorState
           message={t('admin.list.errorLoad')}
@@ -74,15 +74,13 @@ export function AdminOrdersListPage() {
           onRetry={() => void query.refetch()}
         />
       ) : !query.data?.items || query.data.items.length === 0 ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Package className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <h2 className="text-base font-semibold">{t('admin.list.empty.title')}</h2>
-          <p className="mt-1 text-sm text-default-500">
-            {statusFilter !== undefined
-              ? t('admin.list.empty.subtitleFiltered')
-              : t('admin.list.empty.subtitle')}
-          </p>
-        </div>
+        <EmptyState
+          icon={Package}
+          title={t('admin.list.empty.title')}
+          subtitle={statusFilter !== undefined
+            ? t('admin.list.empty.subtitleFiltered')
+            : t('admin.list.empty.subtitle')}
+        />
       ) : (
         <>
           {query.data && query.data.totalCount > 0 ? (
@@ -90,38 +88,42 @@ export function AdminOrdersListPage() {
               {t('admin.list.totalCount', { count: query.data.totalCount })}
             </p>
           ) : null}
-          <div className="overflow-hidden rounded-large border border-divider/60">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-content2">
-                  <th scope="col" className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">#</th>
-                  <th scope="col" className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.date')}</th>
-                  <th scope="col" className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.items')}</th>
-                  <th scope="col" className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.status')}</th>
-                  <th scope="col" className="px-4 py-3 text-end text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.total')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-divider/60">
-                {query.data.items.map((order) => (
-                  <tr key={order.id} className="bg-content1 transition-colors hover:bg-content2">
-                    <td className="px-4 py-3 font-medium">
-                      <Link
-                        to={`/admin/orders/${encodeURIComponent(order.orderNumber)}`}
-                        className="rounded-medium text-primary underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                        aria-label={t('admin.list.openOrder', { orderNumber: order.orderNumber })}
-                      >
-                        {order.orderNumber}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 tabular-nums text-default-500">{dateFmt.format(new Date(order.createdAt))}</td>
-                    <td className="px-4 py-3 tabular-nums text-default-500">{t('admin.list.itemCount', { count: order.itemCount })}</td>
-                    <td className="px-4 py-3"><OrderStatusBadge status={order.status} /></td>
-                    <td className="px-4 py-3 text-end tabular-nums font-medium">{formatCurrency(order.total, lang)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table className="rounded-large border border-divider/60">
+            <Table.ScrollContainer>
+              <Table.Content
+                aria-label={t('admin.list.title')}
+                aria-busy={query.isFetching}
+                onRowAction={(key) => navigate(`/admin/orders/${encodeURIComponent(String(key))}`)}
+              >
+                <Table.Header>
+                  <Table.Column isRowHeader className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">#</Table.Column>
+                  <Table.Column className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.date')}</Table.Column>
+                  <Table.Column className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.items')}</Table.Column>
+                  <Table.Column className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.status')}</Table.Column>
+                  <Table.Column className="px-4 py-3 text-end text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.total')}</Table.Column>
+                </Table.Header>
+                <Table.Body className="divide-y divide-divider/60">
+                  {query.data.items.map((order) => (
+                    <Table.Row id={order.orderNumber} key={order.id} className="bg-content1 transition-colors hover:bg-content2">
+                      <Table.Cell className="px-4 py-3 font-medium">
+                        <Link
+                          to={`/admin/orders/${encodeURIComponent(order.orderNumber)}`}
+                          className="rounded-medium text-primary underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                          aria-label={t('admin.list.openOrder', { orderNumber: order.orderNumber })}
+                        >
+                          {order.orderNumber}
+                        </Link>
+                      </Table.Cell>
+                      <Table.Cell className="px-4 py-3 tabular-nums text-default-500">{dateFmt.format(new Date(order.createdAt))}</Table.Cell>
+                      <Table.Cell className="px-4 py-3 tabular-nums text-default-500">{t('admin.list.itemCount', { count: order.itemCount })}</Table.Cell>
+                      <Table.Cell className="px-4 py-3"><OrderStatusBadge status={order.status} /></Table.Cell>
+                      <Table.Cell className="px-4 py-3 text-end tabular-nums font-medium">{formatCurrency(order.total, lang)}</Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table.Content>
+            </Table.ScrollContainer>
+          </Table>
           <PaginationControls page={page} totalPages={query.data?.totalPages ?? 1} onPageChange={setPage} />
         </>
       )}

@@ -8,7 +8,7 @@
  * blocks into shapes that match real content rows so layout doesn't shift
  * when data arrives.
  */
-import { Skeleton as HeroSkeleton } from '@heroui/react';
+import { Separator, Skeleton as HeroSkeleton } from '@heroui/react';
 import type { ComponentProps } from 'react';
 
 export function Skeleton({ className, ...rest }: ComponentProps<typeof HeroSkeleton>) {
@@ -85,25 +85,6 @@ export function AddressCardSkeleton() {
         <Skeleton className="h-3 w-2/5" />
       </div>
     </div>
-  );
-}
-
-/**
- * Generic table-row skeleton for admin tables. Renders one `<tr>` with `cols`
- * cells; widths cycle through a varied set so a stack of these doesn't look
- * like a single column of identical rectangles. The first cell is wider to
- * mimic the leading name/identifier column most admin tables use.
- */
-export function TableRowSkeleton({ cols = 4 }: { cols?: number }) {
-  const widths = ['w-40', 'w-24', 'w-20', 'w-16', 'w-28', 'w-12'];
-  return (
-    <tr className="border-b border-divider/60 last:border-b-0">
-      {Array.from({ length: cols }).map((_, i) => (
-        <td key={i} className="px-4 py-3">
-          <Skeleton className={`h-4 ${widths[i % widths.length]}`} />
-        </td>
-      ))}
-    </tr>
   );
 }
 
@@ -195,7 +176,7 @@ export function RecentOrderRowSkeleton() {
 /** Checkout summary skeleton — line items + totals. */
 export function CheckoutSummarySkeleton() {
   return (
-    <aside className="h-fit space-y-4 rounded-large border border-divider/60 bg-content1 p-4 lg:sticky lg:top-20">
+    <aside className="content-surface h-fit space-y-4 p-4 lg:sticky lg:top-20">
       <Skeleton className="h-4 w-1/3" />
       <div className="space-y-2">
         {Array.from({ length: 3 }).map((_, i) => (
@@ -205,7 +186,9 @@ export function CheckoutSummarySkeleton() {
           </div>
         ))}
       </div>
-      <div className="space-y-2 border-t border-divider/60 pt-3">
+      {/* Separator per Anatomy A.21; mirrors CheckoutSummary layout post-Phase-8 migration */}
+      <Separator />
+      <div className="space-y-2 pt-3">
         <div className="flex justify-between">
           <Skeleton className="h-3 w-16" />
           <Skeleton className="h-3 w-12" />
@@ -214,10 +197,12 @@ export function CheckoutSummarySkeleton() {
           <Skeleton className="h-3 w-20" />
           <Skeleton className="h-3 w-12" />
         </div>
-        <div className="mt-2 flex justify-between border-t border-divider/60 pt-2">
-          <Skeleton className="h-4 w-12" />
-          <Skeleton className="h-4 w-16" />
-        </div>
+      </div>
+      {/* Separator per Anatomy A.21 */}
+      <Separator />
+      <div className="mt-2 flex justify-between pt-2">
+        <Skeleton className="h-4 w-12" />
+        <Skeleton className="h-4 w-16" />
       </div>
     </aside>
   );

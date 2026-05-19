@@ -1,4 +1,4 @@
-import { Button, Input, Label, Modal, NumberField, ProgressBar, Tooltip } from '@heroui/react';
+import { AlertDialog, Button, Heading, Input, Label, NumberField, ProgressBar, Tooltip } from '@heroui/react';
 import { Trash2, UploadCloud } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,15 +43,22 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
   }
 
   return (
-    <article className="rounded-large border border-divider/60 bg-content1 p-4 space-y-3">
+    <article className="content-surface p-4 space-y-3">
       <header className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
+        <Heading level={2} className="text-sm font-semibold uppercase tracking-wide text-default-600">
           {t('admin.products.images.heading')}
-        </h2>
+        </Heading>
         <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-medium border border-divider bg-content2 px-3 py-1.5 text-sm hover:bg-default-100">
           <UploadCloud className="size-4" aria-hidden />
           {uploadMutation.isPending ? t('admin.products.images.uploading') : t('admin.products.images.upload')}
-          {/* intentional: HeroUI v3 has no file input; see DESIGN.md */}
+          {/* Exception 3 — rejected-primitive trail (per
+              specs/003-heroui-migration/contracts/exceptions-register.md, criterion 5):
+                - HeroUI `FileTrigger` / `FileInput`: considered and rejected — not
+                  exported by @heroui/react v3.0.4.
+                - React Aria `FileTrigger` direct usage: considered and rejected —
+                  would violate FR-014.
+              The visible affordance is the styled <label> wrapper above; the sr-only
+              <input type="file"> only handles the OS file picker. */}
           <input
             ref={inputRef}
             type="file"
@@ -156,19 +163,20 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
           ))}
         </ul>
       )}
-      <Modal>
-        <Modal.Backdrop
+      <AlertDialog>
+        <AlertDialog.Backdrop
           isOpen={pendingDeleteId !== null}
+          isDismissable={false}
           onOpenChange={(open) => { if (!open) setPendingDeleteId(null); }}
         >
-          <Modal.Container size="xs">
-            <Modal.Dialog>
+          <AlertDialog.Container size="xs">
+            <AlertDialog.Dialog>
               {({ close }) => (
                 <>
-                  <Modal.Header>
-                    <Modal.Heading>{t('admin.products.images.delete')}</Modal.Heading>
-                  </Modal.Header>
-                  <Modal.Footer>
+                  <AlertDialog.Header>
+                    <AlertDialog.Heading>{t('admin.products.images.delete')}</AlertDialog.Heading>
+                  </AlertDialog.Header>
+                  <AlertDialog.Footer>
                     <Button variant="ghost" onPress={close}>
                       {t('admin.catalog.actions.cancel')}
                     </Button>
@@ -189,13 +197,13 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
                     >
                       {t('admin.transition.confirm')}
                     </Button>
-                  </Modal.Footer>
+                  </AlertDialog.Footer>
                 </>
               )}
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
+            </AlertDialog.Dialog>
+          </AlertDialog.Container>
+        </AlertDialog.Backdrop>
+      </AlertDialog>
     </article>
   );
 }

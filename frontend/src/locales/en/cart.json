@@ -28,6 +28,7 @@
   },
   "line": {
     "sizeLabel": "Size",
+    "quantityLabel": "Quantity",
     "increaseQuantity": "Increase quantity",
     "decreaseQuantity": "Decrease quantity",
     "remove": "Remove item",

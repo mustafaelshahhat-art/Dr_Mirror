@@ -6,11 +6,19 @@
     "switchLanguage": "تبديل اللغة",
     "marketplace": "السوق",
     "contact": "تواصل معنا",
+    "catalog": "تصفح المنتجات",
     "myAccount": "حسابي",
+    "myOrders": "طلباتي",
     "signIn": "تسجيل الدخول",
     "openMenu": "فتح القائمة",
     "menuLabel": "تنقّل الموقع",
-    "menuSubtitle": "إعدادات الحساب واللغة والسمة"
+    "menuSubtitle": "إعدادات الحساب واللغة والسمة",
+    "cartCount_zero": "السلة",
+    "cartCount_one": "السلة · منتج واحد",
+    "cartCount_two": "السلة · منتجان",
+    "cartCount_few": "السلة · {{count}} منتجات",
+    "cartCount_many": "السلة · {{count}} منتجًا",
+    "cartCount_other": "السلة · {{count}} منتج"
   },
   "account": {
     "welcome": "مرحبا، {{name}}",
@@ -64,7 +72,16 @@
     "skipToContent": "تخطي إلى المحتوى"
   },
   "footer": {
-    "copyright": "د. ميرور © {{year}}"
+    "copyright": "© {{year}} د. ميرور. جميع الحقوق محفوظة.",
+    "tagline": "سكرابات طبية ويونيفورم راقية لمهنيي الرعاية الصحية.",
+    "quickLinks": "روابط سريعة",
+    "browseCatalog": "تصفح المنتجات",
+    "cart": "سلة مشترياتي",
+    "contact": "تواصل معنا",
+    "account": "الحساب",
+    "support": "الدعم والتواصل",
+    "supportLine": "تواصل معنا عبر صفحة الاستفسارات لأي سؤال عن الطلبات أو المقاسات أو الإرجاع.",
+    "contactPage": "فتح استفسار"
   },
   "quantityMultiplier": "× {{count}}",
   "dismiss": "إغلاق",

@@ -1,22 +1,30 @@
-import { Button } from '@heroui/react';
-import { SearchX } from 'lucide-react';
+import { Package2, RefreshCw, Ruler, SearchX, Truck } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
+import { EmptyState } from '../../shared/components/EmptyState';
+import { PaginationControls } from '../../shared/components/PaginationControls';
+import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { CategoryChips } from './components/CategoryChips';
 import { FilterPanel } from './components/FilterPanel';
-import { PaginationBar } from './components/PaginationBar';
 import { ProductCard } from './components/ProductCard';
 import { ProductGridSkeleton } from './components/ProductGridSkeleton';
 import { SearchInput } from './components/SearchInput';
 import { SortSelect } from './components/SortSelect';
 import { useCategoriesQuery, useProductsQuery } from './hooks';
 import type { ProductFilter, ProductGender, ProductSort } from './types';
-import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 const VALID_SORTS: ProductSort[] = ['Newest', 'PriceAsc', 'PriceDesc', 'NameAsc'];
 const PAGE_SIZE = 24;
+
+/** Trust strip icon+label pairs — neutral retail trust signals for medical apparel. */
+const TRUST_ITEMS = [
+  { icon: Package2, key: 'fabric' },
+  { icon: Ruler,    key: 'sizes' },
+  { icon: RefreshCw, key: 'exchange' },
+  { icon: Truck,    key: 'delivery' },
+] as const;
 
 export function CatalogPage() {
   const { t } = useTranslation();
@@ -132,29 +140,51 @@ export function CatalogPage() {
 
   return (
     <div className="space-y-8">
-      {/* Storefront hero — restrained: kicker pill (bone) + tagline as the
-          page's single display heading, no gradient or hero image. Sits at
-          most two screen rows so the catalog stays one scroll away. */}
-      <section className="relative -mx-4 border-b border-divider/60 px-4 py-10 md:-mx-6 md:px-6 md:py-12 lg:-mx-8 lg:px-8 lg:py-14">
+      {/* ── Hero band ───────────────────────────────────────────────────────
+          Full-bleed tinted band. Brand color wash provides visual identity
+          without heavy illustration; catalog follows immediately. */}
+      <section
+        className="hero-band hero-band--tinted"
+        aria-label={t('catalog.title')}
+      >
         <div className="space-y-3">
-          <span className="inline-flex items-center rounded-medium bg-bone px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground/80">
+          <span className="inline-flex items-center rounded-full bg-brand/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand dark:bg-brand/20">
             {t('appName')}
           </span>
-          <h1 className="max-w-2xl text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+          <h1 className="max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
             {t('tagline')}
           </h1>
-          <p className="max-w-prose text-sm text-default-500 md:text-base">
+          <p className="max-w-prose text-sm leading-relaxed text-muted md:text-base">
             {t('catalog.subtitle')}
           </p>
         </div>
+
+        {/* Trust strip — inline with hero on md+, below on mobile */}
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 md:mt-0 md:ms-auto md:max-w-xs">
+          {TRUST_ITEMS.map(({ icon: Icon, key }) => (
+            <div
+              key={key}
+              className="flex flex-col items-start gap-1.5 rounded-large border border-brand/20 bg-brand/5 px-3 py-2.5 dark:bg-brand/10"
+            >
+              <Icon className="size-4 text-brand" aria-hidden />
+              <span className="text-xs font-medium leading-tight text-foreground">
+                {t(`catalog.trust.${key}`)}
+              </span>
+            </div>
+          ))}
+        </div>
       </section>
 
-      <section className="flex flex-col gap-4">
+      {/* ── Search / Sort / Category / Filters ─────────────────────────── */}
+      <section
+        className="flex flex-col gap-4"
+        aria-label={t('catalog.filters.label')}
+      >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="flex-1">
             <SearchInput value={filter.q ?? ''} onCommit={setQuery} />
           </div>
-                    <SortSelect value={filter.sort!} onChange={setSort} />
+          <SortSelect value={filter.sort!} onChange={setSort} />
         </div>
 
         {categoriesQuery.data ? (
@@ -176,6 +206,7 @@ export function CatalogPage() {
         />
       </section>
 
+      {/* ── Product listing ─────────────────────────────────────────────── */}
       {isInitialLoad ? (
         <ProductGridSkeleton />
       ) : productsQuery.isError ? (
@@ -185,20 +216,18 @@ export function CatalogPage() {
           onRetry={() => void productsQuery.refetch()}
         />
       ) : items.length === 0 ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <SearchX className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="enter-fade-up text-base font-semibold text-foreground">{t('catalog.empty.title')}</p>
-          <p className="enter-fade-up mt-1 text-sm text-default-500">{t('catalog.empty.subtitle')}</p>
-          {hasActiveFilters ? (
-            <Button variant="primary" size="sm" onPress={clearAllFilters} className="mt-4">
-              {t('catalog.empty.clearFilters')}
-            </Button>
-          ) : null}
-        </div>
+        <EmptyState
+          icon={SearchX}
+          title={t('catalog.empty.title')}
+          subtitle={t('catalog.empty.subtitle')}
+          action={hasActiveFilters ? { label: t('catalog.empty.clearFilters'), onPress: clearAllFilters } : undefined}
+        />
       ) : (
+        /* eslint-disable-next-line i18next/no-literal-string -- aria-label is set dynamically below */
         <div
           className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
           aria-busy={productsQuery.isFetching}
+          aria-label={t('catalog.list.productListingLabel')}
         >
           {items.map((p) => (
             <ProductCard key={p.id} product={p} />
@@ -207,12 +236,16 @@ export function CatalogPage() {
       )}
 
       {productsQuery.data ? (
-        <PaginationBar
-          page={productsQuery.data.page}
-          totalPages={productsQuery.data.totalPages}
-          totalCount={productsQuery.data.totalCount}
-          onPageChange={setPage}
-        />
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+          <p className="text-xs text-default-500 tabular-nums">
+            {t('catalog.pagination.results', { count: productsQuery.data.totalCount })}
+          </p>
+          <PaginationControls
+            page={productsQuery.data.page}
+            totalPages={productsQuery.data.totalPages}
+            onPageChange={setPage}
+          />
+        </div>
       ) : null}
     </div>
   );

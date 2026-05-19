@@ -1,4 +1,4 @@
-import { Button, FieldError, Form, Label, NumberField, Tooltip } from '@heroui/react';
+import { Button, FieldError, Form, Input, Label, NumberField, TextField, Tooltip } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -32,7 +32,7 @@ export function ProductVariantsSection({ product }: { product: AdminProductDetai
   const [editingId, setEditingId] = useState<string | null>(null);
 
   return (
-    <article className="rounded-large border border-divider/60 bg-content1 p-4 space-y-3">
+    <article className="content-surface p-4 space-y-3">
       <header className="flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
           {t('admin.products.variants.heading')}
@@ -216,21 +216,34 @@ function VariantForm({
         <Controller name="colorNameAr" control={control} render={({ field }) => (
           <SimpleField {...field} label={t('admin.products.variants.colorNameAr')} required maxLength={50} errorMessage={error(errors.colorNameAr?.message)} />
         )} />
+        {/* HeroUI TextField + Input type="color" per Anatomy A.16.
+            The native OS color-picker UX is preserved via Input type="color";
+            the HeroUI TextField wraps it with Label + FieldError so the field
+            participates in the form's accessible label/error chain.
+            Rejected alternatives: ColorField (hex text input — worse admin UX
+            than the OS picker; requires Color-object ↔ string conversion);
+            ColorPicker (HSV popover — disproportionate complexity for this
+            simple hex-code field). */}
         <Controller name="colorHex" control={control} render={({ field }) => (
-          <label className="space-y-1 text-sm">
-            <span className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.variants.hex')}</span>
-            {/* intentional: HeroUI v3 has no color input — see DESIGN.md */}
-            <input
+          <TextField
+            value={field.value}
+            onChange={field.onChange}
+            isRequired
+            isInvalid={Boolean(errors.colorHex)}
+            className="space-y-1 text-sm"
+          >
+            <Label className="text-xs uppercase tracking-wide text-default-500">
+              {t('admin.products.variants.hex')}
+            </Label>
+            <Input
               type="color"
-              value={field.value}
-              onChange={field.onChange}
-              required
-              aria-required="true"
-              aria-invalid={Boolean(errors.colorHex)}
-              className="h-9 w-full rounded-medium border border-divider bg-background"
+              dir="ltr"
+              className="h-9 w-full cursor-pointer rounded-medium border border-divider bg-background p-1"
             />
-            {errors.colorHex?.message ? <span className="text-xs text-danger">{error(errors.colorHex.message)}</span> : null}
-          </label>
+            {errors.colorHex?.message ? (
+              <FieldError className="text-xs text-danger">{error(errors.colorHex.message)}</FieldError>
+            ) : null}
+          </TextField>
         )} />
         <Controller name="sku" control={control} render={({ field }) => (
           <SimpleField {...field} label={t('admin.products.variants.sku')} maxLength={50} dir="ltr" errorMessage={error(errors.sku?.message)} />

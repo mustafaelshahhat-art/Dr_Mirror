@@ -1,4 +1,4 @@
-import { Button, Form, Input, Label, TextField } from '@heroui/react';
+import { Button, Fieldset, Form, Input, Label, TextField } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, type Resolver, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -155,9 +155,12 @@ export function PaymentMethodForm(props: Props) {
         </p>
       )}
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {isCreate ? (
-          <>
+      {isCreate ? (
+        <Fieldset>
+          <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+            {t('admin.payments.sections.identity')}
+          </Fieldset.Legend>
+          <Fieldset.Group className="grid gap-3 sm:grid-cols-2">
             <Controller name="code" control={control} render={({ field }) => (
               <Field {...field} label={t('admin.payments.fields.code')} placeholder="bank-transfer" required maxLength={32} dir="ltr" errorMessage={error(errors.code?.message)} />
             )} />
@@ -176,40 +179,64 @@ export function PaymentMethodForm(props: Props) {
                 ]}
               />
             )} />
-          </>
-        ) : null}
-        <Controller name="nameAr" control={control} render={({ field }) => (
-          <Field {...field} label={t('admin.payments.fields.nameAr')} required maxLength={64} errorMessage={error(errors.nameAr?.message)} />
-        )} />
-        <Controller name="nameEn" control={control} render={({ field }) => (
-          <Field {...field} label={t('admin.payments.fields.nameEn')} required maxLength={64} errorMessage={error(errors.nameEn?.message)} />
-        )} />
-        <Controller name="instructionsAr" control={control} render={({ field }) => (
-          <TextAreaField {...field} label={t('admin.payments.fields.instructionsAr')} maxLength={500} rows={2} errorMessage={error(errors.instructionsAr?.message)} />
-        )} />
-        <Controller name="instructionsEn" control={control} render={({ field }) => (
-          <TextAreaField {...field} label={t('admin.payments.fields.instructionsEn')} maxLength={500} rows={2} errorMessage={error(errors.instructionsEn?.message)} />
-        )} />
-        <Controller name="accountNumber" control={control} render={({ field }) => (
-          <Field {...field} label={t('admin.payments.fields.accountNumber')} maxLength={64} dir="ltr" errorMessage={error(errors.accountNumber?.message)} />
-        )} />
-        <Controller name="accountHolder" control={control} render={({ field }) => (
-          <Field {...field} label={t('admin.payments.fields.accountHolder')} maxLength={100} errorMessage={error(errors.accountHolder?.message)} />
-        )} />
-        <TextField isInvalid={Boolean(errors.displayOrder)} className="flex flex-col gap-1">
-          <Label className="sr-only">{t('admin.payments.fields.displayOrder')}</Label>
-          <Controller name="displayOrder" control={control} render={({ field }) => (
-            <Input
-              type="number"
-              value={String(field.value)}
-              onChange={(e) => field.onChange(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
-              aria-label={t('admin.payments.fields.displayOrder')}
-              className="tabular-nums"
-            />
+          </Fieldset.Group>
+        </Fieldset>
+      ) : null}
+
+      <Fieldset>
+        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+          {t('admin.payments.sections.display')}
+        </Fieldset.Legend>
+        <Fieldset.Group className="grid gap-3 sm:grid-cols-2">
+          <Controller name="nameAr" control={control} render={({ field }) => (
+            <Field {...field} label={t('admin.payments.fields.nameAr')} required maxLength={64} errorMessage={error(errors.nameAr?.message)} />
           )} />
-          {errors.displayOrder?.message ? <p className="text-xs text-danger">{error(errors.displayOrder.message)}</p> : null}
-        </TextField>
-      </div>
+          <Controller name="nameEn" control={control} render={({ field }) => (
+            <Field {...field} label={t('admin.payments.fields.nameEn')} required maxLength={64} errorMessage={error(errors.nameEn?.message)} />
+          )} />
+          <TextField isInvalid={Boolean(errors.displayOrder)} className="flex flex-col gap-1">
+            <Label className="sr-only">{t('admin.payments.fields.displayOrder')}</Label>
+            <Controller name="displayOrder" control={control} render={({ field }) => (
+              <Input
+                type="number"
+                value={String(field.value)}
+                onChange={(e) => field.onChange(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
+                aria-label={t('admin.payments.fields.displayOrder')}
+                className="tabular-nums"
+              />
+            )} />
+            {errors.displayOrder?.message ? <p className="text-xs text-danger">{error(errors.displayOrder.message)}</p> : null}
+          </TextField>
+        </Fieldset.Group>
+      </Fieldset>
+
+      <Fieldset>
+        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+          {t('admin.payments.sections.instructions')}
+        </Fieldset.Legend>
+        <Fieldset.Group className="grid gap-3 sm:grid-cols-2">
+          <Controller name="instructionsAr" control={control} render={({ field }) => (
+            <TextAreaField {...field} label={t('admin.payments.fields.instructionsAr')} maxLength={500} rows={2} errorMessage={error(errors.instructionsAr?.message)} />
+          )} />
+          <Controller name="instructionsEn" control={control} render={({ field }) => (
+            <TextAreaField {...field} label={t('admin.payments.fields.instructionsEn')} maxLength={500} rows={2} errorMessage={error(errors.instructionsEn?.message)} />
+          )} />
+        </Fieldset.Group>
+      </Fieldset>
+
+      <Fieldset>
+        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+          {t('admin.payments.sections.account')}
+        </Fieldset.Legend>
+        <Fieldset.Group className="grid gap-3 sm:grid-cols-2">
+          <Controller name="accountNumber" control={control} render={({ field }) => (
+            <Field {...field} label={t('admin.payments.fields.accountNumber')} maxLength={64} dir="ltr" errorMessage={error(errors.accountNumber?.message)} />
+          )} />
+          <Controller name="accountHolder" control={control} render={({ field }) => (
+            <Field {...field} label={t('admin.payments.fields.accountHolder')} maxLength={100} errorMessage={error(errors.accountHolder?.message)} />
+          )} />
+        </Fieldset.Group>
+      </Fieldset>
 
       <div className="flex gap-2">
         <Button type="submit" variant="primary" size="sm" isPending={pending}>

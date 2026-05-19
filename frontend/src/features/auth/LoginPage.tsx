@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Form } from '@heroui/react';
+import { Alert, Button, Form } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { isAxiosError } from 'axios';
@@ -59,7 +59,7 @@ export function LoginPage() {
           {t('auth.noAccountYet')}{' '}
           <Link
             to="/register"
-            className="font-medium text-foreground underline-offset-4 hover:underline"
+            className="font-medium text-brand underline-offset-4 transition-colors hover:text-brand-hover hover:underline"
           >
             {t('auth.createOne')}
           </Link>
@@ -68,12 +68,11 @@ export function LoginPage() {
     >
       <Form onSubmit={onSubmit} className="flex flex-col gap-4">
         {serverError ? (
-          <div
-            role="alert"
-            className="rounded-medium border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
-          >
-            {serverError}
-          </div>
+          <Alert status="danger" role="alert">
+            <Alert.Content>
+              <Alert.Description>{serverError}</Alert.Description>
+            </Alert.Content>
+          </Alert>
         ) : null}
 
         <FormField
@@ -84,7 +83,7 @@ export function LoginPage() {
           autoComplete="email"
           autoCapitalize="off"
           isRequired
-          variant="underlined"
+          variant="bordered"
         />
 
         <FormField
@@ -94,12 +93,12 @@ export function LoginPage() {
           type="password"
           autoComplete="current-password"
           isRequired
-          variant="underlined"
+          variant="bordered"
         />
 
         <Link
           to="#"
-          className="block text-end text-sm text-default-500 underline-offset-4 hover:underline"
+          className="block text-end text-sm text-muted underline-offset-4 transition-colors hover:text-brand hover:underline"
         >
           {t('auth.forgotPassword')}
         </Link>

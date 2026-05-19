@@ -24,7 +24,7 @@ export function AdminProductEditPage() {
   }
   if (query.isError || !query.data) {
     return (
-      <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center text-sm text-default-500">
+      <div className="content-surface p-10 text-center text-sm text-default-500">
         {t('admin.products.edit.errorLoad')}
       </div>
     );
@@ -36,17 +36,14 @@ function Inner({ product }: { product: AdminProductDetailDto }) {
   const { t } = useTranslation();
   return (
     <section className="space-y-8">
-      <Link
-        to="/admin/products"
-        className="inline-flex items-center gap-1.5 text-sm text-default-500 hover:text-foreground"
-      >
+      <Link to="/admin/products" className="back-link">
         <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
         {t('admin.products.edit.back')}
       </Link>
 
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{product.nameEn}</h1>
-        <p className="text-xs text-default-500" dir="ltr">
+      <header className="page-header">
+        <h1 className="page-title">{product.nameEn}</h1>
+        <p className="page-subtitle" dir="ltr">
           /{product.slug}
         </p>
       </header>

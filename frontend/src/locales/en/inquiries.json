@@ -12,6 +12,8 @@
     "phone": "Phone number (optional)",
     "subject": "Subject",
     "message": "Message",
+    "contactLegend": "Your contact",
+    "messageLegend": "Your message",
     "submit": "Send inquiry",
     "submitting": "Sending...",
     "successTitle": "Inquiry sent!",

@@ -12,23 +12,26 @@ interface CategoryChipsProps {
 /**
  * Horizontal scrollable pill row, doubles as the catalog category filter.
  * Single-select; "All" deselects. Uses logical CSS so it flips correctly in RTL.
+ *
+ * A gradient fade on the trailing edge (right in LTR, left in RTL) indicates
+ * that more chips are scrollable. The gradient direction is computed per locale
+ * so it always points toward the overflow side.
  */
 export function CategoryChips({ categories, selectedId, onSelect }: CategoryChipsProps) {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
+  const isRtl = i18n.dir() === 'rtl';
 
   // Build flat list: "all" at index 0, then categories.
   const allIds: (string | undefined)[] = [undefined, ...categories.map((c) => c.id)];
   const selectedTabIdx = selectedId ? allIds.indexOf(selectedId) : 0;
-  const isRtl = i18n.dir() === 'rtl';
 
   function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     const len = allIds.length;
     if (len === 0) return;
     const current = selectedTabIdx === -1 ? 0 : selectedTabIdx;
     // In RTL the visual "next" pill sits to the LEFT of the current one, so
-    // ArrowLeft must advance and ArrowRight must retreat. ArrowDown/ArrowUp
-    // stay direction-agnostic (logical: next/previous in DOM order).
+    // ArrowLeft must advance and ArrowRight must retreat.
     const forwardKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
     const backwardKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
     let next = -1;
@@ -48,27 +51,44 @@ export function CategoryChips({ categories, selectedId, onSelect }: CategoryChip
     if (next !== -1) onSelect(allIds[next]);
   }
 
+  // Gradient points TOWARD the trailing overflow edge:
+  //   LTR → trailing = right → gradient-to-r (transparent → background)
+  //   RTL → trailing = left  → gradient-to-l (transparent → background)
+  const fadeGradientClass = isRtl
+    ? 'bg-gradient-to-l from-transparent to-background'
+    : 'bg-gradient-to-r from-transparent to-background';
+
   return (
-    <div
-      className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      role="radiogroup"
-      aria-label={t('catalog.filters.categoryLabel')}
-      tabIndex={-1}
-      onKeyDown={handleKeyDown}
-    >
-      <Pill selected={!selectedId} tabIndex={!selectedId ? 0 : -1} onClick={() => onSelect(undefined)}>
-        {t('catalog.filters.all')}
-      </Pill>
-      {categories.map((c) => (
-        <Pill
-          key={c.id}
-          selected={c.id === selectedId}
-          tabIndex={c.id === selectedId ? 0 : -1}
-          onClick={() => onSelect(c.id === selectedId ? undefined : c.id)}
-        >
-          {isAr ? c.nameAr : c.nameEn}
+    <div className="relative">
+      <div
+        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        role="radiogroup"
+        aria-label={t('catalog.filters.categoryLabel')}
+        tabIndex={-1}
+        onKeyDown={handleKeyDown}
+      >
+        <Pill selected={!selectedId} tabIndex={!selectedId ? 0 : -1} onClick={() => onSelect(undefined)}>
+          {t('catalog.filters.all')}
         </Pill>
-      ))}
+        {categories.map((c) => (
+          <Pill
+            key={c.id}
+            selected={c.id === selectedId}
+            tabIndex={c.id === selectedId ? 0 : -1}
+            onClick={() => onSelect(c.id === selectedId ? undefined : c.id)}
+          >
+            {isAr ? c.nameAr : c.nameEn}
+          </Pill>
+        ))}
+        {/* Trailing spacer prevents last chip from sitting under the fade */}
+        <span className="shrink-0 pe-2" aria-hidden />
+      </div>
+      {/* Fade indicator — shows overflow on the trailing edge.
+          pointer-events-none so clicks pass through to the chips. */}
+      <div
+        aria-hidden
+        className={`pointer-events-none absolute inset-y-0 end-0 w-10 ${fadeGradientClass}`}
+      />
     </div>
   );
 }
@@ -85,7 +105,6 @@ function Pill({
   children: React.ReactNode;
 }) {
   return (
-    // intentional: raw <button role="radio"> keeps the RAC radiogroup pattern per DESIGN.md.
     <button
       type="button"
       role="radio"
@@ -94,8 +113,8 @@ function Pill({
       onClick={onClick}
       className={
         selected
-          ? 'shrink-0 rounded-medium bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-          : 'shrink-0 rounded-medium border border-divider/60 bg-content1 px-3 py-1.5 text-xs font-medium text-default-700 transition-colors hover:border-default-400 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-default-300'
+          ? 'shrink-0 rounded-full bg-brand px-3.5 py-1.5 text-xs font-semibold text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand'
+          : 'shrink-0 rounded-full border border-divider/60 bg-surface px-3.5 py-1.5 text-xs font-medium text-default-700 transition-colors hover:border-brand/40 hover:bg-brand/5 hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand dark:text-default-300 dark:hover:border-brand/30 dark:hover:bg-brand/10'
       }
     >
       {children}

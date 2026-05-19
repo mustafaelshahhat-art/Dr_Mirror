@@ -97,8 +97,8 @@
     --danger-foreground: oklch(99.11% 0 0);
     --default: oklch(94.00% 0.0100 273.85);
     --default-foreground: oklch(21.03% 0.0059 273.85);
-    --field-background: oklch(100.00% 0.0050 273.85);
-    --field-border: transparent;
+    --field-background: oklch(99.00% 0.0060 273.85);
+    --field-border: oklch(68.00% 0.0200 273.85);
     --field-foreground: oklch(21.03% 0.0100 273.85);
     --field-placeholder: oklch(55.17% 0.0200 273.85);
     --focus: oklch(57.74% 0.2091 273.85);
@@ -158,8 +158,8 @@
     --danger-foreground: oklch(99.11% 0 0);
     --default: oklch(27.40% 0.0100 273.85);
     --default-foreground: oklch(99.11% 0 0);
-    --field-background: oklch(21.03% 0.0200 273.85);
-    --field-border: transparent;
+    --field-background: oklch(29.00% 0.0250 273.85);
+    --field-border: oklch(42.00% 0.0180 273.85);
     --field-foreground: oklch(99.11% 0.0100 273.85);
     --field-placeholder: oklch(70.50% 0.0200 273.85);
     --focus: oklch(57.74% 0.2091 273.85);
@@ -210,6 +210,23 @@
     font-family: var(--font-en);
   }
 
+  /* Styled scrollbars — thin, brand-tinted for dark mode */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar);
+    border-radius: 99px;
+  }
+
   /* Honor reduced-motion globally — DESIGN_PRINCIPLES §7. */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -231,6 +248,133 @@
   .cq-card {
     container-name: card;
     container-type: inline-size;
+  }
+
+  /* Page-level section header — consistent h1 + subtitle rhythm */
+  .page-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .page-header h1,
+  .page-header .page-title {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.3;
+    color: var(--foreground);
+  }
+  @media (min-width: 640px) {
+    .page-header h1,
+    .page-header .page-title {
+      font-size: 1.75rem; /* text-[1.75rem] — between 2xl and 3xl */
+    }
+  }
+  .page-header .page-subtitle {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* Stat / KPI card — admin dashboard metric display */
+  .stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    border-radius: var(--radius-medium, 0.5rem);
+    border: 1px solid color-mix(in oklab, var(--separator) 100%, transparent);
+    background-color: var(--surface-secondary);
+    padding: 0.875rem 1rem;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.25;
+    font-weight: 500;
+  }
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--foreground);
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-value-sm {
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1;
+    color: var(--foreground);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Hero section — full-bleed negative-margin band (storefront) */
+  .hero-band {
+    position: relative;
+    margin-inline: -1rem; /* -mx-4 */
+    border-bottom: 1px solid color-mix(in oklab, var(--separator) 60%, transparent);
+    padding-inline: 1rem;
+    padding-block: 2.5rem;
+    overflow: hidden;
+    /* Default: plain surface */
+  }
+  /* Tinted variant — subtle brand wash gives the hero visual identity */
+  .hero-band--tinted {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5rem;
+    background-color: color-mix(in oklab, var(--brand) 5%, var(--background));
+  }
+  .dark .hero-band--tinted {
+    background-color: color-mix(in oklab, var(--brand) 8%, var(--background));
+  }
+  @media (min-width: 768px) {
+    .hero-band {
+      margin-inline: -1.5rem; /* -mx-6 */
+      padding-inline: 1.5rem;
+      padding-block: 3rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .hero-band {
+      margin-inline: -2rem; /* -mx-8 */
+      padding-inline: 2rem;
+      padding-block: 3.5rem;
+    }
+  }
+
+  /* Content surface — bordered card-like panel without full Card compound */
+  .content-surface {
+    border-radius: var(--radius-large, 0.75rem);
+    border: 1px solid color-mix(in oklab, var(--separator) 60%, transparent);
+    background-color: var(--surface);
+  }
+
+  /* Prose link — underlined on hover, consistent with brand */
+  .prose-link {
+    color: var(--brand);
+    text-underline-offset: 3px;
+    transition: opacity 120ms ease-out;
+  }
+  .prose-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  /* Back-link — small, muted, arrow affordance */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+    transition: color 120ms ease-out;
+    text-decoration: none;
+  }
+  .back-link:hover {
+    color: var(--foreground);
   }
 }
 

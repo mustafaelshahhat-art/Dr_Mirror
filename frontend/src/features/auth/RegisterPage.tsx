@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Form } from '@heroui/react';
+import { Alert, Button, Form } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { isAxiosError } from 'axios';
@@ -56,7 +56,7 @@ export function RegisterPage() {
           {t('auth.alreadyHaveAccount')}{' '}
           <Link
             to="/login"
-            className="font-medium text-foreground underline-offset-4 hover:underline"
+            className="font-medium text-brand underline-offset-4 transition-colors hover:text-brand-hover hover:underline"
           >
             {t('auth.signInNow')}
           </Link>
@@ -65,12 +65,11 @@ export function RegisterPage() {
     >
       <Form onSubmit={onSubmit} className="flex flex-col gap-4">
         {serverError ? (
-          <div
-            role="alert"
-            className="rounded-medium border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
-          >
-            {serverError}
-          </div>
+          <Alert status="danger" role="alert">
+            <Alert.Content>
+              <Alert.Description>{serverError}</Alert.Description>
+            </Alert.Content>
+          </Alert>
         ) : null}
 
         <FormField
@@ -79,7 +78,7 @@ export function RegisterPage() {
           label={t('auth.fullName')}
           autoComplete="name"
           isRequired
-          variant="underlined"
+          variant="bordered"
         />
 
         <FormField
@@ -89,7 +88,7 @@ export function RegisterPage() {
           type="email"
           autoComplete="email"
           isRequired
-          variant="underlined"
+          variant="bordered"
         />
 
         <FormField
@@ -100,7 +99,7 @@ export function RegisterPage() {
           autoComplete="new-password"
           description={t('auth.passwordHint')}
           isRequired
-          variant="underlined"
+          variant="bordered"
         />
 
         <Button

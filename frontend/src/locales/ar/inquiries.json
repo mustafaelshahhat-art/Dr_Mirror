@@ -12,6 +12,8 @@
     "phone": "رقم الهاتف (اختياري)",
     "subject": "الموضوع",
     "message": "الرسالة",
+    "contactLegend": "بيانات التواصل",
+    "messageLegend": "تفاصيل الاستفسار",
     "submit": "إرسال الاستفسار",
     "submitting": "جارٍ الإرسال...",
     "successTitle": "تم إرسال الاستفسار!",

@@ -6,11 +6,16 @@
     "switchLanguage": "Switch language",
     "marketplace": "Marketplace",
     "contact": "Contact",
+    "catalog": "Browse catalog",
     "myAccount": "My account",
+    "myOrders": "My orders",
     "signIn": "Sign in",
     "openMenu": "Open menu",
     "menuLabel": "Site navigation",
-    "menuSubtitle": "Account, language, and theme controls"
+    "menuSubtitle": "Account, language, and theme controls",
+    "cartCount_zero": "Cart",
+    "cartCount_one": "Cart · 1 item",
+    "cartCount_other": "Cart · {{count}} items"
   },
   "account": {
     "welcome": "Welcome, {{name}}",
@@ -64,7 +69,16 @@
     "skipToContent": "Skip to content"
   },
   "footer": {
-    "copyright": "Dr. Mirror © {{year}}"
+    "copyright": "© {{year}} Dr. Mirror. All rights reserved.",
+    "tagline": "Premium medical scrubs & uniforms for healthcare professionals.",
+    "quickLinks": "Quick links",
+    "browseCatalog": "Browse catalog",
+    "cart": "My cart",
+    "contact": "Contact us",
+    "account": "Account",
+    "support": "Support & contact",
+    "supportLine": "Reach us via our contact page for questions about orders, sizing, or returns.",
+    "contactPage": "Open a support inquiry"
   },
   "quantityMultiplier": "× {{count}}",
   "dismiss": "Dismiss",

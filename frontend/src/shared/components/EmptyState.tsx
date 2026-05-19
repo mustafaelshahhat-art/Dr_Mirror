@@ -1,5 +1,7 @@
+// Approved Composition Component — per Anatomy A.1 (Card) + A.24 (Heading / Paragraph).
+// HeroUI v3 ships no EmptyState primitive; this file is the Approved Composition Component.
+import { Button, Card, Heading, Paragraph } from '@heroui/react';
 import { Inbox, type LucideIcon } from 'lucide-react';
-import { Button } from '@heroui/react';
 
 interface EmptyStateAction {
   label: string;
@@ -20,17 +22,21 @@ export function EmptyState({
   action,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-      <Icon className="size-12 text-default-300" aria-hidden />
-      <div className="space-y-1">
-        <p className="text-base font-medium text-foreground">{title}</p>
-        {subtitle && <p className="text-sm text-default-500">{subtitle}</p>}
-      </div>
-      {action && (
-        <Button variant="primary" onPress={action.onPress}>
-          {action.label}
-        </Button>
-      )}
-    </div>
+    <Card variant="transparent" className="py-14 sm:py-16">
+      <Card.Content className="flex flex-col items-center gap-4 text-center">
+        <div className="enter-fade-up flex size-16 items-center justify-center rounded-2xl bg-default-100 dark:bg-default-50/5">
+          <Icon className="size-8 text-default-400" aria-hidden />
+        </div>
+        <div className="enter-fade-up space-y-1.5">
+          <Heading level={2} className="text-base font-semibold text-foreground">{title}</Heading>
+          {subtitle && <Paragraph className="mx-auto max-w-xs text-sm leading-relaxed text-muted">{subtitle}</Paragraph>}
+        </div>
+        {action && (
+          <Button variant="primary" onPress={action.onPress} className="mt-1">
+            {action.label}
+          </Button>
+        )}
+      </Card.Content>
+    </Card>
   );
 }

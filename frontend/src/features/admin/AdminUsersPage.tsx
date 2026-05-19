@@ -1,14 +1,15 @@
-import { Switch, Tooltip } from '@heroui/react';
+import { Switch, Table, Tooltip } from '@heroui/react';
 import { Users } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SearchInput } from '../catalog/components/SearchInput';
 import { PaginationControls } from '../../shared/components/PaginationControls';
-import { TableRowSkeleton } from '../../shared/components/Skeleton';
+import { TableRowSkeleton, TableSkeletonHeader } from '../../shared/components/TableRowSkeleton';
 import { ALL_ROLES, type AdminUserDto, type UserRole } from './users/types';
 import { useAdminUsersQuery, useUpdateUserRolesMutation } from './users/hooks';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
+import { EmptyState } from '../../shared/components/EmptyState';
 
 export function AdminUsersPage() {
   const { t } = useTranslation();
@@ -23,9 +24,9 @@ export function AdminUsersPage() {
 
   return (
     <section className="space-y-8">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('admin.users.title')}</h1>
-        <p className="text-sm text-default-500">{t('admin.users.subtitle')}</p>
+      <header className="page-header">
+        <h1 className="page-title">{t('admin.users.title')}</h1>
+        <p className="page-subtitle">{t('admin.users.subtitle')}</p>
       </header>
 
       <div className="max-w-sm">
@@ -36,19 +37,18 @@ export function AdminUsersPage() {
       </div>
 
       {query.isLoading ? (
-        <div
-          className="overflow-hidden rounded-large border border-divider/60"
-          aria-busy="true"
-          aria-label={t('admin.users.loading')}
-        >
-          <table className="w-full text-sm">
-            <tbody>
-              {Array.from({ length: 8 }).map((_, i) => (
-                <TableRowSkeleton key={i} cols={3} />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table className="rounded-large border border-divider/60">
+          <Table.ScrollContainer>
+            <Table.Content aria-label={t('admin.users.loading')} aria-busy={true}>
+              <TableSkeletonHeader cols={3} label={t('admin.users.loading')} />
+              <Table.Body>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <TableRowSkeleton key={i} cols={3} />
+                ))}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
+        </Table>
       ) : query.isError ? (
         <QueryErrorState
           message={t('admin.users.errorLoad')}
@@ -57,28 +57,28 @@ export function AdminUsersPage() {
         />
       ) : query.data?.items?.length ? (
         <div className="space-y-4">
-          <div className="overflow-x-auto rounded-large border border-divider/60">
-            <table className="w-full text-sm" aria-busy={query.isFetching}>
-              <thead>
-                <tr className="border-b border-divider/60 bg-content2 text-start">
-                  <th scope="col" className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400">
+          <Table className="rounded-large border border-divider/60">
+            <Table.ScrollContainer>
+              <Table.Content aria-label={t('admin.users.title')} aria-busy={query.isFetching}>
+                <Table.Header>
+                  <Table.Column isRowHeader className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400">
                     {t('admin.users.colName')}
-                  </th>
-                  <th scope="col" className="hidden px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400 sm:table-cell">
+                  </Table.Column>
+                  <Table.Column className="hidden px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400 sm:table-cell">
                     {t('admin.users.colJoined')}
-                  </th>
-                  <th scope="col" className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400">
+                  </Table.Column>
+                  <Table.Column className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400">
                     {t('admin.users.colRoles')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-divider/60">
-                {query.data.items.map((user) => (
-                  <UserRow key={user.id} user={user} dateFmt={dateFmt} />
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  </Table.Column>
+                </Table.Header>
+                <Table.Body className="divide-y divide-divider/60">
+                  {query.data.items.map((user) => (
+                    <UserRow key={user.id} user={user} dateFmt={dateFmt} />
+                  ))}
+                </Table.Body>
+              </Table.Content>
+            </Table.ScrollContainer>
+          </Table>
           <PaginationControls
             page={page}
             totalPages={query.data.totalPages}
@@ -86,10 +86,7 @@ export function AdminUsersPage() {
           />
         </div>
       ) : (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
-          <Users className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="enter-fade-up text-sm text-default-500">{t('admin.users.empty')}</p>
-        </div>
+        <EmptyState icon={Users} title={t('admin.users.empty')} />
       )}
     </section>
   );
@@ -121,15 +118,15 @@ function UserRow({
   }
 
   return (
-    <tr className="bg-content1 transition-colors hover:bg-content2">
-      <td className="px-4 py-3">
+    <Table.Row className="bg-content1 transition-colors hover:bg-content2">
+      <Table.Cell className="px-4 py-3">
         <p className="font-medium text-foreground">{user.fullName}</p>
         <p className="text-xs text-default-500" dir="ltr">{user.email}</p>
-      </td>
-      <td className="hidden px-4 py-3 tabular-nums text-default-500 sm:table-cell">
+      </Table.Cell>
+      <Table.Cell className="hidden px-4 py-3 tabular-nums text-default-500 sm:table-cell">
         {dateFmt.format(new Date(user.createdAt))}
-      </td>
-      <td className="px-4 py-3">
+      </Table.Cell>
+      <Table.Cell className="px-4 py-3">
         <div className="space-y-2">
           <div className="flex flex-wrap gap-2">
             {ALL_ROLES.map((role) => {
@@ -160,7 +157,7 @@ function UserRow({
             })}
           </div>
         </div>
-      </td>
-    </tr>
+      </Table.Cell>
+    </Table.Row>
   );
 }

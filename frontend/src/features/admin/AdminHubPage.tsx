@@ -1,3 +1,4 @@
+import { Heading } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 import {
   ChevronRight,
@@ -9,6 +10,8 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+
+import { EmptyState } from '../../shared/components/EmptyState';
 
 import { useAuth } from '../auth/useAuth';
 import type { OrderStatus } from '../orders/types';
@@ -49,14 +52,14 @@ export function AdminHubPage() {
 
   return (
     <section className="space-y-8">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t('admin.hub.title')}</h1>
-        <p className="text-sm text-default-500">{t('admin.hub.subtitle')}</p>
+      <header className="page-header">
+        <h1 className="page-title">{t('admin.hub.title')}</h1>
+        <p className="page-subtitle">{t('admin.hub.subtitle')}</p>
       </header>
 
       {statsQuery.isLoading ? (
         <div className="space-y-6" aria-busy="true" aria-label={t('admin.hub.subtitle')}>
-          <div className="overflow-hidden rounded-large border border-divider/60 bg-content1">
+          <div className="content-surface overflow-hidden">
             <div className="flex items-center justify-between gap-3 border-b border-divider/60 px-4 py-3">
               <Skeleton className="h-4 w-32" />
               <Skeleton className="h-3 w-20" />
@@ -77,7 +80,7 @@ export function AdminHubPage() {
           <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
             <div className="space-y-3">
               <Skeleton className="h-5 w-32" />
-              <div className="space-y-2 overflow-hidden rounded-large border border-divider/60 bg-content1 divide-y divide-divider/60">
+              <div className="content-surface divide-y divide-divider/60 overflow-hidden space-y-2">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <RecentOrderRowSkeleton key={i} />
                 ))}
@@ -93,7 +96,7 @@ export function AdminHubPage() {
         </div>
       ) : stats ? (
         <>
-          <div className="overflow-hidden rounded-large border border-divider/60 bg-content1">
+          <div className="content-surface overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-divider/60 px-4 py-3">
               <p className="text-sm font-semibold">{t('admin.hub.queue.statusHeading')}</p>
               <span className="text-xs text-default-500 tabular-nums">
@@ -104,7 +107,7 @@ export function AdminHubPage() {
               <Link
                 to={`/admin/orders?status=${ORDER_STATUSES.PendingPaymentReview}`}
                 aria-label={t('admin.hub.queue.reviewProofs')}
-                className="group flex items-center justify-between gap-4 px-4 py-3 text-sm transition-colors hover:bg-content2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
+                className="group flex items-center justify-between gap-4 px-4 py-3 text-sm transition-colors hover:bg-surface-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
               >
                 <span className="min-w-0">
                   <span className="block text-sm text-default-500">
@@ -138,29 +141,30 @@ export function AdminHubPage() {
             </div>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+          <div className="grid gap-6 lg:grid-cols-[1fr_260px]">
             <div className="space-y-3">
-              <h2 className="text-base font-semibold">{t('admin.hub.recent.heading')}</h2>
+              <Heading level={2} className="text-sm font-semibold uppercase tracking-wide text-muted">{t('admin.hub.recent.heading')}</Heading>
               {recentQuery.isLoading ? (
-                <div className="h-32 animate-pulse rounded-large border border-divider/60 bg-content1" />
+                <Skeleton className="h-32 rounded-large" />
               ) : recentOrders.length === 0 ? (
-                <div className="rounded-large border border-divider/60 bg-content1 p-6 text-center">
-                  <Inbox className="enter-fade-up mx-auto mb-2 size-6 text-default-400" aria-hidden />
-                  <p className="enter-fade-up text-sm text-default-500">{t('admin.hub.recent.empty')}</p>
-                </div>
+                <EmptyState icon={Inbox} title={t('admin.hub.recent.empty')} />
               ) : (
-                <div className="space-y-2" aria-busy={recentQuery.isFetching}>
-                  {recentOrders.slice(0, 5).map((o) => (
+                <div className="content-surface overflow-hidden" aria-busy={recentQuery.isFetching}>
+                  {recentOrders.slice(0, 5).map((o, idx) => (
                     <Link
                       key={o.orderNumber}
                       to={`/admin/orders/${o.orderNumber}`}
-                      className="flex items-center justify-between rounded-medium border border-divider/60 bg-content1 px-4 py-3 text-sm transition-colors hover:bg-content2"
+                      className={[
+                        'flex items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-surface-secondary',
+                        idx > 0 ? 'border-t border-divider/40' : '',
+                      ].join(' ')}
                     >
                       <span className="font-medium text-foreground">
                         {o.orderNumber}
                       </span>
-                      <span className="tabular-nums text-default-500">
+                      <span className="flex items-center gap-2 tabular-nums text-muted">
                         {t('admin.list.itemCount', { count: o.itemCount })}
+                        <ChevronRight className="size-3.5 text-default-300 rtl:rotate-180" aria-hidden />
                       </span>
                     </Link>
                   ))}
@@ -168,15 +172,16 @@ export function AdminHubPage() {
               )}
               <Link
                 to="/admin/orders"
-                className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
               >
                 {t('admin.hub.recent.viewAll')}
+                <ChevronRight className="size-3.5 rtl:rotate-180" aria-hidden />
               </Link>
             </div>
 
             <div className="space-y-3">
-              <h2 className="text-base font-semibold">{t('admin.hub.quickLinks')}</h2>
-              <div className="space-y-2">
+              <Heading level={2} className="text-sm font-semibold uppercase tracking-wide text-muted">{t('admin.hub.quickLinks')}</Heading>
+              <div className="flex flex-col gap-1.5">
                 <QuickLink to="/admin/orders" icon={ClipboardList} label={t('admin.shell.nav.orders')} />
                 <QuickLink to="/admin/products" icon={Package} label={t('admin.shell.nav.products')} />
                 <QuickLink to="/admin/users" icon={Users} label={t('admin.shell.nav.users')} />
@@ -204,11 +209,9 @@ function StatusRow({
   value: number;
 }) {
   return (
-    <div className="rounded-medium border border-divider/60 bg-content2/40 p-3">
-      <dt className="text-sm text-default-500">{label}</dt>
-      <dd className="mt-1 text-sm font-medium text-foreground tabular-nums">
-        {value}
-      </dd>
+    <div className="stat-card">
+      <dt className="stat-label">{label}</dt>
+      <dd className="stat-value-sm">{value}</dd>
     </div>
   );
 }
@@ -225,7 +228,7 @@ function QuickLink({
   return (
     <Link
       to={to}
-      className="flex items-center gap-2 rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm text-default-700 transition-colors hover:bg-content2 dark:text-default-300"
+      className="content-surface flex items-center gap-2 px-3 py-2 text-sm text-default-700 transition-colors hover:bg-surface-secondary dark:text-default-300"
     >
       <Icon className="size-4 shrink-0" aria-hidden />
       <span>{label}</span>
