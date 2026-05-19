@@ -57,9 +57,9 @@ export function FormField<T extends FieldValues>({
   const isPassword = type === 'password';
   const [revealed, setRevealed] = useState(false);
   const effectiveType = isPassword && revealed ? 'text' : type;
-  const underlinedClass = variant === 'underlined'
+  const fieldClass = variant === 'underlined'
     ? 'rounded-none border-0 border-b bg-transparent dark:bg-default-100/50'
-    : undefined;
+    : 'border border-default-400 dark:border-default-300';
   return (
     <Controller
       name={name}
@@ -78,7 +78,7 @@ export function FormField<T extends FieldValues>({
         >
           <Label className="text-sm font-medium">{label}</Label>
           {isPassword ? (
-            <InputGroup className={underlinedClass}>
+            <InputGroup className={fieldClass}>
               <InputGroup.Input
                 ref={field.ref}
                 type={effectiveType}
@@ -112,7 +112,7 @@ export function FormField<T extends FieldValues>({
               autoComplete={autoComplete}
               autoCapitalize={autoCapitalize}
               placeholder={placeholder}
-              className={underlinedClass}
+              className={fieldClass}
             />
           )}
           {description ? (

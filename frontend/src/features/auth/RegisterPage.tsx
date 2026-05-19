@@ -56,7 +56,7 @@ export function RegisterPage() {
           {t('auth.alreadyHaveAccount')}{' '}
           <Link
             to="/login"
-            className="font-medium text-foreground underline-offset-4 hover:underline"
+            className="font-medium text-brand underline-offset-4 transition-colors hover:text-brand-hover hover:underline"
           >
             {t('auth.signInNow')}
           </Link>
@@ -78,7 +78,7 @@ export function RegisterPage() {
           label={t('auth.fullName')}
           autoComplete="name"
           isRequired
-          variant="underlined"
+          variant="bordered"
         />
 
         <FormField
@@ -88,7 +88,7 @@ export function RegisterPage() {
           type="email"
           autoComplete="email"
           isRequired
-          variant="underlined"
+          variant="bordered"
         />
 
         <FormField
@@ -99,7 +99,7 @@ export function RegisterPage() {
           autoComplete="new-password"
           description={t('auth.passwordHint')}
           isRequired
-          variant="underlined"
+          variant="bordered"
         />
 
         <Button

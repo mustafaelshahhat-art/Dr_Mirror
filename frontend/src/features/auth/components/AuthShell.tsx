@@ -18,7 +18,7 @@ export function AuthShell() {
             className="inline-flex min-w-0 shrink items-center gap-2 text-foreground no-underline transition-opacity hover:opacity-80"
           >
             <span
-              className="flex size-7 shrink-0 items-center justify-center rounded-md bg-brand text-white"
+              className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand text-white shadow-sm shadow-brand/20"
               aria-hidden
             >
               <Plus className="size-4" />
@@ -29,19 +29,17 @@ export function AuthShell() {
           </HeroLink>
 
           <div className="flex shrink-0 flex-nowrap items-center gap-1">
-            <HeroLink
-              href="/"
-              className="hidden whitespace-nowrap rounded-medium px-3 py-1.5 text-sm text-default-600 transition-colors hover:bg-default-100 sm:inline-flex dark:text-default-300"
-            >
-              {t('auth.backToStore')}
-            </HeroLink>
             <LangSwitcher />
             <ThemeToggle />
           </div>
         </div>
       </header>
 
-      <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 sm:py-14 md:py-16">
+      <main className="relative flex flex-1 items-center justify-center overflow-hidden px-4 py-10 sm:px-6 sm:py-14 md:py-16">
+        <div className="pointer-events-none absolute inset-0 select-none" aria-hidden>
+          <div className="absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-brand/5 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-brand/[3] to-transparent" />
+        </div>
         <Outlet />
       </main>
 

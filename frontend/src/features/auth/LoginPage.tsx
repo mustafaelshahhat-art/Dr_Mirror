@@ -59,7 +59,7 @@ export function LoginPage() {
           {t('auth.noAccountYet')}{' '}
           <Link
             to="/register"
-            className="font-medium text-foreground underline-offset-4 hover:underline"
+            className="font-medium text-brand underline-offset-4 transition-colors hover:text-brand-hover hover:underline"
           >
             {t('auth.createOne')}
           </Link>
@@ -83,7 +83,7 @@ export function LoginPage() {
           autoComplete="email"
           autoCapitalize="off"
           isRequired
-          variant="underlined"
+          variant="bordered"
         />
 
         <FormField
@@ -93,12 +93,12 @@ export function LoginPage() {
           type="password"
           autoComplete="current-password"
           isRequired
-          variant="underlined"
+          variant="bordered"
         />
 
         <Link
           to="#"
-          className="block text-end text-sm text-default-500 underline-offset-4 hover:underline"
+          className="block text-end text-sm text-muted underline-offset-4 transition-colors hover:text-brand hover:underline"
         >
           {t('auth.forgotPassword')}
         </Link>
