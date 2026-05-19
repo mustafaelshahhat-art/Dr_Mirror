@@ -58,11 +58,20 @@ backend/src/DrMirror.Api/appsettings.Development.json
 # These are kept locally for reference but excluded from the repository
 AGENTS.md
 CLAUDE.md
+DESIGN.md
+PRODUCT.md
+audit-report.md
+progress.txt
 # specs/ — un-ignored so the spec workflow can write directly (kept locally; opt back in by un-commenting)
+.agent/
 .agents/
 .claude/
+.devin/
+.opencode/
 # .specify/ — tracked for constitution & project memory
 .windsurf/
+__pycache__/
+*.pyc
 
 # --- Media & Uploads ---
 tmp/
