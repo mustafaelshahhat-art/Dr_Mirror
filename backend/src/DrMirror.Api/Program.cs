@@ -191,6 +191,10 @@ try
         };
     });
 
+    // Convert Minimal-API binding failures (e.g. an enum query parameter with
+    // a value outside the enum) into 400 ProblemDetails instead of unhandled 500.
+    builder.Services.AddExceptionHandler<DrMirror.Api.Shared.ExceptionHandling.BadHttpRequestExceptionHandler>();
+
     builder.Services.AddRouting();
 
     // -----------------------------------------------------------------------
@@ -222,7 +226,7 @@ try
     // -----------------------------------------------------------------------
     // Rate limiting — IP-keyed sliding/fixed windows on sensitive endpoints.
     // -----------------------------------------------------------------------
-    builder.Services.AddRateLimitingPolicies();
+    builder.Services.AddRateLimitingPolicies(builder.Configuration);
 
     builder.Services.AddHealthChecks()
         .AddCheck<SqlServerHealthCheck>("sqlserver")

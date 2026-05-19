@@ -217,9 +217,20 @@ internal static class ServiceCollectionExtensions
 
     /// <summary>
     /// Registers all named rate-limit policies used by the API endpoints.
+    /// All <c>PermitLimit</c> values are multiplied by the config-driven
+    /// <c>RateLimit:PermitLimitMultiplier</c> (default 1). Set to a larger
+    /// value (e.g. 100) in <c>appsettings.Development.json</c> to allow
+    /// local test suites to run without hitting 429. Production must keep
+    /// the multiplier at 1.
     /// </summary>
-    internal static IServiceCollection AddRateLimitingPolicies(this IServiceCollection services)
+    internal static IServiceCollection AddRateLimitingPolicies(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
+        // Read once at startup. Clamp to >= 1 so a misconfiguration cannot
+        // accidentally disable the limiter (PermitLimit must be positive).
+        var multiplier = Math.Max(1, configuration.GetValue("RateLimit:PermitLimitMultiplier", 1));
+
         services.AddRateLimiter(options =>
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -229,7 +240,7 @@ internal static class ServiceCollectionExtensions
             {
                 o.Window = TimeSpan.FromMinutes(1);
                 o.SegmentsPerWindow = 6;
-                o.PermitLimit = 10;
+                o.PermitLimit = 10 * multiplier;
                 o.QueueLimit = 0;
                 o.AutoReplenishment = true;
             });
@@ -239,7 +250,7 @@ internal static class ServiceCollectionExtensions
             {
                 o.Window = TimeSpan.FromMinutes(1);
                 o.SegmentsPerWindow = 6;
-                o.PermitLimit = 30;
+                o.PermitLimit = 30 * multiplier;
                 o.QueueLimit = 0;
                 o.AutoReplenishment = true;
             });
@@ -248,7 +259,7 @@ internal static class ServiceCollectionExtensions
             options.AddFixedWindowLimiter(RateLimitPolicies.InquirySubmit, o =>
             {
                 o.Window = TimeSpan.FromMinutes(1);
-                o.PermitLimit = 5;
+                o.PermitLimit = 5 * multiplier;
                 o.QueueLimit = 0;
                 o.AutoReplenishment = true;
             });
@@ -257,7 +268,7 @@ internal static class ServiceCollectionExtensions
             options.AddFixedWindowLimiter(RateLimitPolicies.AdminApi, o =>
             {
                 o.Window = TimeSpan.FromMinutes(1);
-                o.PermitLimit = 120;
+                o.PermitLimit = 120 * multiplier;
                 o.QueueLimit = 0;
                 o.AutoReplenishment = true;
             });
@@ -271,7 +282,7 @@ internal static class ServiceCollectionExtensions
                 return RateLimitPartition.GetFixedWindowLimiter(userId, _ => new FixedWindowRateLimiterOptions
                 {
                     Window = TimeSpan.FromMinutes(5),
-                    PermitLimit = 10,
+                    PermitLimit = 10 * multiplier,
                     QueueLimit = 0,
                     AutoReplenishment = true,
                 });
@@ -285,7 +296,7 @@ internal static class ServiceCollectionExtensions
                 {
                     Window = TimeSpan.FromMinutes(1),
                     SegmentsPerWindow = 6,
-                    PermitLimit = 60,
+                    PermitLimit = 60 * multiplier,
                     QueueLimit = 0,
                     AutoReplenishment = true,
                 });

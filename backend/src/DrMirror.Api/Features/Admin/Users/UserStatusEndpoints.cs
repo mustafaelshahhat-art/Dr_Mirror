@@ -53,19 +53,30 @@ public static class UserStatusEndpoints
                 statusCode: StatusCodes.Status409Conflict);
         }
 
-        await using var tx = db.Database.IsRelational()
-            ? await db.Database.BeginTransactionAsync(ct)
-            : null;
+        IResult? result = null;
+        var strategy = db.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async ctInner =>
+        {
+            await using var tx = db.Database.IsRelational()
+                ? await db.Database.BeginTransactionAsync(ctInner)
+                : null;
 
-        user.IsDisabled = true;
-        user.UpdatedAt = DateTimeOffset.UtcNow;
-        var stampResult = await userManager.UpdateSecurityStampAsync(user);
-        if (!stampResult.Succeeded) return IdentityProblem(stampResult);
+            user.IsDisabled = true;
+            user.UpdatedAt = DateTimeOffset.UtcNow;
+            var stampResult = await userManager.UpdateSecurityStampAsync(user);
+            if (!stampResult.Succeeded)
+            {
+                result = IdentityProblem(stampResult);
+                return;
+            }
 
-        await audit.WriteAsync("User.Disable", "User", user.Id.ToString(), "Enabled", "Disabled", ct);
-        await db.SaveChangesAsync(ct);
+            await audit.WriteAsync("User.Disable", "User", user.Id.ToString(), "Enabled", "Disabled", ctInner);
+            await db.SaveChangesAsync(ctInner);
 
-        if (tx is not null) await tx.CommitAsync(ct);
+            if (tx is not null) await tx.CommitAsync(ctInner);
+        }, ct);
+
+        if (result is not null) return result;
 
         roles = await userManager.GetRolesAsync(user);
         return Results.Ok(user.ToAdminDto(roles));
@@ -84,19 +95,30 @@ public static class UserStatusEndpoints
             return Results.Problem(title: "User not found", statusCode: StatusCodes.Status404NotFound);
         }
 
-        await using var tx = db.Database.IsRelational()
-            ? await db.Database.BeginTransactionAsync(ct)
-            : null;
+        IResult? result = null;
+        var strategy = db.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async ctInner =>
+        {
+            await using var tx = db.Database.IsRelational()
+                ? await db.Database.BeginTransactionAsync(ctInner)
+                : null;
 
-        user.IsDisabled = false;
-        user.UpdatedAt = DateTimeOffset.UtcNow;
-        var stampResult = await userManager.UpdateSecurityStampAsync(user);
-        if (!stampResult.Succeeded) return IdentityProblem(stampResult);
+            user.IsDisabled = false;
+            user.UpdatedAt = DateTimeOffset.UtcNow;
+            var stampResult = await userManager.UpdateSecurityStampAsync(user);
+            if (!stampResult.Succeeded)
+            {
+                result = IdentityProblem(stampResult);
+                return;
+            }
 
-        await audit.WriteAsync("User.Enable", "User", user.Id.ToString(), "Disabled", "Enabled", ct);
-        await db.SaveChangesAsync(ct);
+            await audit.WriteAsync("User.Enable", "User", user.Id.ToString(), "Disabled", "Enabled", ctInner);
+            await db.SaveChangesAsync(ctInner);
 
-        if (tx is not null) await tx.CommitAsync(ct);
+            if (tx is not null) await tx.CommitAsync(ctInner);
+        }, ct);
+
+        if (result is not null) return result;
 
         var roles = await userManager.GetRolesAsync(user);
         return Results.Ok(user.ToAdminDto(roles));
