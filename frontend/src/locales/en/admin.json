@@ -325,6 +325,7 @@
     "reviewedAt": "Reviewed on {{when}} by {{by}}",
     "approve": "Approve",
     "reject": "Reject",
+    "actionsLabel": "Proof review actions",
     "approveConfirm": "Approve this payment proof? The order will move to Paid.",
     "rejectConfirm": "Reject this payment proof? Order bounces back to Pending and the buyer can re-upload.",
     "notePlaceholderOptional": "Optional note (visible to the buyer).",

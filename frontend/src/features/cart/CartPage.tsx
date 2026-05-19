@@ -1,4 +1,5 @@
 import { Button, Card } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +7,6 @@ import { Link } from 'react-router-dom';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
-import { LinkButton } from '../../shared/components/LinkButton';
 import { CartLineSkeleton } from '../../shared/components/Skeleton';
 
 import { CartLineRow } from './components/CartLineRow';
@@ -161,12 +161,12 @@ export function CartPage() {
               </div>
             </Card.Content>
             <Card.Footer>
-              <LinkButton
+              <Link
                 to="/checkout"
-                fullWidth
+                className={buttonVariants({ variant: 'primary', fullWidth: true })}
               >
                 {t('cart.proceedToCheckout')}
-              </LinkButton>
+              </Link>
             </Card.Footer>
           </Card>
         </div>
@@ -175,12 +175,12 @@ export function CartPage() {
           <ShoppingBag className="mx-auto mb-3 size-6 text-default-400" aria-hidden />
           <h2 className="text-base font-semibold">{t('cart.empty.title')}</h2>
           <p className="mt-1 text-sm text-default-500">{t('cart.empty.subtitle')}</p>
-          <LinkButton
+          <Link
             to="/"
-            className="mt-4"
+            className={`${buttonVariants({ variant: 'primary' })} mt-4`}
           >
             {t('cart.empty.cta')}
-          </LinkButton>
+          </Link>
         </div>
       )}
     </section>

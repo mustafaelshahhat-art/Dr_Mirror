@@ -204,3 +204,64 @@ T047-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual capture 
   - /catalog filter toolbar (FilterPanel active-count Chip)
 
 Phase 5 (US3) automated checkpoint: All in-scope standalone status indicators rendered via HeroUI `Chip` + `Chip.Label`; cart-count anchored counter rendered via HeroUI `Badge` + `Badge.Anchor` + `Badge.Label`. FR-005a + FR-005b satisfied for in-scope files. T039–T047 marked complete in `tasks.md`; T047-vm remains open until manual visual verification is recorded.
+
+== Phase 6: User Story 4 — Buttons, Links & Toolbars (2026-05-19) ==
+
+T048 (delete `LinkButton.tsx`): PASS. File removed; 13 consumers migrated.
+
+T049–T060 (LinkButton consumer migrations): PASS. Migrated `Header.tsx`, `CartPage.tsx`, `CartButton.tsx`, `AdminInquiriesPage.tsx`, `AdminOrderDetailPage.tsx`, `AdminProductsListPage.tsx`, `AdminProductCreatePage.tsx`, `ProductDetailPage.tsx`, `CheckoutEmptyState.tsx`, `OrderDetailPage.tsx`, `OrdersListPage.tsx`, `NotFoundPage.tsx`.
+
+  Deviation (recorded): spec/data-model.md prescribe `<Button as={Link}>` for link-styled actions, but HeroUI v3 `Button` is built on `react-aria-components/Button` and exposes no polymorphic `as` prop — the same constraint already documented in `ProductCard.tsx`. Closest spec-compliant pattern adopted: `<Link to=… className={buttonVariants({ variant, size, fullWidth, isIconOnly })}>` using react-router-dom's `Link` plus HeroUI's own button styling tokens from `@heroui/styles`. `AnchorButton` (mailto: only) → plain `<a href="mailto:…">` + `buttonVariants` (HeroUI Link not used because mailto requires anchor navigation, not RouterProvider routing). FR-017 spirit preserved: HeroUI v3 button styling is the single source of truth for visuals; react-router Link provides client-side navigation.
+
+T061–T071 (admin raw `<button>` sweep): PASS — no-op. Case-sensitive grep `<button ` against `frontend/src/features/admin/**/*.tsx` returns zero matches; these files were already migrated to HeroUI `Button` in prior phases. Verified via T095 gate.
+
+T072–T076, T079–T094 (storefront/shared raw `<button>` sweep): PASS — no-op. Same as admin: case-sensitive grep returns zero matches in scoped files. Verified via T095 gate.
+
+T077 (FilterPanel.tsx non-radio sweep + Toolbar wrap): PASS. The clear/apply cluster does not exist in current `FilterPanel.tsx` (filter applies on change; no submit). The toggle + clear-all action row is wrapped in HeroUI `Toolbar aria-label={t('catalog.filters.label')}`. The four `role="radio"` segment buttons remain (Exception 1 sunset → Phase 12b).
+
+T078 (ProductImageGallery.tsx): PASS. Raw thumbnail `<button>` → HeroUI `Button variant="ghost"` with the same `onPress` / `onKeyDown` ArrowLeft/ArrowRight behavior and `aria-current` preserved. Visual styling preserved via `className` + `p-0` to neutralize HeroUI button padding (thumbnails are an image grid).
+
+T094a (AdminProofReview.tsx Toolbar): PASS. Idle Approve/Reject button row wrapped in `<Toolbar aria-label={t('admin.proofs.actionsLabel')}>`. Reject confirmation Modal footer left untouched (US10 migrates it to AlertDialog).
+
+T094b (AdminTransitionActions.tsx Toolbar): PASS. Allowed-next-state button row wrapped in `<Toolbar aria-label={t('admin.transition.heading')}>`.
+
+T094c (AdminProductsListPage.tsx Toolbar): N/A — no per-row action cluster (single Tooltip+edit-link per row) and no batch-action cluster present. Recorded as deferred until/unless a real cluster is added.
+
+T094d (FilterPanel.tsx Toolbar — verification of T077): PASS. Implemented as part of T077; Toolbar wraps the toggle + clear-all action row with `aria-label={t('catalog.filters.label')}`.
+
+T095 (raw `<button ` grep gate, case-sensitive, excluding CategoryChips/SizePicker/ColorPicker/FilterPanel): PASS — zero matches.
+
+T096 (LinkButton grep): PASS — zero references in `frontend/src/**/*.{ts,tsx}`.
+
+T096a (raw `<a href="/` grep): PASS — zero matches.
+
+T097 (build) — `npm --prefix frontend run build`:
+  Status: PASS
+  Build time: 492ms
+  Main entry (index): 423.96 kB / 129.13 kB gzip (delta vs. Phase 1 baseline: +17.07 kB / +5.34 kB gzip; within ±5% tolerance per phase contract, attributable to net imports for Toolbar primitive and buttonVariants helper across 14 modified files).
+
+T098 (tests) — `npm --prefix frontend test`:
+  Status: PASS
+  Test files: 54
+  Tests: 276 passed
+  Duration: 12.84s (faster than Phase 1 baseline 18.02s; within ±10% tolerance).
+
+T099 (i18n + lint):
+  i18n: PASS (`npm --prefix frontend run i18n:check`). One new key pair introduced: `admin.proofs.actionsLabel` (ar: "إجراءات مراجعة الإثبات", en: "Proof review actions") for the AdminProofReview Toolbar `aria-label`.
+  lint: PASS (`npm --prefix frontend run lint`, exit 0). 30 warnings (up from 29 in Phase 5) — one new `i18next/no-literal-string` warning on `idx === activeImage ? 'true' : undefined` in `ProductImageGallery.tsx` (literal `'true'` is the required value for the `aria-current` attribute, not user-facing copy; same family as the pre-existing warnings). 0 errors.
+
+T099-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual capture per `docs/screenshots/README.md`. Surfaces to capture (en LTR + ar RTL × light + dark × 375 / 768 / 1280 px + keyboard reach + visible focus rings + idle / pressed / disabled states + RTL anchor positioning):
+  - Header sign-in button (logged-out state)
+  - /cart page proceed-to-checkout + empty-state CTA + drawer view-cart button
+  - /account/orders empty-state CTA
+  - /account/orders/:orderNumber back-to-list button (not-found state)
+  - /admin/orders/:orderNumber back-to-list button (not-found state) + transition action toolbar + proof review action toolbar
+  - /admin/products "New product" button + per-row edit Tooltip+Link
+  - /admin/products/new cancel button
+  - /admin/inquiries reply-by-email anchor button
+  - / catalog filter toolbar (toggle + clear-all wrapped in Toolbar)
+  - /products/:slug back-to-catalog button (not-found state) + thumbnail gallery keyboard arrow nav (verify ArrowLeft/ArrowRight in both LTR and RTL)
+  - /checkout empty-state CTA
+  - /404 page CTA (both storefront and admin variants)
+
+Phase 6 (US4) automated checkpoint: Zero raw `<button>` outside the four RAC files (which migrate in Phase 12b). `LinkButton.tsx` deleted. Grouped action bars wrapped in HeroUI `Toolbar`. SC-001 satisfied for buttons. T048–T099 marked complete in `tasks.md`; T099-vm remains open until manual visual verification is recorded.

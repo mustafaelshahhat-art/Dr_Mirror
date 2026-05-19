@@ -1,4 +1,4 @@
-import { Button, FieldError, Label, Modal, TextArea, TextField, useOverlayState } from '@heroui/react';
+import { Button, FieldError, Label, Modal, TextArea, TextField, Toolbar, useOverlayState } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -65,7 +65,7 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
         {t('admin.transition.heading')}
       </h2>
 
-      <div className="flex flex-wrap gap-2">
+      <Toolbar aria-label={t('admin.transition.heading')} className="flex flex-wrap gap-2">
         {order.allowedNextStatesForAdmin.map((status) => {
           const isCancel = status === ORDER_STATUSES.Cancelled;
           const isActive = status === target;
@@ -91,7 +91,7 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
             </Button>
           );
         })}
-      </div>
+      </Toolbar>
 
       {target !== null && !isCancelling ? (
         <div className="space-y-2 rounded-medium border border-divider/60 bg-content2 p-3">

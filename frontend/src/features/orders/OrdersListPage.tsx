@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { buttonVariants } from '@heroui/styles';
 import { Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -6,7 +7,6 @@ import { Link } from 'react-router-dom';
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
 import { PaginationControls } from '../../shared/components/PaginationControls';
-import { LinkButton } from '../../shared/components/LinkButton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { OrderRowSkeleton, Skeleton } from '../../shared/components/Skeleton';
 
@@ -69,12 +69,12 @@ export function OrdersListPage() {
           <Package className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
           <h2 className="enter-fade-up text-base font-semibold">{t('orders.list.empty.title')}</h2>
           <p className="enter-fade-up mt-1 text-sm text-default-500">{t('orders.list.empty.subtitle')}</p>
-          <LinkButton
+          <Link
             to="/"
-            className="mt-4"
+            className={`${buttonVariants({ variant: 'primary' })} mt-4`}
           >
             {t('orders.list.empty.cta')}
-          </LinkButton>
+          </Link>
         </div>
       ) : (
         <ul className="space-y-2" aria-busy={query.isFetching}>

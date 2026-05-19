@@ -1,7 +1,6 @@
+import { buttonVariants } from '@heroui/styles';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
-
-import { LinkButton } from '../components/LinkButton';
+import { Link, useLocation } from 'react-router-dom';
 
 export function NotFoundPage() {
   const { t } = useTranslation();
@@ -28,12 +27,12 @@ export function NotFoundPage() {
       <p className="rounded-medium bg-content2 px-3 py-1.5 text-xs text-default-500" dir="ltr">
         {t('common.notFound.path', { path: location.pathname })}
       </p>
-      <LinkButton
+      <Link
         to={isAdminPath ? '/admin' : '/'}
-        className="mt-2"
+        className={`${buttonVariants({ variant: 'primary' })} mt-2`}
       >
         {t(isAdminPath ? 'common.notFound.adminCta' : 'common.notFound.cta')}
-      </LinkButton>
+      </Link>
     </div>
   );
 }

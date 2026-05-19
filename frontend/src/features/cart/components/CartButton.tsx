@@ -1,9 +1,10 @@
 import { Badge, Button, Drawer } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 import { ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
-import { LinkButton } from '../../../shared/components/LinkButton';
 import { formatCurrency } from '../../../shared/lib/format';
 import type { AppLang } from '../../../shared/lib/theme-storage';
 import { useCart } from '../useCart';
@@ -112,13 +113,12 @@ export function CartButton() {
                 <Drawer.CloseTrigger className="inline-flex flex-1 items-center justify-center rounded-medium border border-divider bg-content1 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-default-100">
                   {t('cart.continueShopping')}
                 </Drawer.CloseTrigger>
-                <LinkButton
+                <Link
                   to="/cart"
-                  fullWidth
-                  className="flex-1"
+                  className={`${buttonVariants({ variant: 'primary', fullWidth: true })} flex-1`}
                 >
                   {t('cart.viewCart')}
-                </LinkButton>
+                </Link>
               </div>
             </Drawer.Footer>
           </Drawer.Dialog>

@@ -1,4 +1,5 @@
 import { Button, Card, Chip } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 import { Mail, MailOpen } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +15,6 @@ import {
   useMarkInquiryRespondedMutation,
 } from '../inquiries/hooks';
 import { PaginationControls } from '../../shared/components/PaginationControls';
-import { AnchorButton } from '../../shared/components/LinkButton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { Skeleton } from '../../shared/components/Skeleton';
 
@@ -229,13 +229,13 @@ function InquiryRow({
 
       <Card.Footer>
         <div className="flex flex-wrap gap-2">
-          <AnchorButton
+          <a
             href={replyHref}
-            size="sm"
+            className={buttonVariants({ variant: 'primary', size: 'sm' })}
           >
             <Mail className="size-4" aria-hidden />
             {t('inquiries.admin.replyByEmail')}
-          </AnchorButton>
+          </a>
           {isNew ? (
             <Button
               type="button"

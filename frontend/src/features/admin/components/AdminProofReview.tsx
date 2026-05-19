@@ -1,4 +1,4 @@
-import { Button, FieldError, Label, Modal, TextArea, TextField, useOverlayState } from '@heroui/react';
+import { Button, FieldError, Label, Modal, TextArea, TextField, Toolbar, useOverlayState } from '@heroui/react';
 import { Check, Download, X } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -192,7 +192,7 @@ function ProofRow({
 
       {isPending && !isSuperseded ? (
         mode === 'idle' ? (
-          <div className="flex gap-2">
+          <Toolbar aria-label={t('admin.proofs.actionsLabel')} className="flex gap-2">
             <Button
               type="button"
               variant="primary"
@@ -226,7 +226,7 @@ function ProofRow({
                 {t('admin.proofs.reject')}
               </span>
             </Button>
-          </div>
+          </Toolbar>
         ) : mode === 'approve' ? (
           <div className="space-y-2 rounded-medium border border-divider/60 bg-content2 p-2">
             <p className="text-xs font-medium text-foreground">

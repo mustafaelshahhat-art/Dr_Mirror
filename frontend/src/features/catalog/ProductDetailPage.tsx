@@ -1,4 +1,5 @@
 import { Button } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, Check, MessageSquare, PackageX, ShoppingBag } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +9,6 @@ import { useCart } from '../cart/useCart';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
-import { LinkButton } from '../../shared/components/LinkButton';
 import { ProductDetailSkeleton } from '../../shared/components/Skeleton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
@@ -92,11 +92,12 @@ export function ProductDetailPage() {
         <p className="text-sm text-default-500">
           {t('catalog.detail.notFoundSubtitle')}
         </p>
-        <LinkButton
+        <Link
           to="/"
+          className={buttonVariants({ variant: 'primary' })}
         >
           {t('catalog.detail.backToCatalog')}
-        </LinkButton>
+        </Link>
       </div>
     );
   }

@@ -1,4 +1,5 @@
 import { Button, Drawer } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 import { LogOut, Menu, User as UserIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +9,6 @@ import { useAuth } from '../../features/auth/useAuth';
 import { CartButton } from '../../features/cart/components/CartButton';
 
 import { LangSwitcher } from './LangSwitcher';
-import { LinkButton } from './LinkButton';
 import { ThemeToggle } from './ThemeToggle';
 
 /**
@@ -66,9 +66,12 @@ export function Header() {
           ) : null}
 
           {!isBootstrapping && !user ? (
-            <LinkButton to="/login" size="sm" className="me-2">
+            <Link
+              to="/login"
+              className={`${buttonVariants({ variant: 'primary', size: 'sm' })} me-2`}
+            >
               {t('header.signIn')}
-            </LinkButton>
+            </Link>
           ) : null}
 
           <CartButton />

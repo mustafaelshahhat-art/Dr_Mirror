@@ -1,7 +1,9 @@
 import { Table, Tooltip } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 import { Package, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 import { SearchInput } from '../../catalog/components/SearchInput';
 import { genderTranslationKey } from '../../catalog/hooks';
@@ -9,7 +11,6 @@ import type { ProductGender } from '../../catalog/types';
 
 import { useAdminCategoriesQuery, useAdminProductsQuery } from './hooks';
 
-import { LinkButton } from '../../../shared/components/LinkButton';
 import { PaginationControls } from '../../../shared/components/PaginationControls';
 import { SelectField } from '../../../shared/components/SelectField';
 import { TableRowSkeleton, TableSkeletonHeader } from '../../../shared/components/TableRowSkeleton';
@@ -39,10 +40,13 @@ export function AdminProductsListPage() {
           </h1>
           <p className="text-sm text-default-500">{t('admin.products.list.subtitle')}</p>
         </div>
-        <LinkButton to="/admin/products/new" size="sm">
+        <Link
+          to="/admin/products/new"
+          className={buttonVariants({ variant: 'primary', size: 'sm' })}
+        >
           <Plus className="size-4" aria-hidden />
           {t('admin.products.list.new')}
-        </LinkButton>
+        </Link>
       </header>
 
       <div className="grid gap-2 sm:grid-cols-[1fr_12rem_10rem_10rem]">
@@ -179,14 +183,13 @@ export function AdminProductsListPage() {
                       </Table.Cell>
                       <Table.Cell className="px-4 py-3 text-end">
                         <Tooltip delay={300} closeDelay={0}>
-                          <LinkButton
+                          <Link
                             to={`/admin/products/${p.id}/edit`}
                             aria-label={t('admin.catalog.actions.edit')}
-                            tone="outline"
-                            size="sm"
+                            className={buttonVariants({ variant: 'outline', size: 'sm', isIconOnly: true })}
                           >
                             <Pencil className="size-4" aria-hidden />
-                          </LinkButton>
+                          </Link>
                           <Tooltip.Content placement="top">
                             {t('admin.catalog.actions.edit')}
                           </Tooltip.Content>

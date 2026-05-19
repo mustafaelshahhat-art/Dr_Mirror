@@ -1,11 +1,11 @@
 import { Card } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, ImageOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
-import { LinkButton } from '../../shared/components/LinkButton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import {
   CartLineSkeleton,
@@ -78,11 +78,12 @@ export function OrderDetailPage() {
         <p className="text-sm text-default-500">
           {t('orders.detail.notFoundSubtitle')}
         </p>
-        <LinkButton
+        <Link
           to="/account/orders"
+          className={buttonVariants({ variant: 'primary' })}
         >
           {t('orders.detail.backToList')}
-        </LinkButton>
+        </Link>
       </div>
     );
   }

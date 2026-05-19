@@ -1,4 +1,5 @@
 import { Card, Tabs } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, ImageOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
@@ -15,7 +16,6 @@ import { useAdminOrderQuery } from './hooks';
 
 import { formatCurrency } from '../../shared/lib/format';
 import type { AppLang } from '../../shared/lib/theme-storage';
-import { LinkButton } from '../../shared/components/LinkButton';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { DetailFieldSkeleton, Skeleton } from '../../shared/components/Skeleton';
 
@@ -94,11 +94,12 @@ export function AdminOrderDetailPage() {
         <p className="text-sm text-default-500">
           {t('admin.detail.notFoundSubtitle')}
         </p>
-        <LinkButton
+        <Link
           to="/admin/orders"
+          className={buttonVariants({ variant: 'primary' })}
         >
           {t('admin.detail.backToList')}
-        </LinkButton>
+        </Link>
       </div>
     );
   }

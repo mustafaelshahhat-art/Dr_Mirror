@@ -1,4 +1,4 @@
-import { Accordion, Button, Chip, Input, Label, TextField } from '@heroui/react';
+import { Accordion, Button, Chip, Input, Label, TextField, Toolbar } from '@heroui/react';
 import type { KeyboardEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { SlidersHorizontal, X } from 'lucide-react';
@@ -84,7 +84,7 @@ export function FilterPanel({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2">
+      <Toolbar aria-label={t('catalog.filters.label')} className="flex items-center gap-2">
         <Button
           type="button"
           variant="ghost"
@@ -117,7 +117,7 @@ export function FilterPanel({
             </span>
           </Button>
         ) : null}
-      </div>
+      </Toolbar>
 
       {open ? (
         <Accordion

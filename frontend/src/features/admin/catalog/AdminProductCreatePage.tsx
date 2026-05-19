@@ -1,4 +1,5 @@
 import { Button, Form } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +11,6 @@ import { useAdminCategoriesQuery, useCreateProductMutation } from './hooks';
 
 import { Field, TextAreaField } from '../../../shared/components/Field';
 import { SelectField } from '../../../shared/components/SelectField';
-import { LinkButton } from '../../../shared/components/LinkButton';
 import { Skeleton } from '../../../shared/components/Skeleton';
 
 export function AdminProductCreatePage() {
@@ -144,12 +144,12 @@ export function AdminProductCreatePage() {
               ? t('admin.products.create.creating')
               : t('admin.products.create.submit')}
           </Button>
-          <LinkButton
+          <Link
             to="/admin/products"
-            tone="outline"
+            className={buttonVariants({ variant: 'outline' })}
           >
             {t('admin.catalog.actions.cancel')}
-          </LinkButton>
+          </Link>
         </div>
       </Form>
     </section>
