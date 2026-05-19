@@ -53,10 +53,7 @@ export function AddressBookPage() {
   if (query.isError) {
     return (
       <section className="space-y-8">
-        <Link
-          to="/account"
-          className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
-        >
+        <Link to="/account" className="back-link">
           <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
           {t('addresses.backToAccount')}
         </Link>
@@ -78,10 +75,7 @@ export function AddressBookPage() {
 
   return (
     <section className="space-y-8">
-      <Link
-        to="/account"
-        className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
-      >
+      <Link to="/account" className="back-link">
         <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
         {t('addresses.backToAccount')}
       </Link>
@@ -115,7 +109,7 @@ export function AddressBookPage() {
       ) : null}
 
       {addresses.length === 0 && !creating ? (
-        <div className="rounded-large border border-divider/60 bg-content1 p-10 text-center">
+        <div className="content-surface p-10 text-center">
           <MapPin className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
           <p className="enter-fade-up text-sm text-default-500">{t('addresses.empty')}</p>
         </div>

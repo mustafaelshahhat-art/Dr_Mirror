@@ -176,7 +176,7 @@ export function RecentOrderRowSkeleton() {
 /** Checkout summary skeleton — line items + totals. */
 export function CheckoutSummarySkeleton() {
   return (
-    <aside className="h-fit space-y-4 rounded-large border border-divider/60 bg-content1 p-4 lg:sticky lg:top-20">
+    <aside className="content-surface h-fit space-y-4 p-4 lg:sticky lg:top-20">
       <Skeleton className="h-4 w-1/3" />
       <div className="space-y-2">
         {Array.from({ length: 3 }).map((_, i) => (

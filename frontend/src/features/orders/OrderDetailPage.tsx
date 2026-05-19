@@ -71,7 +71,7 @@ export function OrderDetailPage() {
       );
     }
     return (
-      <div className="enter-fade-up space-y-3 rounded-large border border-divider/60 bg-content1 p-10 text-center">
+      <div className="enter-fade-up content-surface space-y-3 p-10 text-center">
         <h1 className="text-lg font-semibold">
           {t('orders.detail.notFoundTitle')}
         </h1>
@@ -101,10 +101,7 @@ export function OrderDetailPage() {
 
   return (
     <section className="space-y-8">
-      <Link
-        to="/account/orders"
-        className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
-      >
+      <Link to="/account/orders" className="back-link">
         <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
         {t('orders.detail.backToList')}
       </Link>

@@ -1,4 +1,5 @@
 import { Separator } from '@heroui/react';
+import { Plus } from 'lucide-react';
 import { Link, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -38,10 +39,10 @@ export function Layout() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <span
-                  className="flex size-6 items-center justify-center rounded-md bg-brand text-xs font-bold text-white"
+                  className="flex size-6 items-center justify-center rounded-md bg-brand text-white"
                   aria-hidden
                 >
-                  ✚
+                  <Plus className="size-3.5" />
                 </span>
                 <span className="text-sm font-bold tracking-tight text-foreground">
                   {t('appName')}

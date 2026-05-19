@@ -45,7 +45,7 @@ export function ShellPage() {
         </p>
       </section>
 
-      <section className="rounded-large border border-divider/60 bg-content1 p-6">
+      <section className="content-surface p-6">
         <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
             <dt className="text-xs uppercase tracking-wide text-default-500">
@@ -76,7 +76,7 @@ export function ShellPage() {
         </h2>
         <Link
           to="/account/orders"
-          className="group flex items-center gap-3 rounded-large border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
+          className="group flex items-center gap-3 content-surface p-4 transition-colors hover:bg-surface-secondary"
         >
           <span className="grid size-10 place-items-center rounded-medium bg-primary/10 text-primary">
             <Package className="size-5" aria-hidden />
@@ -93,7 +93,7 @@ export function ShellPage() {
 
         <Link
           to="/account/addresses"
-          className="group flex items-center gap-3 rounded-large border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
+          className="group flex items-center gap-3 content-surface p-4 transition-colors hover:bg-surface-secondary"
         >
           <span className="grid size-10 place-items-center rounded-medium bg-default-200 text-default-600 dark:bg-default-100/10 dark:text-default-400">
             <MapPin className="size-5" aria-hidden />
@@ -111,7 +111,7 @@ export function ShellPage() {
         {user.roles.includes('Admin') ? (
           <Link
             to="/admin"
-            className="group flex items-center gap-3 rounded-large border border-divider/60 bg-content1 p-4 transition-colors hover:bg-content2"
+            className="group flex items-center gap-3 content-surface p-4 transition-colors hover:bg-surface-secondary"
           >
             <span className="grid size-10 place-items-center rounded-medium bg-default-200 text-default-600 dark:bg-default-100/10 dark:text-default-400">
               <LayoutDashboard className="size-5" aria-hidden />
@@ -149,12 +149,12 @@ export function ShellPage() {
             ))}
           </ul>
         ) : orders.length > 0 ? (
-          <ul className="divide-y divide-divider/40 overflow-hidden rounded-large border border-divider/60">
+          <ul className="content-surface divide-y divide-divider/40 overflow-hidden">
             {orders.map((order) => (
               <li key={order.id}>
                 <Link
                   to={`/account/orders/${order.orderNumber}`}
-                  className="flex items-center justify-between gap-4 bg-content1 px-4 py-3 transition-colors hover:bg-content2"
+                  className="flex items-center justify-between gap-4 px-4 py-3 transition-colors hover:bg-surface-secondary"
                 >
                   <span className="text-sm font-medium">
                     {t('account.recentOrders.orderLabel', { number: order.orderNumber })}
@@ -169,14 +169,14 @@ export function ShellPage() {
             <li>
               <Link
                 to="/account/orders"
-                className="flex items-center justify-center bg-content1 px-4 py-3 text-sm font-medium text-primary transition-colors hover:bg-content2"
+                className="flex items-center justify-center border-t border-divider/40 px-4 py-3 text-sm font-medium text-primary transition-colors hover:bg-surface-secondary"
               >
                 {t('account.recentOrders.viewAll')}
               </Link>
             </li>
           </ul>
         ) : (
-          <div className="rounded-large border border-divider/60 bg-content1 p-8 text-center">
+          <div className="content-surface p-8 text-center">
             <ShoppingBag className="mx-auto mb-2 size-6 text-default-400" aria-hidden />
             <p className="text-sm text-default-500">{t('account.recentOrders.empty')}</p>
           </div>

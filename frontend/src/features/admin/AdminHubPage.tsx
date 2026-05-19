@@ -59,7 +59,7 @@ export function AdminHubPage() {
 
       {statsQuery.isLoading ? (
         <div className="space-y-6" aria-busy="true" aria-label={t('admin.hub.subtitle')}>
-          <div className="overflow-hidden rounded-large border border-divider/60 bg-content1">
+          <div className="content-surface overflow-hidden">
             <div className="flex items-center justify-between gap-3 border-b border-divider/60 px-4 py-3">
               <Skeleton className="h-4 w-32" />
               <Skeleton className="h-3 w-20" />
@@ -80,7 +80,7 @@ export function AdminHubPage() {
           <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
             <div className="space-y-3">
               <Skeleton className="h-5 w-32" />
-              <div className="space-y-2 overflow-hidden rounded-large border border-divider/60 bg-content1 divide-y divide-divider/60">
+              <div className="content-surface divide-y divide-divider/60 overflow-hidden space-y-2">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <RecentOrderRowSkeleton key={i} />
                 ))}
@@ -96,7 +96,7 @@ export function AdminHubPage() {
         </div>
       ) : stats ? (
         <>
-          <div className="overflow-hidden rounded-large border border-divider/60 bg-content1">
+          <div className="content-surface overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-divider/60 px-4 py-3">
               <p className="text-sm font-semibold">{t('admin.hub.queue.statusHeading')}</p>
               <span className="text-xs text-default-500 tabular-nums">
@@ -107,7 +107,7 @@ export function AdminHubPage() {
               <Link
                 to={`/admin/orders?status=${ORDER_STATUSES.PendingPaymentReview}`}
                 aria-label={t('admin.hub.queue.reviewProofs')}
-                className="group flex items-center justify-between gap-4 px-4 py-3 text-sm transition-colors hover:bg-content2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
+                className="group flex items-center justify-between gap-4 px-4 py-3 text-sm transition-colors hover:bg-surface-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
               >
                 <span className="min-w-0">
                   <span className="block text-sm text-default-500">
@@ -155,7 +155,7 @@ export function AdminHubPage() {
                       key={o.orderNumber}
                       to={`/admin/orders/${o.orderNumber}`}
                       className={[
-                        'flex items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-content2',
+                        'flex items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-surface-secondary',
                         idx > 0 ? 'border-t border-divider/40' : '',
                       ].join(' ')}
                     >
@@ -228,7 +228,7 @@ function QuickLink({
   return (
     <Link
       to={to}
-      className="flex items-center gap-2 rounded-medium border border-divider/60 bg-content1 px-3 py-2 text-sm text-default-700 transition-colors hover:bg-content2 dark:text-default-300"
+      className="content-surface flex items-center gap-2 px-3 py-2 text-sm text-default-700 transition-colors hover:bg-surface-secondary dark:text-default-300"
     >
       <Icon className="size-4 shrink-0" aria-hidden />
       <span>{label}</span>

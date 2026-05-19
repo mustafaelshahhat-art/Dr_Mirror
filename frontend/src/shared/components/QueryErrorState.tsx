@@ -12,7 +12,7 @@ export function QueryErrorState({ message, retryLabel, onRetry }: QueryErrorStat
     <Alert
       status="danger"
       role="alert"
-      className="enter-fade rounded-large"
+      className="enter-fade-down rounded-large"
     >
       <Alert.Indicator>
         <AlertCircle size={16} aria-hidden className="mt-0.5 shrink-0" />

@@ -1,6 +1,6 @@
 import { Button, Drawer, Link, Separator, Surface } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
-import { LogOut, Menu, ShoppingBag, User as UserIcon } from 'lucide-react';
+import { LogOut, Menu, Plus, ShoppingBag, User as UserIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
@@ -51,10 +51,10 @@ export function Header() {
           >
             {/* Medical cross brand mark */}
             <span
-              className="flex size-7 items-center justify-center rounded-md bg-brand text-sm font-bold text-white"
+              className="flex size-7 items-center justify-center rounded-md bg-brand text-white"
               aria-hidden
             >
-              ✚
+              <Plus className="size-4" />
             </span>
             {t('appName')}
           </Link>
@@ -151,10 +151,10 @@ export function Header() {
                   className="flex items-center gap-2 text-sm font-bold tracking-tight"
                 >
                   <span
-                    className="flex size-6 items-center justify-center rounded-md bg-brand text-xs font-bold text-white"
+                    className="flex size-6 items-center justify-center rounded-md bg-brand text-white"
                     aria-hidden
                   >
-                    ✚
+                    <Plus className="size-3.5" />
                   </span>
                   {t('appName')}
                 </Link>

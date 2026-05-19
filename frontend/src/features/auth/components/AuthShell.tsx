@@ -1,4 +1,5 @@
 import { Link as HeroLink } from '@heroui/react';
+import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 
@@ -10,17 +11,18 @@ export function AuthShell() {
 
   return (
     <div className="flex min-h-svh flex-col bg-background text-foreground">
-      <header className="border-b border-divider/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="border-b border-divider/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
         <div className="mx-auto flex min-h-14 w-full max-w-7xl items-center justify-between gap-3 px-4 md:px-6 lg:px-8">
           <HeroLink
             href="/"
             className="inline-flex min-w-0 shrink items-center gap-2 text-foreground no-underline transition-opacity hover:opacity-80"
           >
-            <img
-              src="/favicon.svg"
-              alt={t('appName')}
-              className="h-7 w-7 shrink-0 rounded-small"
-            />
+            <span
+              className="flex size-7 shrink-0 items-center justify-center rounded-md bg-brand text-white"
+              aria-hidden
+            >
+              <Plus className="size-4" />
+            </span>
             <span className="truncate text-base font-semibold tracking-tight">
               {t('appName')}
             </span>
@@ -29,7 +31,7 @@ export function AuthShell() {
           <div className="flex shrink-0 flex-nowrap items-center gap-1">
             <HeroLink
               href="/"
-              className="hidden whitespace-nowrap rounded-medium px-2 py-1 text-sm text-default-600 transition-colors hover:bg-default-100 sm:inline-flex dark:text-default-300"
+              className="hidden whitespace-nowrap rounded-medium px-3 py-1.5 text-sm text-default-600 transition-colors hover:bg-default-100 sm:inline-flex dark:text-default-300"
             >
               {t('auth.backToStore')}
             </HeroLink>
@@ -42,6 +44,7 @@ export function AuthShell() {
       <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 sm:py-14 md:py-16">
         <Outlet />
       </main>
+
       <footer className="border-t border-divider/40 py-5 text-center text-xs text-muted">
         {t('common.footer.copyright', { year: new Date().getFullYear() })}
       </footer>

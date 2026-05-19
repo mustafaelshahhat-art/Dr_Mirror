@@ -1,20 +1,19 @@
-import { Button } from '@heroui/react';
-import { Package2, RefreshCw, Ruler, Truck } from 'lucide-react';
-import { SearchX } from 'lucide-react';
+import { Package2, RefreshCw, Ruler, SearchX, Truck } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
+import { EmptyState } from '../../shared/components/EmptyState';
+import { PaginationControls } from '../../shared/components/PaginationControls';
+import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { CategoryChips } from './components/CategoryChips';
 import { FilterPanel } from './components/FilterPanel';
-import { PaginationControls } from '../../shared/components/PaginationControls';
 import { ProductCard } from './components/ProductCard';
 import { ProductGridSkeleton } from './components/ProductGridSkeleton';
 import { SearchInput } from './components/SearchInput';
 import { SortSelect } from './components/SortSelect';
 import { useCategoriesQuery, useProductsQuery } from './hooks';
 import type { ProductFilter, ProductGender, ProductSort } from './types';
-import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 const VALID_SORTS: ProductSort[] = ['Newest', 'PriceAsc', 'PriceDesc', 'NameAsc'];
 const PAGE_SIZE = 24;
@@ -217,16 +216,12 @@ export function CatalogPage() {
           onRetry={() => void productsQuery.refetch()}
         />
       ) : items.length === 0 ? (
-        <div className="content-surface py-16 text-center">
-          <SearchX className="enter-fade-up mx-auto mb-4 size-10 text-default-300" aria-hidden />
-          <p className="enter-fade-up text-base font-semibold text-foreground">{t('catalog.empty.title')}</p>
-          <p className="enter-fade-up mt-1.5 text-sm text-muted">{t('catalog.empty.subtitle')}</p>
-          {hasActiveFilters ? (
-            <Button variant="primary" size="sm" onPress={clearAllFilters} className="mt-5">
-              {t('catalog.empty.clearFilters')}
-            </Button>
-          ) : null}
-        </div>
+        <EmptyState
+          icon={SearchX}
+          title={t('catalog.empty.title')}
+          subtitle={t('catalog.empty.subtitle')}
+          action={hasActiveFilters ? { label: t('catalog.empty.clearFilters'), onPress: clearAllFilters } : undefined}
+        />
       ) : (
         /* eslint-disable-next-line i18next/no-literal-string -- aria-label is set dynamically below */
         <div

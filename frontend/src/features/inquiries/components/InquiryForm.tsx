@@ -82,7 +82,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
   return (
     <Form
       onSubmit={onSubmit}
-      className="space-y-4 rounded-large border border-divider/60 bg-content1 p-4"
+      className="content-surface space-y-4 p-4"
     >
       <header className="space-y-1">
         <Heading level={2} className="text-sm font-semibold text-foreground">

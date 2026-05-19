@@ -33,7 +33,7 @@ export function PaymentProofsList({
         {proofs.map((proof) => (
           <li
             key={proof.id}
-            className="flex gap-3 rounded-medium border border-divider/60 bg-content1 p-3"
+            className="content-surface flex gap-3 p-3"
           >
             <PaymentProofFilePreview
               orderNumber={orderNumber}

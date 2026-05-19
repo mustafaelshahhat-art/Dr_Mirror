@@ -86,7 +86,7 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
   return (
     <section
       aria-labelledby="proof-upload-heading"
-      className="space-y-3 rounded-large border border-divider/60 bg-content1 p-4"
+      className="content-surface space-y-3 p-4"
     >
       <header className="space-y-1">
         <h2 id="proof-upload-heading" className="text-sm font-semibold text-foreground">

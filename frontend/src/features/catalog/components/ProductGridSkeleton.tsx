@@ -9,7 +9,7 @@ export function ProductGridSkeleton() {
       {Array.from({ length: 12 }).map((_, i) => (
         <div
           key={i}
-          className="overflow-hidden rounded-large border border-divider/60 bg-content1"
+          className="content-surface overflow-hidden"
         >
           <Skeleton className="aspect-[4/5] w-full rounded-none" />
           <div className="space-y-2 p-4">

@@ -103,7 +103,7 @@ export function AddressForm({
   return (
     <Form
       onSubmit={submit}
-      className="cq space-y-4 rounded-large border border-divider/60 bg-content1 p-4"
+      className="cq content-surface space-y-4 p-4"
     >
       <Fieldset>
         <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">

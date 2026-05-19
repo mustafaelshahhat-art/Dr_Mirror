@@ -30,10 +30,7 @@ export function CartPage() {
 
   return (
     <section className="space-y-8">
-      <Link
-        to="/"
-        className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
-      >
+      <Link to="/" className="back-link">
         <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
         {t('cart.backToCatalog')}
       </Link>
@@ -134,7 +131,7 @@ export function CartPage() {
             </div>
           </div>
 
-          <Card className="h-fit border border-divider/60 shadow-sm lg:sticky lg:top-20">
+          <Card className="h-fit border border-divider/60 lg:sticky lg:top-20">
             <Card.Header className="border-b border-divider/40 px-5 pb-3 pt-5">
               <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
                 {t('cart.summary')}

@@ -136,7 +136,7 @@ export function FilterPanel({
         <Accordion
           allowsMultipleExpanded
           defaultExpandedKeys={expandedKeys}
-          className="rounded-large border border-divider/60 bg-content1"
+          className="content-surface"
         >
           <Accordion.Item id="gender">
             <Accordion.Heading>

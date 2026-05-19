@@ -15,7 +15,7 @@ export function CheckoutSummary({ items, subTotal, lang }: Props) {
   const { t } = useTranslation();
 
   return (
-    <aside className="h-fit space-y-4 rounded-large border border-divider/60 bg-content1 p-4 lg:sticky lg:top-20">
+    <aside className="content-surface h-fit space-y-4 p-4 lg:sticky lg:top-20">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
         {t('checkout.summary.heading')}
       </h2>

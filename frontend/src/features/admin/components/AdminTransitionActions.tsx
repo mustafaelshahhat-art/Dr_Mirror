@@ -59,7 +59,7 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
   return (
     <section
       aria-labelledby="transition-heading"
-      className="space-y-3 rounded-large border border-divider/60 bg-content1 p-4"
+      className="content-surface space-y-3 p-4"
     >
       <Heading level={2} id="transition-heading" className="text-sm font-semibold text-foreground">
         {t('admin.transition.heading')}

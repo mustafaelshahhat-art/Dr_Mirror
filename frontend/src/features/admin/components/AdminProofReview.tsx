@@ -129,7 +129,7 @@ function ProofRow({
   const inFlight = approve.isPending || reject.isPending;
 
   return (
-    <div className="space-y-2 rounded-medium border border-divider/60 bg-content1 p-3">
+    <div className="content-surface space-y-2 p-3">
       <div className="flex gap-3">
         <PaymentProofFilePreview
           orderNumber={orderNumber}

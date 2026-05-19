@@ -43,7 +43,7 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
   }
 
   return (
-    <article className="rounded-large border border-divider/60 bg-content1 p-4 space-y-3">
+    <article className="content-surface p-4 space-y-3">
       <header className="flex items-center justify-between">
         <Heading level={2} className="text-sm font-semibold uppercase tracking-wide text-default-600">
           {t('admin.products.images.heading')}

@@ -64,7 +64,7 @@ export function ProductMasterForm({
   const error = (message?: string) => (message ? t(message) : null);
 
   return (
-    <article className="rounded-large border border-divider/60 bg-content1 p-4">
+    <article className="content-surface p-4">
       <header className="mb-3 flex flex-wrap items-center justify-between gap-2">
         {hideTitle ? <span aria-hidden /> : (
           <div>

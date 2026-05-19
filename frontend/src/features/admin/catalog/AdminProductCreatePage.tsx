@@ -42,7 +42,7 @@ export function AdminProductCreatePage() {
           <Skeleton className="h-7 w-1/3" />
           <Skeleton className="h-4 w-2/3" />
         </header>
-        <div className="space-y-4 rounded-large border border-divider/60 bg-content1 p-4">
+        <div className="content-surface space-y-4 p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="space-y-2">
@@ -64,10 +64,7 @@ export function AdminProductCreatePage() {
 
   return (
     <section className="space-y-8">
-      <Link
-        to="/admin/products"
-        className="inline-flex items-center gap-1.5 text-sm text-default-500 hover:text-foreground"
-      >
+      <Link to="/admin/products" className="back-link">
         <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
         {t('admin.products.create.back')}
       </Link>
@@ -98,7 +95,7 @@ export function AdminProductCreatePage() {
             // Toast emitted by mutation onError.
           }
         }}
-        className="space-y-4 rounded-large border border-divider/60 bg-content1 p-4"
+        className="content-surface space-y-4 p-4"
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label={t('admin.products.fields.nameAr')} value={nameAr} onChange={setNameAr} required maxLength={200} />

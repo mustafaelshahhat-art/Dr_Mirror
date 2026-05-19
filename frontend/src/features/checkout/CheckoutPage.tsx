@@ -217,10 +217,7 @@ function CheckoutBody() {
 
   return (
     <section className="space-y-8">
-      <Link
-        to="/cart"
-        className="inline-flex items-center gap-1.5 text-sm text-default-500 transition-colors hover:text-foreground"
-      >
+      <Link to="/cart" className="back-link">
         <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
         {t('checkout.backToCart')}
       </Link>

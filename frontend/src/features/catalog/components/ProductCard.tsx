@@ -38,7 +38,7 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
       aria-label={name}
       className="cq-card group block h-full rounded-large focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <Card className="flex h-full flex-col overflow-hidden border border-divider/50 transition-all duration-200 hover:border-brand/30 hover:shadow-medium dark:hover:shadow-none">
+      <Card className="flex h-full flex-col overflow-hidden border border-divider/60 transition-all duration-200 hover:border-brand/40 hover:shadow-medium dark:hover:shadow-none">
         {/* Image container */}
         <div className="relative aspect-[4/5] w-full overflow-hidden bg-surface-secondary">
           {product.primaryImageUrl ? (

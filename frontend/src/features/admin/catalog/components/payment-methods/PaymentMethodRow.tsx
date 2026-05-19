@@ -35,7 +35,7 @@ export function PaymentMethodRow({
   const { t } = useTranslation();
 
   return (
-    <div className="rounded-medium border border-divider/60 bg-content1 p-3">
+    <div className="content-surface p-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex flex-wrap items-center gap-2">

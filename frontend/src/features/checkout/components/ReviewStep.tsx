@@ -27,7 +27,7 @@ export function ReviewStep({ reviewAddress, selectedMethod, buyerNote, isAr }: P
       <legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
         {t('checkout.review.heading')}
       </legend>
-      <article className="rounded-medium border border-divider/60 bg-content1 p-3 text-sm">
+      <article className="content-surface p-3 text-sm">
         <h3 className="font-semibold">{t('checkout.review.shippingTo')}</h3>
         <p className="mt-1 leading-relaxed">
           {reviewAddress?.recipientName}
@@ -49,7 +49,7 @@ export function ReviewStep({ reviewAddress, selectedMethod, buyerNote, isAr }: P
           )}
         </p>
       </article>
-      <article className="rounded-medium border border-divider/60 bg-content1 p-3 text-sm">
+      <article className="content-surface p-3 text-sm">
         <h3 className="font-semibold">{t('checkout.review.payingWith')}</h3>
         <p className="mt-1">
           {selectedMethod
@@ -60,7 +60,7 @@ export function ReviewStep({ reviewAddress, selectedMethod, buyerNote, isAr }: P
         </p>
       </article>
       {buyerNote?.trim() ? (
-        <article className="rounded-medium border border-divider/60 bg-content1 p-3 text-sm italic text-default-700 dark:text-default-300">
+        <article className="content-surface p-3 text-sm italic text-default-700 dark:text-default-300">
           {t('checkout.review.buyerNoteQuoted', { note: buyerNote })}
         </article>
       ) : null}
