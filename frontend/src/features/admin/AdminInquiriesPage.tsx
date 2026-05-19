@@ -1,4 +1,4 @@
-import { Button, Card } from '@heroui/react';
+import { Button, Card, Chip } from '@heroui/react';
 import { Mail, MailOpen } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -270,12 +270,12 @@ function InquiryRow({
 
 function StatusBadge({ status }: { status: InquiryStatus }) {
   const { t } = useTranslation();
-  const classes =
+  const color: 'warning' | 'success' | 'default' =
     status === INQUIRY_STATUS.New
-      ? 'bg-warning/15 text-warning border-warning/30'
+      ? 'warning'
       : status === INQUIRY_STATUS.Responded
-        ? 'bg-success/15 text-success border-success/30'
-        : 'bg-content2 text-default-500 border-divider/60';
+        ? 'success'
+        : 'default';
 
   const label =
     status === INQUIRY_STATUS.New
@@ -285,13 +285,8 @@ function StatusBadge({ status }: { status: InquiryStatus }) {
         : t('inquiries.admin.status.read');
 
   return (
-    <span
-      className={[
-        'inline-flex items-center rounded-medium border px-2 py-0.5 text-xs font-medium leading-none',
-        classes,
-      ].join(' ')}
-    >
-      {label}
-    </span>
+    <Chip color={color} variant="soft" size="sm">
+      <Chip.Label>{label}</Chip.Label>
+    </Chip>
   );
 }

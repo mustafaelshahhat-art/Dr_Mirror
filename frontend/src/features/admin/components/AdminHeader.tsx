@@ -1,4 +1,4 @@
-import { Breadcrumbs, BreadcrumbsItem, Button, Tooltip } from '@heroui/react';
+import { Breadcrumbs, Button, Tooltip } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
@@ -39,7 +39,7 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
             className="text-sm font-semibold tracking-tight text-default-700 dark:text-default-300"
           >
             {titleKeys.map((key) => (
-              <BreadcrumbsItem key={key}>{t(key)}</BreadcrumbsItem>
+              <Breadcrumbs.Item key={key}>{t(key)}</Breadcrumbs.Item>
             ))}
           </Breadcrumbs>
         </div>

@@ -1,4 +1,4 @@
-import { Button, Drawer } from '@heroui/react';
+import { Badge, Button, Drawer } from '@heroui/react';
 import { ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,39 +18,45 @@ import { CartLineRow } from './CartLineRow';
 export function CartButton() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
-  const placement = i18n.dir(lang) === 'rtl' ? 'left' : 'right';
+  const isRtl = i18n.dir(lang) === 'rtl';
+  const placement = isRtl ? 'left' : 'right';
+  const badgePlacement = isRtl ? 'top-left' : 'top-right';
   const { cart, updateQuantity, removeItem } = useCart();
   const [isOpen, setIsOpen] = useState(false);
 
   const visibleItems = cart.items;
   const hasItems = visibleItems.length > 0;
+  const showCount = cart.totalQuantity > 0;
+  const countLabel = cart.totalQuantity > 99 ? '99+' : String(cart.totalQuantity);
+
+  const trigger = (
+    <Button
+      variant="ghost"
+      size="sm"
+      aria-label={t('cart.openLabel')}
+      isIconOnly
+      onPress={() => setIsOpen(true)}
+    >
+      <ShoppingBag className="size-5" aria-hidden />
+      <span className="sr-only">
+        {t('cart.countSr', { count: cart.totalQuantity })}
+      </span>
+    </Button>
+  );
 
   return (
     <>
       {/* Drawer.Trigger renders its own <button>, so we drive open state
           manually to avoid the invalid nested-<button> markup it would create
           around our Button component. */}
-      <Button
-        variant="ghost"
-        size="sm"
-        aria-label={t('cart.openLabel')}
-        className="relative"
-        isIconOnly
-        onPress={() => setIsOpen(true)}
-      >
-        <ShoppingBag className="size-5" aria-hidden />
-        {cart.totalQuantity > 0 ? (
-          <span
-            className="absolute -end-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold leading-none text-primary-foreground"
-            aria-hidden
-          >
-            {cart.totalQuantity > 99 ? '99+' : cart.totalQuantity}
-          </span>
-        ) : null}
-        <span className="sr-only">
-          {t('cart.countSr', { count: cart.totalQuantity })}
-        </span>
-      </Button>
+      {showCount ? (
+        <Badge color="accent" placement={badgePlacement} size="sm">
+          <Badge.Anchor>{trigger}</Badge.Anchor>
+          <Badge.Label aria-hidden>{countLabel}</Badge.Label>
+        </Badge>
+      ) : (
+        trigger
+      )}
 
       <Drawer isOpen={isOpen} onOpenChange={setIsOpen}>
 

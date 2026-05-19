@@ -1,4 +1,4 @@
-import { Accordion, Button, Input, Label, TextField } from '@heroui/react';
+import { Accordion, Button, Chip, Input, Label, TextField } from '@heroui/react';
 import type { KeyboardEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { SlidersHorizontal, X } from 'lucide-react';
@@ -97,9 +97,9 @@ export function FilterPanel({
             <SlidersHorizontal className="size-3.5" aria-hidden />
             {open ? t('catalog.filters.hide') : t('catalog.filters.label')}
             {activeCount > 0 && !open ? (
-              <span className="ms-0.5 inline-flex size-4 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground leading-none">
-                {activeCount}
-              </span>
+              <Chip color="accent" variant="primary" size="sm">
+                <Chip.Label>{activeCount}</Chip.Label>
+              </Chip>
             ) : null}
           </span>
         </Button>
