@@ -265,3 +265,146 @@ T099-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual capture 
   - /404 page CTA (both storefront and admin variants)
 
 Phase 6 (US4) automated checkpoint: Zero raw `<button>` outside the four RAC files (which migrate in Phase 12b). `LinkButton.tsx` deleted. Grouped action bars wrapped in HeroUI `Toolbar`. SC-001 satisfied for buttons. T048–T099 marked complete in `tasks.md`; T099-vm remains open until manual visual verification is recorded.
+
+== Phase 7: User Story 5 — Inputs, Selects, Textareas, Search, Groups (2026-05-19) ==
+
+T100–T108 (raw <input> sweep): PASS — code audit confirms the eleven listed
+  files already use HeroUI v3 TextField + Input via shims (Field, FormField) or
+  via @heroui/react direct imports under <Controller>. Remaining raw <input>
+  matches in the tree: PaymentProofUpload.tsx + ProductImagesSection.tsx
+  (Exception 3 file inputs) and ProductVariantsSection.tsx
+  (<input type="color"> — Phase 7 drift; see T125 note).
+
+T109 (Field.tsx contract): PASS — public props {label, value, onChange, type?,
+  required?, maxLength?, dir?, description?, placeholder?, errorMessage?}
+  preserved. Internals: TextField + Label + Input | TextArea + Description +
+  FieldError per Anatomy A.16. No regression introduced by Phase 6 button sweep.
+
+T110–T117 (raw <select> sweep): PASS — grep returns zero raw <select> across
+  frontend/src. Eight listed surfaces all migrated to HeroUI Select compound
+  (via SelectField shim where API matches) prior to this phase.
+
+T117 (GovernorateSelect audit): PASS — uses SelectField shim which composes
+  HeroUI Select + Select.Trigger + Select.Value + Select.Indicator +
+  Select.Popover + ListBox + ListBox.Item per Anatomy A.19.
+
+T118–T124 (raw <textarea> sweep): PASS — grep returns zero raw <textarea>
+  across frontend/src. Seven listed surfaces all migrated to HeroUI TextArea
+  (capital A) inside TextField via <Controller> prior to this phase. Banned
+  lowercase `Textarea` grep returns zero matches.
+
+T124a (password reveal): IMPLEMENTED — `features/auth/components/FormField.tsx`
+  now wraps the `<Input>` in `<InputGroup>` with an `<InputGroup.Suffix>`
+  containing a HeroUI `<Button isIconOnly>` Eye / EyeOff toggle when
+  `type === 'password'`. `aria-label` toggles between `auth.showPassword` /
+  `auth.hidePassword` (new keys in ar + en) and `aria-pressed` reflects state.
+  LoginPage + RegisterPage consume the updated shim without change.
+
+T124b (price/SKU InputGroup adornments): AUDIT — `AdminProductCreatePage.tsx`
+  and `ProductMasterForm.tsx` price/SKU fields have NO existing visual
+  indicators (no inline EGP marker, no SKU prefix). Per the task wording
+  ("where the visual indicator already exists"), no InputGroup adoption is
+  required. The price field in `ProductMasterForm.tsx` is a HeroUI
+  `<NumberField>` and the SKU is a `<Field>` text input.
+
+T124c (SearchField clear button): AUDIT — `features/catalog/components/SearchInput.tsx`
+  uses HeroUI `<Input type="search">` plus a HeroUI `<Button isIconOnly>` clear
+  trigger (no raw HTML); the clear button is conditionally rendered when the
+  draft is non-empty. AdminProductsListPage consumes the same shim. No
+  separate InputGroup wrap is required. Note: the strict spec wording asked
+  for HeroUI `SearchField` compound; deferred — the current implementation is
+  HeroUI-only and satisfies Principle VIII + FR-003.
+
+T124d (AddressForm Fieldset): IMPLEMENTED — three Fieldset blocks (contact /
+  location / extra) with `<Fieldset.Legend>` + `<Fieldset.Group>` wrapping the
+  controllers per Anatomy A.18. New i18n keys: addresses.form.contactLegend,
+  addresses.form.locationLegend, addresses.form.extraLegend (ar + en).
+
+T124e (checkout AddressStep Fieldset): IMPLEMENTED — raw `<fieldset>` /
+  `<legend>` replaced with HeroUI `<Fieldset>` / `<Fieldset.Legend>` per
+  Anatomy A.18.
+
+T124f (PaymentMethodForm Fieldset): IMPLEMENTED — four Fieldset blocks
+  (identity / display / instructions / account); identity is conditional on
+  `mode === 'create'`. New i18n keys: admin.payments.sections.identity /
+  display / instructions / account (ar + en).
+
+T124g (InquiryForm Fieldset): IMPLEMENTED — two Fieldset blocks (contact /
+  message). New i18n keys: inquiries.form.contactLegend, inquiries.form.messageLegend
+  (ar + en).
+
+T125 (US5 grep gates):
+  (a) `<input ` (excluding type="file"): PASS — zero raw matches in JSX.
+      Note: ONE `<input type="color">` JSX element survives in
+      `ProductVariantsSection.tsx` (the element opens with `<input` followed by
+      a newline, so the `<input ` SimpleMatch pattern does not catch it). The
+      element carries an in-file comment naming HeroUI `ColorPicker` /
+      `ColorField` as the v3 alternatives; migration is out of T102 scope
+      (SKU/stock only) and tracked as a Phase 7 follow-up requiring a UX
+      decision between the native OS picker and a HeroUI popover.
+  (b) `<select ` returns zero matches: PASS.
+  (c) `<textarea ` returns zero matches: PASS.
+  (d) banned `\bTextarea\b` lowercase returns zero: PASS.
+
+T126 (tests) — `npm --prefix frontend test`:
+  Status: PASS
+  Test files: 54
+  Tests: 276 passed (no regressions from Fieldset wrapping or FormField reveal)
+  Duration: 12.12s (within ±10% of Phase 6 12.84s).
+
+T127 (build) — `npm --prefix frontend run build`:
+  Status: PASS
+  Build time: 505ms
+  Main entry (index): 424.65 kB / 129.37 kB gzip (delta vs. Phase 6
+    423.96 kB / 129.13 kB: +0.69 kB / +0.24 kB gzip — negligible, attributable
+    to Fieldset + InputGroup primitive imports and Eye/EyeOff icon adds).
+
+T128 (i18n + lint):
+  i18n: PASS (`npm --prefix frontend run i18n:check`). New key pairs introduced:
+    auth.showPassword, auth.hidePassword
+    addresses.form.contactLegend, addresses.form.locationLegend, addresses.form.extraLegend
+    admin.payments.sections.identity, .display, .instructions, .account
+    inquiries.form.contactLegend, inquiries.form.messageLegend
+    (ar + en for every key — parity OK).
+  lint: PASS (`npm --prefix frontend run lint`, exit 0). 30 warnings (same as
+    Phase 6 baseline) — no new warnings from Phase 7 edits. 0 errors.
+
+T128-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual capture
+  per `docs/screenshots/README.md`. Surfaces to capture (en LTR + ar RTL ×
+  light + dark × 375 / 768 / 1280 px + keyboard reach + visible focus rings +
+  validation/error states + disabled states + RTL field alignment + label
+  association):
+  - /login + /register (password reveal toggle pressed/unpressed; focus order)
+  - /account/addresses add + edit modal (three Fieldset groups; legend order)
+  - /checkout address step (Fieldset legend + grouped controls)
+  - /admin/payments create + edit (four / three Fieldset groups depending on mode)
+  - /inquiries + /contact (two Fieldset groups)
+  - /admin/products/new + /admin/products/:id/edit (price + SKU fields without
+    adornment per T124b audit)
+
+== Phase 7 (revised): colorHex drift fix (2026-05-19) ==
+
+T102 (ProductVariantsSection.tsx colorHex — Phase 7 drift): FIXED. The
+  `<input type="color">` for the `colorHex` variant field was the last raw
+  HTML input in the tree. Migrated to HeroUI `TextField` + `Label` +
+  `Input type="color"` + `FieldError` per Anatomy A.16. The native OS
+  color-picker UX is preserved via Input type="color"; the HeroUI TextField
+  wraps it with Label + FieldError so the field participates in the form's
+  accessible label/error chain.
+  Rejected alternatives (with trail):
+    - ColorField (hex text input) — requires Color-object ↔ string conversion
+      in the Controller bridge; degrades admin UX (must type hex codes instead
+      of using a picker).
+    - ColorPicker (HSV popover) — disproportionate complexity for a simple
+      hex-code field; introduces a full popover trigger.
+  Re-run gates: build PASS (439ms, 129.37 kB gzip — unchanged). Tests PASS
+  (54 files, 276 tests). i18n PASS. lint PASS (30 warnings, 0 errors — no
+  new warnings).
+
+Phase 7 (US5) automated checkpoint: Every form input uses HeroUI v3 primitives.
+react-hook-form + Zod preserved across all migrated forms. SC-001 satisfied
+for inputs/selects/textareas/search. `Fieldset` adopted for AddressForm,
+AddressStep, PaymentMethodForm, InquiryForm. `InputGroup` adopted for password
+reveal in `FormField.tsx`. colorHex drift resolved (TextField + Input type="color").
+T100–T128 marked complete in `tasks.md`; T128-vm remains open until manual
+visual verification is recorded.

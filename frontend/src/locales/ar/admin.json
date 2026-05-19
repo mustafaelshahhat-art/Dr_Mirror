@@ -327,6 +327,12 @@
       "accountHolder": "صاحب الحساب",
       "displayOrder": "الترتيب"
     },
+    "sections": {
+      "identity": "بيانات أساسية",
+      "display": "العرض",
+      "instructions": "تعليمات للمشتري",
+      "account": "تفاصيل الحساب"
+    },
     "errors": {
       "unknown": "حدث خطأ ما. حاول مرة أخرى."
     },

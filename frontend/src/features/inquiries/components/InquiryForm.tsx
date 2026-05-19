@@ -1,4 +1,4 @@
-import { Button, Form, Input, Label, TextArea, TextField } from '@heroui/react';
+import { Button, Fieldset, Form, Input, Label, TextArea, TextField } from '@heroui/react';
 import { Check, Send } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -91,59 +91,71 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
         <p className="text-xs text-default-500">{t('inquiries.form.subtitle')}</p>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field
-          label={t('inquiries.form.fullName')}
-          value={form.fullName}
-          // eslint-disable-next-line i18next/no-literal-string
-          onChange={(v) => update('fullName', v)}
-          required
-          maxLength={100}
-          autoComplete="name"
-        />
-        <Field
-          label={t('inquiries.form.email')}
-          type="email"
-          value={form.email}
-          // eslint-disable-next-line i18next/no-literal-string
-          onChange={(v) => update('email', v)}
-          required
-          maxLength={200}
-          autoComplete="email"
-          dir="ltr"
-        />
-        <Field
-          label={t('inquiries.form.phone')}
-          type="tel"
-          value={form.phone}
-          // eslint-disable-next-line i18next/no-literal-string
-          onChange={(v) => update('phone', v)}
-          maxLength={30}
-          autoComplete="tel"
-          dir="ltr"
-        />
-        <Field
-          label={t('inquiries.form.subject')}
-          value={form.subject}
-          // eslint-disable-next-line i18next/no-literal-string
-          onChange={(v) => update('subject', v)}
-          required
-          maxLength={200}
-        />
-      </div>
+      <Fieldset>
+        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+          {t('inquiries.form.contactLegend')}
+        </Fieldset.Legend>
+        <Fieldset.Group className="grid gap-3 sm:grid-cols-2">
+          <Field
+            label={t('inquiries.form.fullName')}
+            value={form.fullName}
+            // eslint-disable-next-line i18next/no-literal-string
+            onChange={(v) => update('fullName', v)}
+            required
+            maxLength={100}
+            autoComplete="name"
+          />
+          <Field
+            label={t('inquiries.form.email')}
+            type="email"
+            value={form.email}
+            // eslint-disable-next-line i18next/no-literal-string
+            onChange={(v) => update('email', v)}
+            required
+            maxLength={200}
+            autoComplete="email"
+            dir="ltr"
+          />
+          <Field
+            label={t('inquiries.form.phone')}
+            type="tel"
+            value={form.phone}
+            // eslint-disable-next-line i18next/no-literal-string
+            onChange={(v) => update('phone', v)}
+            maxLength={30}
+            autoComplete="tel"
+            dir="ltr"
+          />
+          <Field
+            label={t('inquiries.form.subject')}
+            value={form.subject}
+            // eslint-disable-next-line i18next/no-literal-string
+            onChange={(v) => update('subject', v)}
+            required
+            maxLength={200}
+          />
+        </Fieldset.Group>
+      </Fieldset>
 
-      <TextField isRequired className="flex flex-col gap-1">
-        <Label className="text-xs font-medium text-default-700 dark:text-default-300">
-          {t('inquiries.form.message')}
-        </Label>
-        <TextArea
-          rows={4}
-          maxLength={2000}
-          value={form.message}
-          // eslint-disable-next-line i18next/no-literal-string
-          onChange={(e) => update('message', (e.target as HTMLTextAreaElement).value)}
-        />
-      </TextField>
+      <Fieldset>
+        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+          {t('inquiries.form.messageLegend')}
+        </Fieldset.Legend>
+        <Fieldset.Group>
+          <TextField isRequired className="flex flex-col gap-1">
+            <Label className="text-xs font-medium text-default-700 dark:text-default-300">
+              {t('inquiries.form.message')}
+            </Label>
+            <TextArea
+              rows={4}
+              maxLength={2000}
+              value={form.message}
+              // eslint-disable-next-line i18next/no-literal-string
+              onChange={(e) => update('message', (e.target as HTMLTextAreaElement).value)}
+            />
+          </TextField>
+        </Fieldset.Group>
+      </Fieldset>
 
       <Button
         type="submit"

@@ -1,4 +1,4 @@
-import { Button, Checkbox, Description, FieldError, Form, Input, Label, TextField } from '@heroui/react';
+import { Button, Checkbox, Description, FieldError, Fieldset, Form, Input, Label, TextField } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -105,38 +105,59 @@ export function AddressForm({
       onSubmit={submit}
       className="cq space-y-4 rounded-large border border-divider/60 bg-content1 p-4"
     >
-      <div className="grid gap-3 @lg:grid-cols-2">
-        <Controller name="label" control={control} render={({ field }) => (
-          <Field {...field} label={t('addresses.fields.label')} required maxLength={64} description={t('addresses.fields.labelHint')} errorMessage={error(errors.label?.message)} />
-        )} />
-        <Controller name="recipientName" control={control} render={({ field }) => (
-          <Field {...field} label={t('addresses.fields.recipientName')} required maxLength={100} errorMessage={error(errors.recipientName?.message)} />
-        )} />
-        <Controller name="phone" control={control} render={({ field }) => (
-          <Field {...field} label={t('addresses.fields.phone')} required dir="ltr" description={t('addresses.fields.phoneHint')} errorMessage={error(errors.phone?.message)} />
-        )} />
-        <Controller name="governorate" control={control} render={({ field }) => (
-          <GovernorateSelect label={t('addresses.fields.governorate')} value={field.value} onChange={field.onChange} required errorMessage={error(errors.governorate?.message)} />
-        )} />
-        <Controller name="city" control={control} render={({ field }) => (
-          <Field {...field} label={t('addresses.fields.city')} required maxLength={100} errorMessage={error(errors.city?.message)} />
-        )} />
-        <Controller name="streetAddress" control={control} render={({ field }) => (
-          <Field {...field} label={t('addresses.fields.streetAddress')} required maxLength={200} errorMessage={error(errors.streetAddress?.message)} />
-        )} />
-        <Controller name="floor" control={control} render={({ field }) => (
-          <Field {...field} label={t('addresses.fields.floor')} maxLength={50} errorMessage={error(errors.floor?.message)} />
-        )} />
-        <Controller name="apartment" control={control} render={({ field }) => (
-          <Field {...field} label={t('addresses.fields.apartment')} maxLength={50} errorMessage={error(errors.apartment?.message)} />
-        )} />
-        <Controller name="landmark" control={control} render={({ field }) => (
-          <Field {...field} label={t('addresses.fields.landmark')} maxLength={200} errorMessage={error(errors.landmark?.message)} />
-        )} />
-        <Controller name="notes" control={control} render={({ field }) => (
-          <Field {...field} label={t('addresses.fields.notes')} maxLength={500} errorMessage={error(errors.notes?.message)} />
-        )} />
-      </div>
+      <Fieldset>
+        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+          {t('addresses.form.contactLegend')}
+        </Fieldset.Legend>
+        <Fieldset.Group className="grid gap-3 @lg:grid-cols-2">
+          <Controller name="label" control={control} render={({ field }) => (
+            <Field {...field} label={t('addresses.fields.label')} required maxLength={64} description={t('addresses.fields.labelHint')} errorMessage={error(errors.label?.message)} />
+          )} />
+          <Controller name="recipientName" control={control} render={({ field }) => (
+            <Field {...field} label={t('addresses.fields.recipientName')} required maxLength={100} errorMessage={error(errors.recipientName?.message)} />
+          )} />
+          <Controller name="phone" control={control} render={({ field }) => (
+            <Field {...field} label={t('addresses.fields.phone')} required dir="ltr" description={t('addresses.fields.phoneHint')} errorMessage={error(errors.phone?.message)} />
+          )} />
+        </Fieldset.Group>
+      </Fieldset>
+
+      <Fieldset>
+        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+          {t('addresses.form.locationLegend')}
+        </Fieldset.Legend>
+        <Fieldset.Group className="grid gap-3 @lg:grid-cols-2">
+          <Controller name="governorate" control={control} render={({ field }) => (
+            <GovernorateSelect label={t('addresses.fields.governorate')} value={field.value} onChange={field.onChange} required errorMessage={error(errors.governorate?.message)} />
+          )} />
+          <Controller name="city" control={control} render={({ field }) => (
+            <Field {...field} label={t('addresses.fields.city')} required maxLength={100} errorMessage={error(errors.city?.message)} />
+          )} />
+          <Controller name="streetAddress" control={control} render={({ field }) => (
+            <Field {...field} label={t('addresses.fields.streetAddress')} required maxLength={200} errorMessage={error(errors.streetAddress?.message)} />
+          )} />
+          <Controller name="floor" control={control} render={({ field }) => (
+            <Field {...field} label={t('addresses.fields.floor')} maxLength={50} errorMessage={error(errors.floor?.message)} />
+          )} />
+          <Controller name="apartment" control={control} render={({ field }) => (
+            <Field {...field} label={t('addresses.fields.apartment')} maxLength={50} errorMessage={error(errors.apartment?.message)} />
+          )} />
+        </Fieldset.Group>
+      </Fieldset>
+
+      <Fieldset>
+        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+          {t('addresses.form.extraLegend')}
+        </Fieldset.Legend>
+        <Fieldset.Group className="grid gap-3 @lg:grid-cols-2">
+          <Controller name="landmark" control={control} render={({ field }) => (
+            <Field {...field} label={t('addresses.fields.landmark')} maxLength={200} errorMessage={error(errors.landmark?.message)} />
+          )} />
+          <Controller name="notes" control={control} render={({ field }) => (
+            <Field {...field} label={t('addresses.fields.notes')} maxLength={500} errorMessage={error(errors.notes?.message)} />
+          )} />
+        </Fieldset.Group>
+      </Fieldset>
 
       <Controller name="setDefault" control={control} render={({ field }) => (
         <Checkbox

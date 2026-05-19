@@ -1,4 +1,4 @@
-import { Checkbox, Input, Label, Radio, RadioGroup, TextField } from '@heroui/react';
+import { Checkbox, Fieldset, Input, Label, Radio, RadioGroup, TextField } from '@heroui/react';
 import { Plus } from 'lucide-react';
 import type { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -38,10 +38,10 @@ export function AddressStep({
   const { t } = useTranslation();
 
   return (
-    <fieldset className="space-y-4">
-      <legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
+    <Fieldset className="space-y-4">
+      <Fieldset.Legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
         {t('checkout.address.heading')}
-      </legend>
+      </Fieldset.Legend>
 
       {savedAddresses.length > 0 ? (
         <div className="space-y-2">
@@ -210,6 +210,6 @@ export function AddressStep({
           ) : null}
         </>
       ) : null}
-    </fieldset>
+    </Fieldset>
   );
 }

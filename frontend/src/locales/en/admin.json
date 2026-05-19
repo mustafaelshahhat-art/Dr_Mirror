@@ -295,6 +295,12 @@
       "accountHolder": "Account holder",
       "displayOrder": "Order"
     },
+    "sections": {
+      "identity": "Identity",
+      "display": "Display",
+      "instructions": "Buyer instructions",
+      "account": "Account details"
+    },
     "errors": {
       "unknown": "Something went wrong. Please try again."
     },

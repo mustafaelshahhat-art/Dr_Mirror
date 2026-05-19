@@ -8,6 +8,11 @@
   "apartmentShort": "apt.",
   "floorShort": "fl.",
   "landmark": "Landmark",
+  "form": {
+    "contactLegend": "Contact",
+    "locationLegend": "Location",
+    "extraLegend": "Delivery details"
+  },
   "actions": {
     "add": "Add address",
     "create": "Save address",
