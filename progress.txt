@@ -408,3 +408,98 @@ AddressStep, PaymentMethodForm, InquiryForm. `InputGroup` adopted for password
 reveal in `FormField.tsx`. colorHex drift resolved (TextField + Input type="color").
 T100–T128 marked complete in `tasks.md`; T128-vm remains open until manual
 visual verification is recorded.
+
+== Phase 8: User Story 6 — Separators (2026-05-20) ==
+
+T129 (Header.tsx): PASS. Raw `<hr className="my-3 border-divider/60">` inside
+  `Drawer.Body` replaced with `<Separator orientation="horizontal"
+  className="my-3" />` per Anatomy A.21. `Separator` added to import from
+  `@heroui/react`.
+
+T130 (CartButton.tsx): AUDIT PASS — no migration. `border-b border-divider/60`
+  on `Drawer.Header` and `border-t border-divider/60` on `Drawer.Footer` are
+  structural container chrome outlines, not standalone separator lines.
+
+T131 (CheckoutPage.tsx): AUDIT PASS — no migration. No standalone
+  `border-t`/`border-b` separators found. The only border is on a form-error
+  alert `<div role="alert">` (full `border` for container outline, out of scope).
+
+T132 (OrderDetailPage.tsx + AdminOrderDetailPage.tsx): PASS. Three instances
+  in `OrderDetailPage.tsx` and two in `AdminOrderDetailPage.tsx` of
+  `border-t border-divider/60` used as purely-visual separator lines were
+  replaced with `<Separator />` per Anatomy A.21. Implementation detail:
+  `<Separator>` (renders as `<hr role="separator">`) cannot be a direct child
+  of `<dl>` per HTML spec (confirmed by axe regression). The total row was
+  extracted from the `<dl>` and its `<dt>`/`<dd>` changed to `<span>` elements,
+  then `<Separator>` inserted between `<dl>` and the total row. Section
+  separators (payment-method, timeline) were already outside `<dl>` and
+  migrated cleanly. `Separator` added to import in both files.
+
+T133 (AdminSidebar.tsx): AUDIT PASS — no migration. `border-e` on the desktop
+  sidebar wrapper and `border-b` on `Drawer.Header` are structural container
+  outlines. No standalone section separators found.
+
+T134 (US6 grep gates):
+  (a) `<hr ` across `frontend/src/**/*.tsx` — 0 matches. PASS.
+  (b) `\bDivider\b` across `frontend/src/**/*.{tsx,ts}` — 0 matches. PASS.
+
+T135 (build + tests + i18n + lint):
+  build: PASS (499ms, 425.87 kB / 129.72 kB gzip; delta vs. Phase 7 baseline
+    424.65 kB / 129.37 kB: +1.22 kB / +0.35 kB gzip — negligible, within ±5%).
+  tests: PASS — 276/276 (no regressions; axe failure from Separator-inside-dl
+    found and fixed in same session before commit).
+  i18n: PASS (exit 0). No new keys introduced.
+  lint: PASS (exit 0). 31 warnings (up from 30 in Phase 7) — one new
+    `i18next/no-literal-string` false-positive on `orientation="horizontal"`
+    (HeroUI prop literal, not user-facing copy; same family as pre-existing
+    warnings). 0 errors.
+
+T135-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual capture
+  per `docs/screenshots/README.md`. Surfaces to verify (en LTR + ar RTL ×
+  light + dark × 375/768/1280 px + keyboard reach + visible focus):
+  - /account/orders/:orderNumber (summary card Separator + payment-method
+    section Separator + timeline section Separator)
+  - /admin/orders/:orderNumber (summary card Separator + payment-method section
+    Separator)
+  - Storefront header (mobile drawer Separator between nav links and utility row)
+
+Phase 8 (US6) automated checkpoint: Zero `<hr>` in frontend/src. Banned v2
+name `Divider` absent from implementation. All purely-visual separator lines
+in modified files replaced with HeroUI `<Separator>` per Anatomy A.21.
+T129–T135 marked complete in `tasks.md`; T135-vm remains open until manual
+visual verification is recorded.
+
+== Phase 8 review fix (2026-05-19) ==
+
+Post-commit review found three additional files with purely-visual
+`border-t border-divider/60` separator patterns matching the ones already
+migrated in T132 (OrderDetailPage / AdminOrderDetailPage), but omitted from
+the initial Phase 8 scope:
+
+  CartPage.tsx (line 154): `<div className="border-t border-divider/60 pt-3">`
+    wrapping the estimated-total row — same pattern as the total rows in
+    OrderDetailPage and AdminOrderDetailPage. Fixed: `<Separator />` inserted
+    before the div; `border-t border-divider/60` removed from div className.
+    `Separator` added to import.
+
+  CheckoutSummary.tsx (lines 37, 46): two `border-t border-divider/60`
+    occurrences — (1) on the `<dl>` separating the items list from the
+    subtotal/shipping rows; (2) on a total-row `<div>` inside the `<dl>`.
+    Fixed using the same extraction technique as T132: (1) `<Separator />`
+    inserted before `<dl>`, `border-t` removed from `<dl>`; (2) total row
+    extracted from `<dl>` (dt/dd → span/span), `<Separator />` inserted before
+    it, `border-t` removed. `Separator` added to import.
+
+  Skeleton.tsx CheckoutSummarySkeleton (lines 189, 198): skeleton mirrors the
+    old `border-t` layout; updated to mirror the new CheckoutSummary structure
+    (`<Separator />` at both split points; subtotal/shipping rows in a plain
+    `<div className="space-y-2 pt-3">`; total row extracted as a sibling).
+    `Separator` added to import.
+
+Re-run gates after fixes:
+  build: PASS (444ms, 424.98 kB / 129.49 kB gzip — within ±5% of Phase 8
+    baseline 129.72 kB; slight decrease because Separator is now tree-shaken
+    from the shared HeroUI bundle more efficiently).
+  tests: PASS — 276/276. No regressions.
+  i18n: PASS (exit 0). No new keys introduced.
+  lint: PASS (exit 0). 31 warnings (unchanged). 0 errors.

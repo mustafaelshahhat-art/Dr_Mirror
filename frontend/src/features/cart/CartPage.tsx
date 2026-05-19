@@ -1,4 +1,4 @@
-import { Button, Card } from '@heroui/react';
+import { Button, Card, Separator } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
@@ -151,7 +151,9 @@ export function CartPage() {
                   <dd>{t('cart.calculatedAtCheckout')}</dd>
                 </div>
               </dl>
-              <div className="border-t border-divider/60 pt-3">
+              {/* Separator per Anatomy A.21; maps border-t border-divider purely-visual separator */}
+              <Separator />
+              <div className="pt-3">
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm text-default-500">{t('cart.estimatedTotal')}</span>
                   <span className="text-lg font-semibold tabular-nums text-foreground">

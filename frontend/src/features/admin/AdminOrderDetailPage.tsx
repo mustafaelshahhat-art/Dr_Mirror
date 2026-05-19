@@ -1,4 +1,4 @@
-import { Card, Tabs } from '@heroui/react';
+import { Card, Separator, Tabs } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, ImageOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -345,12 +345,16 @@ export function AdminOrderDetailPage() {
                     : t('admin.detail.freeShipping')}
                 </dd>
               </div>
-              <div className="flex justify-between border-t border-divider/60 pt-2 text-base font-semibold">
-                <dt>{t('admin.detail.total')}</dt>
-                <dd className="tabular-nums">{formatCurrency(order.total, lang)}</dd>
-              </div>
             </dl>
-            <div className="border-t border-divider/60 pt-3">
+            {/* Separator per Anatomy A.21; maps border-t border-divider purely-visual separator */}
+            <Separator />
+            <div className="flex justify-between pt-2 text-base font-semibold">
+              <span>{t('admin.detail.total')}</span>
+              <span className="tabular-nums">{formatCurrency(order.total, lang)}</span>
+            </div>
+            {/* Separator per Anatomy A.21 */}
+            <Separator />
+            <div className="pt-3">
               <h3 className="text-xs uppercase tracking-wide text-default-500">
                 {t('admin.detail.paymentMethod')}
               </h3>

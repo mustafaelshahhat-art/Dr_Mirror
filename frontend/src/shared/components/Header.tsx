@@ -1,4 +1,4 @@
-import { Button, Drawer } from '@heroui/react';
+import { Button, Drawer, Separator } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { LogOut, Menu, User as UserIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -135,7 +135,8 @@ export function Header() {
                   ) : null}
                 </nav>
 
-                <hr className="my-3 border-divider/60" />
+                {/* Separator per Anatomy A.21; maps <hr class="border-divider"> → HeroUI Separator */}
+                <Separator orientation="horizontal" className="my-3" />
 
                 <div className="space-y-2 px-1">
                   <div className="flex items-center justify-between gap-3">
