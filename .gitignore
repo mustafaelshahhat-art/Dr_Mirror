@@ -53,6 +53,11 @@ appsettings.*.Local.json
 appsettings.Local.json
 backend/src/DrMirror.Api/appsettings.json
 backend/src/DrMirror.Api/appsettings.Development.json
+# Ensure no secrets reach the repository
+**/appsettings.json
+**/appsettings.Development.json
+**/appsettings.*.json
+!**/appsettings.Example.json
 
 # --- Internal Documentation & AI Specs ---
 # These are kept locally for reference but excluded from the repository
@@ -72,6 +77,22 @@ progress.txt
 .windsurf/
 __pycache__/
 *.pyc
+
+# --- Global Development Artifacts ---
+.python-version
+.node-version
+.nvmrc
+.eslintcache
+.stylelintcache
+.npm/
+.yarn/
+!.yarn/releases/
+!.yarn/plugins/
+!.yarn/sdks/
+!.yarn/versions/
+.pnp.*
+.vscode/*.log
+*.tsbuildinfo
 
 # --- Media & Uploads ---
 tmp/
