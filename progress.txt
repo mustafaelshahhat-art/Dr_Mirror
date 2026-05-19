@@ -113,3 +113,41 @@ T029-vm (SC-009 Visual Verification Matrix): DEFERRED to PR-author manual captur
 
 Phase 3 (US1) checkpoint: All in-scope card surfaces inherit theme tokens via HeroUI v3 dot-notation `Card` compound. SC-002 satisfied for in-scope files. Banned v2 card names (`CardBody`/`CardHeader`/`CardFooter` named exports, `isPressable` prop) absent in modified files.
 
+== Phase 4: User Story 2 — Tables (2026-05-19) ==
+
+T030 (AdminOrdersListPage.tsx): PASS. Raw tables migrated to HeroUI `Table` compound (`Table` + `Table.ScrollContainer` + `Table.Content` + `Table.Header` / `Table.Column` + `Table.Body` / `Table.Row` / `Table.Cell`) per Anatomy A.2. `aria-label` and `aria-busy` retained. `onRowAction` preserves keyboard activation for the order-detail route while the visible order-number link remains.
+
+T031 (AdminUsersPage.tsx): PASS. Raw loading and populated tables migrated to HeroUI `Table` compound per Anatomy A.2. Responsive `hidden sm:table-cell` visibility moved to `Table.Column` and matching `Table.Cell`.
+
+T032 (AdminProductsListPage.tsx): PASS. Raw product tables migrated to HeroUI `Table` compound per Anatomy A.2. Responsive category/gender/stock columns preserved. Existing row edit action retained for US4 `LinkButton` migration.
+
+T033 (AuditLogPage.tsx): PASS. Raw audit-log tables migrated to HeroUI `Table` compound per Anatomy A.2. Existing HeroUI filter row preserved unchanged.
+
+T034 (TableRowSkeleton): PASS. Exact path is `frontend/src/shared/components/TableRowSkeleton.tsx`. Added table-only `TableRowSkeleton` and hidden `TableSkeletonHeader` helpers so React Aria receives matching column metadata during loading. Skeleton cells use self-closing HeroUI `Skeleton` with `animationType="shimmer"` inside `Table.Row` > `Table.Cell` per Anatomy A.20. The helper is split from generic `Skeleton.tsx` so non-table skeleton users do not pull in the Table bundle.
+
+T035 grep gates:
+  (a) `<table ` across `frontend/src/**/*.tsx` — 0 matches.
+  (b) `\b(TableHeader|TableColumn|TableBody|TableRow|TableCell)\b` across `frontend/src/**/*.tsx` — 0 matches.
+
+T036 (build) — `npm --prefix frontend run build`:
+  Status: PASS
+  Build time: 706ms (vs 571ms baseline; +135ms)
+  Main entry (index): 423.27 kB / 128.93 kB gzip (vs 123.79 kB baseline; +5.14 kB / +4.15%, within ±5% tolerance)
+  Top async chunks (gzip):
+    AuditLogPage: 47.32 kB (vs 47.39 kB baseline; -0.07 kB)
+    TableRowSkeleton: 30.26 kB (new table-only async chunk from HeroUI Table / React Aria Table)
+    schemas: 28.40 kB (unchanged)
+
+T037 (tests) — `npm --prefix frontend test`:
+  Status: PASS
+  Test files: 54
+  Tests: 276 passed
+  Duration: 15.19s (vs 18.02s baseline; faster — likely import-cache hit)
+
+T038 (i18n + lint):
+  i18n: PASS (`npm --prefix frontend run i18n:check`). No new keys introduced in this batch ("None").
+  lint: PASS (`npm --prefix frontend run lint`, exit 0). 26 warnings (unchanged from baseline; same i18next/no-literal-string warnings on non-user-facing props). 0 new warnings introduced.
+
+T038-vm (SC-009 Visual Verification Matrix): PENDING / PR-author manual capture per `docs/screenshots/README.md` (no Playwright in repo). Surfaces to capture: `/admin/orders`, `/admin/users`, `/admin/products`, `/admin/audit` in en LTR + ar RTL x light + dark x 375 / 768 / 1280 px, including idle/loading/error/empty states, keyboard reach, visible focus rings, no horizontal overflow, and mirror parity.
+
+Phase 4 (US2) automated checkpoint: Zero raw `<table>` in `frontend/src`. HeroUI v3 dot-notation table compound used throughout modified admin table pages. T030-T038 marked complete in `tasks.md`; T038-vm remains open until manual visual verification is recorded.
