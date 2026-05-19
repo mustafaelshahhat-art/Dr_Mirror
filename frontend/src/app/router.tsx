@@ -19,6 +19,7 @@ import { useAuth } from '../features/auth/useAuth';
 
 const LoginPage = lazy(() => import('../features/auth/LoginPage').then((m) => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('../features/auth/RegisterPage').then((m) => ({ default: m.RegisterPage })));
+const AuthShell = lazy(() => import('../features/auth/components/AuthShell').then((m) => ({ default: m.AuthShell })));
 
 const CatalogPage = lazy(() => import('../features/catalog/CatalogPage').then((m) => ({ default: m.CatalogPage })));
 const ProductDetailPage = lazy(() => import('../features/catalog/ProductDetailPage').then((m) => ({ default: m.ProductDetailPage })));
@@ -62,8 +63,10 @@ export function AppRoutes() {
     <Suspense fallback={<PageFallback />}>
       <Routes>
         <Route element={<PublicOnlyRoute />}>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route element={<AuthShell />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Route>
         </Route>
 
         <Route element={<Layout />}>

@@ -165,7 +165,7 @@ export function AdminProductsListPage() {
                     <td className="px-4 py-3">
                       <span
                         className={[
-                          'inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium leading-none',
+                          'inline-flex items-center rounded-medium border px-2 py-0.5 text-xs font-medium leading-none',
                           p.isPublished
                             ? 'border-success/30 bg-success/15 text-success'
                             : 'border-warning/30 bg-warning/15 text-warning',

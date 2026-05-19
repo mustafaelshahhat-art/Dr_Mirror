@@ -74,7 +74,7 @@ export function AdminInquiriesPage() {
               className="space-y-3 rounded-large border border-divider/60 bg-content1 p-4"
             >
               <div className="flex items-center gap-2">
-                <Skeleton className="h-5 w-16 rounded-md" />
+                <Skeleton className="h-5 w-16 rounded-medium" />
                 <Skeleton className="h-3 w-32" />
               </div>
               <Skeleton className="h-4 w-2/3" />
@@ -192,11 +192,11 @@ function InquiryRow({
 
       <div className="flex flex-wrap items-center gap-2 text-xs text-default-500">
         {productName ? (
-          <span className="rounded-md bg-content2 px-2 py-0.5">
+          <span className="rounded-medium bg-content2 px-2 py-0.5">
             {t('inquiries.admin.productLabel')}: <span className="font-medium text-foreground">{productName}</span>
           </span>
         ) : (
-          <span className="rounded-md bg-content2 px-2 py-0.5">
+          <span className="rounded-medium bg-content2 px-2 py-0.5">
             {t('inquiries.admin.generalLabel')}
           </span>
         )}
@@ -282,7 +282,7 @@ function StatusBadge({ status }: { status: InquiryStatus }) {
   return (
     <span
       className={[
-        'inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium leading-none',
+        'inline-flex items-center rounded-medium border px-2 py-0.5 text-xs font-medium leading-none',
         classes,
       ].join(' ')}
     >

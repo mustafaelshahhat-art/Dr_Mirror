@@ -191,7 +191,7 @@ function Card({
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-semibold">{a.label}</h2>
             {a.isDefault ? (
-              <span className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+              <span className="inline-flex items-center gap-1 rounded-medium border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                 <Star className="size-3" aria-hidden />
                 {t('addresses.defaultBadge')}
               </span>

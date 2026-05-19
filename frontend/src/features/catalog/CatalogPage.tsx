@@ -137,7 +137,7 @@ export function CatalogPage() {
           most two screen rows so the catalog stays one scroll away. */}
       <section className="relative -mx-4 border-b border-divider/60 px-4 py-10 md:-mx-6 md:px-6 md:py-12 lg:-mx-8 lg:px-8 lg:py-14">
         <div className="space-y-3">
-          <span className="inline-flex items-center rounded-md bg-bone px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground/80">
+          <span className="inline-flex items-center rounded-medium bg-bone px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground/80">
             {t('appName')}
           </span>
           <h1 className="max-w-2xl text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">

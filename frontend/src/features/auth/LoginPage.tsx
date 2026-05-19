@@ -82,6 +82,7 @@ export function LoginPage() {
           label={t('auth.email')}
           type="email"
           autoComplete="email"
+          autoCapitalize="off"
           isRequired
           variant="underlined"
         />
@@ -95,6 +96,13 @@ export function LoginPage() {
           isRequired
           variant="underlined"
         />
+
+        <Link
+          to="#"
+          className="block text-end text-sm text-default-500 underline-offset-4 hover:underline"
+        >
+          {t('auth.forgotPassword')}
+        </Link>
 
         <Button
           type="submit"

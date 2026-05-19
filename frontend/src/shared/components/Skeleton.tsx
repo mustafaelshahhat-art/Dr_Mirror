@@ -16,7 +16,7 @@ export function Skeleton({ className, ...rest }: ComponentProps<typeof HeroSkele
     <HeroSkeleton
       aria-hidden
       className={[
-        'rounded-md bg-default-200/60 motion-safe:animate-pulse',
+        'rounded-medium bg-default-200/60 motion-safe:animate-pulse',
         className ?? '',
       ].join(' ')}
       {...rest}
@@ -66,7 +66,7 @@ export function OrderRowSkeleton({ variant = 'page' }: { variant?: 'compact' | '
         <Skeleton className="h-3 w-44" />
       </div>
       <div className="flex shrink-0 items-center gap-3">
-        <Skeleton className="h-5 w-16 rounded-md" />
+        <Skeleton className="h-5 w-16 rounded-medium" />
         <Skeleton className="h-4 w-16" />
       </div>
     </div>

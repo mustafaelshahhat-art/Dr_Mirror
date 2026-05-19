@@ -252,8 +252,8 @@ function GenderPill({
       onClick={onClick}
       className={
         selected
-          ? 'rounded-md bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-          : 'rounded-md border border-divider/60 bg-content2 px-3 py-1 text-xs font-medium text-default-700 transition-colors hover:bg-content2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-default-300'
+          ? 'rounded-medium bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+          : 'rounded-medium border border-divider/60 bg-content2 px-3 py-1 text-xs font-medium text-default-700 transition-colors hover:bg-content2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-default-300'
       }
     >
       {label}

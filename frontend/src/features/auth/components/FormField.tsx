@@ -20,6 +20,7 @@ interface FormFieldProps<T extends FieldValues> {
   label: string;
   type?: HTMLInputTypeAttribute;
   autoComplete?: string;
+  autoCapitalize?: string;
   placeholder?: string;
   description?: ReactNode;
   isRequired?: boolean;
@@ -38,6 +39,7 @@ export function FormField<T extends FieldValues>({
   label,
   type = 'text',
   autoComplete,
+  autoCapitalize,
   placeholder,
   description,
   isRequired,
@@ -65,8 +67,9 @@ export function FormField<T extends FieldValues>({
             ref={field.ref}
             type={type}
             autoComplete={autoComplete}
+            autoCapitalize={autoCapitalize}
             placeholder={placeholder}
-            className={variant === 'underlined' ? 'rounded-none border-0 border-b bg-transparent' : undefined}
+            className={variant === 'underlined' ? 'rounded-none border-0 border-b bg-transparent dark:bg-default-100/50' : undefined}
           />
           {description ? (
             <Description className="text-xs text-default-500">{description}</Description>

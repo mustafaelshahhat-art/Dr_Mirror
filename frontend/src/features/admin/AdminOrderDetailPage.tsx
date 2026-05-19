@@ -46,7 +46,7 @@ export function AdminOrderDetailPage() {
             <Skeleton className="h-6 w-40" />
             <Skeleton className="h-3 w-56" />
           </div>
-          <Skeleton className="h-6 w-24 rounded-md" />
+          <Skeleton className="h-6 w-24 rounded-medium" />
         </header>
         <article className="rounded-large border border-divider/60 bg-content1 p-4 space-y-2">
           <Skeleton className="h-3 w-24" />

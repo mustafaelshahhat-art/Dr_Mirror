@@ -158,7 +158,7 @@ export function AdminCategoriesPage() {
                   <div className="flex shrink-0 items-center gap-2">
                     <span
                       className={[
-                        'inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium leading-none',
+                        'inline-flex items-center rounded-medium border px-2 py-0.5 text-xs font-medium leading-none',
                         cat.isActive
                           ? 'border-success/30 bg-success/15 text-success'
                           : 'border-divider/60 bg-content2 text-default-500',

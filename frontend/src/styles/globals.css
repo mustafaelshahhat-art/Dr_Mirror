@@ -31,7 +31,7 @@
   --color-bone: var(--bone);
   --color-muted-2: var(--muted-2);
 
-  /* Brand palette — emerald accent ("primary" in app-level vocabulary). */
+  /* Brand palette — accent ("primary" in app-level vocabulary). */
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
   --color-brand-active: var(--brand-active);
@@ -73,36 +73,58 @@
       sans-serif;
     --font-ar: 'Alexandria', 'Satoshi', 'Segoe UI', 'Tahoma', sans-serif;
 
+    /* Legacy custom vars consumed by @theme inline. */
     --bone: oklch(0.94 0.006 245);
     --muted-2: oklch(0.58 0 0);
 
-    /* Light mode brand palette (DESIGN.md §Color → Light mode).
-     *
-     * Derivation pattern (mirrors the dark-mode block):
-     *   --brand-hover  : +0.05 lightness  → emerald reads slightly brighter on hover
-     *   --brand-active : -0.04 lightness  → emerald reads slightly pressed on click
-     *   --brand-subtle : high L (0.92), low chroma (0.04) → tinted background
-     *                    for badges, callouts, selected-row washes; keeps AA
-     *                    contrast against the dark `--brand` foreground.
+    /* Brand palette derived from accent (hue 273.85).
+     *   --brand-hover  : +5% lightness
+     *   --brand-active : -4% lightness
+     *   --brand-subtle : high L, low chroma → tinted background
      */
-    --brand: oklch(0.50 0.14 165);
-    --brand-hover: oklch(0.55 0.14 165);
-    --brand-active: oklch(0.46 0.14 165);
-    --brand-subtle: oklch(0.92 0.04 165);
-    --brand-foreground: oklch(0.99 0 0);
+    --brand: oklch(57.74% 0.2091 273.85);
+    --brand-hover: oklch(62.74% 0.2091 273.85);
+    --brand-active: oklch(53.74% 0.2091 273.85);
+    --brand-subtle: oklch(92% 0.04 273.85);
+    --brand-foreground: oklch(99.11% 0 0);
 
-    /* Override HeroUI v3 base tokens to brand palette (light). */
-    --background: oklch(0.99 0 0);
-    --foreground: oklch(0.18 0 0);
-    --surface: oklch(1 0 0);
-    --surface-secondary: oklch(0.97 0 0);
-    --surface-tertiary: oklch(0.94 0 0);
-    --muted: oklch(0.45 0 0);
-    --border: oklch(0 0 0 / 0.08);
-    --separator: oklch(0 0 0 / 0.08);
-    --accent: var(--brand);
-    --accent-foreground: var(--brand-foreground);
-    --focus: var(--brand);
+    /* HeroUI v3 Theme — Light Mode */
+    --accent: oklch(57.74% 0.2091 273.85);
+    --accent-foreground: oklch(99.11% 0 0);
+    --background: oklch(97.02% 0.0100 273.85);
+    --border: oklch(90.00% 0.0100 273.85);
+    --danger: oklch(65.32% 0.2375 28.14);
+    --danger-foreground: oklch(99.11% 0 0);
+    --default: oklch(94.00% 0.0100 273.85);
+    --default-foreground: oklch(21.03% 0.0059 273.85);
+    --field-background: oklch(100.00% 0.0050 273.85);
+    --field-border: transparent;
+    --field-foreground: oklch(21.03% 0.0100 273.85);
+    --field-placeholder: oklch(55.17% 0.0200 273.85);
+    --focus: oklch(57.74% 0.2091 273.85);
+    --foreground: oklch(21.03% 0.0100 273.85);
+    --muted: oklch(55.17% 0.0200 273.85);
+    --overlay: oklch(100.00% 0.0030 273.85);
+    --overlay-foreground: oklch(21.03% 0.0100 273.85);
+    --scrollbar: oklch(87.10% 0.0100 273.85);
+    --segment: oklch(100.00% 0.0100 273.85);
+    --segment-foreground: oklch(21.03% 0.0100 273.85);
+    --separator: oklch(92.00% 0.0100 273.85);
+    --success: oklch(73.29% 0.1974 153.21);
+    --success-foreground: oklch(21.03% 0.0059 153.21);
+    --surface: oklch(100.00% 0.0050 273.85);
+    --surface-foreground: oklch(21.03% 0.0100 273.85);
+    --surface-secondary: oklch(95.24% 0.0080 273.85);
+    --surface-secondary-foreground: oklch(21.03% 0.0100 273.85);
+    --surface-tertiary: oklch(93.73% 0.0080 273.85);
+    --surface-tertiary-foreground: oklch(21.03% 0.0100 273.85);
+    --warning: oklch(78.19% 0.1617 74.73);
+    --warning-foreground: oklch(21.03% 0.0059 74.73);
+
+    /* Border Radius */
+    --radius: 0.25rem;
+    --field-radius: 0.5rem;
+
     accent-color: var(--brand);
   }
 
@@ -115,28 +137,54 @@
 
   html.dark {
     color-scheme: dark;
+
+    /* Legacy custom vars consumed by @theme inline. */
     --bone: oklch(0.92 0.01 90);
-    --muted: oklch(0.70 0 0);
     --muted-2: oklch(0.55 0 0);
 
-    /* Dark mode brand palette (DESIGN.md §Color → Dark mode, canonical). */
-    --brand: oklch(0.65 0.13 165);
-    --brand-hover: oklch(0.70 0.13 165);
-    --brand-active: oklch(0.60 0.13 165);
-    --brand-subtle: oklch(0.30 0.05 165);
-    --brand-foreground: oklch(0.12 0 0);
+    /* Dark brand palette derived from accent (hue 273.85). */
+    --brand: oklch(57.74% 0.2091 273.85);
+    --brand-hover: oklch(62.74% 0.2091 273.85);
+    --brand-active: oklch(53.74% 0.2091 273.85);
+    --brand-subtle: oklch(30% 0.05 273.85);
+    --brand-foreground: oklch(99.11% 0 0);
 
-    /* Override HeroUI v3 base tokens to brand palette (dark, canonical). */
-    --background: oklch(0.12 0 0);
-    --foreground: oklch(0.99 0 0);
-    --surface: oklch(0.16 0 0);
-    --surface-secondary: oklch(0.20 0 0);
-    --surface-tertiary: oklch(0.24 0 0);
-    --border: oklch(1 0 0 / 0.08);
-    --separator: oklch(1 0 0 / 0.08);
-    --accent: var(--brand);
-    --accent-foreground: var(--brand-foreground);
-    --focus: var(--brand);
+    /* HeroUI v3 Theme — Dark Mode */
+    --accent: oklch(57.74% 0.2091 273.85);
+    --accent-foreground: oklch(99.11% 0 0);
+    --background: oklch(12.00% 0.0100 273.85);
+    --border: oklch(28.00% 0.0100 273.85);
+    --danger: oklch(59.40% 0.2006 27.03);
+    --danger-foreground: oklch(99.11% 0 0);
+    --default: oklch(27.40% 0.0100 273.85);
+    --default-foreground: oklch(99.11% 0 0);
+    --field-background: oklch(21.03% 0.0200 273.85);
+    --field-border: transparent;
+    --field-foreground: oklch(99.11% 0.0100 273.85);
+    --field-placeholder: oklch(70.50% 0.0200 273.85);
+    --focus: oklch(57.74% 0.2091 273.85);
+    --foreground: oklch(99.11% 0.0100 273.85);
+    --muted: oklch(70.50% 0.0200 273.85);
+    --overlay: oklch(21.03% 0.0200 273.85);
+    --overlay-foreground: oklch(99.11% 0.0100 273.85);
+    --scrollbar: oklch(70.50% 0.0100 273.85);
+    --segment: oklch(39.64% 0.0100 273.85);
+    --segment-foreground: oklch(99.11% 0.0100 273.85);
+    --separator: oklch(25.00% 0.0100 273.85);
+    --success: oklch(73.29% 0.1974 153.21);
+    --success-foreground: oklch(21.03% 0.0059 153.21);
+    --surface: oklch(21.03% 0.0200 273.85);
+    --surface-foreground: oklch(99.11% 0.0100 273.85);
+    --surface-secondary: oklch(25.70% 0.0150 273.85);
+    --surface-secondary-foreground: oklch(99.11% 0.0100 273.85);
+    --surface-tertiary: oklch(27.21% 0.0150 273.85);
+    --surface-tertiary-foreground: oklch(99.11% 0.0100 273.85);
+    --warning: oklch(82.03% 0.1416 78.74);
+    --warning-foreground: oklch(21.03% 0.0059 78.74);
+
+    /* Border Radius */
+    --radius: 0.25rem;
+    --field-radius: 0.5rem;
   }
 
   html.light {

@@ -72,7 +72,7 @@ export function AddressStep({
                     <p className="text-sm font-semibold">
                       {a.label}
                       {a.isDefault ? (
-                        <span className="ms-2 inline-flex items-center rounded-md border border-primary/30 bg-primary/10 px-2 py-0 text-xs font-medium text-primary">
+                        <span className="ms-2 inline-flex items-center rounded-medium border border-primary/30 bg-primary/10 px-2 py-0 text-xs font-medium text-primary">
                           {t('addresses.defaultBadge')}
                         </span>
                       ) : null}
