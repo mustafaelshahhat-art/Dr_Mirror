@@ -67,7 +67,7 @@ DESIGN.md
 PRODUCT.md
 audit-report.md
 progress.txt
-# specs/ — un-ignored so the spec workflow can write directly (kept locally; opt back in by un-commenting)
+specs/
 .agent/
 .agents/
 .claude/

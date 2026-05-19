@@ -36,10 +36,9 @@ frontend/
 
 ## Documentation
 
-- [Project Map](docs/PROJECT_MAP.md)
-- [Deployment Guide](docs/DEPLOY.md)
-- [Backup and Restore](docs/BACKUP_RESTORE.md)
-- [Redesign Audit](docs/REDESIGN_AUDIT.md)
+- [Agent Guide](AGENTS.md) — conventions, commands, and constraints for AI coding agents
+- [Claude Guide](CLAUDE.md) — same content with repo-boundary rules for Claude
+- [Constitution](.specify/memory/constitution.md) — non-negotiable governance principles (v1.1.1)
 
 ## Quick start
 
@@ -165,4 +164,4 @@ Current focus is Phase 004 — UI/UX Excellence Pass.
 
 ---
 
-Architecture decisions, branching rules, breakpoints, migration safety, and UI system discipline live in [Project Map](docs/PROJECT_MAP.md). Visual system tokens, component rules, and RTL conventions live in [DESIGN.md](DESIGN.md). Product strategy and brand principles live in [PRODUCT.md](PRODUCT.md).
+Agent conventions, stack constraints, and UI system discipline live in [AGENTS.md](AGENTS.md). Governance principles and non-negotiable rules live in [.specify/memory/constitution.md](.specify/memory/constitution.md).
