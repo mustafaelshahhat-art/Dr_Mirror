@@ -80,7 +80,6 @@ export function SizePicker({
                 ? 0
                 : -1;
           return (
-            // intentional: raw <button role="radio"> keeps the RAC radiogroup pattern per DESIGN.md.
             <button
               key={s}
               type="button"

@@ -51,7 +51,14 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
         <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-medium border border-divider bg-content2 px-3 py-1.5 text-sm hover:bg-default-100">
           <UploadCloud className="size-4" aria-hidden />
           {uploadMutation.isPending ? t('admin.products.images.uploading') : t('admin.products.images.upload')}
-          {/* intentional: HeroUI v3 has no file input; see DESIGN.md */}
+          {/* Exception 3 — rejected-primitive trail (per
+              specs/003-heroui-migration/contracts/exceptions-register.md, criterion 5):
+                - HeroUI `FileTrigger` / `FileInput`: considered and rejected — not
+                  exported by @heroui/react v3.0.4.
+                - React Aria `FileTrigger` direct usage: considered and rejected —
+                  would violate FR-014.
+              The visible affordance is the styled <label> wrapper above; the sr-only
+              <input type="file"> only handles the OS file picker. */}
           <input
             ref={inputRef}
             type="file"

@@ -28,6 +28,14 @@ interface SnippetProps {
  * primitive and the Phase 4 brief forbids new dependencies, so this wrapper
  * preserves the v2-era ergonomic API on top of v3-native parts.
  *
+ * Exception 2 — rejected-primitive trail (per
+ * specs/003-heroui-migration/contracts/exceptions-register.md, criterion 5):
+ *   - HeroUI `Snippet`: considered and rejected — not exported by @heroui/react v3.0.4.
+ *   - Native `<button>` + `navigator.clipboard.writeText`: considered and rejected —
+ *     would violate FR-003 (HeroUI-only UI primitives in app code).
+ * The composition below (HeroUI `Button` + `Tooltip` + Lucide icons) is the
+ * Approved Composition Component answer to the missing v3 primitive.
+ *
  * The component renders the visible `children` followed by an icon-only
  * `Button` with a tooltip. On press, `value` is written to the clipboard;
   * the icon swaps from `Copy` to `Check` for ~1500ms then reverts.

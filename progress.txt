@@ -1,0 +1,55 @@
+HeroUI v3 Migration — progress.txt
+Feature: specs/003-heroui-migration
+Branch: 003-heroui-migration
+
+== Phase 1: Baseline (captured 2026-05-19) ==
+
+T001 (working tree on 003-heroui-migration, clean modulo specs/003-heroui-migration/ untracked spec docs): PASS
+T002 (npm install): NOT-RUN — pre-existing peer-dep conflict (eslint-plugin-jsx-a11y@6.10.2 caps at eslint^9; project pins eslint^10.3.0). Existing frontend/node_modules used for all baselines. Independent of this migration. Recommend running `npm install --legacy-peer-deps` or upgrading the plugin in a separate PR.
+
+T003 (build) — `npm --prefix frontend run build`:
+  Status: PASS
+  Build time: 571ms
+  Main entry (index): 406.89 kB / 123.79 kB gzip
+  Top async chunks (gzip):
+    AuditLogPage: 47.39 kB
+    schemas: 28.40 kB
+    useTranslation: 16.23 kB
+
+T004 (tests) — `npm --prefix frontend test`:
+  Status: PASS
+  Test files: 54
+  Tests: 276 passed
+  Duration: 18.02s
+
+T005 (i18n) — `npm --prefix frontend run i18n:check`:
+  Status: PASS (exit 0). All locale keys covered across en and ar.
+
+T006 (lint) — `npm --prefix frontend run lint`:
+  Status: PASS (exit 0)
+  Warnings: 26 (0 errors). All i18next/no-literal-string warnings on non-user-facing props (placement, autoCapitalize, color, tooltipPlacement, internal mode literals).
+
+Baseline locked. Subsequent phases compare deltas against these numbers.
+
+== Phase 2: Foundational audits (2026-05-19) ==
+
+T007 (providers.tsx): PASS. RouterProvider, I18nProvider (via LocaleScope w/ live `locale={resolvedLanguage}`), ToastProvider, next-themes all wired. Note: I18nProvider receives `locale` only — no explicit `dir` prop; direction propagation relies on locale tag + DirectionSync setting <html dir>. No drift requiring T007-fix.
+
+T008 (Field.tsx): PASS. Uses TextField + Label + Input + TextArea + Description + FieldError per Anatomy A.16. Public props match contract.
+
+T009 (SelectField.tsx): PASS. Uses Select + Select.Trigger + Select.Value + Select.Indicator + Select.Popover + ListBox + ListBox.Item per Anatomy A.19.
+
+T010 (PaginationControls.tsx): PASS. Uses Pagination + Pagination.Previous + Pagination.Content + Pagination.Item + Pagination.Link + Pagination.Ellipsis + Pagination.Next per Anatomy A.4. Public props (page, totalPages, onPageChange, isDisabled?, className?) match contract.
+
+T011 (Snippet.tsx): Updated same-file justification comment to satisfy exceptions-register criterion 5 (rejected-primitive trail).
+
+T012 (PaymentProofUpload.tsx): Updated same-file justification comment with rejected-primitive trail (HeroUI FileTrigger/FileInput; React Aria FileTrigger).
+
+T013 (ProductImagesSection.tsx): Same as T012.
+
+T014 (PaymentMethodForm.tsx): No `<input type="file">` present — no comment needed. Recorded.
+
+T015: Removed 4 RAC-justification comments from CategoryChips.tsx, SizePicker.tsx, ColorPicker.tsx, FilterPanel.tsx in preparation for Phase 12b migration to ToggleButtonGroup. Raw JSX retained until Phase 12b lands.
+
+CLI gates: build PASS (636ms), tests PASS (54 files, 276 tests, 18.28s). No regressions vs. baseline.
+

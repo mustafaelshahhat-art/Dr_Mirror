@@ -71,7 +71,6 @@ export function ColorPicker({ colors, selected, onSelect }: ColorPickerProps) {
           const isSelected = c.colorName === selected;
           const onLight = isLightHex(c.colorHex);
           return (
-            // intentional: raw <button role="radio"> keeps the RAC radiogroup pattern per DESIGN.md.
             <button
               key={c.colorName}
               type="button"

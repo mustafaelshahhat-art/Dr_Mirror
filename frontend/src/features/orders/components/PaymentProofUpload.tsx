@@ -107,10 +107,14 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
       >
         <UploadCloud className="size-5 text-default-500" aria-hidden />
         <span>{selected ? selected.name : t('orders.upload.pickFile')}</span>
-        {/* intentional: HeroUI v3 has no file input; see DESIGN.md */}
-        {/* Documented exception (audit section 1.8): HeroUI v3 has no native file-input
-            primitive. The visible affordance is the styled <label> above; the
-            <input type="file"> is sr-only and only handles the OS file picker. */}
+        {/* Exception 3 — rejected-primitive trail (per
+            specs/003-heroui-migration/contracts/exceptions-register.md, criterion 5):
+              - HeroUI `FileTrigger` / `FileInput`: considered and rejected — not exported
+                by @heroui/react v3.0.4.
+              - React Aria `FileTrigger` direct usage: considered and rejected — would
+                violate FR-014 (no React Aria imports in app code; HeroUI is the boundary).
+            The visible affordance is the styled <label> above (purely presentational);
+            the sr-only native <input type="file"> only handles the OS file picker. */}
         <input
           id={`proof-input-${orderNumber}`}
           ref={inputRef}
