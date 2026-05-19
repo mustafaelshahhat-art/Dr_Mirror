@@ -333,7 +333,7 @@ Documented exception: native `<input type="file">` (Exception 3).
 
 **Independent Test**: Header renders on `/`, RTL/LTR toggle places brand at inline-start, mobile menu opens as a HeroUI `<Drawer>`, responsive collapse breakpoint unchanged. The grep for `<header ` outside the `Header.tsx` file returns zero (the single `<header>` element inside `Header.tsx` is permitted only as the root semantic landmark; otherwise the wrapper is a HeroUI `Surface` or `Toolbar`).
 
-- [ ] T136 [US7] Refactor `frontend/src/shared/components/Header.tsx` as a thin Approved Composition Component over HeroUI v3 primitives ONLY (per FR-018; per `data-model.md` آ§ Approved Composition Components). Specifically:
+- [X] T136 [US7] Refactor `frontend/src/shared/components/Header.tsx` as a thin Approved Composition Component over HeroUI v3 primitives ONLY (per FR-018; per `data-model.md` آ§ Approved Composition Components). Specifically:
   - **Outer wrapper**: HeroUI `<Surface>` (per Anatomy A.21) with `variant="default"` and a `className` carrying sticky positioning utilities (`sticky top-0 z-40`). If the design requires the `<header>` semantic landmark, the `Surface` may be wrapped in a single root `<header role="banner">` element â€” no other raw chrome elements are permitted.
   - **Brand area**: `<Button as={Link} to="/" variant="ghost">` (per Anatomy A.14 + react-router `Link`); brand text uses HeroUI `<Typography>` (per Anatomy A.24); optional Lucide brand-mark icon as a sibling.
   - **Nav links** (desktop): HeroUI `<Link as={RouterLink}>` (per Anatomy A.23) OR `<Button as={Link} variant="ghost" size="sm">` for button-styled nav items.
@@ -342,11 +342,11 @@ Documented exception: native `<input type="file">` (Exception 3).
   - **Bottom edge**: HeroUI `<Separator orientation="horizontal" />` (already migrated in T129).
   - **Cart-trigger badge**: HeroUI `<Badge>` + `<Badge.Anchor>` (already migrated in T045a).
   - **Forbidden**: hand-styled `<header>` chrome with token classes; any `<div class="bg-content* border-divider">` shell that could be a `Surface` or `Card` instead; raw `<button>` / `<a href>` for nav.
-- [ ] T137 [US7] Confirm the `if (isAdmin) return null;` guard is preserved.
-- [ ] T138 [US7] Confirm sticky positioning (`sticky top-0 z-40` or equivalent) is moved to the `Surface`'s `className` (NOT applied to a hand-styled wrapper div). Confirm RTL parity via logical CSS only.
+- [X] T137 [US7] Confirm the `if (isAdmin) return null;` guard is preserved.
+- [X] T138 [US7] Confirm sticky positioning (`sticky top-0 z-40` or equivalent) is moved to the `Surface`'s `className` (NOT applied to a hand-styled wrapper div). Confirm RTL parity via logical CSS only.
 - [ ] T139 [US7] Visual gate: load `/` in dev (`npm --prefix frontend run dev`), toggle theme/direction, resize to 375/768/1280px; record screenshots per `docs/screenshots/README.md`. This is the per-batch surface for the **SC-009 Visual Verification Matrix**.
-- [ ] T140 [US7] Run `npm --prefix frontend run build`, `npm --prefix frontend test`, `npm --prefix frontend run i18n:check`, `npm --prefix frontend run lint` â€” all must pass.
-- [ ] T140-vm [US7] **SC-009 Visual Verification Matrix** for the storefront header (en LTR + ar RTL أ— light + dark أ— 375/768/1280 + mobile menu open/closed + sticky scroll behavior + keyboard reach + visible focus + Escape closes Drawer). Record per-state result table in PR.
+- [X] T140 [US7] Run `npm --prefix frontend run build`, `npm --prefix frontend test`, `npm --prefix frontend run i18n:check`, `npm --prefix frontend run lint` — all must pass.
+- [ ] T140-vm [US7] **SC-009 Visual Verification Matrix** for the storefront header (en LTR + ar RTL × light + dark × 375/768/1280 + mobile menu open/closed + sticky scroll behavior + keyboard reach + visible focus + Escape closes Drawer). Record per-state result table in PR.
 
 **Checkpoint**: Header is an Approved Composition Component over HeroUI v3 primitives only. Note in PR that v3 ships no `Navbar` (composition is the v3-idiomatic answer).
 
