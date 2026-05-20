@@ -16,7 +16,7 @@ export function CheckoutSummary({ items, subTotal, lang }: Props) {
 
   return (
     <aside className="h-fit space-y-4 overflow-hidden rounded-2xl border border-separator/60 bg-surface p-5 lg:sticky lg:top-20">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
+      <h2 className="text-base font-semibold uppercase tracking-wide text-default-700">
         {t('checkout.summary.heading')}
       </h2>
       <ul className="space-y-2.5 text-sm">
@@ -39,11 +39,11 @@ export function CheckoutSummary({ items, subTotal, lang }: Props) {
       <Separator />
       <dl className="space-y-1.5 pt-1 text-sm">
         <div className="flex justify-between">
-          <dt className="text-default-500">{t('checkout.summary.subTotal')}</dt>
+          <dt className="text-muted-strong">{t('checkout.summary.subTotal')}</dt>
           <dd className="tabular-nums">{formatCurrency(subTotal, lang)}</dd>
         </div>
         <div className="flex justify-between">
-          <dt className="text-default-500">{t('checkout.summary.shipping')}</dt>
+          <dt className="text-muted-strong">{t('checkout.summary.shipping')}</dt>
           <dd className="tabular-nums">{t('checkout.summary.shippingFreeM3')}</dd>
         </div>
       </dl>

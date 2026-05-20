@@ -70,7 +70,7 @@ export function SelectField({
       fullWidth
       className={className}
     >
-      <Label className={hideLabel ? 'sr-only' : 'text-xs uppercase tracking-wide text-default-500'}>
+      <Label className={hideLabel ? 'sr-only' : 'text-sm uppercase tracking-wide text-default-600 font-medium'}>
         {label}
       </Label>
       <Select.Trigger className={triggerClass}>

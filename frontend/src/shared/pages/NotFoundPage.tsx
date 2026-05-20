@@ -24,7 +24,7 @@ export function NotFoundPage() {
       <p className="max-w-prose text-sm text-default-500">
         {t('common.notFound.subtitle')}
       </p>
-      <p className="rounded-medium bg-content2 px-3 py-1.5 text-xs text-default-500" dir="ltr">
+      <p className="rounded-medium bg-content2 px-3 py-1.5 text-xs text-default-500">
         {t('common.notFound.path', { path: location.pathname })}
       </p>
       <Link

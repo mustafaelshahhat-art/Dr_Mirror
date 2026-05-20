@@ -41,6 +41,7 @@ export function PaginationControls({
         onPress={() => onPageChange(page - 1)}
         isDisabled={!canGoPrev}
         aria-label={t('common.pagination.prev')}
+        className="min-h-11 min-w-11"
       >
         <ChevronLeft className="size-3.5 rtl:rotate-180" aria-hidden />
       </Pagination.Previous>
@@ -72,6 +73,7 @@ export function PaginationControls({
         onPress={() => onPageChange(page + 1)}
         isDisabled={!canGoNext}
         aria-label={t('common.pagination.next')}
+        className="min-h-11 min-w-11"
       >
         <ChevronRight className="size-3.5 rtl:rotate-180" aria-hidden />
       </Pagination.Next>

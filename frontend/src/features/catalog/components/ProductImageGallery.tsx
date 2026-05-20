@@ -27,7 +27,7 @@ export function ProductImageGallery({ images, productName }: Props) {
 
   return (
     <section className="space-y-4">
-      <div className="aspect-[4/5] w-[95%] lg:w-[90%] mx-auto overflow-hidden rounded-[2rem] border border-divider/60 bg-bone shadow-sm">
+      <div className="aspect-[4/5] max-h-[70vh] sm:max-h-none w-[95%] lg:w-[90%] mx-auto overflow-hidden rounded-[2rem] border border-divider/60 bg-bone shadow-sm">
         {currentImage ? (
           <img
             src={currentImage.url}

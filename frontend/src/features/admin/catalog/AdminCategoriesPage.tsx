@@ -1,6 +1,6 @@
 import { Button, Form, Input, Label, Switch, TextField, Tooltip } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FolderTree, Pencil, Plus } from 'lucide-react';
+import { FolderTree, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +27,7 @@ export function AdminCategoriesPage() {
   const toggleMutation = useToggleCategoryActiveMutation();
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
 
   if (query.isLoading) {
     return (
@@ -79,20 +80,41 @@ export function AdminCategoriesPage() {
 
   return (
     <section className="space-y-8">
-      <PageHeader title={t('admin.catalog.categories.title')} subtitle={t('admin.catalog.categories.subtitle')} />
-
-      <CreateCategoryForm
-        onSubmit={async (body) => {
-          try {
-            await createMutation.mutateAsync(body);
-            return true;
-          } catch {
-            // Toast emitted by mutation onError.
-            return false;
-          }
-        }}
-        isPending={createMutation.isPending}
+      <PageHeader
+        title={t('admin.catalog.categories.title')}
+        subtitle={t('admin.catalog.categories.subtitle')}
+        action={
+          !isCreating ? (
+            <Button
+              variant="primary"
+              size="sm"
+              onPress={() => setIsCreating(true)}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <Plus className="size-4" aria-hidden />
+                {t('admin.catalog.actions.create')}
+              </span>
+            </Button>
+          ) : undefined
+        }
       />
+
+      {isCreating ? (
+        <CreateCategoryForm
+          onSubmit={async (body) => {
+            try {
+              await createMutation.mutateAsync(body);
+              setIsCreating(false);
+              return true;
+            } catch {
+              // Toast emitted by mutation onError.
+              return false;
+            }
+          }}
+          onCancel={() => setIsCreating(false)}
+          isPending={createMutation.isPending}
+        />
+      ) : null}
 
       {categories.length === 0 ? (
         <div className="content-surface p-10 text-center">
@@ -128,21 +150,23 @@ export function AdminCategoriesPage() {
                   isPending={updateMutation.isPending}
                 />
               ) : (
-                <div className="content-surface flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0 space-y-0.5">
+                <div className="content-surface flex flex-row items-start justify-between gap-3 p-3">
+                  <button
+                    type="button"
+                    className="min-w-0 flex-1 space-y-0.5 text-start"
+                    onClick={() => setEditingId(cat.id)}
+                    aria-label={`${t('admin.catalog.actions.edit')}: ${isAr ? cat.nameAr : cat.nameEn}`}
+                  >
                     <p className="text-sm font-semibold text-foreground">
                       {isAr ? cat.nameAr : cat.nameEn}
-                    </p>
-                    <p className="text-xs text-default-500" dir="ltr">
-                      /{cat.slug}
                     </p>
                     <p className="text-xs text-default-500">
                       {t('admin.catalog.categories.productCount', { count: cat.productCount })}
                       {' · '}
                       {t('admin.catalog.categories.displayOrder')} {cat.displayOrder}
                     </p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
+                  </button>
+                  <div className="flex shrink-0 flex-col items-end gap-2">
                     <span
                       className={[
                         'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
@@ -155,18 +179,6 @@ export function AdminCategoriesPage() {
                         ? t('admin.catalog.status.active')
                         : t('admin.catalog.status.inactive')}
                     </span>
-                    <Tooltip>
-                      <Button
-                        isIconOnly
-                        variant="ghost"
-                        size="md"
-                        onPress={() => setEditingId(cat.id)}
-                        aria-label={t('admin.catalog.actions.edit')}
-                      >
-                        <Pencil className="size-4" aria-hidden />
-                      </Button>
-                      <Tooltip.Content placement="top">{t('admin.catalog.actions.edit')}</Tooltip.Content>
-                    </Tooltip>
                     <Tooltip delay={300} closeDelay={0}>
                       <Switch
                         size="sm"
@@ -211,6 +223,7 @@ export function AdminCategoriesPage() {
 
 interface CategoryFormProps {
   onSubmit: (body: { nameAr: string; nameEn: string; displayOrder: number }) => Promise<boolean>;
+  onCancel?: () => void;
   isPending: boolean;
 }
 
@@ -222,7 +235,7 @@ const categoryFormSchema = z.object({
 
 type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 
-function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
+function CreateCategoryForm({ onSubmit, onCancel, isPending }: CategoryFormProps) {
   const { t } = useTranslation();
   const {
     register,
@@ -248,10 +261,10 @@ function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
           reset();
         }
       })}
-      className="content-surface flex flex-col gap-3 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto] sm:items-end"
+      className="content-surface flex flex-col gap-3 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto_auto] sm:items-end"
     >
       <TextField isRequired isInvalid={Boolean(errors.nameAr)} className="flex flex-col gap-1">
-        <Label className="text-xs uppercase tracking-wide text-default-500">
+        <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
           {t('admin.catalog.categories.nameAr')}
         </Label>
         <Input
@@ -261,7 +274,7 @@ function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
         {errors.nameAr?.message ? <p className="text-xs text-danger">{error(errors.nameAr.message)}</p> : null}
       </TextField>
       <TextField isRequired isInvalid={Boolean(errors.nameEn)} className="flex flex-col gap-1">
-        <Label className="text-xs uppercase tracking-wide text-default-500">
+        <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
           {t('admin.catalog.categories.nameEn')}
         </Label>
         <Input
@@ -271,7 +284,7 @@ function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
         {errors.nameEn?.message ? <p className="text-xs text-danger">{error(errors.nameEn.message)}</p> : null}
       </TextField>
       <TextField isInvalid={Boolean(errors.displayOrder)} className="flex flex-col gap-1">
-        <Label className="text-xs uppercase tracking-wide text-default-500">
+        <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
           {t('admin.catalog.categories.displayOrder')}
         </Label>
         <Input
@@ -287,6 +300,11 @@ function CreateCategoryForm({ onSubmit, isPending }: CategoryFormProps) {
           {pending ? t('admin.catalog.actions.creating') : t('admin.catalog.actions.create')}
         </span>
       </Button>
+      {onCancel ? (
+        <Button type="button" variant="ghost" size="sm" onPress={onCancel} isDisabled={pending}>
+          {t('admin.catalog.actions.cancel')}
+        </Button>
+      ) : null}
     </Form>
   );
 }
@@ -325,7 +343,7 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
       className="flex flex-col gap-3 rounded-large border border-primary/30 bg-primary/5 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto_auto] sm:items-end"
     >
       <TextField isRequired isInvalid={Boolean(errors.nameAr)} className="flex flex-col gap-1">
-        <Label className="text-xs uppercase tracking-wide text-default-500">
+        <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
           {t('admin.catalog.categories.nameAr')}
         </Label>
         <Input
@@ -335,7 +353,7 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
         {errors.nameAr?.message ? <p className="text-xs text-danger">{error(errors.nameAr.message)}</p> : null}
       </TextField>
       <TextField isRequired isInvalid={Boolean(errors.nameEn)} className="flex flex-col gap-1">
-        <Label className="text-xs uppercase tracking-wide text-default-500">
+        <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
           {t('admin.catalog.categories.nameEn')}
         </Label>
         <Input
@@ -345,7 +363,7 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
         {errors.nameEn?.message ? <p className="text-xs text-danger">{error(errors.nameEn.message)}</p> : null}
       </TextField>
       <TextField isInvalid={Boolean(errors.displayOrder)} className="flex flex-col gap-1">
-        <Label className="text-xs uppercase tracking-wide text-default-500">
+        <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
           {t('admin.catalog.categories.displayOrder')}
         </Label>
         <Input

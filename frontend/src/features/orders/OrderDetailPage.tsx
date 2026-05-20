@@ -141,7 +141,7 @@ export function OrderDetailPage() {
           ) : null}
 
           <section aria-labelledby="items-heading" className="cq space-y-2">
-            <h2 id="items-heading" className="text-sm font-semibold text-foreground">
+            <h2 id="items-heading" className="text-base font-semibold text-foreground">
               {t('orders.detail.itemsHeading')}
             </h2>
             <ul className="space-y-2">
@@ -196,7 +196,7 @@ export function OrderDetailPage() {
                             <span aria-hidden>·</span>
                             <span>{t('common.quantityMultiplier', { count: item.quantity })}</span>
                           </p>
-                          <p className="mt-0.5 text-xs font-mono uppercase tracking-wide text-default-400">
+                          <p className="mt-0.5 text-xs font-mono uppercase tracking-wide text-default-500">
                             {item.sku}
                           </p>
                         </div>
@@ -212,13 +212,13 @@ export function OrderDetailPage() {
           </section>
 
           <section aria-labelledby="address-heading" className="space-y-2">
-            <h2 id="address-heading" className="text-sm font-semibold text-foreground">
+            <h2 id="address-heading" className="text-base font-semibold text-foreground">
               {t('orders.detail.shippingHeading')}
             </h2>
             <Card>
-              <Card.Content className="text-sm leading-relaxed">
+              <Card.Content className="text-sm leading-relaxed sm:text-base">
                 <p className="font-medium">{order.shippingAddress.recipientName}</p>
-                <p className="text-default-700 dark:text-default-300" dir="ltr">
+                <p className="text-default-700 dark:text-default-300">
                   {order.shippingAddress.phone}
                 </p>
                 <p className="mt-1 text-default-700 dark:text-default-300">
@@ -256,18 +256,18 @@ export function OrderDetailPage() {
 
         <Card className="h-fit lg:sticky lg:top-20">
           <Card.Header>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-default-700">
               {t('orders.detail.summary')}
             </h2>
           </Card.Header>
           <Card.Content className="space-y-4">
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <dt className="text-default-500">{t('orders.detail.subTotal')}</dt>
+                <dt className="text-muted-strong">{t('orders.detail.subTotal')}</dt>
                 <dd className="tabular-nums">{formatCurrency(order.subTotal, lang)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-default-500">{t('orders.detail.shipping')}</dt>
+                <dt className="text-muted-strong">{t('orders.detail.shipping')}</dt>
                 <dd className="tabular-nums">
                   {order.shippingFee > 0
                     ? formatCurrency(order.shippingFee, lang)
@@ -284,7 +284,7 @@ export function OrderDetailPage() {
             {/* Separator per Anatomy A.21 */}
             <Separator />
             <div className="pt-3">
-              <h3 className="text-xs uppercase tracking-wide text-default-500">
+              <h3 className="text-sm uppercase tracking-wide text-default-600 font-medium">
                 {t('orders.detail.paymentMethod')}
               </h3>
               <p className="mt-1 text-sm font-medium">
@@ -294,7 +294,7 @@ export function OrderDetailPage() {
             {/* Separator per Anatomy A.21 */}
             <Separator />
             <div className="pt-3">
-              <h3 className="text-xs uppercase tracking-wide text-default-500">
+              <h3 className="text-sm uppercase tracking-wide text-default-600 font-medium">
                 {t('orders.detail.timeline')}
               </h3>
               <div className="mt-2">

@@ -31,8 +31,8 @@ export function EmptyState({
           <Icon className="size-7 text-brand" aria-hidden />
         </div>
         <div className="enter-fade-up space-y-1.5">
-          <Heading level={2} className="text-base font-semibold text-foreground">{title}</Heading>
-          {subtitle && <Paragraph className="mx-auto max-w-xs text-sm leading-relaxed text-muted">{subtitle}</Paragraph>}
+          <Heading level={2} className="text-lg font-semibold text-foreground">{title}</Heading>
+          {subtitle && <Paragraph className="mx-auto max-w-xs text-sm leading-relaxed text-muted sm:text-base">{subtitle}</Paragraph>}
         </div>
         {(action || secondaryAction) && (
           <div className="mt-1 flex flex-wrap justify-center gap-2">

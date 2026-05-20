@@ -50,14 +50,17 @@
   --color-divider: var(--separator);
 
   /* Legacy alias: default-100..700 neutral scale (used heavily for text +
-     subtle backgrounds). Mixed against --foreground at increasing strengths. */
+     subtle backgrounds). Mixed against --foreground at increasing strengths.
+     300–700 are pinned to --foreground so all regular/muted text is full
+     black in light mode and full white in dark mode (Issue D). */
   --color-default-100: color-mix(in oklab, var(--surface) 92%, var(--foreground) 8%);
   --color-default-200: color-mix(in oklab, var(--surface) 84%, var(--foreground) 16%);
-  --color-default-300: color-mix(in oklab, var(--surface) 76%, var(--foreground) 24%);
-  --color-default-400: color-mix(in oklab, var(--surface) 60%, var(--foreground) 40%);
-  --color-default-500: var(--muted);
-  --color-default-600: color-mix(in oklab, var(--muted) 70%, var(--foreground) 30%);
-  --color-default-700: color-mix(in oklab, var(--muted) 50%, var(--foreground) 50%);
+  --color-default-300: var(--foreground);
+  --color-default-400: var(--foreground);
+  --color-default-500: var(--foreground);
+  --color-default-600: var(--foreground);
+  --color-default-700: var(--foreground);
+  --color-muted-strong: var(--foreground);
 }
 
 @custom-variant ar (&:where([dir="rtl"], [dir="rtl"] *));
@@ -100,16 +103,17 @@
     --field-background: oklch(99.00% 0.0050 175);
     --field-border: oklch(68.00% 0.0150 175);
     --field-foreground: oklch(21.03% 0.0080 175);
-    --field-placeholder: oklch(55.17% 0.0150 175);
+    --field-placeholder: oklch(48% 0.015 175);
     --focus: oklch(46% 0.10 175);
     --foreground: oklch(21.03% 0.0100 175);
-    --muted: oklch(55.17% 0.0150 175);
+    --muted: var(--foreground);
+    --muted-strong: var(--foreground);
     --overlay: oklch(100.00% 0.0030 175);
     --overlay-foreground: oklch(21.03% 0.0080 175);
     --scrollbar: oklch(87.10% 0.0080 175);
     --segment: oklch(100.00% 0.0080 175);
     --segment-foreground: oklch(21.03% 0.0080 175);
-    --separator: oklch(92.00% 0.0080 175);
+    --separator: oklch(87% 0.008 175);
     --success: oklch(73.29% 0.1974 153.21);
     --success-foreground: oklch(21.03% 0.0059 153.21);
     --surface: oklch(100.00% 0.0050 175);
@@ -137,6 +141,9 @@
        the actual colors via its layered theme architecture. */
     color-scheme: light dark;
     text-size-adjust: 100%;
+    /* Anchor / skip-link targets land clear of the sticky header.
+       Logical property (not scroll-padding-top) per Principle VIII. */
+    scroll-padding-block-start: 5rem;
   }
 
   html.dark {
@@ -147,9 +154,9 @@
     --muted-2: oklch(0.55 0 0);
 
     /* Dark brand palette — accent (hue 175, eucalyptus teal). */
-    --brand: oklch(58% 0.085 175);
-    --brand-hover: oklch(63% 0.085 175);
-    --brand-active: oklch(54% 0.085 175);
+    --brand: oklch(62% 0.085 175);
+    --brand-hover: oklch(67% 0.085 175);
+    --brand-active: oklch(58% 0.085 175);
     --brand-subtle: oklch(30% 0.05 175);
     --brand-foreground: oklch(99.11% 0 0);
 
@@ -168,7 +175,8 @@
     --field-placeholder: oklch(70.50% 0.0150 175);
     --focus: oklch(58% 0.085 175);
     --foreground: oklch(99.11% 0.0100 175);
-    --muted: oklch(70.50% 0.0150 175);
+    --muted: var(--foreground);
+    --muted-strong: var(--foreground);
     --overlay: oklch(21.03% 0.0100 175);
     --overlay-foreground: oklch(99.11% 0.0080 175);
     --scrollbar: oklch(70.50% 0.0080 175);
@@ -299,11 +307,11 @@
   .page-header {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.5rem;
   }
   .page-header h1,
   .page-header .page-title {
-    font-size: 1.5rem; /* text-2xl */
+    font-size: 1.75rem;
     font-weight: 600;
     letter-spacing: -0.025em;
     line-height: 1.3;
@@ -312,13 +320,24 @@
   @media (min-width: 640px) {
     .page-header h1,
     .page-header .page-title {
-      font-size: 1.75rem; /* text-[1.75rem] — between 2xl and 3xl */
+      font-size: 2rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .page-header h1,
+    .page-header .page-title {
+      font-size: 2.25rem;
     }
   }
   .page-header .page-subtitle {
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: var(--muted);
     line-height: 1.5;
+  }
+  @media (min-width: 640px) {
+    .page-header .page-subtitle {
+      font-size: 1.125rem;
+    }
   }
 
   /* Stat / KPI card — admin dashboard metric display */
@@ -332,7 +351,7 @@
     padding: 0.875rem 1rem;
   }
   .stat-label {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     color: var(--muted);
     line-height: 1.25;
     font-weight: 500;
@@ -423,7 +442,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: var(--muted);
     transition: color 120ms ease-out;
     text-decoration: none;

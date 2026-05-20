@@ -106,7 +106,7 @@ export function AddressForm({
       className="cq content-surface space-y-4 p-4"
     >
       <Fieldset>
-        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+        <Fieldset.Legend className="text-sm uppercase tracking-wide text-default-600 font-medium">
           {t('addresses.form.contactLegend')}
         </Fieldset.Legend>
         <Fieldset.Group className="grid gap-3 @lg:grid-cols-2">
@@ -123,7 +123,7 @@ export function AddressForm({
       </Fieldset>
 
       <Fieldset>
-        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+        <Fieldset.Legend className="text-sm uppercase tracking-wide text-default-600 font-medium">
           {t('addresses.form.locationLegend')}
         </Fieldset.Legend>
         <Fieldset.Group className="grid gap-3 @lg:grid-cols-2">
@@ -146,7 +146,7 @@ export function AddressForm({
       </Fieldset>
 
       <Fieldset>
-        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+        <Fieldset.Legend className="text-sm uppercase tracking-wide text-default-600 font-medium">
           {t('addresses.form.extraLegend')}
         </Fieldset.Legend>
         <Fieldset.Group className="grid gap-3 @lg:grid-cols-2">
@@ -213,7 +213,7 @@ function Field({
 }) {
   return (
     <TextField isRequired={required} isInvalid={Boolean(errorMessage)} className="flex flex-col gap-1">
-      <Label className="text-xs uppercase tracking-wide text-default-500">{label}</Label>
+      <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">{label}</Label>
       <Input
         value={value}
         onChange={(e) => onChange((e.target as HTMLInputElement).value)}

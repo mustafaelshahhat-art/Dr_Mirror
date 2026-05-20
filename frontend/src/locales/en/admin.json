@@ -429,6 +429,18 @@
       "status": "Status"
     },
     "empty": "No audit entries yet.",
-    "errorLoad": "Couldn't load the audit log. Please try again."
+    "errorLoad": "Couldn't load the audit log. Please try again.",
+    "actionTypes": {
+      "OrderStatusChanged": "Order status changed",
+      "PaymentReviewed": "Payment reviewed",
+      "ProductUpdated": "Product updated",
+      "UserRoleUpdated": "User role updated"
+    },
+    "targetTypes": {
+      "Order": "Order",
+      "Payment": "Payment",
+      "Product": "Product",
+      "User": "User"
+    }
   }
 }

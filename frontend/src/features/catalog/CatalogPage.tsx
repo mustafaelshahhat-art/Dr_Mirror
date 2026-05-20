@@ -27,7 +27,7 @@ const TRUST_ITEMS = [
 ] as const;
 
 export function CatalogPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filter: ProductFilter = useMemo(() => {
@@ -127,11 +127,12 @@ export function CatalogPage() {
             eyebrow={t('catalog.hero.eyebrow')}
             title={t('catalog.hero.title')}
             subtitle={t('catalog.hero.subtitle')}
+            className={i18n.language === 'ar' ? '[&_.page-title]:text-balance' : undefined}
           />
           {/* Trust strip */}
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
             {TRUST_ITEMS.map(({ icon: Icon, key }) => (
-              <span key={key} className="flex items-center gap-2 text-sm leading-relaxed text-default-500">
+              <span key={key} className="flex items-center gap-2 text-sm leading-relaxed text-default-500 sm:text-base">
                 <Icon className="size-4 shrink-0" aria-hidden />
                 {t(`common.trust.${key}`)}
               </span>

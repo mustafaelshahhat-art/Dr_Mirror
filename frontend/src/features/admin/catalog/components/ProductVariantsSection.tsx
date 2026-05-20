@@ -113,7 +113,7 @@ function VariantRow({
           <p className="text-sm font-medium">
             {variant.size} / {isAr ? variant.colorNameAr : variant.colorName}
           </p>
-          <p className="font-mono text-xs text-default-500" dir="ltr">
+          <p className="font-mono text-xs text-default-500">
             {variant.sku}
           </p>
         </div>
@@ -232,7 +232,7 @@ function VariantForm({
             isInvalid={Boolean(errors.colorHex)}
             className="space-y-1 text-sm"
           >
-            <Label className="text-xs uppercase tracking-wide text-default-500">
+            <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
               {t('admin.products.variants.hex')}
             </Label>
             <Input
@@ -259,7 +259,7 @@ function VariantForm({
             variant="secondary"
             className="text-sm"
           >
-            <Label className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.variants.stockLabel')}</Label>
+            <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">{t('admin.products.variants.stockLabel')}</Label>
             <NumberField.Group>
               <NumberField.DecrementButton />
               <NumberField.Input className="tabular-nums" />

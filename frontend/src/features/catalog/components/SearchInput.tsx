@@ -60,7 +60,7 @@ export function SearchInput({ value, onCommit, debounceMs = 350 }: SearchInputPr
         onKeyDown={handleKeyDown}
         placeholder={t('catalog.search.placeholder')}
         aria-label={t('catalog.search.label')}
-        className="w-full h-10 ps-10 pe-10 rounded-full border border-default-200/60 bg-default-100/30 dark:bg-default-50/10 text-sm text-default-700 dark:text-default-300 placeholder:text-default-400 font-semibold transition-all duration-300 hover:border-brand/40 hover:bg-brand/5 dark:hover:bg-brand/10 focus:border-brand/80 focus:outline-none focus:ring-2 focus:ring-brand/20"
+        className="w-full h-10 ps-10 pe-10 rounded-full border border-default-200/60 bg-default-100/30 dark:bg-default-50/10 text-sm text-default-700 dark:text-default-300 placeholder:text-default-500 font-semibold transition-all duration-300 hover:border-brand/40 hover:bg-brand/5 dark:hover:bg-brand/10 focus:border-brand/80 focus:outline-none focus:ring-2 focus:ring-brand/20"
       />
 
       {/* Clear Button */}

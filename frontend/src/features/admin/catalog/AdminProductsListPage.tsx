@@ -9,6 +9,7 @@ import { SearchInput } from '../../catalog/components/SearchInput';
 import { genderTranslationKey } from '../../catalog/hooks';
 import type { ProductGender } from '../../catalog/types';
 
+import { AdminProductsListMobileCards } from './AdminProductsListMobileCards';
 import { useAdminCategoriesQuery, useAdminProductsQuery } from './hooks';
 
 import { PageHeader } from '../../../shared/components/PageHeader';
@@ -46,11 +47,13 @@ export function AdminProductsListPage() {
         }
       />
 
-      <div className="grid gap-3 sm:grid-cols-[1fr_12rem_10rem_10rem]">
-        <SearchInput
-          value={q}
-          onCommit={(val) => { setQ(val); setPage(1); }}
-        />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-[1fr_12rem_10rem_10rem]">
+        <div className="col-span-2">
+          <SearchInput
+            value={q}
+            onCommit={(val) => { setQ(val); setPage(1); }}
+          />
+        </div>
         <SelectField
           label={t('admin.products.fields.category')}
           hideLabel
@@ -121,83 +124,91 @@ export function AdminProductsListPage() {
         <EmptyState icon={Package} title={t('admin.products.list.empty')} />
       ) : (
         <div className="space-y-4">
-          <Table className="rounded-large border border-divider/60">
-            <Table.ScrollContainer>
-              <Table.Content aria-label={t('admin.products.list.title')} aria-busy={products.isFetching}>
-                <Table.Header>
-                  <Table.Column isRowHeader className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">
-                    {t('admin.products.fields.nameEn')}
-                  </Table.Column>
-                  <Table.Column className="hidden px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400 md:table-cell">
-                    {t('admin.products.fields.category')}
-                  </Table.Column>
-                  <Table.Column className="hidden px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400 lg:table-cell">
-                    {t('admin.products.fields.gender')}
-                  </Table.Column>
-                  <Table.Column className="hidden px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400 sm:table-cell">
-                    {t('admin.products.variants.stockLabel')}
-                  </Table.Column>
-                  <Table.Column className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">
-                    {t('admin.list.status')}
-                  </Table.Column>
-                  <Table.Column className="px-4 py-3 text-end text-xs font-medium uppercase tracking-wide text-default-400">
-                    {t('admin.products.fields.price')}
-                  </Table.Column>
-                  <Table.Column className="w-12 px-4 py-3" aria-label={t('admin.catalog.actions.edit')} />
-                </Table.Header>
-                <Table.Body className="divide-y divide-divider/60">
-                  {(products.data?.items ?? []).map((p) => (
-                    <Table.Row key={p.id} className="bg-content1 transition-colors hover:bg-content2">
-                      <Table.Cell className="px-4 py-3">
-                        <p className="font-medium text-foreground">{isAr ? p.nameAr : p.nameEn}</p>
-                        <p className="text-xs text-default-500" dir="ltr">/{p.slug}</p>
-                      </Table.Cell>
-                      <Table.Cell className="hidden px-4 py-3 text-default-500 md:table-cell">
-                        {isAr ? p.categoryNameAr : p.categoryNameEn}
-                      </Table.Cell>
-                      <Table.Cell className="hidden px-4 py-3 text-default-500 lg:table-cell">
-                        {t(genderTranslationKey(p.gender))}
-                      </Table.Cell>
-                      <Table.Cell className="hidden px-4 py-3 tabular-nums text-default-500 sm:table-cell">
-                        {t('admin.products.list.totalStock', { count: p.totalStock })}
-                      </Table.Cell>
-                      <Table.Cell className="px-4 py-3">
-                        <span
-                          className={[
-                            'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
-                            p.isPublished
-                              ? 'border-success/30 bg-success/15 text-success'
-                              : 'border-warning/30 bg-warning/15 text-warning',
-                          ].join(' ')}
-                        >
-                          {p.isPublished
-                            ? t('admin.products.list.published')
-                            : t('admin.products.list.draft')}
-                        </span>
-                      </Table.Cell>
-                      <Table.Cell className="px-4 py-3 text-end tabular-nums font-medium">
-                        {formatCurrency(p.price, lang)}
-                      </Table.Cell>
-                      <Table.Cell className="px-4 py-3 text-end">
-                        <Tooltip delay={300} closeDelay={0}>
-                          <Link
-                            to={`/admin/products/${p.id}/edit`}
-                            aria-label={t('admin.catalog.actions.edit')}
-                            className={buttonVariants({ variant: 'outline', size: 'sm', isIconOnly: true })}
+          <div className="hidden sm:block">
+            <Table className="rounded-large border border-divider/60">
+              <Table.ScrollContainer>
+                <Table.Content aria-label={t('admin.products.list.title')} aria-busy={products.isFetching}>
+                  <Table.Header>
+                    <Table.Column isRowHeader className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-default-500">
+                      {isAr ? t('admin.products.fields.nameAr') : t('admin.products.fields.nameEn')}
+                    </Table.Column>
+                    <Table.Column className="hidden px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-default-500 md:table-cell">
+                      {t('admin.products.fields.category')}
+                    </Table.Column>
+                    <Table.Column className="hidden px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-default-500 lg:table-cell">
+                      {t('admin.products.fields.gender')}
+                    </Table.Column>
+                    <Table.Column className="hidden px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-default-500 sm:table-cell">
+                      {t('admin.products.variants.stockLabel')}
+                    </Table.Column>
+                    <Table.Column className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-default-500">
+                      {t('admin.list.status')}
+                    </Table.Column>
+                    <Table.Column className="px-4 py-3 text-end text-xs font-semibold uppercase tracking-wide text-default-500">
+                      {t('admin.products.fields.price')}
+                    </Table.Column>
+                    <Table.Column className="w-12 px-4 py-3" aria-label={t('admin.catalog.actions.edit')} />
+                  </Table.Header>
+                  <Table.Body className="divide-y divide-divider/60">
+                    {(products.data?.items ?? []).map((p) => (
+                      <Table.Row key={p.id} className="bg-content1 transition-colors hover:bg-content2">
+                        <Table.Cell className="px-4 py-3">
+                          <p className="font-medium text-foreground">{isAr ? p.nameAr : p.nameEn}</p>
+                          {!isAr && <p className="text-xs text-default-500">/{p.slug}</p>}
+                        </Table.Cell>
+                        <Table.Cell className="hidden px-4 py-3 text-default-500 md:table-cell">
+                          {isAr ? p.categoryNameAr : p.categoryNameEn}
+                        </Table.Cell>
+                        <Table.Cell className="hidden px-4 py-3 text-default-500 lg:table-cell">
+                          {t(genderTranslationKey(p.gender))}
+                        </Table.Cell>
+                        <Table.Cell className="hidden px-4 py-3 tabular-nums text-default-500 sm:table-cell">
+                          {t('admin.products.list.totalStock', { count: p.totalStock })}
+                        </Table.Cell>
+                        <Table.Cell className="px-4 py-3">
+                          <span
+                            className={[
+                              'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
+                              p.isPublished
+                                ? 'border-success/30 bg-success/15 text-success'
+                                : 'border-warning/30 bg-warning/15 text-warning',
+                            ].join(' ')}
                           >
-                            <Pencil className="size-4" aria-hidden />
-                          </Link>
-                          <Tooltip.Content placement="top">
-                            {t('admin.catalog.actions.edit')}
-                          </Tooltip.Content>
-                        </Tooltip>
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table.Content>
-            </Table.ScrollContainer>
-          </Table>
+                            {p.isPublished
+                              ? t('admin.products.list.published')
+                              : t('admin.products.list.draft')}
+                          </span>
+                        </Table.Cell>
+                        <Table.Cell className="px-4 py-3 text-end tabular-nums font-medium">
+                          {formatCurrency(p.price, lang)}
+                        </Table.Cell>
+                        <Table.Cell className="px-4 py-3 text-end">
+                          <Tooltip delay={300} closeDelay={0}>
+                            <Link
+                              to={`/admin/products/${p.id}/edit`}
+                              aria-label={t('admin.catalog.actions.edit')}
+                              className={`${buttonVariants({ variant: 'outline', size: 'sm', isIconOnly: true })} min-h-11 min-w-11`}
+                            >
+                              <Pencil className="size-4" aria-hidden />
+                            </Link>
+                            <Tooltip.Content placement="top">
+                              {t('admin.catalog.actions.edit')}
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </Table.Cell>
+                      </Table.Row>
+                    ))}
+                  </Table.Body>
+                </Table.Content>
+              </Table.ScrollContainer>
+            </Table>
+          </div>
+          <div className="sm:hidden">
+            <AdminProductsListMobileCards
+              products={products.data?.items ?? []}
+              lang={lang}
+            />
+          </div>
           <PaginationControls
             page={page}
             totalPages={products.data?.totalPages ?? 1}

@@ -47,7 +47,7 @@ export function ProductInfoTabs({
 function SpecField({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-xs uppercase tracking-wide text-default-500">{label}</dt>
+      <dt className="text-sm uppercase tracking-wide text-default-600 font-medium">{label}</dt>
       <dd className="mt-0.5 font-medium">{value}</dd>
     </div>
   );

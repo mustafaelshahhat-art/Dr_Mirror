@@ -23,7 +23,7 @@ export function AuthCard({
           <Plus className="size-6" />
         </div>
         <div className="flex flex-col gap-1">
-          <h1 className="text-[1.375rem] font-semibold tracking-tight">{title}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
           {subtitle ? (
             <p className="text-sm leading-relaxed text-muted">{subtitle}</p>
           ) : null}

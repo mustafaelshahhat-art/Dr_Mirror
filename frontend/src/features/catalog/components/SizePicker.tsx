@@ -91,7 +91,7 @@ export function SizePicker({
               onClick={() => onSelect(s)}
               className={
                 isOut
-                  ? 'inline-flex min-w-14 cursor-not-allowed items-center justify-center rounded-full border border-divider/40 bg-default-100/40 px-4 py-2 text-sm text-default-400 line-through'
+                  ? 'inline-flex min-w-14 cursor-not-allowed items-center justify-center rounded-full border border-divider/40 bg-default-100/40 px-4 py-2 text-sm text-default-500 line-through'
                   : isSelected
                     ? 'inline-flex min-w-14 items-center justify-center rounded-full border-2 border-foreground bg-content1 px-4 py-2 text-sm font-medium text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
                     : 'inline-flex min-w-14 items-center justify-center rounded-full border border-divider/60 bg-content1 px-4 py-2 text-sm text-default-700 transition-colors hover:border-default-400 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-default-300'

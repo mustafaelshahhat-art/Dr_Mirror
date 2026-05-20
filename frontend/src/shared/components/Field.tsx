@@ -13,7 +13,7 @@ import type { HTMLInputTypeAttribute } from 'react';
  * row pattern is unified.
  */
 
-const LABEL_CLASS = 'text-xs uppercase tracking-wide text-default-500';
+const LABEL_CLASS = 'text-sm uppercase tracking-wide text-default-600 font-medium';
 const DESCRIPTION_CLASS = 'text-xs text-default-500';
 
 export interface FieldProps {
