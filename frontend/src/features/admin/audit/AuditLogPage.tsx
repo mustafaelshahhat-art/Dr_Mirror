@@ -261,7 +261,7 @@ function AuditDateFilter({
           </DatePicker.Trigger>
         </DateField.Suffix>
       </DateField.Group>
-      <DatePicker.Popover className="border border-default-200/60 bg-background/85 backdrop-blur-md shadow-lg rounded-large overflow-hidden">
+      <DatePicker.Popover className="border border-default-200/60 bg-background/85 backdrop-blur-md shadow-lg rounded-large min-w-max overflow-hidden">
         <I18nProvider locale={locale}>
           <Calendar aria-label={label}>
             <Calendar.Header>
