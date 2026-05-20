@@ -115,7 +115,7 @@ export function ProductDetailPage() {
         <section className="flex flex-col gap-5">
           <Link
             to={`/?categoryId=${product.category.id}`}
-            className="text-xs uppercase tracking-wide text-default-500 hover:text-foreground"
+            className="text-sm uppercase tracking-wide text-default-600 font-medium hover:text-foreground"
           >
             {categoryName}
           </Link>

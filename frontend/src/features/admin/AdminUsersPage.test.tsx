@@ -73,7 +73,9 @@ describe('AdminUsersPage', () => {
 
     renderWithProviders(<AdminUsersPage />, { authValue: adminAuth });
 
-    expect(await screen.findByText('Admin User')).toBeInTheDocument();
+    // Admin User appears twice — once in the desktop table, once in the
+    // mobile card list — so use findAllByText to wait for data to load.
+    expect((await screen.findAllByText('Admin User')).length).toBeGreaterThan(0);
     await userEvent.click(screen.getByRole('switch', { name: /toggle vendor role/i }));
 
     expect(adminUsersApi.updateRoles).toHaveBeenCalledWith('user-1', ['Admin', 'Vendor', 'Buyer']);
@@ -109,7 +111,9 @@ describe('AdminUsersPage', () => {
 
     renderWithProviders(<AdminUsersPage />, { authValue: adminAuth });
 
-    expect(await screen.findByText('Only Admin')).toBeInTheDocument();
+    // Only Admin appears twice — once in the desktop table, once in the
+    // mobile card list — so use findAllByText to wait for data to load.
+    expect((await screen.findAllByText('Only Admin')).length).toBeGreaterThan(0);
     await userEvent.click(screen.getByRole('switch', { name: /toggle admin role/i }));
 
     expect(toastDangerMock).toHaveBeenCalledWith('Something went wrong. Please try again.');

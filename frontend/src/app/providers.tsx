@@ -57,7 +57,8 @@ function DirectionSync({ children }: { children: ReactNode }) {
  */
 function LocaleScope({ children }: { children: ReactNode }) {
   const { i18n: client } = useTranslation();
-  const locale = (client.resolvedLanguage ?? DEFAULT_LANG) as AppLang;
+  const lang = (client.resolvedLanguage ?? DEFAULT_LANG) as AppLang;
+  const locale = lang === 'ar' ? 'ar-EG' : 'en-US';
   return <I18nProvider locale={locale}>{children}</I18nProvider>;
 }
 

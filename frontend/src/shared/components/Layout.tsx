@@ -42,30 +42,30 @@ export function Layout() {
                 <BrandMark size={20} />
                 {t('appName')}
               </span>
-              <p className="max-w-xs text-xs leading-relaxed text-muted">
+              <p className="max-w-xs text-sm leading-relaxed text-muted">
                 {t('common.footer.tagline')}
               </p>
               {/* Payment affordances row */}
               <div className="flex flex-wrap gap-x-4 gap-y-2">
-                <span className="flex items-center gap-1.5 text-xs text-muted">
+                <span className="flex items-center gap-1.5 text-sm text-muted">
                   <Banknote className="size-4 shrink-0" aria-hidden />
                   {t('common.payment.cod.label')}
                 </span>
-                <span className="flex items-center gap-1.5 text-xs text-muted">
+                <span className="flex items-center gap-1.5 text-sm text-muted">
                   <Smartphone className="size-4 shrink-0" aria-hidden />
                   {t('common.payment.instapay.label')}
                 </span>
-                <span className="flex items-center gap-1.5 text-xs text-muted">
+                <span className="flex items-center gap-1.5 text-sm text-muted">
                   <Wallet className="size-4 shrink-0" aria-hidden />
                   {t('common.payment.wallet.label')}
                 </span>
               </div>
-              <p className="text-xs text-muted">{t('common.governorateCaption')}</p>
+              <p className="text-sm text-muted">{t('common.governorateCaption')}</p>
             </div>
 
             {/* Shop column */}
             <div className="space-y-3">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-foreground/70">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground/70">
                 {t('common.footer.shop.title')}
               </h2>
               <ul className="space-y-2" role="list">
@@ -84,7 +84,7 @@ export function Layout() {
 
             {/* Account column */}
             <div className="space-y-3">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-foreground/70">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground/70">
                 {t('common.footer.accountNav.title')}
               </h2>
               <ul className="space-y-2" role="list">
@@ -108,10 +108,10 @@ export function Layout() {
 
             {/* Support column */}
             <div className="space-y-3">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-foreground/70">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground/70">
                 {t('common.footer.support')}
               </h2>
-              <p className="text-xs leading-relaxed text-muted">
+              <p className="text-sm leading-relaxed text-muted">
                 {t('common.footer.supportLine')}
               </p>
               <Link
@@ -127,7 +127,7 @@ export function Layout() {
 
           {/* Copyright row */}
           <div className="py-5 text-center">
-            <p className="text-xs text-muted">
+            <p className="text-sm text-muted">
               {t('common.footer.copyright', { year: new Date().getFullYear() })}
             </p>
           </div>

@@ -46,7 +46,7 @@ export function PaymentInstructionsCard({ order }: { order: OrderDetailDto }) {
           <Card.Content>
             <dl className="grid gap-2 text-sm sm:grid-cols-2">
               <div>
-                <dt className="text-xs uppercase tracking-wide text-default-500">
+                <dt className="text-sm uppercase tracking-wide text-default-600 font-medium">
                   {t('orders.paymentInstructions.amount')}
                 </dt>
                 <dd className="mt-0.5 text-base font-semibold tabular-nums text-foreground">
@@ -55,7 +55,7 @@ export function PaymentInstructionsCard({ order }: { order: OrderDetailDto }) {
               </div>
               {accountNumber ? (
                 <div>
-                  <dt className="text-xs uppercase tracking-wide text-default-500">
+                  <dt className="text-sm uppercase tracking-wide text-default-600 font-medium">
                     {t('orders.paymentInstructions.accountNumber')}
                   </dt>
                   <dd className="mt-0.5">
@@ -75,7 +75,7 @@ export function PaymentInstructionsCard({ order }: { order: OrderDetailDto }) {
               ) : null}
               {accountHolder ? (
                 <div className="sm:col-span-2">
-                  <dt className="text-xs uppercase tracking-wide text-default-500">
+                  <dt className="text-sm uppercase tracking-wide text-default-600 font-medium">
                     {t('orders.paymentInstructions.accountHolder')}
                   </dt>
                   <dd className="mt-0.5 text-sm text-foreground">{accountHolder}</dd>

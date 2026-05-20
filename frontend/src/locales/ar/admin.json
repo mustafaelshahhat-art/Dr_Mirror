@@ -93,7 +93,11 @@
       "proofsHelp": "ابدأ من هنا. هذه الطلبات متوقفة حتى يعتمد المشغل إثبات الدفع أو يرفضه.",
       "reviewProofs": "مراجعة إثباتات الدفع",
       "statusHeading": "الطابور حسب الحالة",
+      "totalOrders_zero": "لا توجد طلبات",
       "totalOrders_one": "طلب واحد إجمالاً",
+      "totalOrders_two": "طلبان إجمالاً",
+      "totalOrders_few": "{{count}} طلبات إجمالاً",
+      "totalOrders_many": "{{count}} طلبًا إجمالاً",
       "totalOrders_other": "{{count}} طلب إجمالاً"
     },
     "recent": {
@@ -181,7 +185,7 @@
       "errorLoad": "تعذّر تحميل المنتجات. حاول مرة أخرى.",
       "searchPlaceholder": "ابحث بالاسم أو الماركة أو الكود...",
       "allCategories": "كل الفئات",
-      "allGenders": "كل الفئات (للجنس)",
+      "allGenders": "كل الأجناس",
       "allStatuses": "كل الحالات",
       "published": "منشور",
       "draft": "مسودة",
@@ -461,6 +465,18 @@
       "status": "الحالة"
     },
     "empty": "لا توجد إدخالات تدقيق بعد.",
-    "errorLoad": "تعذّر تحميل سجل التدقيق. حاول مرة أخرى."
+    "errorLoad": "تعذّر تحميل سجل التدقيق. حاول مرة أخرى.",
+    "actionTypes": {
+      "OrderStatusChanged": "تغيير حالة الطلب",
+      "PaymentReviewed": "مراجعة الدفع",
+      "ProductUpdated": "تحديث المنتج",
+      "UserRoleUpdated": "تحديث دور المستخدم"
+    },
+    "targetTypes": {
+      "Order": "طلب",
+      "Payment": "دفعة",
+      "Product": "منتج",
+      "User": "مستخدم"
+    }
   }
 }

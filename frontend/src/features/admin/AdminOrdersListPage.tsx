@@ -9,6 +9,7 @@ import { OrderStatusBadge } from '../orders/components/OrderStatusBadge';
 import { ORDER_STATUSES, type OrderStatus } from '../orders/types';
 
 import { StatusFilterDropdown } from './components/StatusFilterDropdown';
+import { AdminOrdersListMobileCards } from './AdminOrdersListMobileCards';
 import { useAdminOrdersQuery } from './hooks';
 import { PageHeader } from '../../shared/components/PageHeader';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
@@ -89,42 +90,47 @@ export function AdminOrdersListPage() {
               {t('admin.list.totalCount', { count: query.data.totalCount })}
             </p>
           ) : null}
-          <Table className="rounded-large border border-divider/60">
-            <Table.ScrollContainer>
-              <Table.Content
-                aria-label={t('admin.list.title')}
-                aria-busy={query.isFetching}
-                onRowAction={(key) => navigate(`/admin/orders/${encodeURIComponent(String(key))}`)}
-              >
-                <Table.Header>
-                  <Table.Column isRowHeader className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">#</Table.Column>
-                  <Table.Column className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.date')}</Table.Column>
-                  <Table.Column className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.items')}</Table.Column>
-                  <Table.Column className="px-4 py-3 text-start text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.status')}</Table.Column>
-                  <Table.Column className="px-4 py-3 text-end text-xs font-medium uppercase tracking-wide text-default-400">{t('admin.list.total')}</Table.Column>
-                </Table.Header>
-                <Table.Body className="divide-y divide-divider/60">
-                  {query.data.items.map((order) => (
-                    <Table.Row id={order.orderNumber} key={order.id} className="bg-content1 transition-colors hover:bg-content2">
-                      <Table.Cell className="px-4 py-3 font-medium">
-                        <Link
-                          to={`/admin/orders/${encodeURIComponent(order.orderNumber)}`}
-                          className="rounded-medium text-primary underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                          aria-label={t('admin.list.openOrder', { orderNumber: order.orderNumber })}
-                        >
-                          {order.orderNumber}
-                        </Link>
-                      </Table.Cell>
-                      <Table.Cell className="px-4 py-3 tabular-nums text-default-500">{dateFmt.format(new Date(order.createdAt))}</Table.Cell>
-                      <Table.Cell className="px-4 py-3 tabular-nums text-default-500">{t('admin.list.itemCount', { count: order.itemCount })}</Table.Cell>
-                      <Table.Cell className="px-4 py-3"><OrderStatusBadge status={order.status} /></Table.Cell>
-                      <Table.Cell className="px-4 py-3 text-end tabular-nums font-medium">{formatCurrency(order.total, lang)}</Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table.Content>
-            </Table.ScrollContainer>
-          </Table>
+          <div className="hidden sm:block">
+            <Table className="rounded-large border border-divider/60">
+              <Table.ScrollContainer>
+                <Table.Content
+                  aria-label={t('admin.list.title')}
+                  aria-busy={query.isFetching}
+                  onRowAction={(key) => navigate(`/admin/orders/${encodeURIComponent(String(key))}`)}
+                >
+                  <Table.Header>
+                    <Table.Column isRowHeader className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-default-500">#</Table.Column>
+                    <Table.Column className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-default-500">{t('admin.list.date')}</Table.Column>
+                    <Table.Column className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-default-500">{t('admin.list.items')}</Table.Column>
+                    <Table.Column className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-default-500">{t('admin.list.status')}</Table.Column>
+                    <Table.Column className="px-4 py-3 text-end text-xs font-semibold uppercase tracking-wide text-default-500">{t('admin.list.total')}</Table.Column>
+                  </Table.Header>
+                  <Table.Body className="divide-y divide-divider/60">
+                    {query.data.items.map((order) => (
+                      <Table.Row id={order.orderNumber} key={order.id} className="bg-content1 transition-colors hover:bg-content2">
+                        <Table.Cell className="px-4 py-3 font-medium">
+                          <Link
+                            to={`/admin/orders/${encodeURIComponent(order.orderNumber)}`}
+                            className="rounded-medium text-primary underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                            aria-label={t('admin.list.openOrder', { orderNumber: order.orderNumber })}
+                          >
+                            {order.orderNumber}
+                          </Link>
+                        </Table.Cell>
+                        <Table.Cell className="px-4 py-3 tabular-nums text-default-500">{dateFmt.format(new Date(order.createdAt))}</Table.Cell>
+                        <Table.Cell className="px-4 py-3 tabular-nums text-default-500">{t('admin.list.itemCount', { count: order.itemCount })}</Table.Cell>
+                        <Table.Cell className="px-4 py-3"><OrderStatusBadge status={order.status} /></Table.Cell>
+                        <Table.Cell className="px-4 py-3 text-end tabular-nums font-medium">{formatCurrency(order.total, lang)}</Table.Cell>
+                      </Table.Row>
+                    ))}
+                  </Table.Body>
+                </Table.Content>
+              </Table.ScrollContainer>
+            </Table>
+          </div>
+          <div className="sm:hidden">
+            <AdminOrdersListMobileCards orders={query.data.items} lang={lang} />
+          </div>
           <PaginationControls page={page} totalPages={query.data?.totalPages ?? 1} onPageChange={setPage} />
         </>
       )}

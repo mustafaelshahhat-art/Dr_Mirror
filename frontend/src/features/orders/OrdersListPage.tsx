@@ -87,7 +87,7 @@ export function OrdersListPage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-3 sm:justify-end">
-                  <p className="text-xs tabular-nums text-muted">
+                  <p className="text-xs font-medium tabular-nums text-muted">
                     {dateFmt.format(new Date(order.createdAt))} ·{' '}
                     {t('orders.list.itemCount', { count: order.itemCount })}
                   </p>

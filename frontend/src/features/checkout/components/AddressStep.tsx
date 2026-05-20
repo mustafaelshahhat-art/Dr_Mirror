@@ -45,7 +45,7 @@ export function AddressStep({
 
       {savedAddresses.length > 0 ? (
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-default-500">
+          <p className="text-sm uppercase tracking-wide text-default-600 font-medium">
             {t('checkout.address.savedHeading')}
           </p>
           <RadioGroup
@@ -77,7 +77,7 @@ export function AddressStep({
                         </span>
                       ) : null}
                     </p>
-                    <p className="text-xs text-default-500" dir="ltr">
+                    <p className="text-xs text-default-500">
                       {a.phone}
                     </p>
                     <p className="text-xs text-default-700 dark:text-default-300">
@@ -199,7 +199,7 @@ export function AddressStep({
           </Checkbox>
           {saveAsNewAddress ? (
             <TextField className="flex flex-col gap-1.5">
-              <Label className="text-xs uppercase tracking-wide text-default-500">
+              <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
                 {t('checkout.address.newLabel')}
               </Label>
               <Input

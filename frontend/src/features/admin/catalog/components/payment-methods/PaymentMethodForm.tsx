@@ -157,7 +157,7 @@ export function PaymentMethodForm(props: Props) {
 
       {isCreate ? (
         <Fieldset>
-          <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+          <Fieldset.Legend className="text-sm uppercase tracking-wide text-default-600 font-medium">
             {t('admin.payments.sections.identity')}
           </Fieldset.Legend>
           <Fieldset.Group className="grid gap-3 sm:grid-cols-2">
@@ -184,7 +184,7 @@ export function PaymentMethodForm(props: Props) {
       ) : null}
 
       <Fieldset>
-        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+        <Fieldset.Legend className="text-sm uppercase tracking-wide text-default-600 font-medium">
           {t('admin.payments.sections.display')}
         </Fieldset.Legend>
         <Fieldset.Group className="grid gap-3 sm:grid-cols-2">
@@ -211,7 +211,7 @@ export function PaymentMethodForm(props: Props) {
       </Fieldset>
 
       <Fieldset>
-        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+        <Fieldset.Legend className="text-sm uppercase tracking-wide text-default-600 font-medium">
           {t('admin.payments.sections.instructions')}
         </Fieldset.Legend>
         <Fieldset.Group className="grid gap-3 sm:grid-cols-2">
@@ -225,7 +225,7 @@ export function PaymentMethodForm(props: Props) {
       </Fieldset>
 
       <Fieldset>
-        <Fieldset.Legend className="text-xs uppercase tracking-wide text-default-500">
+        <Fieldset.Legend className="text-sm uppercase tracking-wide text-default-600 font-medium">
           {t('admin.payments.sections.account')}
         </Fieldset.Legend>
         <Fieldset.Group className="grid gap-3 sm:grid-cols-2">

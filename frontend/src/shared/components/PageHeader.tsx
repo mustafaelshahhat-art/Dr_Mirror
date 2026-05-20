@@ -29,7 +29,7 @@ export function PageHeader({
       <div
         className={[
           'flex w-full gap-4',
-          action ? 'flex-col sm:flex-row sm:items-center sm:justify-between' : '',
+          action ? 'flex-row flex-wrap items-center justify-between' : '',
         ]
           .filter(Boolean)
           .join(' ')}

@@ -28,7 +28,7 @@ export function AuthShell() {
           </a>
 
           <div className="mt-auto space-y-6 pb-4">
-            <p className="text-xl font-semibold tracking-tight leading-snug">
+            <p className="text-2xl font-semibold tracking-tight leading-snug sm:text-3xl">
               {t('auth.shell.tagline')}
             </p>
             <ul className="space-y-4">
@@ -73,7 +73,7 @@ export function AuthShell() {
           <Outlet />
         </main>
 
-        <footer className="border-t border-border/40 py-5 text-center text-xs text-muted">
+        <footer className="border-t border-border/40 py-5 text-center text-sm text-muted">
           {t('common.footer.copyright', { year: new Date().getFullYear() })}
         </footer>
       </div>

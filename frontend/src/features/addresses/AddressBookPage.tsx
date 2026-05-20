@@ -180,7 +180,7 @@ function AddressCard({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 space-y-1">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-semibold">{a.label}</h2>
+              <h2 className="text-base font-semibold">{a.label}</h2>
               {a.isDefault ? (
                 <span className="inline-flex items-center gap-1 rounded-medium border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                   <Star className="size-3" aria-hidden />
@@ -189,7 +189,7 @@ function AddressCard({
               ) : null}
             </div>
             <p className="text-sm font-medium text-foreground">{a.recipientName}</p>
-            <p className="font-mono text-xs text-default-500" dir="ltr">
+            <p className="font-mono text-xs text-muted-strong">
               {a.phone}
             </p>
             <p className="text-sm text-default-700 dark:text-default-300">
@@ -201,21 +201,22 @@ function AddressCard({
               {a.city}, {localizedGovernorate}
             </p>
             {a.landmark ? (
-              <p className="text-xs text-default-500">
+              <p className="text-xs text-muted-strong">
                 {t('addresses.landmark')}: {a.landmark}
               </p>
             ) : null}
             {a.notes ? (
-              <p className="text-xs italic text-default-500">{a.notes}</p>
+              <p className="text-xs italic text-muted-strong">{a.notes}</p>
             ) : null}
           </div>
-          <div className="flex shrink-0 flex-col gap-1.5">
+          <div className="flex shrink-0 flex-col gap-2">
             <Button
               isIconOnly
               variant="ghost"
               size="md"
               onPress={onEdit}
               aria-label={t('addresses.actions.edit')}
+              className="min-h-11 min-w-11"
             >
               <Pencil className="size-4" aria-hidden />
             </Button>
@@ -227,6 +228,7 @@ function AddressCard({
                 onPress={onSetDefault}
                 isDisabled={isMutating}
                 aria-label={t('addresses.actions.setDefault')}
+                className="min-h-11 min-w-11"
               >
                 <Star className="size-4" aria-hidden />
               </Button>
@@ -238,7 +240,7 @@ function AddressCard({
               onPress={onDelete}
               isDisabled={isMutating}
               aria-label={t('addresses.actions.delete')}
-              className="text-default-500 hover:text-danger"
+              className="min-h-11 min-w-11 text-default-500 hover:text-danger"
             >
               <Trash2 className="size-4" aria-hidden />
             </Button>

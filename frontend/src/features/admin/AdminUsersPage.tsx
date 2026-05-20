@@ -10,6 +10,7 @@ import { ALL_ROLES, type AdminUserDto, type UserRole } from './users/types';
 import { useAdminUsersQuery, useUpdateUserRolesMutation } from './users/hooks';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { EmptyState } from '../../shared/components/EmptyState';
+import { AdminUsersMobileCards } from './AdminUsersMobileCards';
 
 export function AdminUsersPage() {
   const { t } = useTranslation();
@@ -57,28 +58,33 @@ export function AdminUsersPage() {
         />
       ) : query.data?.items?.length ? (
         <div className="space-y-4">
-          <Table className="rounded-large border border-divider/60">
-            <Table.ScrollContainer>
-              <Table.Content aria-label={t('admin.users.title')} aria-busy={query.isFetching}>
-                <Table.Header>
-                  <Table.Column isRowHeader className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400">
-                    {t('admin.users.colName')}
-                  </Table.Column>
-                  <Table.Column className="hidden px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400 sm:table-cell">
-                    {t('admin.users.colJoined')}
-                  </Table.Column>
-                  <Table.Column className="px-4 py-2 text-start text-xs font-medium uppercase tracking-wide text-default-400">
-                    {t('admin.users.colRoles')}
-                  </Table.Column>
-                </Table.Header>
-                <Table.Body className="divide-y divide-divider/60">
-                  {query.data.items.map((user) => (
-                    <UserRow key={user.id} user={user} dateFmt={dateFmt} />
-                  ))}
-                </Table.Body>
-              </Table.Content>
-            </Table.ScrollContainer>
-          </Table>
+          <div className="hidden sm:block">
+            <Table className="rounded-large border border-divider/60">
+              <Table.ScrollContainer>
+                <Table.Content aria-label={t('admin.users.title')} aria-busy={query.isFetching}>
+                  <Table.Header>
+                    <Table.Column isRowHeader className="px-4 py-2 text-start text-xs font-semibold uppercase tracking-wide text-default-500">
+                      {t('admin.users.colName')}
+                    </Table.Column>
+                    <Table.Column className="hidden px-4 py-2 text-start text-xs font-semibold uppercase tracking-wide text-default-500 sm:table-cell">
+                      {t('admin.users.colJoined')}
+                    </Table.Column>
+                    <Table.Column className="px-4 py-2 text-start text-xs font-semibold uppercase tracking-wide text-default-500">
+                      {t('admin.users.colRoles')}
+                    </Table.Column>
+                  </Table.Header>
+                  <Table.Body className="divide-y divide-divider/60">
+                    {query.data.items.map((user) => (
+                      <UserRow key={user.id} user={user} dateFmt={dateFmt} />
+                    ))}
+                  </Table.Body>
+                </Table.Content>
+              </Table.ScrollContainer>
+            </Table>
+          </div>
+          <div className="sm:hidden">
+            <AdminUsersMobileCards users={query.data.items} dateFmt={dateFmt} />
+          </div>
           <PaginationControls
             page={page}
             totalPages={query.data.totalPages}
@@ -121,7 +127,7 @@ function UserRow({
     <Table.Row className="bg-content1 transition-colors hover:bg-content2">
       <Table.Cell className="px-4 py-3">
         <p className="font-medium text-foreground">{user.fullName}</p>
-        <p className="text-xs text-default-500" dir="ltr">{user.email}</p>
+        <p className="text-xs text-default-500">{user.email}</p>
       </Table.Cell>
       <Table.Cell className="hidden px-4 py-3 tabular-nums text-default-500 sm:table-cell">
         {dateFmt.format(new Date(user.createdAt))}

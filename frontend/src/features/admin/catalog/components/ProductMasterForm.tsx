@@ -69,7 +69,7 @@ export function ProductMasterForm({
         {hideTitle ? <span aria-hidden /> : (
           <div>
             <Heading className="text-xl font-semibold tracking-tight">{product.nameEn}</Heading>
-            <p className="text-xs text-default-500" dir="ltr">
+            <p className="text-xs text-default-500">
               /{product.slug}
             </p>
           </div>
@@ -157,7 +157,7 @@ export function ProductMasterForm({
             variant="secondary"
             className="text-sm"
           >
-            <Label className="text-xs uppercase tracking-wide text-default-500">{t('admin.products.fields.price')}</Label>
+            <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">{t('admin.products.fields.price')}</Label>
             <NumberField.Group>
               <NumberField.Input className="tabular-nums" />
             </NumberField.Group>

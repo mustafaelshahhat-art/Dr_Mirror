@@ -28,7 +28,7 @@ import { ThemeToggle } from './ThemeToggle';
  * Approved Composition Component: Surface + Button + Drawer + Link + Separator.
  */
 export function Header() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, logout, isBootstrapping, isAdmin } = useAuth();
   const { cart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -71,7 +71,7 @@ export function Header() {
                   size="sm"
                   onPress={() => void logout()}
                   aria-label={t('auth.signOut')}
-                  className="text-default-600 dark:text-default-400"
+                  className="text-default-600 dark:text-default-500"
                 >
                   {t('auth.signOut')}
                 </Button>
@@ -117,7 +117,7 @@ export function Header() {
       <Drawer isOpen={menuOpen} onOpenChange={setMenuOpen}>
         <Drawer.Backdrop className="bg-foreground/40">
           <Drawer.Content
-            placement="left"
+            placement={i18n.dir() === "rtl" ? "right" : "left"}
             className="w-72 max-w-[85vw]"
           >
             <Drawer.Dialog className="flex h-full flex-col">
@@ -215,7 +215,7 @@ export function Header() {
                       void logout();
                     }}
                     aria-label={t('auth.signOut')}
-                    className="text-default-600 dark:text-default-400"
+                    className="text-default-600 dark:text-default-500"
                   >
                     <span className="inline-flex items-center gap-2">
                       <LogOut className="size-4 rtl:rotate-180" aria-hidden />

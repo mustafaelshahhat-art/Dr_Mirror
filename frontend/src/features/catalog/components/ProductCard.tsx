@@ -80,13 +80,13 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
           </div>
 
           {/* Product name */}
-          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground underline-offset-2 group-hover:underline sm:text-base">
+          <h3 className="line-clamp-2 text-base font-semibold leading-snug text-foreground underline-offset-2 group-hover:underline sm:text-lg">
             {name}
           </h3>
 
           {/* Brand — slightly more visible than muted */}
           {product.brand ? (
-            <span className="text-xs font-medium text-default-600 dark:text-default-400">{product.brand}</span>
+            <span className="text-xs font-medium text-default-600 dark:text-default-500">{product.brand}</span>
           ) : null}
 
           {product.availableColors.length > 0 ? (
@@ -99,7 +99,7 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
               {formatCurrency(product.price, lang)}
             </span>
             {sizeCount > 0 ? (
-              <span className="text-xs font-medium tabular-nums text-default-600 dark:text-default-400 @md:text-end">
+              <span className="text-xs font-medium tabular-nums text-default-600 dark:text-default-500 @md:text-end">
                 {t('catalog.list.sizesAvailable', { count: sizeCount })}
               </span>
             ) : null}

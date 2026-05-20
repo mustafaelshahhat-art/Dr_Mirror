@@ -88,7 +88,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
         <Heading level={2} className="text-sm font-semibold text-foreground">
           {productId ? t('inquiries.form.productHeading') : t('inquiries.form.heading')}
         </Heading>
-        <Paragraph className="text-xs text-default-500">{t('inquiries.form.subtitle')}</Paragraph>
+        <Paragraph className="text-sm text-default-500 sm:text-base">{t('inquiries.form.subtitle')}</Paragraph>
       </header>
 
       <Fieldset>

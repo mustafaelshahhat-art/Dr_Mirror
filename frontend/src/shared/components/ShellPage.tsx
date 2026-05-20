@@ -48,12 +48,12 @@ export function ShellPage() {
           {initials}
         </div>
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold tracking-tight">
+          <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
             {t('common.account.welcome', { name: user.fullName })}
           </h1>
           <p className="mt-0.5 text-sm text-muted">{user.email}</p>
           {createdAt ? (
-            <p className="mt-0.5 text-xs text-default-400">
+            <p className="mt-0.5 text-xs text-default-500">
               {t('account.account.memberSince', { date: createdAt })}
             </p>
           ) : null}
@@ -73,10 +73,10 @@ export function ShellPage() {
             <Package className="size-5" aria-hidden />
           </span>
           <span className="min-w-0">
-            <span className="block text-sm font-semibold text-foreground">
+            <span className="block text-base font-semibold text-foreground">
               {t('common.account.myOrders.title')}
             </span>
-            <span className="block text-xs text-default-500">
+            <span className="block text-sm text-default-500">
               {t('common.account.myOrders.subtitle')}
             </span>
           </span>
@@ -90,10 +90,10 @@ export function ShellPage() {
             <MapPin className="size-5" aria-hidden />
           </span>
           <span className="min-w-0">
-            <span className="block text-sm font-semibold text-foreground">
+            <span className="block text-base font-semibold text-foreground">
               {t('common.account.addresses.title')}
             </span>
-            <span className="block text-xs text-default-500">
+            <span className="block text-sm text-default-500">
               {t('common.account.addresses.subtitle')}
             </span>
           </span>
@@ -104,14 +104,14 @@ export function ShellPage() {
             to="/admin"
             className="group flex items-center gap-3 content-surface p-4 transition-colors hover:bg-surface-secondary"
           >
-            <span className="grid size-10 place-items-center rounded-medium bg-default-200 text-default-600 dark:bg-default-100/10 dark:text-default-400">
+            <span className="grid size-10 place-items-center rounded-medium bg-default-200 text-default-700 dark:bg-default-100/10 dark:text-default-500">
               <LayoutDashboard className="size-5" aria-hidden />
             </span>
             <span className="min-w-0">
-              <span className="block text-sm font-semibold text-foreground">
-                {t('common.account.adminDashboard.title')}
-              </span>
-              <span className="block text-xs text-default-500">
+            <span className="block text-base font-semibold text-foreground">
+              {t('common.account.adminDashboard.title')}
+            </span>
+            <span className="block text-sm text-default-500">
                 {t('common.account.adminDashboard.subtitle')}
               </span>
             </span>

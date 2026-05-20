@@ -149,7 +149,6 @@ export function AdminOrderDetailPage() {
           <a
             href={`mailto:${order.buyer.email}`}
             className="text-sm text-primary underline-offset-2 hover:underline"
-            dir="ltr"
           >
             {order.buyer.email}
           </a>
@@ -181,10 +180,10 @@ export function AdminOrderDetailPage() {
               <Tabs.Panel id="proofs">
                 <Card aria-labelledby="admin-proofs-heading">
                   <Card.Header>
-                    <h2
-                      id="admin-proofs-heading"
-                      className="text-sm font-semibold text-foreground"
-                    >
+                <h2
+                  id="admin-proofs-heading"
+                  className="text-base font-semibold text-foreground"
+                >
                       {t('admin.detail.proofsHeading')}
                     </h2>
                   </Card.Header>
@@ -199,7 +198,7 @@ export function AdminOrderDetailPage() {
             ) : null}
             <Tabs.Panel id="items">
               <section aria-labelledby="admin-items-heading" className="space-y-2">
-                <h2 id="admin-items-heading" className="text-sm font-semibold text-foreground">
+                <h2 id="admin-items-heading" className="text-base font-semibold text-foreground">
                   {t('admin.detail.itemsHeading')}
                 </h2>
                 <ul className="space-y-2">
@@ -249,7 +248,7 @@ export function AdminOrderDetailPage() {
                                 <span aria-hidden>·</span>
                                 <span>{t('common.quantityMultiplier', { count: item.quantity })}</span>
                               </p>
-                              <p className="mt-0.5 font-mono text-xs uppercase tracking-wide text-default-400">
+                              <p className="mt-0.5 font-mono text-sm uppercase tracking-wide font-medium text-default-500">
                                 {item.sku}
                               </p>
                             </div>
@@ -267,13 +266,13 @@ export function AdminOrderDetailPage() {
           </Tabs>
 
           <section aria-labelledby="admin-address-heading" className="space-y-2">
-            <h2 id="admin-address-heading" className="text-sm font-semibold text-foreground">
+            <h2 id="admin-address-heading" className="text-base font-semibold text-foreground">
               {t('admin.detail.shippingHeading')}
             </h2>
             <Card>
               <Card.Content className="text-sm leading-relaxed">
                 <p className="font-medium">{order.shippingAddress.recipientName}</p>
-                <p className="text-default-700 dark:text-default-300" dir="ltr">
+                <p className="text-default-700 dark:text-default-300">
                   {order.shippingAddress.phone}
                 </p>
                 <p className="mt-1 text-default-700 dark:text-default-300">
@@ -308,7 +307,7 @@ export function AdminOrderDetailPage() {
 
           {order.buyerNote ? (
             <section aria-labelledby="admin-note-heading" className="space-y-2">
-              <h2 id="admin-note-heading" className="text-sm font-semibold text-foreground">
+              <h2 id="admin-note-heading" className="text-base font-semibold text-foreground">
                 {t('admin.detail.buyerNoteHeading')}
               </h2>
               <Card>
@@ -324,18 +323,18 @@ export function AdminOrderDetailPage() {
 
         <Card className="h-fit lg:sticky lg:top-20">
           <Card.Header>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-default-700">
               {t('admin.detail.summary')}
             </h2>
           </Card.Header>
           <Card.Content className="space-y-4">
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <dt className="text-default-500">{t('admin.detail.subTotal')}</dt>
+                <dt className="text-muted-strong">{t('admin.detail.subTotal')}</dt>
                 <dd className="tabular-nums">{formatCurrency(order.subTotal, lang)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-default-500">{t('admin.detail.shipping')}</dt>
+                <dt className="text-muted-strong">{t('admin.detail.shipping')}</dt>
                 <dd className="tabular-nums">
                   {order.shippingFee > 0
                     ? formatCurrency(order.shippingFee, lang)
@@ -352,7 +351,7 @@ export function AdminOrderDetailPage() {
             {/* Separator per Anatomy A.21 */}
             <Separator />
             <div className="pt-3">
-              <h3 className="text-xs uppercase tracking-wide text-default-500">
+              <h3 className="text-sm uppercase tracking-wide text-default-600 font-medium">
                 {t('admin.detail.paymentMethod')}
               </h3>
               <p className="mt-1 text-sm font-medium">

@@ -135,7 +135,7 @@ export function CartPage() {
 
           <Card className="h-fit rounded-3xl border border-divider/60 lg:sticky lg:top-20">
             <Card.Header className="border-b border-divider/40 px-5 pb-3 pt-5">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
+              <h2 className="text-base font-semibold uppercase tracking-wider text-muted">
                 {t('cart.summary')}
               </h2>
             </Card.Header>

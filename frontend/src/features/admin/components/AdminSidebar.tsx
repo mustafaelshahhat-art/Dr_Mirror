@@ -17,7 +17,7 @@ export function AdminSidebar({
   open: boolean;
   onClose: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
   const initials = (user?.fullName ?? '')
     .split(' ')
@@ -64,7 +64,7 @@ export function AdminSidebar({
           className={['bg-background/70', ADMIN_HEADER_OFFSET_CLASS, ADMIN_DRAWER_HEIGHT_CLASS].join(' ')}
         >
           <Drawer.Content
-            placement="left"
+            placement={i18n.dir() === "rtl" ? "right" : "left"}
             className={[
               'w-56 max-w-xs rounded-none border-divider/60 bg-background p-0 data-[placement=left]:border-e data-[placement=right]:border-s',
               ADMIN_HEADER_OFFSET_CLASS,
@@ -96,7 +96,7 @@ function SidebarNav({ label, onClose }: { label: string; onClose?: () => void })
     <nav aria-label={label} className="flex flex-1 flex-col overflow-y-auto px-2 pb-4 pt-2">
       {ADMIN_NAV_GROUPS.map((group) => (
         <div key={group.groupKey}>
-          <p className="px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-wide text-default-400">
+          <p className="px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-wide text-default-500">
             {t(`admin.shell.nav.groups.${group.groupKey}`)}
           </p>
           <div className="flex flex-col gap-0.5">
@@ -133,7 +133,7 @@ function NavItem({
           'flex items-center gap-2.5 rounded-medium px-3 py-2 text-sm font-medium transition-colors motion-reduce:transition-none',
           isActive
             ? 'relative bg-brand-subtle text-brand before:absolute before:start-0 before:top-1 before:h-[calc(100%-8px)] before:w-[3px] before:rounded-e-full before:bg-brand'
-            : 'text-default-600 hover:bg-default-100 hover:text-foreground dark:text-default-400 dark:hover:bg-default-50/5 dark:hover:text-foreground',
+            : 'text-default-600 hover:bg-default-100 hover:text-foreground dark:text-default-500 dark:hover:bg-default-50/5 dark:hover:text-foreground',
         ].join(' ')
       }
     >

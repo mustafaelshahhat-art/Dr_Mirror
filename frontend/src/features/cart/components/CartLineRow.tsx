@@ -78,7 +78,7 @@ export function CartLineRow({
         <div className="flex flex-col gap-1 @sm:flex-row @sm:items-start @sm:justify-between @sm:gap-2">
           <Link
             to={`/products/${line.productSlug}`}
-            className="line-clamp-2 text-sm font-medium leading-tight text-foreground hover:underline"
+            className="line-clamp-2 text-sm font-medium leading-tight text-foreground hover:underline sm:text-base"
           >
             {name}
           </Link>
@@ -103,7 +103,7 @@ export function CartLineRow({
           {!isCompact ? (
             <>
               <span aria-hidden>·</span>
-              <span className="font-mono text-xs uppercase tracking-wide">{line.sku}</span>
+              <span className="font-mono text-sm uppercase tracking-wide font-medium">{line.sku}</span>
             </>
           ) : null}
         </div>
@@ -128,12 +128,12 @@ export function CartLineRow({
             aria-label={t('cart.line.quantityLabel')}
           >
             <Label className="sr-only">{t('cart.line.quantityLabel')}</Label>
-            <NumberField.Group>
-              <NumberField.DecrementButton aria-label={t('cart.line.decreaseQuantity')}>
+            <NumberField.Group className="gap-2">
+              <NumberField.DecrementButton aria-label={t('cart.line.decreaseQuantity')} className="min-h-11 min-w-11">
                 <Minus className="size-3.5" aria-hidden />
               </NumberField.DecrementButton>
               <NumberField.Input className="tabular-nums" />
-              <NumberField.IncrementButton aria-label={t('cart.line.increaseQuantity')}>
+              <NumberField.IncrementButton aria-label={t('cart.line.increaseQuantity')} className="min-h-11 min-w-11">
                 <Plus className="size-3.5" aria-hidden />
               </NumberField.IncrementButton>
             </NumberField.Group>
@@ -147,7 +147,7 @@ export function CartLineRow({
               onPress={onRemove}
               isDisabled={isMutating}
               aria-label={t('cart.line.remove')}
-              className="text-default-500 hover:text-danger self-start @sm:self-auto"
+              className="min-h-11 min-w-11 text-default-500 hover:text-danger self-start @sm:self-auto"
             >
               <Trash2 className="size-4" aria-hidden />
             </Button>
