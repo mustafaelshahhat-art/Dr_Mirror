@@ -1,4 +1,4 @@
-import { Badge, Button, Drawer } from '@heroui/react';
+import { Button, Drawer } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
@@ -25,10 +25,10 @@ import { CartLineRow } from './CartLineRow';
 export function CartButton() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
-  const isRtl = i18n.dir(lang) === 'rtl';
-  // Cart is a TRAILING edge drawer — opposite of the navigation drawer.
-  const placement = isRtl ? 'left' : 'right';
-  const badgePlacement = isRtl ? 'top-left' : 'top-right';
+  // Cart drawer always slides in from the physical LEFT edge of the viewport,
+  // regardless of document direction. In LTR this sits opposite the cart icon
+  // (which renders on the right of the header); in RTL it lands on the same
+  // side as the icon. Per product direction.
   const { cart, updateQuantity, removeItem } = useCart();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -56,24 +56,24 @@ export function CartButton() {
 
   return (
     <>
-      {/* Drawer.Trigger renders its own <button>, so we drive open state
-          manually to avoid the invalid nested-<button> markup it would create
-          around our Button component. */}
-      {showCount ? (
-        <Badge color="accent" placement={badgePlacement} size="sm">
-          <Badge.Anchor>{trigger}</Badge.Anchor>
-          <Badge.Label aria-hidden>{countLabel}</Badge.Label>
-        </Badge>
-      ) : (
-        trigger
-      )}
+      <div className="relative inline-flex">
+        {trigger}
+        {showCount ? (
+          <span
+            className="absolute -end-1 -top-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-white tabular-nums shadow-sm outline outline-2 outline-background"
+            aria-hidden
+          >
+            {countLabel}
+          </span>
+        ) : null}
+      </div>
 
       <Drawer isOpen={isOpen} onOpenChange={setIsOpen}>
         {/* bg-foreground/40 gives a semi-transparent scrim so the page behind
             remains partially visible — not fully blacked out. */}
         <Drawer.Backdrop className="bg-foreground/40">
-          <Drawer.Content placement={placement} className="w-full max-w-md">
-            <Drawer.Dialog className="flex h-full flex-col">
+          <Drawer.Content placement="left">
+            <Drawer.Dialog className="flex h-full w-[72vw] max-w-sm flex-col p-0 sm:w-[26rem]">
               <Drawer.Header className="border-b border-divider/60 px-4 py-3">
                 <Drawer.Heading className="text-base font-semibold">
                   {t('cart.title')}
@@ -123,9 +123,9 @@ export function CartButton() {
               </Drawer.Body>
 
               <Drawer.Footer
-                className="border-t border-divider/60 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3"
+                className="flex flex-col items-stretch gap-3 border-t border-divider/60 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3"
               >
-                <div className="mb-3 flex items-baseline justify-between text-sm">
+                <div className="flex items-baseline justify-between gap-3 text-sm">
                   <span className="text-default-500">{t('cart.subTotal')}</span>
                   <span className="text-base font-semibold tabular-nums text-foreground">
                     {formatCurrency(cart.subTotal, lang)}

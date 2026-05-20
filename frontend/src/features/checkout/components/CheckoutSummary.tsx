@@ -15,11 +15,11 @@ export function CheckoutSummary({ items, subTotal, lang }: Props) {
   const { t } = useTranslation();
 
   return (
-    <aside className="content-surface h-fit space-y-4 p-4 lg:sticky lg:top-20">
+    <aside className="h-fit space-y-4 overflow-hidden rounded-2xl border border-separator/60 bg-surface p-5 lg:sticky lg:top-20">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-default-600">
         {t('checkout.summary.heading')}
       </h2>
-      <ul className="space-y-2 text-sm">
+      <ul className="space-y-2.5 text-sm">
         {items.map((line) => {
           const name = lang === 'ar' ? line.nameAr : line.nameEn;
           return (
@@ -37,7 +37,7 @@ export function CheckoutSummary({ items, subTotal, lang }: Props) {
       </ul>
       {/* Separator per Anatomy A.21; maps border-t border-divider purely-visual separator */}
       <Separator />
-      <dl className="space-y-1 pt-3 text-sm">
+      <dl className="space-y-1.5 pt-1 text-sm">
         <div className="flex justify-between">
           <dt className="text-default-500">{t('checkout.summary.subTotal')}</dt>
           <dd className="tabular-nums">{formatCurrency(subTotal, lang)}</dd>
@@ -49,7 +49,7 @@ export function CheckoutSummary({ items, subTotal, lang }: Props) {
       </dl>
       {/* Separator per Anatomy A.21; Separator cannot be a direct child of <dl> (HTML spec) */}
       <Separator />
-      <div className="mt-2 flex justify-between pt-2 text-base font-semibold">
+      <div className="flex justify-between rounded-xl bg-brand/5 p-3 text-base font-semibold dark:bg-brand/10">
         <span>{t('checkout.summary.total')}</span>
         <span className="tabular-nums">{formatCurrency(subTotal, lang)}</span>
       </div>

@@ -203,6 +203,7 @@
     text-rendering: optimizeLegibility;
     margin: 0;
     min-height: 100svh;
+    overflow-x: hidden;
   }
 
   /* Locale-aware primary font (per A17 / A19). */
@@ -217,18 +218,38 @@
   /* Styled scrollbars — thin, brand-tinted for dark mode */
   * {
     scrollbar-width: thin;
-    scrollbar-color: var(--scrollbar) transparent;
+    scrollbar-color: color-mix(in oklab, var(--brand) 30%, var(--scrollbar)) transparent;
   }
   *::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
   *::-webkit-scrollbar-track {
     background: transparent;
   }
   *::-webkit-scrollbar-thumb {
-    background-color: var(--scrollbar);
+    background: color-mix(in oklab, var(--brand) 25%, var(--scrollbar));
+    border: 2px solid transparent;
+    background-clip: padding-box;
     border-radius: 99px;
+    transition: background-color 0.2s ease;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--brand);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  /* Globally disable all link underlines and hover underlines */
+  a,
+  button,
+  [role="button"],
+  .prose-link,
+  .prose-link:hover,
+  [class*="underline"],
+  [class*="hover\:underline"]:hover,
+  [class*="group-hover\:underline"] {
+    text-decoration: none !important;
   }
 
   /* Honor reduced-motion globally — DESIGN_PRINCIPLES §7. */
@@ -242,6 +263,26 @@
       scroll-behavior: auto !important;
     }
   }
+
+}
+
+/* HeroUI v3 Select uses physical right-side positioning for the indicator
+   (`right: 0.5rem`, `padding-right: 1.75rem`) and a left text-alignment for
+   the value, which collide with the value text in RTL. Override with logical
+   properties so the chevron sits on the logical end and the trigger reserves
+   padding on the logical end in both directions. Declared OUTSIDE any
+   `@layer` so it wins over HeroUI's `@layer components` rules. */
+.select__trigger:has(.select__indicator) {
+  padding-right: 0.75rem;
+  padding-inline-end: 1.75rem;
+}
+.select__indicator {
+  right: auto;
+  left: auto;
+  inset-inline-end: 0.5rem;
+}
+.select__value {
+  text-align: start;
 }
 
 @layer components {
@@ -313,12 +354,12 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Hero section — full-bleed negative-margin band (storefront) */
+  /* Hero section — floating, elegantly rounded card */
   .hero-band {
     position: relative;
-    margin-inline: -1rem; /* -mx-4 */
-    border-bottom: 1px solid color-mix(in oklab, var(--separator) 60%, transparent);
-    padding-inline: 1rem;
+    border-radius: 1.5rem; /* rounded-3xl */
+    border: 1px solid color-mix(in oklab, var(--separator) 80%, transparent);
+    padding-inline: 1.5rem;
     padding-block: 2.5rem;
     overflow: hidden;
     /* Default: plain surface */
@@ -333,18 +374,17 @@
   }
   .dark .hero-band--tinted {
     background-color: color-mix(in oklab, var(--brand) 8%, var(--background));
+    border-color: color-mix(in oklab, var(--brand) 15%, var(--separator));
   }
   @media (min-width: 768px) {
     .hero-band {
-      margin-inline: -1.5rem; /* -mx-6 */
-      padding-inline: 1.5rem;
+      padding-inline: 2rem;
       padding-block: 3rem;
     }
   }
   @media (min-width: 1024px) {
     .hero-band {
-      margin-inline: -2rem; /* -mx-8 */
-      padding-inline: 2rem;
+      padding-inline: 2.5rem;
       padding-block: 3.5rem;
     }
   }
@@ -356,15 +396,26 @@
     background-color: var(--surface);
   }
 
-  /* Prose link — underlined on hover, consistent with brand */
+  /* Prose link — consistent with brand */
   .prose-link {
     color: var(--brand);
-    text-underline-offset: 3px;
     transition: opacity 120ms ease-out;
   }
   .prose-link:hover {
     opacity: 0.8;
-    text-decoration: underline;
+  }
+
+  /* Checkout step card — generous rounded container for each checkout section */
+  .checkout-card {
+    border-radius: 1rem; /* rounded-2xl */
+    border: 1px solid color-mix(in oklab, var(--separator) 60%, transparent);
+    background-color: var(--surface);
+    padding: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .checkout-card {
+      padding: 1.5rem;
+    }
   }
 
   /* Back-link — small, muted, arrow affordance */

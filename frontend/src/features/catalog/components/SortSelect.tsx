@@ -26,13 +26,14 @@ export function SortSelect({
     <SelectField
       label={t('catalog.sort.label')}
       hideLabel
+      isFilter
       value={value}
       onChange={(v) => {
         if (!v) return;
         onChange(v as ProductSort);
       }}
       options={OPTIONS.map((opt) => ({ value: opt, label: t(`catalog.sort.${opt}`) }))}
-      className="w-44 shrink-0"
+      className="w-full sm:w-44 shrink-0"
     />
   );
 }

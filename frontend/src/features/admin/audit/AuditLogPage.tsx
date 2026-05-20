@@ -1,6 +1,6 @@
 import type { DateValue } from '@internationalized/date';
 import { parseDate } from '@internationalized/date';
-import { Calendar, DateField, DatePicker, Label, ListBox, Select, Table } from '@heroui/react';
+import { Calendar, DateField, DatePicker, Label, Table } from '@heroui/react';
 import { ScrollText } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,11 +9,11 @@ import { PaginationControls } from '../../../shared/components/PaginationControl
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { EmptyState } from '../../../shared/components/EmptyState';
 import { TableRowSkeleton, TableSkeletonHeader } from '../../../shared/components/TableRowSkeleton';
+import { SelectField } from '../../../shared/components/SelectField';
 import { useAuditLogs } from './hooks';
 
 const ACTION_TYPES = ['OrderStatusChanged', 'PaymentReviewed', 'ProductUpdated', 'UserRoleUpdated'];
 const TARGET_TYPES = ['Order', 'Payment', 'Product', 'User'];
-const ALL_FILTER_VALUE = '__all__';
 
 export function AuditLogPage() {
   const { t } = useTranslation();
@@ -50,19 +50,23 @@ export function AuditLogPage() {
       </header>
 
       <div className="flex flex-wrap items-end gap-3">
-        <AuditSelectFilter
+        <SelectField
           label={t('admin.audit.filters.actionType')}
           value={actionType}
-          allLabel={t('admin.filters.all')}
-          options={ACTION_TYPES}
+          emptyLabel={t('admin.filters.all')}
+          options={ACTION_TYPES.map((a) => ({ value: a, label: a }))}
           onChange={(next) => { setActionType(next); setPage(1); }}
+          isFilter
+          className="min-w-40"
         />
-        <AuditSelectFilter
+        <SelectField
           label={t('admin.audit.filters.target')}
           value={targetType}
-          allLabel={t('admin.filters.all')}
-          options={TARGET_TYPES}
+          emptyLabel={t('admin.filters.all')}
+          options={TARGET_TYPES.map((t) => ({ value: t, label: t }))}
           onChange={(next) => { setTargetType(next); setPage(1); }}
+          isFilter
+          className="min-w-40"
         />
         <AuditDateFilter
           label={t('admin.audit.filters.from')}
@@ -168,44 +172,6 @@ export function AuditLogPage() {
   );
 }
 
-function AuditSelectFilter({
-  label,
-  value,
-  allLabel,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  allLabel: string;
-  options: string[];
-  onChange: (next: string) => void;
-}) {
-  return (
-    <Select
-      value={value || ALL_FILTER_VALUE}
-      onChange={(next: unknown) => onChange(next === ALL_FILTER_VALUE || next == null ? '' : String(next))}
-      variant="secondary"
-      selectionMode="single"
-      className="min-w-40"
-    >
-      <Label className="text-xs font-medium text-default-500">{label}</Label>
-      <Select.Trigger>
-        <Select.Value />
-        <Select.Indicator />
-      </Select.Trigger>
-      <Select.Popover>
-        <ListBox>
-          <ListBox.Item id={ALL_FILTER_VALUE} textValue={allLabel}>{allLabel}</ListBox.Item>
-          {options.map((option) => (
-            <ListBox.Item key={option} id={option} textValue={option}>{option}</ListBox.Item>
-          ))}
-        </ListBox>
-      </Select.Popover>
-    </Select>
-  );
-}
-
 function AuditDateFilter({
   label,
   value,
@@ -223,18 +189,18 @@ function AuditDateFilter({
       onChange={(next: DateValue | null) => onChange(next?.toString() ?? '')}
       className="min-w-44"
     >
-      <Label className="text-xs font-medium text-default-500">{label}</Label>
-      <DateField.Group>
+      <Label className="text-xs uppercase tracking-wide text-default-500">{label}</Label>
+      <DateField.Group className="flex items-center justify-between w-full h-10 px-4 text-xs font-semibold border border-default-200/60 bg-default-100/30 dark:bg-default-50/10 hover:border-brand/40 hover:bg-brand/5 dark:hover:bg-brand/10 focus-within:ring-2 focus-within:ring-brand/20 focus-within:border-brand transition-all duration-300 rounded-full cursor-pointer text-default-700 dark:text-default-300">
         <DateField.Input>
           {(segment) => <DateField.Segment segment={segment} />}
         </DateField.Input>
         <DateField.Suffix>
-          <DatePicker.Trigger>
+          <DatePicker.Trigger className="text-default-400 hover:text-brand transition-colors duration-200 cursor-pointer">
             <DatePicker.TriggerIndicator />
           </DatePicker.Trigger>
         </DateField.Suffix>
       </DateField.Group>
-      <DatePicker.Popover>
+      <DatePicker.Popover className="border border-default-200/60 bg-background/85 backdrop-blur-md shadow-lg rounded-large overflow-hidden">
         <Calendar aria-label={label}>
           <Calendar.Header>
             <Calendar.YearPickerTrigger>

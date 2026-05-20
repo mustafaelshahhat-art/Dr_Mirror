@@ -28,13 +28,11 @@ import { ThemeToggle } from './ThemeToggle';
  * Approved Composition Component: Surface + Button + Drawer + Link + Separator.
  */
 export function Header() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user, logout, isBootstrapping, isAdmin } = useAuth();
   const { cart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Navigation drawer: leading edge (left in LTR, right in RTL)
-  const navPlacement = i18n.dir() === 'rtl' ? 'right' : 'left';
 
   if (isAdmin) return null;
 
@@ -59,30 +57,14 @@ export function Header() {
             aria-label={t('header.menuLabel')}
             className="hidden items-center gap-1 sm:flex"
           >
-            <Link
-              href="/"
-              className="rounded-medium px-3 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-foreground dark:text-default-300 dark:hover:bg-default-50/10"
-            >
-              {t('header.catalog')}
-            </Link>
-
-            <Link
-              href="/inquiries"
-              className="rounded-medium px-3 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-foreground dark:text-default-300 dark:hover:bg-default-50/10"
-            >
-              {t('header.contact')}
-            </Link>
-
-            <Separator orientation="vertical" className="mx-1 h-5" />
-
             {!isBootstrapping && user ? (
               <>
                 <Link
                   href="/account"
-                  className="flex items-center gap-1.5 rounded-medium px-3 py-2 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 hover:text-foreground dark:text-default-300 dark:hover:bg-default-50/10"
+                  aria-label={user.fullName}
+                  className="flex size-9 items-center justify-center rounded-full text-default-700 transition-colors hover:bg-default-100 hover:text-foreground dark:text-default-300 dark:hover:bg-default-50/10"
                 >
-                  <UserIcon className="size-4 shrink-0" aria-hidden />
-                  <span className="max-w-28 truncate">{user.fullName}</span>
+                  <UserIcon className="size-5 shrink-0" aria-hidden />
                 </Link>
                 <Button
                   variant="ghost"
@@ -135,7 +117,7 @@ export function Header() {
       <Drawer isOpen={menuOpen} onOpenChange={setMenuOpen}>
         <Drawer.Backdrop className="bg-foreground/40">
           <Drawer.Content
-            placement={navPlacement}
+            placement="left"
             className="w-72 max-w-[85vw]"
           >
             <Drawer.Dialog className="flex h-full flex-col">
@@ -154,22 +136,6 @@ export function Header() {
               <Drawer.Body className="flex-1 overflow-y-auto px-3 py-4">
                 {/* Navigation links */}
                 <nav aria-label={t('header.menuLabel')} className="space-y-0.5">
-                  <RouterLink
-                    to="/"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex min-h-11 items-center gap-3 rounded-medium px-3 py-2.5 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 dark:text-default-300 dark:hover:bg-default-50/10"
-                  >
-                    {t('header.catalog')}
-                  </RouterLink>
-
-                  <RouterLink
-                    to="/inquiries"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex min-h-11 items-center gap-3 rounded-medium px-3 py-2.5 text-sm font-medium text-default-700 transition-colors hover:bg-default-100 dark:text-default-300 dark:hover:bg-default-50/10"
-                  >
-                    {t('header.contact')}
-                  </RouterLink>
-
                   {!isBootstrapping && user ? (
                     <>
                       <RouterLink

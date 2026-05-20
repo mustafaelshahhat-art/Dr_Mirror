@@ -49,7 +49,7 @@ export function ShellPage() {
         </div>
         <div className="min-w-0">
           <h1 className="text-xl font-semibold tracking-tight">
-            {t('account.welcome', { name: user.fullName })}
+            {t('common.account.welcome', { name: user.fullName })}
           </h1>
           <p className="mt-0.5 text-sm text-muted">{user.email}</p>
           {createdAt ? (
@@ -63,7 +63,7 @@ export function ShellPage() {
       {/* Navigation rail */}
       <section aria-labelledby="quick-links" className="grid gap-3 sm:grid-cols-2">
         <h2 id="quick-links" className="sr-only">
-          {t('account.quickLinks')}
+          {t('common.account.quickLinks')}
         </h2>
         <Link
           to="/account/orders"
@@ -74,10 +74,10 @@ export function ShellPage() {
           </span>
           <span className="min-w-0">
             <span className="block text-sm font-semibold text-foreground">
-              {t('account.myOrders.title')}
+              {t('common.account.myOrders.title')}
             </span>
             <span className="block text-xs text-default-500">
-              {t('account.myOrders.subtitle')}
+              {t('common.account.myOrders.subtitle')}
             </span>
           </span>
         </Link>
@@ -91,10 +91,10 @@ export function ShellPage() {
           </span>
           <span className="min-w-0">
             <span className="block text-sm font-semibold text-foreground">
-              {t('account.addresses.title')}
+              {t('common.account.addresses.title')}
             </span>
             <span className="block text-xs text-default-500">
-              {t('account.addresses.subtitle')}
+              {t('common.account.addresses.subtitle')}
             </span>
           </span>
         </Link>
@@ -109,10 +109,10 @@ export function ShellPage() {
             </span>
             <span className="min-w-0">
               <span className="block text-sm font-semibold text-foreground">
-                {t('account.adminDashboard.title')}
+                {t('common.account.adminDashboard.title')}
               </span>
               <span className="block text-xs text-default-500">
-                {t('account.adminDashboard.subtitle')}
+                {t('common.account.adminDashboard.subtitle')}
               </span>
             </span>
           </Link>
@@ -123,7 +123,7 @@ export function ShellPage() {
         <div className="flex items-center justify-between">
           <h2 id="recent-orders" className="flex items-center gap-2 text-base font-semibold">
             <ShoppingBag className="size-4" aria-hidden />
-            {t('account.recentOrders.title')}
+            {t('account.account.recentOrders.title')}
           </h2>
         </div>
 
@@ -131,7 +131,7 @@ export function ShellPage() {
           <ul
             className="space-y-2"
             aria-busy="true"
-            aria-label={t('account.loading')}
+            aria-label={t('account.account.loading')}
           >
             {Array.from({ length: 3 }).map((_, i) => (
               <li key={i}>
@@ -148,7 +148,7 @@ export function ShellPage() {
                   className="flex items-center justify-between gap-4 px-4 py-3 transition-colors hover:bg-surface-secondary"
                 >
                   <span className="text-sm font-medium">
-                    {t('account.recentOrders.orderLabel', { number: order.orderNumber })}
+                    {t('account.account.recentOrders.orderLabel', { number: order.orderNumber })}
                   </span>
                   <span className="flex items-center gap-3 text-xs text-default-500">
                     <span className="tabular-nums">{dateFmt.format(new Date(order.createdAt))}</span>
@@ -162,14 +162,14 @@ export function ShellPage() {
                 to="/account/orders"
                 className="flex items-center justify-center border-t border-divider/40 px-4 py-3 text-sm font-medium text-primary transition-colors hover:bg-surface-secondary"
               >
-                {t('account.recentOrders.viewAll')}
+                {t('account.account.recentOrders.viewAll')}
               </Link>
             </li>
           </ul>
         ) : (
           <div className="content-surface p-8 text-center">
             <ShoppingBag className="mx-auto mb-2 size-6 text-default-400" aria-hidden />
-            <p className="text-sm text-default-500">{t('account.recentOrders.empty')}</p>
+            <p className="text-sm text-default-500">{t('account.account.recentOrders.empty')}</p>
           </div>
         )}
       </section>

@@ -26,8 +26,8 @@ export function ProductImageGallery({ images, productName }: Props) {
   const currentImage = images[activeImage] ?? images[0];
 
   return (
-    <section className="space-y-3">
-      <div className="aspect-[4/5] w-full overflow-hidden rounded-large border border-divider/60 bg-bone max-h-[clamp(240px,52svh,480px)] lg:max-h-none">
+    <section className="space-y-4">
+      <div className="aspect-[4/5] w-[95%] lg:w-[90%] mx-auto overflow-hidden rounded-[2rem] border border-divider/60 bg-bone shadow-sm">
         {currentImage ? (
           <img
             src={currentImage.url}
@@ -48,7 +48,7 @@ export function ProductImageGallery({ images, productName }: Props) {
 
       {images.length > 1 ? (
         <div
-          className="flex gap-2 overflow-x-auto"
+          className="flex w-[95%] lg:w-[90%] mx-auto gap-2 overflow-x-auto"
           role="group"
           aria-label={t('catalog.detail.galleryAria', { product: productName })}
         >
@@ -77,8 +77,8 @@ export function ProductImageGallery({ images, productName }: Props) {
               }}
               className={
                 idx === activeImage
-                  ? 'h-16 w-20 shrink-0 overflow-hidden rounded-medium ring-2 ring-primary p-0'
-                  : 'h-16 w-20 shrink-0 overflow-hidden rounded-medium border border-divider/60 transition-shadow hover:ring-1 hover:ring-default-300 p-0'
+                  ? 'h-16 w-20 shrink-0 overflow-hidden rounded-2xl ring-2 ring-primary p-0'
+                  : 'h-16 w-20 shrink-0 overflow-hidden rounded-2xl border border-divider/60 transition-shadow hover:ring-1 hover:ring-default-300 p-0'
               }
             >
               <img

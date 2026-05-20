@@ -45,11 +45,14 @@ export function SearchInput({ value, onCommit, debounceMs = 350 }: SearchInputPr
   }
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full group">
+      {/* Search Icon */}
       <Search
         aria-hidden
-        className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-default-400"
+        className="pointer-events-none absolute start-3.5 top-1/2 size-4 -translate-y-1/2 text-default-400 group-hover:text-brand/70 group-focus-within:text-brand transition-colors duration-300 shrink-0"
       />
+      
+      {/* Input element */}
       <Input
         type="search"
         value={draft}
@@ -57,11 +60,11 @@ export function SearchInput({ value, onCommit, debounceMs = 350 }: SearchInputPr
         onKeyDown={handleKeyDown}
         placeholder={t('catalog.search.placeholder')}
         aria-label={t('catalog.search.label')}
-        className="ps-9 pe-10"
+        className="w-full h-10 ps-10 pe-10 rounded-full border border-default-200/60 bg-default-100/30 dark:bg-default-50/10 text-sm text-default-700 dark:text-default-300 placeholder:text-default-400 font-semibold transition-all duration-300 hover:border-brand/40 hover:bg-brand/5 dark:hover:bg-brand/10 focus:border-brand/80 focus:outline-none focus:ring-2 focus:ring-brand/20"
       />
+
+      {/* Clear Button */}
       {draft.length > 0 ? (
-        /* Touch target: size-8 button keeps the icon small but expands the hit area
-           to ~32px — combined with the input's padding this meets mobile expectations. */
         <Button
           type="button"
           isIconOnly
@@ -69,7 +72,7 @@ export function SearchInput({ value, onCommit, debounceMs = 350 }: SearchInputPr
           size="sm"
           aria-label={t('catalog.search.clear')}
           onPress={handleClear}
-          className="absolute end-1 top-1/2 size-8 min-w-0 -translate-y-1/2 text-default-500 hover:text-foreground"
+          className="absolute end-1 top-1/2 size-8 min-w-0 -translate-y-1/2 text-default-500 hover:text-foreground rounded-full transition-all duration-200 active:scale-90"
         >
           <X className="size-3.5" aria-hidden />
         </Button>

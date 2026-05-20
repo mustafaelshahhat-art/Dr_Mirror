@@ -47,7 +47,7 @@ export function PaymentMethodSection({
         aria-label={t('checkout.payment.loading')}
       >
         {Array.from({ length: 3 }).map((_, i) => (
-          <PaymentMethodTileSkeleton key={i} />
+          <PaymentMethodTileSkeleton key={i} rounded />
         ))}
       </div>
     );
@@ -55,7 +55,7 @@ export function PaymentMethodSection({
 
   if (query.isError) {
     return (
-      <Alert status="danger" role="alert">
+      <Alert status="danger" role="alert" className="rounded-xl">
         <Alert.Content>
           <Alert.Description>{t('checkout.payment.errorLoad')}</Alert.Description>
         </Alert.Content>
@@ -63,7 +63,7 @@ export function PaymentMethodSection({
           variant="ghost"
           size="sm"
           onPress={() => void query.refetch()}
-          className="shrink-0 text-danger"
+          className="shrink-0 rounded-xl text-danger"
         >
           {t('checkout.payment.retry')}
         </Button>
@@ -75,7 +75,7 @@ export function PaymentMethodSection({
     return (
       <div
         role="status"
-        className="space-y-2 rounded-medium border border-warning/30 bg-warning/10 px-4 py-4 text-sm text-warning-700 dark:text-warning"
+        className="space-y-2 rounded-xl border border-warning/30 bg-warning/10 px-4 py-4 text-sm text-warning-700 dark:text-warning"
       >
         <div className="flex items-center gap-2 font-medium">
           <CreditCard className="size-4 shrink-0" aria-hidden />

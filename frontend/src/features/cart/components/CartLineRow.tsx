@@ -42,15 +42,18 @@ export function CartLineRow({
   return (
     <div
       className={[
-        'cq flex flex-col gap-3 rounded-medium border border-divider/60 bg-content1 p-3 @sm:flex-row',
+        'cq flex flex-col gap-3 @sm:flex-row',
+        isCompact
+          ? 'rounded-2xl border border-divider/60 bg-content1 p-3'
+          : '',
         isUnavailable ? 'opacity-60' : '',
       ].join(' ')}
     >
       <Link
         to={`/products/${line.productSlug}`}
         className={[
-          isCompact ? 'size-16' : 'h-24 w-20',
-          'shrink-0 overflow-hidden rounded-medium bg-bone',
+          isCompact ? 'size-16 rounded-xl' : 'h-24 w-20 rounded-2xl',
+          'shrink-0 overflow-hidden bg-bone',
         ].join(' ')}
       >
         {line.primaryImageUrl ? (
@@ -111,6 +114,7 @@ export function CartLineRow({
 
         <div className="mt-1 flex flex-col gap-2 @sm:flex-row @sm:items-center @sm:justify-between">
           <NumberField
+            dir="ltr"
             value={line.quantity}
             minValue={1}
             maxValue={maxQuantity}

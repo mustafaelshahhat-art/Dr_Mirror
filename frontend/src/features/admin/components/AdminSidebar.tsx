@@ -17,9 +17,7 @@ export function AdminSidebar({
   open: boolean;
   onClose: () => void;
 }) {
-  const { t, i18n } = useTranslation();
-  const placement = i18n.dir() === 'rtl' ? 'right' : 'left';
-
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const initials = (user?.fullName ?? '')
     .split(' ')
@@ -66,7 +64,7 @@ export function AdminSidebar({
           className={['bg-background/70', ADMIN_HEADER_OFFSET_CLASS, ADMIN_DRAWER_HEIGHT_CLASS].join(' ')}
         >
           <Drawer.Content
-            placement={placement}
+            placement="left"
             className={[
               'w-56 max-w-xs rounded-none border-divider/60 bg-background p-0 data-[placement=left]:border-e data-[placement=right]:border-s',
               ADMIN_HEADER_OFFSET_CLASS,

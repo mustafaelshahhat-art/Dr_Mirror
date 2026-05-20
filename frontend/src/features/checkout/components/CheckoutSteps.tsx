@@ -19,20 +19,24 @@ export function CheckoutSteps({ current }: { current: CheckoutStep }) {
         const reached = idx <= currentIndex;
         const isLast = idx === ORDER.length - 1;
         const completed = idx < currentIndex;
+        const isCurrent = idx === currentIndex;
         return (
-          <li key={step} className="flex flex-1 items-center gap-1.5 sm:gap-2">
+          <li
+            key={step}
+            className={`flex items-center gap-1.5 sm:gap-2 ${isLast ? 'shrink-0' : 'flex-1'}`}
+          >
             <span
-              aria-current={idx === currentIndex ? 'step' : undefined}
+              aria-current={isCurrent ? 'step' : undefined}
               className={[
-                'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold sm:size-7',
+                'flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 sm:size-9',
                 completed
                   ? 'bg-brand text-brand-foreground'
-                  : reached
-                    ? 'bg-brand text-brand-foreground'
+                  : isCurrent
+                    ? 'bg-brand text-brand-foreground ring-4 ring-brand/20'
                     : 'bg-default-200 text-muted',
               ].join(' ')}
             >
-              {completed ? <Check className="size-3" aria-hidden /> : idx + 1}
+              {completed ? <Check className="size-3.5" aria-hidden /> : idx + 1}
             </span>
             <span
               className={[
@@ -46,8 +50,8 @@ export function CheckoutSteps({ current }: { current: CheckoutStep }) {
               <span
                 aria-hidden
                 className={[
-                  'h-px flex-1',
-                  idx < currentIndex ? 'bg-success/40' : 'bg-divider/60',
+                  'h-0.5 flex-1 rounded-full transition-colors duration-300',
+                  idx < currentIndex ? 'bg-brand/40' : 'bg-divider/60',
                 ].join(' ')}
               />
             ) : null}

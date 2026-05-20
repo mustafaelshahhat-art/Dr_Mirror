@@ -90,12 +90,12 @@ export function Layout() {
               <ul className="space-y-2" role="list">
                 <li>
                   <Link to="/account/orders" className="text-sm text-muted transition-colors hover:text-foreground">
-                    {t('account.myOrders.title')}
+                    {t('common.account.myOrders.title')}
                   </Link>
                 </li>
                 <li>
                   <Link to="/account/addresses" className="text-sm text-muted transition-colors hover:text-foreground">
-                    {t('account.addresses.title')}
+                    {t('common.account.addresses.title')}
                   </Link>
                 </li>
                 <li>

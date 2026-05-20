@@ -30,7 +30,7 @@ export function CartPage() {
   const errorMessage = cart.error?.message;
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-6">
       <Link to="/" className="back-link">
         <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
         {t('cart.backToCatalog')}
@@ -80,20 +80,23 @@ export function CartPage() {
         </div>
       ) : hasItems ? (
         <div
-          className="grid gap-6 lg:grid-cols-[1fr_320px]"
+          className="grid gap-6 lg:grid-cols-[1fr_320px] lg:gap-8"
           aria-busy={cart.isMutating}
         >
           <div className="space-y-4">
-            {cart.items.map((line) => (
-              <CartLineRow
-                key={line.id}
-                line={line}
-                onUpdate={(q) => void updateQuantity(line, q)}
-                onRemove={() => void removeItem(line)}
-                isMutating={cart.isMutating}
-              />
-            ))}
-            <div className="pt-2">
+            <ul className="divide-y divide-divider/40 overflow-hidden rounded-3xl border border-divider/60 bg-content1">
+              {cart.items.map((line) => (
+                <li key={line.id} className="p-4">
+                  <CartLineRow
+                    line={line}
+                    onUpdate={(q) => void updateQuantity(line, q)}
+                    onRemove={() => void removeItem(line)}
+                    isMutating={cart.isMutating}
+                  />
+                </li>
+              ))}
+            </ul>
+            <div className="pt-2 text-start">
               {confirmClear ? (
                 <div className="inline-flex flex-wrap items-center gap-2 rounded-medium border border-danger/30 bg-danger/10 p-2">
                   <span className="text-sm text-danger">{t('cart.clearConfirm')}</span>
@@ -130,7 +133,7 @@ export function CartPage() {
             </div>
           </div>
 
-          <Card className="h-fit border border-divider/60 lg:sticky lg:top-20">
+          <Card className="h-fit rounded-3xl border border-divider/60 lg:sticky lg:top-20">
             <Card.Header className="border-b border-divider/40 px-5 pb-3 pt-5">
               <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
                 {t('cart.summary')}

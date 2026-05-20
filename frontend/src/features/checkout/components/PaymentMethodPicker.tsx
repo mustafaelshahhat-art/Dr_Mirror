@@ -27,7 +27,7 @@ export function PaymentMethodPicker({
 
   if (sorted.length === 0) {
     return (
-      <p className="rounded-medium border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
+      <p className="rounded-xl border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
         {t('checkout.payment.noMethods')}
       </p>
     );
@@ -51,7 +51,7 @@ export function PaymentMethodPicker({
               key={method.id}
               value={method.id}
               className={({ isFocusVisible, isSelected }) => [
-                'flex w-full cursor-pointer items-start gap-3 rounded-medium border p-3 text-start transition-colors',
+                'flex w-full cursor-pointer items-start gap-3 rounded-xl border p-3.5 text-start transition-all duration-200',
                 isFocusVisible ? 'outline outline-2 outline-offset-2 outline-primary' : '',
                 isSelected
                   ? 'border-primary bg-primary/5 ring-1 ring-primary'
@@ -60,13 +60,22 @@ export function PaymentMethodPicker({
             >
               {({ isSelected }) => (
                 <>
-                  <Icon
+                  <span
                     className={[
-                      'mt-0.5 size-5 shrink-0',
-                      isSelected ? 'text-primary' : 'text-default-500',
+                      'mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full transition-colors duration-200',
+                      isSelected
+                        ? 'bg-brand/10 dark:bg-brand/15'
+                        : 'bg-default-100 dark:bg-default-200/50',
                     ].join(' ')}
-                    aria-hidden
-                  />
+                  >
+                    <Icon
+                      className={[
+                        'size-4',
+                        isSelected ? 'text-primary' : 'text-default-500',
+                      ].join(' ')}
+                      aria-hidden
+                    />
+                  </span>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-foreground">{name}</p>
                     {instructions ? (

@@ -82,8 +82,8 @@ export function ColorPicker({ colors, selected, onSelect }: ColorPickerProps) {
               onClick={() => onSelect(c.colorName)}
               className={
                 isSelected
-                  ? 'relative size-9 rounded-full border-2 border-foreground transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-                  : 'relative size-9 rounded-full border border-divider/60 transition-transform hover:scale-105 hover:border-default-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+                  ? 'relative size-10 rounded-full border-2 border-foreground transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+                  : 'relative size-10 rounded-full border border-divider/60 transition-transform hover:scale-105 hover:border-default-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
               }
               style={{ backgroundColor: c.colorHex }}
             >

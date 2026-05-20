@@ -163,9 +163,9 @@ export function ProductDetailSkeleton() {
 }
 
 /** A single payment-method radio tile placeholder. */
-export function PaymentMethodTileSkeleton() {
+export function PaymentMethodTileSkeleton({ rounded }: { rounded?: boolean }) {
   return (
-    <div className="flex items-start gap-3 rounded-medium border border-divider/60 bg-content1 p-3">
+    <div className={`flex items-start gap-3 ${rounded ? 'rounded-xl' : 'rounded-medium'} border border-divider/60 bg-content1 p-3`}>
       <Skeleton className="mt-1 h-4 w-4 rounded-full" />
       <div className="min-w-0 flex-1 space-y-2">
         <Skeleton className="h-4 w-32" />
@@ -201,9 +201,9 @@ export function RecentOrderRowSkeleton() {
 /** Checkout summary skeleton — line items + totals. */
 export function CheckoutSummarySkeleton() {
   return (
-    <aside className="content-surface h-fit space-y-4 p-4 lg:sticky lg:top-20">
+    <aside className="h-fit space-y-4 overflow-hidden rounded-2xl border border-separator/60 bg-surface p-5 lg:sticky lg:top-20">
       <Skeleton className="h-4 w-1/3" />
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="flex justify-between gap-3">
             <Skeleton className="h-4 w-2/3" />
@@ -213,7 +213,7 @@ export function CheckoutSummarySkeleton() {
       </div>
       {/* Separator per Anatomy A.21; mirrors CheckoutSummary layout post-Phase-8 migration */}
       <Separator />
-      <div className="space-y-2 pt-3">
+      <div className="space-y-2 pt-1">
         <div className="flex justify-between">
           <Skeleton className="h-3 w-16" />
           <Skeleton className="h-3 w-12" />
@@ -225,7 +225,7 @@ export function CheckoutSummarySkeleton() {
       </div>
       {/* Separator per Anatomy A.21 */}
       <Separator />
-      <div className="mt-2 flex justify-between pt-2">
+      <div className="flex justify-between rounded-xl bg-default-100/50 p-3">
         <Skeleton className="h-4 w-12" />
         <Skeleton className="h-4 w-16" />
       </div>

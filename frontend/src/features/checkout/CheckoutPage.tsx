@@ -1,4 +1,4 @@
-import { Alert, Button, Form, ProgressBar } from '@heroui/react';
+import { Alert, Button, Form } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -29,13 +29,6 @@ import {
   CheckoutSummarySkeleton,
   Skeleton,
 } from '../../shared/components/Skeleton';
-
-const CHECKOUT_STEP_PROGRESS: Record<CheckoutStep, number> = {
-  address: 1,
-  payment: 2,
-  review: 3,
-};
-
 /**
  * Multi-step checkout. Behind <c>ProtectedRoute</c> — anonymous users land
  * on the cart page's "proceed" button and get bounced to /login first.
@@ -75,6 +68,20 @@ function CheckoutBody() {
   const [saveAsNewAddress, setSaveAsNewAddress] = useState(false);
   const [newAddressLabel, setNewAddressLabel] = useState('');
   const addressesQuery = useAddressesQuery();
+  const [hasInitializedAddress, setHasInitializedAddress] = useState(false);
+
+  // Auto-select default address or first saved address on initial load
+  useEffect(() => {
+    if (addressesQuery.data && !hasInitializedAddress) {
+      const defaultAddress = addressesQuery.data.find((a) => a.isDefault);
+      if (defaultAddress) {
+        setSavedAddressId(defaultAddress.id);
+      } else if (addressesQuery.data.length > 0) {
+        setSavedAddressId(addressesQuery.data[0].id);
+      }
+      setHasInitializedAddress(true);
+    }
+  }, [addressesQuery.data, hasInitializedAddress]);
 
   const {
     control,
@@ -116,9 +123,9 @@ function CheckoutBody() {
         aria-busy="true"
         aria-label={t('checkout.loading')}
       >
-        <div className="space-y-4">
-          <Skeleton className="h-7 w-1/3" />
-          <Skeleton className="h-4 w-2/3" />
+        <div className="space-y-4 rounded-2xl">
+          <Skeleton className="h-7 w-1/3 rounded-xl" />
+          <Skeleton className="h-4 w-2/3 rounded-xl" />
           {Array.from({ length: 3 }).map((_, i) => (
             <CartLineSkeleton key={i} />
           ))}
@@ -225,18 +232,7 @@ function CheckoutBody() {
 
       <PageHeader title={t('checkout.title')} subtitle={t('checkout.subtitle')} />
 
-      <div className="space-y-3">
-        <ProgressBar
-          value={CHECKOUT_STEP_PROGRESS[step]}
-          minValue={0}
-          maxValue={3}
-          aria-label={t('checkout.title')}
-          size="sm"
-        >
-          <ProgressBar.Track className="h-1.5 rounded-full bg-default-200">
-            <ProgressBar.Fill className="bg-brand" />
-          </ProgressBar.Track>
-        </ProgressBar>
+      <div className="rounded-2xl border border-separator/40 bg-surface p-4 sm:p-5">
         <CheckoutSteps current={step} />
       </div>
 
@@ -246,68 +242,71 @@ function CheckoutBody() {
       >
         <div className="space-y-4">
           {formError ? (
-            <Alert status="danger" role="alert">
+            <Alert status="danger" role="alert" className="rounded-xl">
               <Alert.Content>
                 <Alert.Description>{formError}</Alert.Description>
               </Alert.Content>
             </Alert>
           ) : null}
 
-          {step === 'address' ? (
-            <AddressStep
-              control={control}
-              watch={watch}
-              setValue={setValue}
-              savedAddresses={savedAddresses}
-              savedAddressId={savedAddressId}
-              setSavedAddressId={setSavedAddressId}
-              saveAsNewAddress={saveAsNewAddress}
-              setSaveAsNewAddress={setSaveAsNewAddress}
-              newAddressLabel={newAddressLabel}
-              setNewAddressLabel={setNewAddressLabel}
-            />
-          ) : null}
-
-          {step === 'payment' ? (
-            <fieldset className="space-y-4">
-              <legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
-                {t('checkout.payment.heading')}
-              </legend>
-              <PaymentMethodSection
-                selectedId={paymentMethodId || null}
-                onSelect={(id) =>
-                  // eslint-disable-next-line i18next/no-literal-string
-                  setValue('paymentMethodId', id, {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                  })
-                }
-                onAvailabilityChange={setPaymentAvailable}
-              />
-              <FormField
-                name="buyerNote"
+          <div key={step} className="checkout-card enter-fade-up">
+            {step === 'address' ? (
+              <AddressStep
                 control={control}
-                label={t('checkout.buyerNote.label')}
-                description={t('checkout.buyerNote.hint')}
+                watch={watch}
+                setValue={setValue}
+                savedAddresses={savedAddresses}
+                savedAddressId={savedAddressId}
+                setSavedAddressId={setSavedAddressId}
+                saveAsNewAddress={saveAsNewAddress}
+                setSaveAsNewAddress={setSaveAsNewAddress}
+                newAddressLabel={newAddressLabel}
+                setNewAddressLabel={setNewAddressLabel}
               />
-            </fieldset>
-          ) : null}
+            ) : null}
 
-          {step === 'review' ? (
-            <ReviewStep
-              reviewAddress={reviewAddress}
-              selectedMethod={selectedMethod}
-              buyerNote={buyerNote}
-              isAr={isAr}
-            />
-          ) : null}
+            {step === 'payment' ? (
+              <fieldset className="space-y-4">
+                <legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
+                  {t('checkout.payment.heading')}
+                </legend>
+                <PaymentMethodSection
+                  selectedId={paymentMethodId || null}
+                  onSelect={(id) =>
+                    // eslint-disable-next-line i18next/no-literal-string
+                    setValue('paymentMethodId', id, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    })
+                  }
+                  onAvailabilityChange={setPaymentAvailable}
+                />
+                <FormField
+                  name="buyerNote"
+                  control={control}
+                  label={t('checkout.buyerNote.label')}
+                  description={t('checkout.buyerNote.hint')}
+                />
+              </fieldset>
+            ) : null}
 
-          <div className="flex items-center justify-between gap-2 pt-2">
+            {step === 'review' ? (
+              <ReviewStep
+                reviewAddress={reviewAddress}
+                selectedMethod={selectedMethod}
+                buyerNote={buyerNote}
+                isAr={isAr}
+              />
+            ) : null}
+          </div>
+
+          <div className="flex items-center justify-between gap-2 rounded-xl pt-2">
             <Button
               type="button"
               variant="ghost"
               isDisabled={step === 'address' || isSubmitting}
               onPress={previous}
+              className="rounded-xl"
             >
               <span className="inline-flex items-center gap-1.5">
                 <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
@@ -321,6 +320,7 @@ function CheckoutBody() {
                 variant="primary"
                 isDisabled={step === 'payment' && !paymentAvailable}
                 onPress={() => void next()}
+                className="rounded-xl"
               >
                 <span className="inline-flex items-center gap-1.5">
                   {t('checkout.continue')}
@@ -328,7 +328,7 @@ function CheckoutBody() {
                 </span>
               </Button>
             ) : (
-              <Button type="submit" variant="primary" isPending={isSubmitting}>
+              <Button type="submit" variant="primary" isPending={isSubmitting} className="rounded-xl">
                 {isSubmitting ? t('checkout.placing') : t('checkout.placeOrder')}
               </Button>
             )}

@@ -7,8 +7,7 @@ import { EmptyState } from '../../shared/components/EmptyState';
 import { PageHeader } from '../../shared/components/PageHeader';
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
-import { CategoryChips } from './components/CategoryChips';
-import { FilterPanel } from './components/FilterPanel';
+import { CategorySelect } from './components/CategorySelect';
 import { ProductCard } from './components/ProductCard';
 import { ProductGridSkeleton } from './components/ProductGridSkeleton';
 import { SearchInput } from './components/SearchInput';
@@ -94,32 +93,7 @@ export function CatalogPage() {
     (page: number) => updateParams({ page: page <= 1 ? undefined : String(page) }),
     [updateParams],
   );
-  const setGender = useCallback(
-    (g: ProductGender | undefined) =>
-      updateParams({ gender: g !== undefined ? String(g) : undefined }),
-    [updateParams],
-  );
-  const setSize = useCallback((s: string) => updateParams({ size: s }), [updateParams]);
-  const setColor = useCallback((c: string) => updateParams({ color: c }), [updateParams]);
-  const setMinPrice = useCallback(
-    (v: string) => updateParams({ minPrice: v.trim() || undefined }),
-    [updateParams],
-  );
-  const setMaxPrice = useCallback(
-    (v: string) => updateParams({ maxPrice: v.trim() || undefined }),
-    [updateParams],
-  );
-  const clearAdvancedFilters = useCallback(
-    () =>
-      updateParams({
-        gender: undefined,
-        size: undefined,
-        color: undefined,
-        minPrice: undefined,
-        maxPrice: undefined,
-      }),
-    [updateParams],
-  );
+
 
   const clearAllFilters = useCallback(
     () => setSearchParams(new URLSearchParams(), { replace: true }),
@@ -175,26 +149,15 @@ export function CatalogPage() {
           <div className="flex-1">
             <SearchInput value={filter.q ?? ''} onCommit={setQuery} />
           </div>
+          {categoriesQuery.data ? (
+            <CategorySelect
+              categories={categoriesQuery.data}
+              selectedId={filter.categoryId}
+              onSelect={setCategoryId}
+            />
+          ) : null}
           <SortSelect value={filter.sort!} onChange={setSort} />
         </div>
-
-        {categoriesQuery.data ? (
-          <CategoryChips
-            categories={categoriesQuery.data}
-            selectedId={filter.categoryId}
-            onSelect={setCategoryId}
-          />
-        ) : null}
-
-        <FilterPanel
-          filter={filter}
-          onGenderChange={setGender}
-          onSizeChange={setSize}
-          onColorChange={setColor}
-          onMinPriceChange={setMinPrice}
-          onMaxPriceChange={setMaxPrice}
-          onClearAll={clearAdvancedFilters}
-        />
       </section>
 
       {/* ── Product listing ─────────────────────────────────────────────── */}

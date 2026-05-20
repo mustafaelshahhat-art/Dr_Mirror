@@ -109,10 +109,10 @@ export function ProductDetailPage() {
         {t('catalog.detail.backToCatalog')}
       </Link>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 lg:items-start">
         <ProductImageGallery images={product.images} productName={name} />
 
-        <section className="flex flex-col gap-4">
+        <section className="flex flex-col gap-5">
           <Link
             to={`/?categoryId=${product.category.id}`}
             className="text-xs uppercase tracking-wide text-default-500 hover:text-foreground"

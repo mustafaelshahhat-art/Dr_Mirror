@@ -62,7 +62,7 @@ export function AddressStep({
                     key={a.id}
                     value={a.id}
                     className={({ isFocusVisible, isSelected }) => [
-                      'cursor-pointer rounded-medium border p-3 text-start transition-colors',
+                      'cursor-pointer rounded-xl border p-3.5 text-start transition-all duration-200',
                       isFocusVisible ? 'outline outline-2 outline-offset-2 outline-brand' : '',
                       isSelected
                         ? 'border-brand bg-brand-subtle'
@@ -72,7 +72,7 @@ export function AddressStep({
                     <p className="text-sm font-semibold">
                       {a.label}
                       {a.isDefault ? (
-                        <span className="ms-2 inline-flex items-center rounded-medium border border-primary/30 bg-primary/10 px-2 py-0 text-xs font-medium text-primary">
+                        <span className="ms-2 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
                           {t('addresses.defaultBadge')}
                         </span>
                       ) : null}
@@ -96,7 +96,7 @@ export function AddressStep({
             <Radio
               value={NEW_ADDRESS_VALUE}
               className={({ isFocusVisible, isSelected }) => [
-                'block cursor-pointer rounded-medium border border-dashed p-3 text-start transition-colors',
+                'block cursor-pointer rounded-xl border border-dashed p-3.5 text-start transition-all duration-200',
                 isFocusVisible ? 'outline outline-2 outline-offset-2 outline-primary' : '',
                 isSelected
                   ? 'border-primary bg-primary/5 ring-1 ring-primary'
@@ -104,7 +104,9 @@ export function AddressStep({
               ].filter(Boolean).join(' ')}
             >
               <span className="flex items-center gap-3">
-                <Plus className="size-5 shrink-0 text-default-500" aria-hidden />
+                <span className="flex size-8 items-center justify-center rounded-full bg-default-100 dark:bg-default-200/50">
+                  <Plus className="size-4 shrink-0 text-default-500" aria-hidden />
+                </span>
                 <span>
                   <span className="block text-sm font-medium">
                     {t('checkout.address.useNew.title')}
@@ -120,7 +122,7 @@ export function AddressStep({
       ) : null}
 
       {savedAddressId === null ? (
-        <>
+        <div className="space-y-4 rounded-2xl border border-separator/40 bg-surface-secondary/30 p-4 dark:bg-surface-secondary/20">
           <FormField
             name="address.recipientName"
             control={control}
@@ -205,10 +207,11 @@ export function AddressStep({
                 onChange={(e) => setNewAddressLabel((e.target as HTMLInputElement).value)}
                 maxLength={64}
                 placeholder={t('checkout.address.newLabelPlaceholder')}
+                className="rounded-xl"
               />
             </TextField>
           ) : null}
-        </>
+        </div>
       ) : null}
     </Fieldset>
   );

@@ -46,7 +46,7 @@ export function AdminProductsListPage() {
         }
       />
 
-      <div className="grid gap-2 sm:grid-cols-[1fr_12rem_10rem_10rem]">
+      <div className="grid gap-3 sm:grid-cols-[1fr_12rem_10rem_10rem]">
         <SearchInput
           value={q}
           onCommit={(val) => { setQ(val); setPage(1); }}
@@ -54,6 +54,7 @@ export function AdminProductsListPage() {
         <SelectField
           label={t('admin.products.fields.category')}
           hideLabel
+          isFilter
           value={categoryId ?? ''}
           emptyLabel={t('admin.products.list.allCategories')}
           onChange={(next) => { setCategoryId(next || undefined); setPage(1); }}
@@ -65,6 +66,7 @@ export function AdminProductsListPage() {
         <SelectField
           label={t('admin.products.fields.gender')}
           hideLabel
+          isFilter
           value={gender === undefined ? '' : String(gender)}
           emptyLabel={t('admin.products.list.allGenders')}
           onChange={(next) => {
@@ -79,6 +81,7 @@ export function AdminProductsListPage() {
         <SelectField
           label={t('admin.list.status')}
           hideLabel
+          isFilter
           // eslint-disable-next-line i18next/no-literal-string -- API enum values, not user copy
           value={published === undefined ? '' : published ? 'pub' : 'draft'}
           emptyLabel={t('admin.products.list.allStatuses')}
