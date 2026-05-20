@@ -27,7 +27,7 @@ export function AdminSidebar({
 
   return (
     <>
-      <div className="hidden w-60 flex-col border-e border-border/50 bg-surface md:flex">
+      <div className="hidden w-60 flex-col border-e border-border/50 bg-surface md:flex sticky top-14 h-[calc(100svh-3.5rem)] overflow-y-auto">
         {/* Sidebar header — BrandMark + product name */}
         <div className="flex items-center gap-2 border-b border-border/40 px-4 py-3.5">
           <BrandMark size={20} title="Dr Mirror" />

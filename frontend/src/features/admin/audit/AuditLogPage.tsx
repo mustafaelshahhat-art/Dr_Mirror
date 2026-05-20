@@ -274,7 +274,7 @@ function AuditDateFilter({
               {/* eslint-disable-next-line i18next/no-literal-string -- React Aria calendar slot, not user copy */}
               <Calendar.NavButton slot="next" />
             </Calendar.Header>
-            <Calendar.Grid>
+            <Calendar.Grid weekdayStyle="narrow">
               <Calendar.GridHeader>
                 {(day) => <Calendar.HeaderCell>{day}</Calendar.HeaderCell>}
               </Calendar.GridHeader>
