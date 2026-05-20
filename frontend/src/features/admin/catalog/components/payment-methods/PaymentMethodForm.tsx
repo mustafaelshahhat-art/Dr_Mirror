@@ -202,7 +202,7 @@ export function PaymentMethodForm(props: Props) {
                 value={String(field.value)}
                 onChange={(e) => field.onChange(Number.parseInt((e.target as HTMLInputElement).value, 10) || 0)}
                 aria-label={t('admin.payments.fields.displayOrder')}
-                className="tabular-nums"
+                className="tabular-nums border border-default-400 dark:border-default-300"
               />
             )} />
             {errors.displayOrder?.message ? <p className="text-xs text-danger">{error(errors.displayOrder.message)}</p> : null}

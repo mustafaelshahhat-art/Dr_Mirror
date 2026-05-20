@@ -154,7 +154,6 @@ export function AdminProductsListPage() {
                       <Table.Row key={p.id} className="bg-content1 transition-colors hover:bg-content2">
                         <Table.Cell className="px-4 py-3">
                           <p className="font-medium text-foreground">{isAr ? p.nameAr : p.nameEn}</p>
-                          {!isAr && <p className="text-xs text-default-500">/{p.slug}</p>}
                         </Table.Cell>
                         <Table.Cell className="hidden px-4 py-3 text-default-500 md:table-cell">
                           {isAr ? p.categoryNameAr : p.categoryNameEn}

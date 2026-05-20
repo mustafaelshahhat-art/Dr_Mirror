@@ -1,7 +1,7 @@
 import type { DateValue } from '@internationalized/date';
 import { parseDate } from '@internationalized/date';
 import { Calendar, DateField, DatePicker, I18nProvider, Label, Table } from '@heroui/react';
-import { ArrowRight, ScrollText } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, ScrollText } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -241,7 +241,8 @@ function AuditDateFilter({
   onChange: (next: string) => void;
 }) {
   const { i18n } = useTranslation();
-  const locale = i18n.language?.startsWith('ar') ? 'ar-EG' : 'en-US';
+  const isRtl = i18n.language?.startsWith('ar');
+  const locale = isRtl ? 'ar-EG' : 'en-US';
   const parsedValue = value ? parseDate(value) : null;
 
   return (
@@ -270,9 +271,9 @@ function AuditDateFilter({
                 <Calendar.YearPickerTriggerIndicator />
               </Calendar.YearPickerTrigger>
               {/* eslint-disable-next-line i18next/no-literal-string -- React Aria calendar slot, not user copy */}
-              <Calendar.NavButton slot="previous" />
+              <Calendar.NavButton slot="previous">{isRtl ? <ChevronRight size={16} aria-hidden /> : <ChevronLeft size={16} aria-hidden />}</Calendar.NavButton>
               {/* eslint-disable-next-line i18next/no-literal-string -- React Aria calendar slot, not user copy */}
-              <Calendar.NavButton slot="next" />
+              <Calendar.NavButton slot="next">{isRtl ? <ChevronLeft size={16} aria-hidden /> : <ChevronRight size={16} aria-hidden />}</Calendar.NavButton>
             </Calendar.Header>
             <Calendar.Grid weekdayStyle="narrow">
               <Calendar.GridHeader>
@@ -280,6 +281,9 @@ function AuditDateFilter({
               </Calendar.GridHeader>
               <Calendar.GridBody>{(date) => <Calendar.Cell date={date} />}</Calendar.GridBody>
             </Calendar.Grid>
+            <Calendar.YearPickerGrid>
+              <Calendar.YearPickerGridBody />
+            </Calendar.YearPickerGrid>
           </Calendar>
         </I18nProvider>
       </DatePicker.Popover>

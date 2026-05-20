@@ -71,7 +71,7 @@ export function CancelOrderButton({ order }: { order: OrderDetailDto }) {
                       maxLength={500}
                       fullWidth
                       placeholder={t('orders.cancel.reasonPlaceholder')}
-                      className="text-sm text-start"
+                      className="text-sm text-start border border-default-400 dark:border-default-300"
                     />
                   </AlertDialog.Body>
                   <AlertDialog.Footer>

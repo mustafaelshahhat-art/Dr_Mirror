@@ -221,6 +221,7 @@ function Field({
         name={name}
         maxLength={maxLength}
         dir={dir}
+        className="border border-default-400 dark:border-default-300"
       />
       {description ? (
         <Description className="text-xs text-default-500">{description}</Description>

@@ -51,6 +51,7 @@ export function Field({
         maxLength={maxLength}
         dir={dir}
         placeholder={placeholder}
+        className="border border-default-400 dark:border-default-300"
       />
       {description ? (
         <Description className={DESCRIPTION_CLASS}>{description}</Description>
@@ -95,6 +96,7 @@ export function TextAreaField({
         onChange={(e) => onChange((e.target as HTMLTextAreaElement).value)}
         maxLength={maxLength}
         rows={rows}
+        className="border border-default-400 dark:border-default-300"
       />
       {errorMessage ? (
         <FieldError className="text-xs text-danger">{errorMessage}</FieldError>

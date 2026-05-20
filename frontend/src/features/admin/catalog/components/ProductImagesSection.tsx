@@ -98,6 +98,7 @@ export function ProductImagesSection({ product }: { product: AdminProductDetailD
                 defaultValue={img.alt ?? ''}
                 placeholder={t('admin.products.images.altPlaceholder')}
                 maxLength={180}
+                className="w-full text-xs border border-default-400 dark:border-default-300"
                 onBlur={async (e) => {
                   const next = e.target.value.trim();
                   if ((next || null) === (img.alt ?? null) && img.displayOrder === img.displayOrder) return;

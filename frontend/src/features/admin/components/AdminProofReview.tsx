@@ -241,7 +241,7 @@ function ProofRow({
                 maxLength={500}
                 fullWidth
                 placeholder={t('admin.proofs.notePlaceholderOptional')}
-                className="text-sm text-start"
+                className="text-sm text-start border border-default-400 dark:border-default-300"
               />
               {error ? <FieldError className="text-xs text-danger">{error}</FieldError> : null}
             </TextField>
@@ -308,7 +308,7 @@ function ProofRow({
                         maxLength={500}
                         fullWidth
                         placeholder={t('admin.proofs.notePlaceholderRequired')}
-                        className="text-sm text-start"
+                        className="text-sm text-start border border-default-400 dark:border-default-300"
                       />
                       {error ? <FieldError className="text-xs text-danger">{error}</FieldError> : null}
                     </TextField>

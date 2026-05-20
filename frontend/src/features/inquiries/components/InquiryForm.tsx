@@ -152,6 +152,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
               value={form.message}
               // eslint-disable-next-line i18next/no-literal-string
               onChange={(e) => update('message', (e.target as HTMLTextAreaElement).value)}
+              className="border border-default-400 dark:border-default-300"
             />
           </TextField>
         </Fieldset.Group>
@@ -193,6 +194,7 @@ function Field({ label, value, onChange, type = 'text', required, maxLength, aut
         maxLength={maxLength}
         autoComplete={autoComplete}
         dir={dir}
+        className="border border-default-400 dark:border-default-300"
       />
     </TextField>
   );

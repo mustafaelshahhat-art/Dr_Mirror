@@ -117,7 +117,7 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
                   ? t('admin.transition.reasonPlaceholderRequired')
                   : t('admin.transition.reasonPlaceholderOptional')
               }
-              className="text-sm text-start"
+              className="text-sm text-start border border-default-400 dark:border-default-300"
             />
             {error ? <FieldError className="text-xs text-danger">{error}</FieldError> : null}
           </TextField>
@@ -184,7 +184,7 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
                         maxLength={500}
                         fullWidth
                         placeholder={t('admin.transition.reasonPlaceholderRequired')}
-                        className="text-sm text-start"
+                        className="text-sm text-start border border-default-400 dark:border-default-300"
                       />
                       {error ? <FieldError className="text-xs text-danger">{error}</FieldError> : null}
                     </TextField>

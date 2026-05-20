@@ -270,6 +270,7 @@ function CreateCategoryForm({ onSubmit, onCancel, isPending }: CategoryFormProps
         <Input
           {...register('nameAr')}
           maxLength={120}
+          className="border border-default-400 dark:border-default-300"
         />
         {errors.nameAr?.message ? <p className="text-xs text-danger">{error(errors.nameAr.message)}</p> : null}
       </TextField>
@@ -280,6 +281,7 @@ function CreateCategoryForm({ onSubmit, onCancel, isPending }: CategoryFormProps
         <Input
           {...register('nameEn')}
           maxLength={120}
+          className="border border-default-400 dark:border-default-300"
         />
         {errors.nameEn?.message ? <p className="text-xs text-danger">{error(errors.nameEn.message)}</p> : null}
       </TextField>
@@ -290,7 +292,7 @@ function CreateCategoryForm({ onSubmit, onCancel, isPending }: CategoryFormProps
         <Input
           type="number"
           {...register('displayOrder', { valueAsNumber: true })}
-          className="tabular-nums"
+          className="tabular-nums border border-default-400 dark:border-default-300"
         />
         {errors.displayOrder?.message ? <p className="text-xs text-danger">{error(errors.displayOrder.message)}</p> : null}
       </TextField>
@@ -349,6 +351,7 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
         <Input
           {...register('nameAr')}
           maxLength={120}
+          className="border border-default-400 dark:border-default-300"
         />
         {errors.nameAr?.message ? <p className="text-xs text-danger">{error(errors.nameAr.message)}</p> : null}
       </TextField>
@@ -359,6 +362,7 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
         <Input
           {...register('nameEn')}
           maxLength={120}
+          className="border border-default-400 dark:border-default-300"
         />
         {errors.nameEn?.message ? <p className="text-xs text-danger">{error(errors.nameEn.message)}</p> : null}
       </TextField>
@@ -369,7 +373,7 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
         <Input
           type="number"
           {...register('displayOrder', { valueAsNumber: true })}
-          className="tabular-nums"
+          className="tabular-nums border border-default-400 dark:border-default-300"
         />
         {errors.displayOrder?.message ? <p className="text-xs text-danger">{error(errors.displayOrder.message)}</p> : null}
       </TextField>

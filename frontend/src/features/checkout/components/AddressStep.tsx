@@ -207,7 +207,7 @@ export function AddressStep({
                 onChange={(e) => setNewAddressLabel((e.target as HTMLInputElement).value)}
                 maxLength={64}
                 placeholder={t('checkout.address.newLabelPlaceholder')}
-                className="rounded-xl"
+                className="rounded-xl border border-default-400 dark:border-default-300"
               />
             </TextField>
           ) : null}

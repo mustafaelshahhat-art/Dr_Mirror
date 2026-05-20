@@ -71,9 +71,11 @@ export function PaymentMethodRow({
           </span>
         </div>
         {method.accountNumber ? (
-          <p className="font-mono text-xs text-default-500" dir="ltr">
-            {method.accountNumber}
-            {method.accountHolder ? ` · ${method.accountHolder}` : ''}
+          <p className="font-mono text-xs text-default-500">
+            <span dir="ltr">
+              {method.accountNumber}
+              {method.accountHolder ? ` · ${method.accountHolder}` : ''}
+            </span>
           </p>
         ) : null}
         <p className="text-xs text-default-500">

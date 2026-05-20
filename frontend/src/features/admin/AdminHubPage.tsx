@@ -192,11 +192,6 @@ export function AdminHubPage() {
         </>
       ) : null}
 
-      <div className="flex items-center justify-between border-t border-divider/60 pt-4 text-xs text-default-500">
-        <span>
-          {t('admin.shell.accountMenu.signedInAs', { name: user?.fullName ?? '' })}
-        </span>
-      </div>
     </section>
   );
 }

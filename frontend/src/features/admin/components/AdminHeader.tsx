@@ -45,11 +45,6 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
         </div>
 
         <div className="flex items-center gap-1">
-          {user ? (
-            <span className="hidden text-sm text-default-500 sm:inline-block">
-              {user.fullName}
-            </span>
-          ) : null}
           <Button
             variant="ghost"
             size="sm"
