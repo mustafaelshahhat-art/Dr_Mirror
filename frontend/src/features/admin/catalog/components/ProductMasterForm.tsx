@@ -77,7 +77,7 @@ export function ProductMasterForm({
         <div className="flex items-center gap-2">
           <span
             className={[
-              'inline-flex items-center rounded-medium border px-2 py-0.5 text-xs font-medium leading-none',
+              'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
               product.isPublished
                 ? 'border-success/30 bg-success/15 text-success'
                 : 'border-warning/30 bg-warning/15 text-warning',

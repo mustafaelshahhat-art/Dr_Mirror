@@ -7,12 +7,15 @@ namespace DrMirror.Api.Infrastructure.Persistence.Seed;
 
 /// <summary>
 /// Idempotent catalog seeder for Development. Creates a small set of
-/// apparel categories and products with picsum.photos image URLs so the
-/// frontend has something to render while admin upload (M4) is not yet
-/// built. Each product gets a full Size × Color variant matrix.
+/// apparel categories and products with curated Unsplash image URLs so the
+/// frontend has realistic product photography to render. Each product gets
+/// a full Size × Color variant matrix.
 ///
 /// Activated only when <c>Catalog:SeedSamples=true</c>. Skips if any
 /// product already exists in the database.
+///
+/// NOTE: In production, replace these images with your own product photography
+/// via the Admin Panel → Products → Edit → Images tab.
 /// </summary>
 public sealed class DevCatalogSeeder
 {
@@ -46,6 +49,120 @@ public sealed class DevCatalogSeeder
     private static readonly string[] OneSize = ["OS"];
     private static readonly string[] FootwearFull = ["36", "37", "38", "39", "40", "41", "42", "43", "44"];
     private static readonly string[] FootwearWomen = ["36", "37", "38", "39", "40", "41", "42"];
+
+    // -------------------------------------------------------------------------
+    // Curated Unsplash image URLs — real medical uniform photography.
+    // Format: https://images.unsplash.com/photo-{id}?w=1200&h=900&fit=crop&q=80
+    // All images are free under the Unsplash License.
+    // -------------------------------------------------------------------------
+    internal static class Images
+    {
+        // Scrub tops — healthcare professionals in coloured scrubs
+        private const string ScrubNavy1   = "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=1200&h=900&fit=crop&q=80";
+        private const string ScrubNavy2   = "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=1200&h=900&fit=crop&q=80";
+        private const string ScrubBlack1  = "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=1200&h=900&fit=crop&q=80";
+        private const string ScrubBlack2  = "https://images.unsplash.com/photo-1666214280557-f1b5022eb634?w=1200&h=900&fit=crop&q=80";
+        private const string ScrubTeal1   = "https://images.unsplash.com/photo-1631815588090-d4bfec5b1b89?w=1200&h=900&fit=crop&q=80";
+        private const string ScrubTeal2   = "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=1200&h=900&fit=crop&q=80";
+        private const string ScrubWine1   = "https://images.unsplash.com/photo-1638202993928-7267aad84c31?w=1200&h=900&fit=crop&q=80";
+        private const string ScrubPlum1   = "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=1200&h=900&fit=crop&q=80";
+        private const string ScrubGreen1  = "https://images.unsplash.com/photo-1584515933487-779824d29309?w=1200&h=900&fit=crop&q=80";
+        private const string ScrubPink1   = "https://images.unsplash.com/photo-1527613426441-4da17471b66d?w=1200&h=900&fit=crop&q=80";
+        private const string ScrubOlive1  = "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&h=900&fit=crop&q=80";
+        private const string ScrubCharcoal1 = "https://images.unsplash.com/photo-1585842378054-ee2e52f94ba2?w=1200&h=900&fit=crop&q=80";
+
+        // Lab coats — doctors in white coats
+        private const string LabCoat1     = "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=900&fit=crop&q=80";
+        private const string LabCoat2     = "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&h=900&fit=crop&q=80";
+        private const string LabCoat3     = "https://images.unsplash.com/photo-1612277795421-9bc7706a4a34?w=1200&h=900&fit=crop&q=80";
+        private const string LabCoat4     = "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=1200&h=900&fit=crop&q=80";
+
+        // Surgical headwear — OR environment with surgical caps
+        private const string SurgCap1     = "https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=1200&h=900&fit=crop&q=80";
+        private const string SurgCap2     = "https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?w=1200&h=900&fit=crop&q=80";
+        private const string SurgCap3     = "https://images.unsplash.com/photo-1579154204601-01588f351e67?w=1200&h=900&fit=crop&q=80";
+        private const string SurgCap4     = "https://images.unsplash.com/photo-1551076805-e1869033e561?w=1200&h=900&fit=crop&q=80";
+
+        // Medical footwear — clinical shoes / clogs
+        private const string MedShoe1     = "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=1200&h=900&fit=crop&q=80";
+        private const string MedShoe2     = "https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=1200&h=900&fit=crop&q=80";
+        private const string MedShoe3     = "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=1200&h=900&fit=crop&q=80";
+        private const string MedShoe4     = "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=1200&h=900&fit=crop&q=80";
+        private const string MedShoe5     = "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=1200&h=900&fit=crop&q=80";
+        private const string MedShoe6     = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200&h=900&fit=crop&q=80";
+
+        /// <summary>
+        /// Returns curated image URLs for a product based on slug and colour.
+        /// Falls back to a category-appropriate default if no exact match exists.
+        /// </summary>
+        public static string[] GetUrls(string slug, string colorName, string categorySlug, int count)
+        {
+            var urls = (slug, colorName.ToLowerInvariant()) switch
+            {
+                // V-Neck Solid Scrub Top
+                ("v-neck-solid-scrub-top", "navy")       => new[] { ScrubNavy1 },
+                ("v-neck-solid-scrub-top", "black")      => new[] { ScrubBlack1 },
+                ("v-neck-solid-scrub-top", "teal")       => new[] { ScrubTeal1 },
+                ("v-neck-solid-scrub-top", "wine")       => new[] { ScrubWine1 },
+
+                // Mock Wrap Scrub Top
+                ("mock-wrap-scrub-top", "black")         => new[] { ScrubBlack2 },
+                ("mock-wrap-scrub-top", "plum")          => new[] { ScrubPlum1 },
+                ("mock-wrap-scrub-top", "sage green")    => new[] { ScrubGreen1 },
+                ("mock-wrap-scrub-top", "hot pink")      => new[] { ScrubPink1 },
+
+                // Cargo Drawstring Scrub Pant
+                ("cargo-drawstring-scrub-pant", "navy")     => new[] { ScrubNavy2 },
+                ("cargo-drawstring-scrub-pant", "black")    => new[] { ScrubCharcoal1 },
+                ("cargo-drawstring-scrub-pant", "charcoal") => new[] { ScrubBlack1 },
+
+                // Jogger Slim Scrub Pant
+                ("jogger-slim-scrub-pant", "black")      => new[] { ScrubBlack2 },
+                ("jogger-slim-scrub-pant", "navy")       => new[] { ScrubNavy1 },
+                ("jogger-slim-scrub-pant", "olive")      => new[] { ScrubOlive1 },
+
+                // Knee-Length Classic Lab Coat
+                ("knee-length-classic-lab-coat", _)       => new[] { LabCoat1, LabCoat2 },
+
+                // Hip-Length Modern Lab Coat
+                ("hip-length-modern-lab-coat", _)         => new[] { LabCoat3, LabCoat4 },
+
+                // Tie-Back Scrub Cap
+                ("tie-back-scrub-cap", "navy")           => new[] { SurgCap1 },
+                ("tie-back-scrub-cap", "black")          => new[] { SurgCap2 },
+                ("tie-back-scrub-cap", "teal")           => new[] { SurgCap3 },
+                ("tie-back-scrub-cap", "plum")           => new[] { SurgCap4 },
+
+                // Bouffant Scrub Cap
+                ("bouffant-scrub-cap", "navy")           => new[] { SurgCap2 },
+                ("bouffant-scrub-cap", "black")          => new[] { SurgCap1 },
+                ("bouffant-scrub-cap", "teal")           => new[] { SurgCap4 },
+
+                // Slip-Resistant Medical Clogs
+                ("slip-resistant-medical-clogs", "white")  => new[] { MedShoe1 },
+                ("slip-resistant-medical-clogs", "black")  => new[] { MedShoe2 },
+
+                // Memory Foam Medical Sneaker
+                ("memory-foam-medical-sneaker", "white")       => new[] { MedShoe3 },
+                ("memory-foam-medical-sneaker", "blush pink")  => new[] { MedShoe5 },
+                ("memory-foam-medical-sneaker", "navy")        => new[] { MedShoe4 },
+
+                // Category-level fallbacks
+                (_, _) when categorySlug == "scrub-tops"         => new[] { ScrubTeal2 },
+                (_, _) when categorySlug == "scrub-pants"        => new[] { ScrubNavy2 },
+                (_, _) when categorySlug == "lab-coats"          => new[] { LabCoat1 },
+                (_, _) when categorySlug == "surgical-headwear"  => new[] { SurgCap1 },
+                (_, _) when categorySlug == "medical-footwear"   => new[] { MedShoe3 },
+                _ => new[] { ScrubTeal1 },
+            };
+
+            // Return exactly the requested count, cycling if needed.
+            var result = new string[count];
+            for (var i = 0; i < count; i++)
+                result[i] = urls[i % urls.Length];
+            return result;
+        }
+    }
 
     public async Task SeedAsync(CancellationToken ct = default)
     {
@@ -278,19 +395,19 @@ public sealed class DevCatalogSeeder
             };
             products.Add(product);
 
-            // Color-keyed gallery: each colour gets its own picsum image set so
-            // the SPA can swap the gallery when a buyer picks a different colour.
+            // Color-keyed gallery: each colour gets a curated Unsplash image so
+            // the SPA displays real medical uniform photography.
             var displayOrder = 0;
             foreach (var color in seed.Colors)
             {
+                var urls = Images.GetUrls(slug, color.Name, seed.Category.Slug, seed.ImagesPerColor);
                 for (var i = 0; i < seed.ImagesPerColor; i++)
                 {
-                    var imageSeed = $"{slug}-{SlugGenerator.Slugify(color.Name)}-{i}";
                     images.Add(new ProductImage
                     {
                         Id = Guid.NewGuid(),
                         ProductId = product.Id,
-                        Url = $"https://picsum.photos/seed/{imageSeed}/1200/900",
+                        Url = urls[i],
                         Alt = $"{seed.NameEn} — {color.Name}",
                         DisplayOrder = displayOrder++,
                     });

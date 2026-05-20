@@ -1,9 +1,10 @@
 namespace DrMirror.Api.Domain.Entities;
 
 /// <summary>
-/// A single image attached to a <see cref="Product"/>. M2 seeded picsum.photos
-/// URLs; admin uploads route through <c>IFileStorageService</c> and populate
-/// <see cref="FileKey"/> so subsequent deletes can purge the underlying blob.
+/// A single image attached to a <see cref="Product"/>. Dev-seeded rows use
+/// curated Unsplash URLs; admin uploads route through <c>IFileStorageService</c>
+/// and populate <see cref="FileKey"/> so subsequent deletes can purge the
+/// underlying blob.
 /// </summary>
 public class ProductImage
 {

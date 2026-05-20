@@ -66,6 +66,7 @@ public sealed class DatabaseSeeder
         await EnsureAdminAsync();
         await EnsurePaymentMethodsAsync(ct);
         await EnsureCatalogAsync(ct);
+        await MigratePicsumImageUrlsAsync(ct);
     }
 
     /// <summary>
@@ -152,6 +153,47 @@ public sealed class DatabaseSeeder
         if (!enabled) return;
 
         await _catalogSeeder.SeedAsync(ct);
+    }
+
+    /// <summary>
+    /// One-time migration: replace any leftover picsum.photos placeholder image
+    /// URLs with curated Unsplash medical-uniform photography. Idempotent —
+    /// skips if no picsum URLs remain. Runs in all environments so production
+    /// databases seeded during development are also fixed.
+    /// </summary>
+    private async Task MigratePicsumImageUrlsAsync(CancellationToken ct)
+    {
+        var picsumImages = await _db.ProductImages
+            .Include(pi => pi.Product)
+                .ThenInclude(p => p!.Category)
+            .Where(pi => pi.Url.Contains("picsum.photos"))
+            .ToListAsync(ct);
+
+        if (picsumImages.Count == 0) return;
+
+        foreach (var img in picsumImages)
+        {
+            var product = img.Product!;
+            var categorySlug = product.Category?.Slug ?? "scrub-tops";
+
+            // Extract colour name from the Alt text pattern "Product Name — Color"
+            var colorName = "navy"; // fallback
+            var dashIdx = img.Alt?.IndexOf('—') ?? -1;
+            if (dashIdx >= 0 && img.Alt is not null)
+            {
+                colorName = img.Alt[(dashIdx + 1)..].Trim();
+            }
+
+            var urls = Seed.DevCatalogSeeder.Images.GetUrls(
+                product.Slug, colorName, categorySlug, count: 1);
+            img.Url = urls[0];
+        }
+
+        await _db.SaveChangesAsync(ct);
+
+        _logger.LogInformation(
+            "Migrated {Count} product images from picsum.photos → Unsplash.",
+            picsumImages.Count);
     }
 
     private async Task EnsureRolesAsync()

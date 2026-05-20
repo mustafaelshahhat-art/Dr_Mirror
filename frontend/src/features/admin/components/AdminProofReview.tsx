@@ -147,7 +147,7 @@ function ProofRow({
           <div className="flex flex-wrap items-center gap-2">
             <ProofStatusBadge status={proof.status} tone="admin" />
             {isSuperseded ? (
-              <span className="inline-flex items-center rounded-medium border border-default-300 bg-default-100 px-2 py-0.5 text-xs font-medium text-default-500">
+              <span className="inline-flex items-center rounded-full border border-default-300 bg-default-100 px-2 py-0.5 text-xs font-medium text-default-500">
                 {t('admin.proofs.superseded')}
               </span>
             ) : null}
@@ -164,7 +164,7 @@ function ProofRow({
             </p>
           ) : null}
           {proof.reviewNote ? (
-            <p className="mt-1 rounded-medium bg-content2 px-2 py-1 text-xs text-foreground">
+            <p className="mt-1 rounded-xl bg-content2 px-2 py-1 text-xs text-foreground">
               {t('orders.proofs.reviewNoteQuoted', { note: proof.reviewNote })}
             </p>
           ) : null}

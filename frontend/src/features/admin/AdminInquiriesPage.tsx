@@ -192,17 +192,17 @@ function InquiryRow({
       <Card.Content className="space-y-3">
         <div className="flex flex-wrap items-center gap-2 text-xs text-default-500">
           {productName ? (
-            <span className="rounded-medium bg-content2 px-2 py-0.5">
+            <span className="rounded-full bg-content2 px-2 py-0.5">
               {t('inquiries.admin.productLabel')}: <span className="font-medium text-foreground">{productName}</span>
             </span>
           ) : (
-            <span className="rounded-medium bg-content2 px-2 py-0.5">
+            <span className="rounded-full bg-content2 px-2 py-0.5">
               {t('inquiries.admin.generalLabel')}
             </span>
           )}
         </div>
 
-        <p className="whitespace-pre-line rounded-medium bg-content2 px-3 py-2 text-sm leading-relaxed text-foreground">
+        <p className="whitespace-pre-line rounded-xl bg-content2 px-3 py-2 text-sm leading-relaxed text-foreground">
           {inquiry.message}
         </p>
 

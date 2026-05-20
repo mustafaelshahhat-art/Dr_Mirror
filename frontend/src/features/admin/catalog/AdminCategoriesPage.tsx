@@ -1,6 +1,6 @@
-import { Button, Form, Input, Label, TextField, Tooltip } from '@heroui/react';
+import { Button, Form, Input, Label, Switch, TextField, Tooltip } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FolderTree, Pencil, Plus, ToggleLeft, ToggleRight } from 'lucide-react';
+import { FolderTree, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -145,7 +145,7 @@ export function AdminCategoriesPage() {
                   <div className="flex shrink-0 items-center gap-2">
                     <span
                       className={[
-                        'inline-flex items-center rounded-medium border px-2 py-0.5 text-xs font-medium leading-none',
+                        'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
                         cat.isActive
                           ? 'border-success/30 bg-success/15 text-success'
                           : 'border-divider/60 bg-content2 text-default-500',
@@ -167,13 +167,12 @@ export function AdminCategoriesPage() {
                       </Button>
                       <Tooltip.Content placement="top">{t('admin.catalog.actions.edit')}</Tooltip.Content>
                     </Tooltip>
-                    <Tooltip>
-                      <Button
-                        isIconOnly
-                        variant="ghost"
-                        size="md"
+                    <Tooltip delay={300} closeDelay={0}>
+                      <Switch
+                        size="sm"
+                        isSelected={cat.isActive}
                         isDisabled={toggleMutation.isPending}
-                        onPress={async () => {
+                        onChange={async () => {
                           try {
                             await toggleMutation.mutateAsync({
                               id: cat.id,
@@ -189,12 +188,10 @@ export function AdminCategoriesPage() {
                             : t('admin.catalog.actions.activate')
                         }
                       >
-                        {cat.isActive ? (
-                          <ToggleRight className="size-4 text-success" aria-hidden />
-                        ) : (
-                          <ToggleLeft className="size-4 text-default-400" aria-hidden />
-                        )}
-                      </Button>
+                        <Switch.Control>
+                          <Switch.Thumb />
+                        </Switch.Control>
+                      </Switch>
                       <Tooltip.Content placement="top">
                         {cat.isActive
                           ? t('admin.catalog.actions.deactivate')
