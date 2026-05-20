@@ -1,7 +1,7 @@
 import type { DateValue } from '@internationalized/date';
 import { parseDate } from '@internationalized/date';
 import { Calendar, DateField, DatePicker, I18nProvider, Label, Table } from '@heroui/react';
-import { ScrollText } from 'lucide-react';
+import { ArrowRight, ScrollText } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -201,8 +201,7 @@ export function AuditLogPage() {
                           {entry.previousStatus && entry.newStatus ? (
                             <span className="text-xs text-default-500">
                               {auditStatusLabel(t, entry.actionType, entry.previousStatus)}
-                              {/* eslint-disable-next-line i18next/no-literal-string -- decorative arrow, same in all locales */}
-                              <span className="mx-1 text-default-300">&rarr;</span>
+                              <ArrowRight className="mx-1 inline size-3 shrink-0 text-default-300 rtl:rotate-180" aria-hidden />
                               {auditStatusLabel(t, entry.actionType, entry.newStatus)}
                             </span>
                           ) : (
@@ -262,7 +261,7 @@ function AuditDateFilter({
           </DatePicker.Trigger>
         </DateField.Suffix>
       </DateField.Group>
-      <DatePicker.Popover className="border border-default-200/60 bg-background/85 backdrop-blur-md shadow-lg rounded-large max-w-[min(320px,calc(100vw-1rem))] overflow-x-auto">
+      <DatePicker.Popover className="border border-default-200/60 bg-background/85 backdrop-blur-md shadow-lg rounded-large w-max max-w-[calc(100vw-1rem)] overflow-hidden">
         <I18nProvider locale={locale}>
           <Calendar aria-label={label}>
             <Calendar.Header>

@@ -4,6 +4,7 @@
    list-style: none (the default for Tailwind utility classes). */
 
 import { Card } from '@heroui/react';
+import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import type { AuditLogEntryDto } from './types';
@@ -87,8 +88,7 @@ export function AuditLogMobileCards({ entries, dateFmt }: AuditLogMobileCardsPro
               {entry.previousStatus && entry.newStatus ? (
                 <div className="text-xs text-default-500">
                   <span>{auditStatusLabel(t, entry.actionType, entry.previousStatus)}</span>
-                  {/* eslint-disable-next-line i18next/no-literal-string -- decorative arrow, same in all locales */}
-                  <span className="mx-1 text-default-300">&rarr;</span>
+                  <ArrowRight className="mx-1 inline size-3 shrink-0 text-default-300 rtl:rotate-180" aria-hidden />
                   <span>{auditStatusLabel(t, entry.actionType, entry.newStatus)}</span>
                 </div>
               ) : null}
