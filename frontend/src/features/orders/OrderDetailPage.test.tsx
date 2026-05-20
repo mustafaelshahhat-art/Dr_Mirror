@@ -62,6 +62,8 @@ function makeOrder(overrides: Partial<OrderDetailDto> = {}): OrderDetailDto {
     shippedAt: null,
     deliveredAt: null,
     cancelledAt: null,
+    pendingPaymentReviewAt: null,
+    paymentStatusLabel: 'awaitingPayment',
     allowedNextStatesForBuyer: [ORDER_STATUSES.Cancelled],
     allowedNextStatesForAdmin: [],
     items: [

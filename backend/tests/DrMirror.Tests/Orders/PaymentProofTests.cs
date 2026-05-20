@@ -145,9 +145,9 @@ public class PaymentProofTests
         fsm.Transition(order, OrderStatus.Pending, OrderActor.Admin, "Photo unreadable.");
 
         Assert.Equal(OrderStatus.Pending, order.Status);
-        // Rejection note is stored as CancellationReason by the FSM Transition overload.
-        // The endpoint also sets it on the PaymentProof.ReviewNote — tested here at FSM level.
-        Assert.Equal("Photo unreadable.", order.CancellationReason);
+        // CancellationReason is NOT set on Pending transition — it was a bug
+        // that has been fixed. The review note lives on PaymentProof.ReviewNote.
+        Assert.Null(order.CancellationReason);
     }
 
     [Fact]

@@ -67,6 +67,8 @@ public sealed record OrderDetailDto(
     DateTimeOffset? ShippedAt,
     DateTimeOffset? DeliveredAt,
     DateTimeOffset? CancelledAt,
+    DateTimeOffset? PendingPaymentReviewAt,
+    string PaymentStatusLabel,
     IReadOnlyList<OrderStatus> AllowedNextStatesForBuyer,
     IReadOnlyList<OrderStatus> AllowedNextStatesForAdmin,
     IReadOnlyList<OrderItemDto> Items,

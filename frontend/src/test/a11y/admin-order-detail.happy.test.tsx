@@ -9,7 +9,7 @@ const order: OrderDetailDto = {
   id: 'o1', orderNumber: 'DM-1', status: ORDER_STATUSES.Delivered, subTotal: 100, shippingFee: 0, total: 100, currency: 'EGP',
   shippingAddress: { recipientName: 'Ahmed', phone: '01000000000', governorate: 'cairo', city: 'Cairo', streetAddress: 'Street', floor: null, apartment: null, landmark: null, notes: null },
   paymentMethodId: 'pm1', paymentMethodKind: PAYMENT_METHOD_KIND.Cod, paymentMethodNameEn: 'COD', paymentMethodNameAr: 'الدفع عند الاستلام', paymentInstructionsEn: null, paymentInstructionsAr: null, paymentAccountNumber: null, paymentAccountHolder: null,
-  buyerNote: null, cancellationReason: null, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z', confirmedAt: null, paidAt: null, shippedAt: null, deliveredAt: null, cancelledAt: null,
+  buyerNote: null, cancellationReason: null, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z', confirmedAt: null, paidAt: null, shippedAt: null, deliveredAt: null, cancelledAt: null, pendingPaymentReviewAt: null, paymentStatusLabel: 'cod',
   allowedNextStatesForBuyer: [], allowedNextStatesForAdmin: [], items: [{ id: 'i1', productId: 'p1', productSlug: 'scrub', productVariantId: 'v1', nameAr: 'سكرب', nameEn: 'Scrub', sku: 'SKU-1', size: 'M', colorName: 'Navy', colorNameAr: 'كحلي', colorHex: '#000080', primaryImageUrl: null, unitPrice: 100, quantity: 1, lineTotal: 100 }], paymentProofs: [], buyer: { id: 'b1', fullName: 'Ahmed', email: 'a@example.com' },
 };
 

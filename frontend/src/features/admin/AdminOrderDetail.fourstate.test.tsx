@@ -44,6 +44,8 @@ const MOCK_ORDER: OrderDetailDto = {
   shippedAt: null,
   deliveredAt: null,
   cancelledAt: null,
+  pendingPaymentReviewAt: null,
+  paymentStatusLabel: 'underReview',
   allowedNextStatesForBuyer: [],
   allowedNextStatesForAdmin: [ORDER_STATUSES.Confirmed, ORDER_STATUSES.Paid],
   items: [

@@ -115,7 +115,18 @@ public static class RejectPaymentProofEndpoint
             ct);
 
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
-        await db.SaveChangesAsync(ct);
+
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Results.Problem(
+                title: "Order state conflict",
+                detail: "The order was modified by another request. Please refresh and try again.",
+                statusCode: StatusCodes.Status409Conflict);
+        }
 
         return Results.Ok(order.ToDetail(fsm));
     }

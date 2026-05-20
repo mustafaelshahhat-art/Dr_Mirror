@@ -33,6 +33,10 @@ public static class OrderFactory
             PaymentMethodKind = paymentMethod.Kind,
             PaymentMethodNameEn = paymentMethod.NameEn,
             PaymentMethodNameAr = paymentMethod.NameAr,
+            PaymentAccountNumber = paymentMethod.AccountNumber,
+            PaymentAccountHolder = paymentMethod.AccountHolder,
+            PaymentInstructionsEn = paymentMethod.InstructionsEn,
+            PaymentInstructionsAr = paymentMethod.InstructionsAr,
             BuyerNote = buyerNote,
             ShippingAddress = shippingAddress,
         };

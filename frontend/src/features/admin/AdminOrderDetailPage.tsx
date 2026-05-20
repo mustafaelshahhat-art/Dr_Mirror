@@ -1,4 +1,4 @@
-import { Card, Separator, Tabs } from '@heroui/react';
+import { Card, Chip, Separator, Tabs } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, ImageOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -136,6 +136,19 @@ export function AdminOrderDetailPage() {
           </p>
         </div>
         <OrderStatusBadge status={order.status} />
+        <Chip
+          variant="soft"
+          size="sm"
+          color={
+            order.paymentStatusLabel === 'cod' || order.paymentStatusLabel === 'paid'
+              ? 'success'
+              : order.paymentStatusLabel === 'cancelled'
+                ? 'danger'
+                : 'warning'
+          }
+        >
+          {t(`admin.paymentStatus.${order.paymentStatusLabel}`)}
+        </Chip>
       </header>
 
       <Card>

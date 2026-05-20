@@ -354,6 +354,13 @@
       "displayOrderInteger": "الترتيب يجب أن يكون رقمًا صحيحًا."
     }
   },
+  "paymentStatus": {
+    "cod": "الدفع عند الاستلام",
+    "awaitingPayment": "في انتظار الدفع",
+    "underReview": "قيد المراجعة",
+    "paid": "تم الدفع",
+    "cancelled": "ملغي"
+  },
   "proofs": {
     "noneYet": "المشتري لم يرفع إثبات دفع حتى الآن.",
     "imageAlt": "صورة إثبات الدفع",

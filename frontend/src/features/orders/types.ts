@@ -156,6 +156,8 @@ export interface OrderDetailDto {
   shippedAt: string | null;
   deliveredAt: string | null;
   cancelledAt: string | null;
+  pendingPaymentReviewAt: string | null;
+  paymentStatusLabel: 'cod' | 'awaitingPayment' | 'underReview' | 'paid' | 'cancelled';
   allowedNextStatesForBuyer: OrderStatus[];
   allowedNextStatesForAdmin: OrderStatus[];
   items: OrderItemDto[];

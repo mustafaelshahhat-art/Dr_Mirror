@@ -354,6 +354,7 @@ function getProofDownloadFileName(orderNumber: string, proof: PaymentProofDto) {
     'image/jpeg': 'jpg',
     'image/png': 'png',
     'image/webp': 'webp',
+    'application/pdf': 'pdf',
   };
   const extension = extensionByContentType[proof.contentType.toLowerCase()] ?? 'jpg';
 

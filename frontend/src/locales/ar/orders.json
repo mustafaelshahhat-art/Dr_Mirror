@@ -85,6 +85,7 @@
     "submit": "رفع",
     "uploading": "جاري الرفع...",
     "clear": "إزالة",
+    "awaitingReview": "تم إرسال إثبات الدفع وهو قيد المراجعة",
     "errors": {
       "tooLarge": "حجم الملف أكبر من {{mb}} ميجابايت.",
       "unsupportedType": "نقبل فقط ملفات JPEG أو PNG أو PDF.",

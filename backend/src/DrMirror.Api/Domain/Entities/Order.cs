@@ -72,6 +72,22 @@ public class Order
     public DateTimeOffset? ShippedAt { get; set; }
     public DateTimeOffset? DeliveredAt { get; set; }
     public DateTimeOffset? CancelledAt { get; set; }
+    public DateTimeOffset? PendingPaymentReviewAt { get; set; }
+
+    /// <summary>Auto-generated SQL Server rowversion for optimistic concurrency.</summary>
+    public byte[]? RowVersion { get; set; }
+
+    /// <summary>Snapshotted from PaymentMethod.AccountNumber at checkout.</summary>
+    public string? PaymentAccountNumber { get; set; }
+
+    /// <summary>Snapshotted from PaymentMethod.AccountHolder at checkout.</summary>
+    public string? PaymentAccountHolder { get; set; }
+
+    /// <summary>Snapshotted from PaymentMethod.InstructionsEn at checkout.</summary>
+    public string? PaymentInstructionsEn { get; set; }
+
+    /// <summary>Snapshotted from PaymentMethod.InstructionsAr at checkout.</summary>
+    public string? PaymentInstructionsAr { get; set; }
 
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
 

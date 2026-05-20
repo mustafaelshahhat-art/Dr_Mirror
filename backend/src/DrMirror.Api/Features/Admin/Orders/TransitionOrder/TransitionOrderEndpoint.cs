@@ -92,11 +92,11 @@ public static class TransitionOrderEndpoint
         {
             await db.SaveChangesAsync(ct);
         }
-        catch (DbUpdateConcurrencyException) when (request.ToStatus == OrderStatus.Cancelled)
+        catch (DbUpdateConcurrencyException)
         {
             return Results.Problem(
-                title: "Couldn't cancel order",
-                detail: "Stock changed while the order was being cancelled. Refresh and try again.",
+                title: "Order state conflict",
+                detail: "The order was modified by another request. Please refresh and try again.",
                 statusCode: StatusCodes.Status409Conflict);
         }
 

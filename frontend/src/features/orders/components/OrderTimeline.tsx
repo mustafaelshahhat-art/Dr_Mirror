@@ -92,7 +92,7 @@ function buildPoints(order: OrderDetailDto): TimelinePoint[] {
       ]
     : [
         { status: ORDER_STATUSES.Pending, at: order.createdAt },
-        { status: ORDER_STATUSES.PendingPaymentReview, at: null },
+        { status: ORDER_STATUSES.PendingPaymentReview, at: order.pendingPaymentReviewAt ?? null },
         { status: ORDER_STATUSES.Paid, at: order.paidAt },
         { status: ORDER_STATUSES.Preparing, at: null },
         { status: ORDER_STATUSES.Shipped, at: order.shippedAt },
