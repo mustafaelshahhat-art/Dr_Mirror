@@ -59,6 +59,7 @@ function makeOrder(overrides: Partial<OrderDetailDto> = {}): OrderDetailDto {
     updatedAt: '2026-01-01T00:00:00Z',
     confirmedAt: null,
     paidAt: null,
+    preparingAt: null,
     shippedAt: null,
     deliveredAt: null,
     cancelledAt: null,

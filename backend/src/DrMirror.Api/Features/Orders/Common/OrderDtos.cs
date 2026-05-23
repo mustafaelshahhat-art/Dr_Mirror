@@ -64,6 +64,7 @@ public sealed record OrderDetailDto(
     DateTimeOffset UpdatedAt,
     DateTimeOffset? ConfirmedAt,
     DateTimeOffset? PaidAt,
+    DateTimeOffset? PreparingAt,
     DateTimeOffset? ShippedAt,
     DateTimeOffset? DeliveredAt,
     DateTimeOffset? CancelledAt,

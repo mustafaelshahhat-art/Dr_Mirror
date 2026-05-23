@@ -72,7 +72,7 @@ const MOCK_ORDER: OrderDetailDto = {
   paymentAccountNumber: '01000000000', paymentAccountHolder: 'Dr. Mirror',
   buyerNote: 'Please deliver after 5 PM', cancellationReason: null,
   createdAt: '2026-01-15T10:30:00Z', updatedAt: '2026-01-15T10:30:00Z',
-  confirmedAt: null, paidAt: null, shippedAt: null, deliveredAt: null, cancelledAt: null, pendingPaymentReviewAt: null, paymentStatusLabel: 'underReview',
+  confirmedAt: null, paidAt: null, preparingAt: null, shippedAt: null, deliveredAt: null, cancelledAt: null, pendingPaymentReviewAt: null, paymentStatusLabel: 'underReview',
   allowedNextStatesForBuyer: [], allowedNextStatesForAdmin: [ORDER_STATUSES.Confirmed, ORDER_STATUSES.Paid],
   items: [{
     id: 'item-1', productId: 'prod-1', productSlug: 'medical-scrubs',

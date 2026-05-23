@@ -73,6 +73,7 @@ public sealed class OrderStateMachine
         {
             case OrderStatus.Confirmed: order.ConfirmedAt = now; break;
             case OrderStatus.Paid: order.PaidAt = now; break;
+            case OrderStatus.Preparing: order.PreparingAt = now; break;
             case OrderStatus.Shipped: order.ShippedAt = now; break;
             case OrderStatus.Delivered: order.DeliveredAt = now; break;
             case OrderStatus.Pending:

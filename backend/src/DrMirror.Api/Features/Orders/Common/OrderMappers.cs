@@ -116,6 +116,7 @@ internal static class OrderMappers
         UpdatedAt: order.UpdatedAt,
         ConfirmedAt: order.ConfirmedAt,
         PaidAt: order.PaidAt,
+        PreparingAt: order.PreparingAt,
         ShippedAt: order.ShippedAt,
         DeliveredAt: order.DeliveredAt,
         CancelledAt: order.CancelledAt,

@@ -34,6 +34,13 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
 
   const isCancelling = target === ORDER_STATUSES.Cancelled;
 
+  function resetLocalState() {
+    setTarget(null);
+    setReason('');
+    setError(null);
+    if (cancelState.isOpen) cancelState.close();
+  }
+
   async function submit() {
     if (target === null) return;
     if (isCancelling && reason.trim().length === 0) {
@@ -46,13 +53,9 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
         toStatus: target,
         reason: reason.trim() || null,
       });
-      // Reset panel on success; the new allowedNextStatesForAdmin will drive
-      // the next render anyway.
-      if (cancelState.isOpen) cancelState.close();
-      setTarget(null);
-      setReason('');
+      resetLocalState();
     } catch {
-      // Toast emitted by mutation onError.
+      resetLocalState();
     }
   }
 
@@ -75,6 +78,7 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
               type="button"
               variant={isCancel ? 'danger-soft' : isActive ? 'primary' : 'outline'}
               size="sm"
+              isDisabled={transition.isPending}
               onPress={() => {
                 setError(null);
                 if (isCancel && !isActive) {

@@ -46,7 +46,11 @@ export function useAdminTransitionMutation({ orderNumber }: MutationCommonArgs) 
       queryClient.setQueryData(queryKeys.admin.orders.detail(orderNumber), order);
       void queryClient.invalidateQueries({ queryKey: queryKeys.admin.orders.listRoot(), exact: false });
     },
-    onError: errorToast,
+    onError: (error) => {
+      errorToast(error);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.admin.orders.detail(orderNumber) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.admin.orders.listRoot(), exact: false });
+    },
   });
 }
 

@@ -153,6 +153,7 @@ export interface OrderDetailDto {
   updatedAt: string;
   confirmedAt: string | null;
   paidAt: string | null;
+  preparingAt: string | null;
   shippedAt: string | null;
   deliveredAt: string | null;
   cancelledAt: string | null;

@@ -86,7 +86,7 @@ function buildPoints(order: OrderDetailDto): TimelinePoint[] {
   const ladder: Array<{ status: OrderStatus; at: string | null }> = isCod
     ? [
         { status: ORDER_STATUSES.Confirmed, at: order.confirmedAt },
-        { status: ORDER_STATUSES.Preparing, at: null },
+        { status: ORDER_STATUSES.Preparing, at: order.preparingAt ?? null },
         { status: ORDER_STATUSES.Shipped, at: order.shippedAt },
         { status: ORDER_STATUSES.Delivered, at: order.deliveredAt },
       ]
@@ -94,7 +94,7 @@ function buildPoints(order: OrderDetailDto): TimelinePoint[] {
         { status: ORDER_STATUSES.Pending, at: order.createdAt },
         { status: ORDER_STATUSES.PendingPaymentReview, at: order.pendingPaymentReviewAt ?? null },
         { status: ORDER_STATUSES.Paid, at: order.paidAt },
-        { status: ORDER_STATUSES.Preparing, at: null },
+        { status: ORDER_STATUSES.Preparing, at: order.preparingAt ?? null },
         { status: ORDER_STATUSES.Shipped, at: order.shippedAt },
         { status: ORDER_STATUSES.Delivered, at: order.deliveredAt },
       ];

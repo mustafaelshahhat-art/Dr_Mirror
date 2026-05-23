@@ -69,6 +69,7 @@ public class Order
 
     public DateTimeOffset? ConfirmedAt { get; set; }
     public DateTimeOffset? PaidAt { get; set; }
+    public DateTimeOffset? PreparingAt { get; set; }
     public DateTimeOffset? ShippedAt { get; set; }
     public DateTimeOffset? DeliveredAt { get; set; }
     public DateTimeOffset? CancelledAt { get; set; }
