@@ -7,10 +7,13 @@ import { ordersApi } from '../../orders/api';
 import { PaymentProofFilePreview } from '../../orders/components/PaymentProofFilePreview';
 import { ProofStatusBadge } from '../../orders/components/ProofStatusBadge';
 import {
+  ORDER_STATUSES,
   PAYMENT_PROOF_STATUS,
   type PaymentProofDto,
 } from '../../orders/types';
 import { useApproveProofMutation, useRejectProofMutation } from '../hooks';
+
+import { adminTransitionActionKey } from './adminTransitionActionKey';
 
 interface AdminProofReviewProps {
   orderNumber: string;
@@ -206,7 +209,7 @@ function ProofRow({
             >
               <span className="inline-flex items-center gap-1.5">
                 <Check className="size-4" aria-hidden />
-                {t('admin.proofs.approve')}
+                {t(adminTransitionActionKey(ORDER_STATUSES.PendingPaymentReview, ORDER_STATUSES.Paid))}
               </span>
             </Button>
             <Button
@@ -223,7 +226,7 @@ function ProofRow({
             >
               <span className="inline-flex items-center gap-1.5">
                 <X className="size-4" aria-hidden />
-                {t('admin.proofs.reject')}
+                {t(adminTransitionActionKey(ORDER_STATUSES.PendingPaymentReview, ORDER_STATUSES.Pending))}
               </span>
             </Button>
           </Toolbar>
@@ -293,7 +296,9 @@ function ProofRow({
               {({ close }) => (
                 <>
                   <AlertDialog.Header>
-                    <AlertDialog.Heading>{t('admin.proofs.reject')}</AlertDialog.Heading>
+                    <AlertDialog.Heading>
+                      {t(adminTransitionActionKey(ORDER_STATUSES.PendingPaymentReview, ORDER_STATUSES.Pending))}
+                    </AlertDialog.Heading>
                   </AlertDialog.Header>
                   <AlertDialog.Body className="space-y-2">
                     <p className="text-sm font-medium">

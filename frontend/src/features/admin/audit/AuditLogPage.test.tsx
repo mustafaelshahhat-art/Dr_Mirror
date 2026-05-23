@@ -39,6 +39,7 @@ const mockEntry = {
   targetEntityId: 'ORD-001',
   previousStatus: 'Pending',
   newStatus: 'Paid',
+  note: null,
   correlationId: null,
   timestampUtc: '2025-06-01T10:00:00.000Z',
 };

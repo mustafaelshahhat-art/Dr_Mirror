@@ -41,7 +41,7 @@
     "shipped": "Shipped",
     "delivered": "Delivered",
     "cancelled": "Cancelled",
-    "unknown": "Status"
+    "orderPlaced": "Order placed"
   },
   "paymentInstructions": {
     "heading": "How to pay",

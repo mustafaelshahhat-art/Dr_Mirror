@@ -27,7 +27,8 @@ public sealed class AdminAuditWriter : IAdminAuditWriter
         string targetEntityId,
         string? previousStatus,
         string? newStatus,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? note = null)
     {
         var userId = _httpContextAccessor.HttpContext?.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         if (!Guid.TryParse(userId, out var actorUserId))
@@ -46,7 +47,8 @@ public sealed class AdminAuditWriter : IAdminAuditWriter
             previousStatus,
             newStatus,
             correlationId,
-            _timeProvider.GetUtcNow());
+            _timeProvider.GetUtcNow(),
+            note);
 
         _db.AdminAuditLogEntries.Add(entry);
         return Task.CompletedTask;

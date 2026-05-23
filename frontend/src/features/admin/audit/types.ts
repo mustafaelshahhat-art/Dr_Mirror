@@ -7,6 +7,7 @@ export interface AuditLogEntryDto {
   targetEntityId: string;
   previousStatus: string | null;
   newStatus: string | null;
+  note: string | null;
   correlationId: string | null;
   timestampUtc: string;
 }
@@ -16,6 +17,7 @@ export interface AuditLogParams {
   pageSize?: number;
   actionType?: string;
   targetType?: string;
+  targetId?: string;
   actorUserId?: string;
   from?: string;
   to?: string;

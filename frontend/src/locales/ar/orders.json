@@ -49,7 +49,7 @@
     "shipped": "تم الشحن",
     "delivered": "تم التوصيل",
     "cancelled": "ملغي",
-    "unknown": "الحالة"
+    "orderPlaced": "تم استلام الطلب"
   },
   "paymentInstructions": {
     "heading": "كيفية الدفع",

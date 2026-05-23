@@ -5,48 +5,48 @@
 
 /** Stays in lock-step with backend OrderStatus enum (Domain/Orders). */
 export type OrderStatus =
-  | 0 // Pending
-  | 1 // Confirmed
-  | 2 // PendingPaymentReview
-  | 3 // Paid
-  | 4 // Preparing
-  | 5 // Shipped
-  | 6 // Delivered
-  | 99; // Cancelled
+  | 'Pending'
+  | 'Confirmed'
+  | 'PendingPaymentReview'
+  | 'Paid'
+  | 'Preparing'
+  | 'Shipped'
+  | 'Delivered'
+  | 'Cancelled';
 
 export const ORDER_STATUSES = {
-  Pending: 0,
-  Confirmed: 1,
-  PendingPaymentReview: 2,
-  Paid: 3,
-  Preparing: 4,
-  Shipped: 5,
-  Delivered: 6,
-  Cancelled: 99,
+  Pending: 'Pending',
+  Confirmed: 'Confirmed',
+  PendingPaymentReview: 'PendingPaymentReview',
+  Paid: 'Paid',
+  Preparing: 'Preparing',
+  Shipped: 'Shipped',
+  Delivered: 'Delivered',
+  Cancelled: 'Cancelled',
 } as const satisfies Record<string, OrderStatus>;
 
 export type PaymentMethodKind =
-  | 0 // Cod
-  | 1 // Instapay
-  | 2 // Wallet
-  | 3; // BankTransfer
+  | 'Cod'
+  | 'Instapay'
+  | 'Wallet'
+  | 'BankTransfer';
 
 export const PAYMENT_METHOD_KIND = {
-  Cod: 0,
-  Instapay: 1,
-  Wallet: 2,
-  BankTransfer: 3,
+  Cod: 'Cod',
+  Instapay: 'Instapay',
+  Wallet: 'Wallet',
+  BankTransfer: 'BankTransfer',
 } as const satisfies Record<string, PaymentMethodKind>;
 
 export type PaymentProofStatus =
-  | 0 // Pending
-  | 1 // Approved
-  | 2; // Rejected
+  | 'Pending'
+  | 'Approved'
+  | 'Rejected';
 
 export const PAYMENT_PROOF_STATUS = {
-  Pending: 0,
-  Approved: 1,
-  Rejected: 2,
+  Pending: 'Pending',
+  Approved: 'Approved',
+  Rejected: 'Rejected',
 } as const satisfies Record<string, PaymentProofStatus>;
 
 export interface PaymentMethodDto {

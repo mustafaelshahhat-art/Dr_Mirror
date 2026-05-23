@@ -108,11 +108,12 @@ public static class RejectPaymentProofEndpoint
 
         await audit.WriteAsync(
             "PaymentProof.Reject",
-            "PaymentProof",
-            proof.Id.ToString(),
+            "Order",
+            order.Id.ToString(),
             PaymentProofStatus.Pending.ToString(),
             proof.Status.ToString(),
-            ct);
+            ct,
+            request.ReviewNote);
 
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
 

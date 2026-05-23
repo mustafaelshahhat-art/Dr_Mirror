@@ -91,4 +91,17 @@ describe('AdminProofReview proof files', () => {
     expect(clickSpy).toHaveBeenCalled();
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:download');
   });
+
+  it('uses explicit admin transition action labels for approve and reject buttons', async () => {
+    vi.mocked(ordersApi.getPaymentProofFile).mockResolvedValue(
+      new Blob(['proof-bytes'], { type: 'image/png' }),
+    );
+
+    renderWithProviders(
+      <AdminProofReview orderNumber="DM-2026-TEST" proofs={[proof]} />,
+    );
+
+    expect(await screen.findByRole('button', { name: /approve payment/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /reject payment proof/i })).toBeInTheDocument();
+  });
 });

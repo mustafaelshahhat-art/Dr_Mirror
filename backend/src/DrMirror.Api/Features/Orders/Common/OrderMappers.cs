@@ -15,7 +15,7 @@ internal static class OrderMappers
     /// </summary>
     private static string ComputePaymentStatusLabel(Order order)
     {
-        if (order.PaymentMethodKind == PaymentMethodKind.Cod)
+        if (PaymentMethodClassification.Classify(order.PaymentMethodKind) == PaymentMethodGroup.Cod)
             return "cod";
 
         return order.Status switch
@@ -26,6 +26,32 @@ internal static class OrderMappers
             _ => "paid",
         };
     }
+
+    private static IReadOnlyList<OrderStatus> ComputeAdminActionSet(Order order, OrderStateMachine fsm)
+    {
+        var allowed = fsm.NextStates(order.Status, OrderActor.Admin);
+        var group = PaymentMethodClassification.Classify(order.PaymentMethodKind);
+
+        if (group == PaymentMethodGroup.ProofBased && order.Status == OrderStatus.PendingPaymentReview)
+        {
+            return allowed
+                .Where(s => s is OrderStatus.Paid or OrderStatus.Pending)
+                .ToArray();
+        }
+
+        if (order.Status == OrderStatus.Paid)
+        {
+            return allowed.Where(s => s == OrderStatus.Preparing).ToArray();
+        }
+
+        if (order.Status == OrderStatus.Preparing)
+        {
+            return allowed.Where(s => s == OrderStatus.Shipped).ToArray();
+        }
+
+        return allowed;
+    }
+
     public static ShippingAddressDto ToDto(this ShippingAddress address) => new(
         address.RecipientName,
         address.Phone,
@@ -123,7 +149,7 @@ internal static class OrderMappers
         PendingPaymentReviewAt: order.PendingPaymentReviewAt,
         PaymentStatusLabel: ComputePaymentStatusLabel(order),
         AllowedNextStatesForBuyer: fsm.NextStates(order.Status, OrderActor.Buyer),
-        AllowedNextStatesForAdmin: fsm.NextStates(order.Status, OrderActor.Admin),
+        AllowedNextStatesForAdmin: ComputeAdminActionSet(order, fsm),
         Items: order.Items.OrderBy(i => i.CreatedAt).Select(i => i.ToDto()).ToList(),
         PaymentProofs: order.PaymentProofs.OrderByDescending(p => p.UploadedAt).Select(p => p.ToDto(order.OrderNumber)).ToList(),
         Buyer: new BuyerSummaryDto(

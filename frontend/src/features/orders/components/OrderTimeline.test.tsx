@@ -114,21 +114,31 @@ describe('OrderTimeline — preparingAt timestamp', () => {
 });
 
 describe('OrderTimeline — COD payment status', () => {
-  it('does not show Pending/PaymentReview steps for COD order', () => {
-    const order = makeCodOrder();
+  it('renders four fulfillment-only steps for COD order', () => {
+    const order = makeCodOrder({ status: ORDER_STATUSES.Confirmed });
     renderWithProviders(<OrderTimeline order={order} />);
 
+    expect(screen.getAllByRole('listitem')).toHaveLength(4);
+    expect(screen.getByText('Order placed')).toBeInTheDocument();
+    expect(screen.getByText('Preparing')).toBeInTheDocument();
+    expect(screen.getByText('Shipped')).toBeInTheDocument();
+    expect(screen.getByText('Delivered')).toBeInTheDocument();
     expect(screen.queryByText('Pending')).not.toBeInTheDocument();
     expect(screen.queryByText('Payment under review')).not.toBeInTheDocument();
     expect(screen.queryByText('Paid')).not.toBeInTheDocument();
   });
 
-  it('shows Confirmed and Preparing steps for COD order', () => {
-    const order = makeCodOrder();
-    renderWithProviders(<OrderTimeline order={order} />);
+  it('uses Arabic and English orderPlaced copy for the first COD step', async () => {
+    const order = makeCodOrder({ status: ORDER_STATUSES.Confirmed });
 
-    expect(screen.getByText('Confirmed')).toBeInTheDocument();
-    expect(screen.getByText('Preparing')).toBeInTheDocument();
+    await testI18n.changeLanguage('en');
+    const { unmount } = renderWithProviders(<OrderTimeline order={order} />);
+    expect(screen.getByText('Order placed')).toBeInTheDocument();
+    unmount();
+
+    await testI18n.changeLanguage('ar');
+    renderWithProviders(<OrderTimeline order={order} />);
+    expect(screen.getByText('تم استلام الطلب')).toBeInTheDocument();
   });
 });
 
@@ -143,6 +153,9 @@ describe('OrderTimeline — non-COD payment status', () => {
     });
     renderWithProviders(<OrderTimeline order={order} />);
 
+    expect(screen.getAllByRole('listitem')).toHaveLength(6);
     expect(screen.getByText('Awaiting payment')).toBeInTheDocument();
+    expect(screen.getByText('Payment under review')).toBeInTheDocument();
+    expect(screen.getByText('Paid')).toBeInTheDocument();
   });
 });

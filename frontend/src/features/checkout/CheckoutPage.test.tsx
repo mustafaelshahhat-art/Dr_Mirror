@@ -4,13 +4,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { makeAuthValue, makeBuyerUser, renderWithProviders } from '../../test/utils';
 import { CartContext } from '../cart/CartContext';
 import type { CartContextValue, CartView } from '../cart/CartContext';
+import { PAYMENT_METHOD_KIND } from '../orders/types';
 import { CheckoutPage } from './CheckoutPage';
 
 vi.mock('../orders/api', () => ({
   ordersApi: {
     getPaymentMethods: vi.fn().mockResolvedValue([
-      { id: 'pm-cod', code: 'cod', kind: 0, nameEn: 'Cash on Delivery', nameAr: 'الدفع عند الاستلام', displayOrder: 0 },
-      { id: 'pm-instapay', code: 'instapay', kind: 1, nameEn: 'Instapay', nameAr: 'إنستاباي', displayOrder: 1 },
+      { id: 'pm-cod', code: 'cod', kind: PAYMENT_METHOD_KIND.Cod, nameEn: 'Cash on Delivery', nameAr: 'الدفع عند الاستلام', displayOrder: 0 },
+      { id: 'pm-instapay', code: 'instapay', kind: PAYMENT_METHOD_KIND.Instapay, nameEn: 'Instapay', nameAr: 'إنستاباي', displayOrder: 1 },
     ]),
     createOrder: vi.fn(),
     listMyOrders: vi.fn().mockResolvedValue({ items: [], page: 1, pageSize: 20, totalCount: 0, totalPages: 0 }),

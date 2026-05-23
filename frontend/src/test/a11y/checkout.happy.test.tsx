@@ -6,7 +6,7 @@ import { makeAuthValue, makeBuyerUser, renderWithProviders } from '../utils';
 import { axe } from '../axe';
 
 vi.mock('../../features/orders/api', () => ({ ordersApi: {
-  getPaymentMethods: vi.fn().mockResolvedValue([{ id: 'pm-cod', code: 'cod', kind: 0, nameEn: 'Cash on Delivery', nameAr: 'الدفع عند الاستلام', displayOrder: 0 }]),
+  getPaymentMethods: vi.fn().mockResolvedValue([{ id: 'pm-cod', code: 'cod', kind: 'Cod', nameEn: 'Cash on Delivery', nameAr: 'الدفع عند الاستلام', displayOrder: 0 }]),
   createOrder: vi.fn(), listMyOrders: vi.fn(), getMyOrder: vi.fn(), cancelMyOrder: vi.fn(), uploadPaymentProof: vi.fn(), getAppConfig: vi.fn(),
 } }));
 vi.mock('../../features/addresses/hooks', () => ({ useAddressesQuery: () => ({ data: [], isLoading: false, isError: false }) }));

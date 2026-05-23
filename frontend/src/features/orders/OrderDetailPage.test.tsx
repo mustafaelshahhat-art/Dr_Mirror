@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '../../test/utils';
 import { ORDER_STATUSES, PAYMENT_METHOD_KIND, type OrderDetailDto } from './types';
 import { CancelOrderButton } from './components/CancelOrderButton';
+import { paymentMethodGroup } from './lib/paymentMethodGroup';
 
 vi.mock('./hooks', () => ({
   usePaymentMethodsQuery: () => ({ data: [], isLoading: false }),
@@ -131,8 +132,8 @@ describe('Payment proof upload visibility', () => {
       status: ORDER_STATUSES.Confirmed,
     });
     // COD -> isNonCod is false -> canUploadProof is false
-    const isNonCod = order.paymentMethodKind !== PAYMENT_METHOD_KIND.Cod;
-    const canUpload = isNonCod && (order.status === ORDER_STATUSES.Pending || order.status === ORDER_STATUSES.PendingPaymentReview);
+    const isProofBased = paymentMethodGroup(order.paymentMethodKind) === 'proof';
+    const canUpload = isProofBased && (order.status === ORDER_STATUSES.Pending || order.status === ORDER_STATUSES.PendingPaymentReview);
     expect(canUpload).toBe(false);
   });
 
@@ -141,8 +142,8 @@ describe('Payment proof upload visibility', () => {
       paymentMethodKind: PAYMENT_METHOD_KIND.Instapay,
       status: ORDER_STATUSES.Pending,
     });
-    const isNonCod = order.paymentMethodKind !== PAYMENT_METHOD_KIND.Cod;
-    const canUpload = isNonCod && (order.status === ORDER_STATUSES.Pending || order.status === ORDER_STATUSES.PendingPaymentReview);
+    const isProofBased = paymentMethodGroup(order.paymentMethodKind) === 'proof';
+    const canUpload = isProofBased && (order.status === ORDER_STATUSES.Pending || order.status === ORDER_STATUSES.PendingPaymentReview);
     expect(canUpload).toBe(true);
   });
 
@@ -151,8 +152,8 @@ describe('Payment proof upload visibility', () => {
       paymentMethodKind: PAYMENT_METHOD_KIND.Instapay,
       status: ORDER_STATUSES.Confirmed,
     });
-    const isNonCod = order.paymentMethodKind !== PAYMENT_METHOD_KIND.Cod;
-    const canUpload = isNonCod && (order.status === ORDER_STATUSES.Pending || order.status === ORDER_STATUSES.PendingPaymentReview);
+    const isProofBased = paymentMethodGroup(order.paymentMethodKind) === 'proof';
+    const canUpload = isProofBased && (order.status === ORDER_STATUSES.Pending || order.status === ORDER_STATUSES.PendingPaymentReview);
     expect(canUpload).toBe(false);
   });
 
@@ -161,8 +162,8 @@ describe('Payment proof upload visibility', () => {
       paymentMethodKind: PAYMENT_METHOD_KIND.Instapay,
       status: ORDER_STATUSES.PendingPaymentReview,
     });
-    const isNonCod = order.paymentMethodKind !== PAYMENT_METHOD_KIND.Cod;
-    const canUpload = isNonCod && (order.status === ORDER_STATUSES.Pending || order.status === ORDER_STATUSES.PendingPaymentReview);
+    const isProofBased = paymentMethodGroup(order.paymentMethodKind) === 'proof';
+    const canUpload = isProofBased && (order.status === ORDER_STATUSES.Pending || order.status === ORDER_STATUSES.PendingPaymentReview);
     expect(canUpload).toBe(true);
   });
 });

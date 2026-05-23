@@ -2,6 +2,8 @@ import { CheckCircle2, Circle, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { ORDER_STATUSES, type OrderDetailDto, type OrderStatus } from '../types';
+import { paymentMethodGroup } from '../lib/paymentMethodGroup';
+import { timelineLadder } from '../lib/timelineLadder';
 
 import { orderStatusTranslationKey } from './orderStatusTranslationKey';
 
@@ -76,38 +78,20 @@ export function OrderTimeline({ order }: { order: OrderDetailDto }) {
 }
 
 function buildPoints(order: OrderDetailDto): TimelinePoint[] {
-  // If the order is cancelled, fold the happy-path steps the order reached and
-  // append a terminal Cancelled node so the buyer sees both arcs at once.
   const cancelledAt = order.cancelledAt;
 
-  // Build the linear happy-path. PaymentMethodKind=0 (COD) skips Paid; non-COD
-  // orders pass through PendingPaymentReview → Paid before Preparing.
-  const isCod = order.paymentMethodKind === 0;
-  const ladder: Array<{ status: OrderStatus; at: string | null }> = isCod
-    ? [
-        { status: ORDER_STATUSES.Confirmed, at: order.confirmedAt },
-        { status: ORDER_STATUSES.Preparing, at: order.preparingAt ?? null },
-        { status: ORDER_STATUSES.Shipped, at: order.shippedAt },
-        { status: ORDER_STATUSES.Delivered, at: order.deliveredAt },
-      ]
-    : [
-        { status: ORDER_STATUSES.Pending, at: order.createdAt },
-        { status: ORDER_STATUSES.PendingPaymentReview, at: order.pendingPaymentReviewAt ?? null },
-        { status: ORDER_STATUSES.Paid, at: order.paidAt },
-        { status: ORDER_STATUSES.Preparing, at: order.preparingAt ?? null },
-        { status: ORDER_STATUSES.Shipped, at: order.shippedAt },
-        { status: ORDER_STATUSES.Delivered, at: order.deliveredAt },
-      ];
+  const group = paymentMethodGroup(order.paymentMethodKind);
+  const ladder: Array<{ status: OrderStatus; at: string | null }> = timelineLadder(group).map((status) => ({
+    status,
+    at: timestampForStatus(order, status),
+  }));
 
-  // A point is "reached" if the order's current status is ≥ it on the ladder,
-  // or if the corresponding timestamp is non-null.
   const currentIndex = ladder.findIndex((p) => p.status === order.status);
   const points: TimelinePoint[] = ladder.map((p, idx) => ({
     status: p.status,
     at: p.at,
     reached:
       (currentIndex >= 0 && idx <= currentIndex) ||
-      // Cancelled order — earlier states with timestamps are still reached.
       Boolean(p.at),
   }));
 
@@ -120,4 +104,18 @@ function buildPoints(order: OrderDetailDto): TimelinePoint[] {
   }
 
   return points;
+}
+
+function timestampForStatus(order: OrderDetailDto, status: OrderStatus): string | null {
+  switch (status) {
+    case ORDER_STATUSES.Pending: return order.createdAt;
+    case ORDER_STATUSES.Confirmed: return order.confirmedAt;
+    case ORDER_STATUSES.PendingPaymentReview: return order.pendingPaymentReviewAt ?? null;
+    case ORDER_STATUSES.Paid: return order.paidAt;
+    case ORDER_STATUSES.Preparing: return order.preparingAt ?? null;
+    case ORDER_STATUSES.Shipped: return order.shippedAt;
+    case ORDER_STATUSES.Delivered: return order.deliveredAt;
+    case ORDER_STATUSES.Cancelled: return order.cancelledAt;
+    default: return null;
+  }
 }

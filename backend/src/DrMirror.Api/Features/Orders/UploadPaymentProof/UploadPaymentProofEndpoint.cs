@@ -127,7 +127,7 @@ public static class UploadPaymentProofEndpoint
         }
 
         // COD orders never need a proof.
-        if (order.PaymentMethodKind == PaymentMethodKind.Cod)
+        if (PaymentMethodClassification.Classify(order.PaymentMethodKind) == PaymentMethodGroup.Cod)
         {
             return Results.Problem(
                 title: "Proof not required",

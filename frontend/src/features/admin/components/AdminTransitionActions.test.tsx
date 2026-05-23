@@ -79,6 +79,61 @@ afterEach(() => {
   document.documentElement.classList.remove('dark', 'light');
 });
 
+describe('AdminTransitionActions — explicit action labels', () => {
+  it('renders only Mark as Preparing and Cancel order for COD Confirmed', async () => {
+    await testI18n.changeLanguage('en');
+
+    renderWithProviders(<AdminTransitionActions order={makeOrder()} />);
+
+    expect(screen.getByRole('button', { name: 'Mark as Preparing' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cancel order' })).toBeInTheDocument();
+    expect(screen.queryByText('admin.transition.actions.unknown')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Status' })).not.toBeInTheDocument();
+  });
+
+  it('does not render fulfillment buttons for proof-based Pending orders', async () => {
+    await testI18n.changeLanguage('en');
+    const order = makeOrder({
+      paymentMethodKind: PAYMENT_METHOD_KIND.Instapay,
+      status: ORDER_STATUSES.Pending,
+      allowedNextStatesForAdmin: [
+        ORDER_STATUSES.Preparing,
+        ORDER_STATUSES.Shipped,
+        ORDER_STATUSES.Delivered,
+        ORDER_STATUSES.Cancelled,
+      ],
+    });
+
+    renderWithProviders(<AdminTransitionActions order={order} />);
+
+    expect(screen.queryByRole('button', { name: 'Mark as Preparing' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Mark as Shipped' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Mark as Delivered' })).not.toBeInTheDocument();
+  });
+
+  it('renders only proof-review actions for proof-based PendingPaymentReview orders', async () => {
+    await testI18n.changeLanguage('en');
+    const order = makeOrder({
+      paymentMethodKind: PAYMENT_METHOD_KIND.Instapay,
+      status: ORDER_STATUSES.PendingPaymentReview,
+      allowedNextStatesForAdmin: [
+        ORDER_STATUSES.Paid,
+        ORDER_STATUSES.Pending,
+        ORDER_STATUSES.Cancelled,
+        ORDER_STATUSES.Preparing,
+      ],
+    });
+
+    renderWithProviders(<AdminTransitionActions order={order} />);
+
+    expect(screen.getByRole('button', { name: 'Approve payment' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reject payment proof' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cancel order' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Mark as Preparing' })).not.toBeInTheDocument();
+    expect(screen.queryByText('admin.transition.actions.unknown')).not.toBeInTheDocument();
+  });
+});
+
 describe('AdminTransitionActions — conflict recovery', () => {
   it('resets local state and closes cancel dialog on mutation failure', async () => {
     await testI18n.changeLanguage('en');
@@ -87,7 +142,7 @@ describe('AdminTransitionActions — conflict recovery', () => {
 
     renderWithProviders(<AdminTransitionActions order={order} />);
 
-    const cancelButton = screen.getByRole('button', { name: /cancelled/i });
+    const cancelButton = screen.getByRole('button', { name: /cancel order/i });
     await userEvent.click(cancelButton);
 
     expect(screen.getByRole('alertdialog')).toBeInTheDocument();
@@ -118,7 +173,7 @@ describe('AdminTransitionActions — conflict recovery', () => {
     const preparingButton = screen.getByRole('button', { name: /preparing/i });
     await userEvent.click(preparingButton);
 
-    expect(screen.getByText(/Mark as Preparing/i)).toBeInTheDocument();
+    expect(screen.getByText('Mark as Preparing?')).toBeInTheDocument();
 
     const confirmButton = screen.getByRole('button', { name: /^confirm$/i });
     await userEvent.click(confirmButton);
@@ -128,7 +183,7 @@ describe('AdminTransitionActions — conflict recovery', () => {
     });
 
     await waitFor(() => {
-      expect(screen.queryByText(/Mark as Preparing/i)).not.toBeInTheDocument();
+      expect(screen.queryByText('Mark as Preparing?')).not.toBeInTheDocument();
     });
   });
 });

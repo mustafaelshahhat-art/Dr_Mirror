@@ -151,6 +151,21 @@ public class PaymentProofTests
     }
 
     [Fact]
+    public void Reject_does_not_write_fulfillment_timestamps()
+    {
+        var fsm = new OrderStateMachine();
+        var order = NewOrder(OrderStatus.PendingPaymentReview);
+
+        fsm.Transition(order, OrderStatus.Pending, OrderActor.Admin);
+
+        Assert.Equal(OrderStatus.Pending, order.Status);
+        Assert.Null(order.PaidAt);
+        Assert.Null(order.PreparingAt);
+        Assert.Null(order.ShippedAt);
+        Assert.Null(order.DeliveredAt);
+    }
+
+    [Fact]
     public void Already_reviewed_proof_cannot_transition_via_FSM()
     {
         // Once in Paid, admin cannot re-run approve (order is no longer PendingPaymentReview).
