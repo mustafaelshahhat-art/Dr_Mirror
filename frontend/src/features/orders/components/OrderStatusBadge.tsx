@@ -7,6 +7,10 @@ import { orderStatusTranslationKey } from './orderStatusTranslationKey';
 
 type ChipColor = 'accent' | 'danger' | 'default' | 'success' | 'warning';
 
+function assertNever(_: never): never {
+  throw new Error(`Unhandled OrderStatus: ${String(_)}`);
+}
+
 function statusColor(status: OrderStatus): ChipColor {
   switch (status) {
     case ORDER_STATUSES.Pending:
@@ -23,7 +27,7 @@ function statusColor(status: OrderStatus): ChipColor {
     case ORDER_STATUSES.Cancelled:
       return 'danger';
     default:
-      return 'default';
+      assertNever(status);
   }
 }
 

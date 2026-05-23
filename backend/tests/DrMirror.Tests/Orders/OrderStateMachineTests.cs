@@ -131,6 +131,19 @@ public class OrderStateMachineTests
     }
 
     [Fact]
+    public void Transition_to_Preparing_sets_PreparingAt()
+    {
+        var fsm = new OrderStateMachine();
+        var order = NewOrder(OrderStatus.Confirmed);
+
+        Assert.Null(order.PreparingAt);
+        fsm.Transition(order, OrderStatus.Preparing, OrderActor.Admin);
+
+        Assert.Equal(OrderStatus.Preparing, order.Status);
+        Assert.NotNull(order.PreparingAt);
+    }
+
+    [Fact]
     public void Transition_to_Cancelled_records_reason()
     {
         var fsm = new OrderStateMachine();

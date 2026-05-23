@@ -141,10 +141,8 @@ export function AdminOrdersListPage() {
 function parseStatusFilter(value: string | null): OrderStatus | undefined {
   if (value === null || value === '') return undefined;
 
-  const numericValue = Number(value);
   const validStatuses = Object.values(ORDER_STATUSES) as OrderStatus[];
-
-  return validStatuses.includes(numericValue as OrderStatus)
-    ? (numericValue as OrderStatus)
+  return validStatuses.includes(value as OrderStatus)
+    ? (value as OrderStatus)
     : undefined;
 }

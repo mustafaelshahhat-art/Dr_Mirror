@@ -85,7 +85,7 @@ function CheckoutBody() {
 
   const {
     control,
-    handleSubmit,
+    getValues,
     trigger,
     setValue,
     watch,
@@ -187,10 +187,33 @@ function CheckoutBody() {
     else if (step === 'payment') setStep('address');
   }
 
-  const onSubmit = handleSubmit(async (values) => {
+  async function onFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     setFormError(null);
+
+    const usingSaved = savedAddressId !== null;
+
+    // Validate only the relevant fields for the active address mode.
+    if (!usingSaved) {
+      const addressOk = await trigger('address');
+      if (!addressOk) {
+        setFormError(t('checkout.errors.unknown'));
+        return;
+      }
+      if (saveAsNewAddress && newAddressLabel.trim().length === 0) {
+        setFormError(t('checkout.errors.labelRequired'));
+        return;
+      }
+    }
+
+    const paymentOk = await trigger('paymentMethodId');
+    if (!paymentOk) {
+      setFormError(t('checkout.errors.unknown'));
+      return;
+    }
+
     try {
-      const usingSaved = savedAddressId !== null;
+      const values = getValues();
       const order = await createOrder.mutateAsync({
         idempotencyKey,
         input: {
@@ -221,7 +244,7 @@ function CheckoutBody() {
     } catch {
       // Toast emitted by mutation onError.
     }
-  });
+  }
 
   return (
     <section className="space-y-8">
@@ -237,7 +260,7 @@ function CheckoutBody() {
       </div>
 
       <Form
-        onSubmit={onSubmit}
+        onSubmit={onFormSubmit}
         className="grid gap-6 lg:grid-cols-[1fr_320px]"
       >
         <div className="space-y-4">

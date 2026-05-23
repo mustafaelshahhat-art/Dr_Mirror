@@ -3,8 +3,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { orderStatusTranslationKey } from '../../orders/components/orderStatusTranslationKey';
+import { paymentMethodGroup } from '../../orders/lib/paymentMethodGroup';
 import { ORDER_STATUSES, type OrderDetailDto, type OrderStatus } from '../../orders/types';
 import { useAdminTransitionMutation } from '../hooks';
+
+import { adminTransitionActionKey } from './adminTransitionActionKey';
 
 interface AdminTransitionActionsProps {
   order: OrderDetailDto;
@@ -23,8 +26,9 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
   const [error, setError] = useState<string | null>(null);
   const transition = useAdminTransitionMutation({ orderNumber: order.orderNumber });
   const cancelState = useOverlayState({ defaultOpen: false });
+  const visibleNextStates = visibleAdminNextStates(order);
 
-  if (order.allowedNextStatesForAdmin.length === 0) {
+  if (visibleNextStates.length === 0) {
     return (
       <p className="text-xs text-default-500">
         {t('admin.transition.terminalState')}
@@ -33,6 +37,13 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
   }
 
   const isCancelling = target === ORDER_STATUSES.Cancelled;
+
+  function resetLocalState() {
+    setTarget(null);
+    setReason('');
+    setError(null);
+    if (cancelState.isOpen) cancelState.close();
+  }
 
   async function submit() {
     if (target === null) return;
@@ -46,13 +57,9 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
         toStatus: target,
         reason: reason.trim() || null,
       });
-      // Reset panel on success; the new allowedNextStatesForAdmin will drive
-      // the next render anyway.
-      if (cancelState.isOpen) cancelState.close();
-      setTarget(null);
-      setReason('');
+      resetLocalState();
     } catch {
-      // Toast emitted by mutation onError.
+      resetLocalState();
     }
   }
 
@@ -66,15 +73,17 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
       </Heading>
 
       <Toolbar aria-label={t('admin.transition.heading')} className="flex flex-wrap gap-2">
-        {order.allowedNextStatesForAdmin.map((status) => {
+        {visibleNextStates.map((status) => {
           const isCancel = status === ORDER_STATUSES.Cancelled;
           const isActive = status === target;
+          const actionKey = adminTransitionActionKey(order.status, status);
           return (
             <Button
               key={status}
               type="button"
               variant={isCancel ? 'danger-soft' : isActive ? 'primary' : 'outline'}
               size="sm"
+              isDisabled={transition.isPending}
               onPress={() => {
                 setError(null);
                 if (isCancel && !isActive) {
@@ -87,7 +96,7 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
                 if (!isActive) setReason('');
               }}
             >
-              {t(orderStatusTranslationKey(status))}
+              {t(actionKey)}
             </Button>
           );
         })}
@@ -219,4 +228,34 @@ export function AdminTransitionActions({ order }: AdminTransitionActionsProps) {
       </AlertDialog>
     </section>
   );
+}
+
+function visibleAdminNextStates(order: OrderDetailDto): OrderStatus[] {
+  const group = paymentMethodGroup(order.paymentMethodKind);
+
+  if (group === 'proof' && order.status === ORDER_STATUSES.PendingPaymentReview) {
+    return order.allowedNextStatesForAdmin.filter((status) =>
+      status === ORDER_STATUSES.Paid || status === ORDER_STATUSES.Pending,
+    );
+  }
+
+  if (group === 'proof' && order.status === ORDER_STATUSES.Pending) {
+    return order.allowedNextStatesForAdmin.filter((status) => !isFulfillmentStatus(status));
+  }
+
+  if (order.status === ORDER_STATUSES.Paid) {
+    return order.allowedNextStatesForAdmin.filter((status) => status === ORDER_STATUSES.Preparing);
+  }
+
+  if (order.status === ORDER_STATUSES.Preparing) {
+    return order.allowedNextStatesForAdmin.filter((status) => status === ORDER_STATUSES.Shipped);
+  }
+
+  return order.allowedNextStatesForAdmin;
+}
+
+function isFulfillmentStatus(status: OrderStatus): boolean {
+  return status === ORDER_STATUSES.Preparing
+    || status === ORDER_STATUSES.Shipped
+    || status === ORDER_STATUSES.Delivered;
 }

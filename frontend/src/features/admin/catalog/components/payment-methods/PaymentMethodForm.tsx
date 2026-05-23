@@ -62,7 +62,12 @@ const paymentMethodSharedSchema = z.object({
 
 const createSchema = paymentMethodSharedSchema.extend({
   code: z.string().trim().min(1, 'admin.payments.validation.codeRequired').max(32, 'admin.payments.validation.codeTooLong'),
-  kind: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]),
+  kind: z.union([
+    z.literal(PAYMENT_METHOD_KIND.Cod),
+    z.literal(PAYMENT_METHOD_KIND.Instapay),
+    z.literal(PAYMENT_METHOD_KIND.Wallet),
+    z.literal(PAYMENT_METHOD_KIND.BankTransfer),
+  ]),
 });
 
 const editSchema = paymentMethodSharedSchema;
@@ -168,7 +173,7 @@ export function PaymentMethodForm(props: Props) {
               <SelectField
                 label={t('admin.payments.fields.kind')}
                 value={String(field.value)}
-                onChange={(next) => field.onChange(Number(next) as PaymentMethodKind)}
+                onChange={(next) => field.onChange(next as PaymentMethodKind)}
                 isRequired
                 errorMessage={error(errors.kind?.message)}
                 options={[

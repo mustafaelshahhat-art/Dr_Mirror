@@ -11,6 +11,7 @@ public sealed record AdminAuditLogDto(
     string TargetEntityId,
     string? PreviousStatus,
     string? NewStatus,
+    string? Note,
     string? CorrelationId,
     DateTimeOffset TimestampUtc);
 
@@ -25,6 +26,7 @@ public static class AdminAuditLogMapping
         TargetEntityId: entry.TargetEntityId,
         PreviousStatus: entry.PreviousStatus,
         NewStatus: entry.NewStatus,
+        Note: entry.Note,
         CorrelationId: entry.CorrelationId,
         TimestampUtc: entry.TimestampUtc);
 }

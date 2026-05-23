@@ -50,11 +50,30 @@ public static class TransitionOrderEndpoint
                 statusCode: StatusCodes.Status404NotFound);
         }
 
+        if (PaymentMethodClassification.Classify(order.PaymentMethodKind) == PaymentMethodGroup.ProofBased
+            && IsFulfillmentStatus(request.ToStatus)
+            && order.Status is not (OrderStatus.Paid or OrderStatus.Preparing or OrderStatus.Shipped))
+        {
+            return Results.Problem(
+                title: "Fulfillment requires Paid payment",
+                detail: "Proof-based orders must be paid before fulfillment can begin.",
+                statusCode: StatusCodes.Status409Conflict);
+        }
+
         if (!fsm.CanTransition(order.Status, request.ToStatus, OrderActor.Admin))
         {
             return Results.Problem(
                 title: "Invalid status transition",
                 detail: $"Cannot move order from {order.Status} to {request.ToStatus} as Admin.",
+                statusCode: StatusCodes.Status409Conflict);
+        }
+
+        if (PaymentMethodClassification.Classify(order.PaymentMethodKind) == PaymentMethodGroup.ProofBased
+            && request.ToStatus is OrderStatus.Preparing or OrderStatus.Shipped or OrderStatus.Delivered
+            && order.Status is not (OrderStatus.Paid or OrderStatus.Preparing or OrderStatus.Shipped))
+        {
+            return Results.Problem(
+                title: "Fulfillment requires Paid payment",
                 statusCode: StatusCodes.Status409Conflict);
         }
 
@@ -85,21 +104,27 @@ public static class TransitionOrderEndpoint
             order.Id.ToString(),
             previousStatus.ToString(),
             order.Status.ToString(),
-            ct);
+            ct,
+            request.Reason);
 
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
         try
         {
             await db.SaveChangesAsync(ct);
         }
-        catch (DbUpdateConcurrencyException) when (request.ToStatus == OrderStatus.Cancelled)
+        catch (DbUpdateConcurrencyException)
         {
             return Results.Problem(
-                title: "Couldn't cancel order",
-                detail: "Stock changed while the order was being cancelled. Refresh and try again.",
+                title: "Order state conflict",
+                detail: "The order was modified by another request. Please refresh and try again.",
                 statusCode: StatusCodes.Status409Conflict);
         }
 
         return Results.Ok(order.ToDetail(fsm));
     }
+
+    private static bool IsFulfillmentStatus(OrderStatus status) => status is
+        OrderStatus.Preparing or
+        OrderStatus.Shipped or
+        OrderStatus.Delivered;
 }

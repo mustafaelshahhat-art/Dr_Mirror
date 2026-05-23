@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { makeAuthValue, makeBuyerUser, renderWithProviders } from '../../test/utils';
+import { ORDER_STATUSES } from './types';
 import { OrdersListPage } from './OrdersListPage';
 
 vi.mock('./api', () => ({
@@ -47,7 +48,7 @@ describe('OrdersListPage', () => {
   it('hides pagination when totalPages is 1', async () => {
     vi.mocked(ordersApi.listMyOrders).mockResolvedValue(
       makePagedResult(
-        [{ id: '1', orderNumber: 'ORD-001', status: 0, total: 100, itemCount: 1, currency: 'EGP', createdAt: new Date().toISOString() }],
+        [{ id: '1', orderNumber: 'ORD-001', status: ORDER_STATUSES.Pending, total: 100, itemCount: 1, currency: 'EGP', createdAt: new Date().toISOString() }],
         1,
         1,
       ),
@@ -60,7 +61,7 @@ describe('OrdersListPage', () => {
   it('shows pagination controls when totalPages > 1', async () => {
     vi.mocked(ordersApi.listMyOrders).mockResolvedValue(
       makePagedResult(
-        [{ id: '1', orderNumber: 'ORD-001', status: 0, total: 100, itemCount: 1, currency: 'EGP', createdAt: new Date().toISOString() }],
+        [{ id: '1', orderNumber: 'ORD-001', status: ORDER_STATUSES.Pending, total: 100, itemCount: 1, currency: 'EGP', createdAt: new Date().toISOString() }],
         1,
         3,
       ),

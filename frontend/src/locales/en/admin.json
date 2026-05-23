@@ -48,6 +48,9 @@
     "total": "Total",
     "paymentMethod": "Payment method",
     "timeline": "Timeline",
+    "auditHeading": "Audit trail",
+    "auditLoading": "Loading audit trail...",
+    "auditEmpty": "No audit entries yet for this order.",
     "sizeLabel": "Size",
     "floorShort": "fl.",
     "apartmentShort": "apt.",
@@ -57,13 +60,29 @@
     "heading": "Move order forward",
     "terminalState": "This order is in a terminal state; no further transitions are possible.",
     "confirmHeading": "Mark as {{status}}?",
+    "actions": {
+      "approvePayment": "Approve payment",
+      "rejectPaymentProof": "Reject payment proof",
+      "markPreparing": "Mark as Preparing",
+      "markShipped": "Mark as Shipped",
+      "markDelivered": "Mark as Delivered",
+      "cancel": "Cancel order"
+    },
     "reasonPlaceholderOptional": "Optional note (visible in the order's audit log).",
     "reasonPlaceholderRequired": "Why is the order being cancelled? (required, shown to the buyer)",
     "reasonRequired": "A reason is required when cancelling an order.",
     "confirm": "Confirm",
     "submitting": "Working...",
     "dismiss": "Dismiss",
-    "errorUnknown": "Couldn't update the order. Please try again."
+    "errorUnknown": "Couldn't update the order. Please try again.",
+    "actions": {
+      "approvePayment": "Approve payment",
+      "rejectPaymentProof": "Reject payment proof",
+      "markPreparing": "Mark as Preparing",
+      "markShipped": "Mark as Shipped",
+      "markDelivered": "Mark as Delivered",
+      "cancel": "Cancel order"
+    }
   },
   "hub": {
     "title": "Admin dashboard",
@@ -318,6 +337,13 @@
       "displayOrderInteger": "Order must be a whole number."
     }
   },
+  "paymentStatus": {
+    "cod": "Cash on Delivery",
+    "awaitingPayment": "Awaiting payment",
+    "underReview": "Under review",
+    "paid": "Paid",
+    "cancelled": "Cancelled"
+  },
   "proofs": {
     "noneYet": "The buyer hasn't uploaded a payment proof yet.",
     "imageAlt": "Payment proof image",
@@ -428,6 +454,7 @@
       "target": "Target",
       "status": "Status"
     },
+    "noteQuoted": "\"{{note}}\"",
     "empty": "No audit entries yet.",
     "errorLoad": "Couldn't load the audit log. Please try again.",
     "actionTypes": {

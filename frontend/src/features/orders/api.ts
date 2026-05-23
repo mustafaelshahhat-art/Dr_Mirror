@@ -64,12 +64,14 @@ export const ordersApi = {
   async uploadPaymentProof(orderNumber: string, file: File): Promise<OrderDetailDto> {
     const form = new FormData();
     form.append('file', file);
-    // Important: do NOT set Content-Type manually here. Axios detects FormData
-    // and emits `multipart/form-data; boundary=----WebKitFormBoundary…`. A manual
-    // header without a boundary makes the server's multipart parser fail.
+    // The shared axios instance defaults to `Content-Type: application/json`.
+    // Setting Content-Type to undefined for this request lets the browser/axios
+    // emit the correct `multipart/form-data; boundary=…` from the FormData body
+    // — without this the server gets `application/json` and rejects with 415.
     const { data } = await api.post<OrderDetailDto>(
       `/orders/${encodeURIComponent(orderNumber)}/proof`,
       form,
+      { headers: { 'Content-Type': undefined } },
     );
     return data;
   },

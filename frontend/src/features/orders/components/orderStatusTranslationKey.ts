@@ -1,12 +1,17 @@
 import { ORDER_STATUSES, type OrderStatus } from '../types';
 
-/** Translation key for each status. Caller passes `t(orderStatusTranslationKey(status))`. */
+function assertNever(_: never): never {
+  throw new Error(`Unhandled OrderStatus: ${String(_)}`);
+}
+
 export function orderStatusTranslationKey(status: OrderStatus): string {
+  // No unknown fallback: rendering a placeholder like "Status" is worse than
+  // failing fast when a new backend status is added without a translation.
   switch (status) {
     case ORDER_STATUSES.Pending:
       return 'orders.status.pending';
     case ORDER_STATUSES.Confirmed:
-      return 'orders.status.confirmed';
+      return 'orders.status.orderPlaced';
     case ORDER_STATUSES.PendingPaymentReview:
       return 'orders.status.pendingPaymentReview';
     case ORDER_STATUSES.Paid:
@@ -20,6 +25,6 @@ export function orderStatusTranslationKey(status: OrderStatus): string {
     case ORDER_STATUSES.Cancelled:
       return 'orders.status.cancelled';
     default:
-      return 'orders.status.unknown';
+      assertNever(status);
   }
 }

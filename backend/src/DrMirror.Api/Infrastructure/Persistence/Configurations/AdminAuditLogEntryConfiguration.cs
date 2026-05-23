@@ -16,6 +16,7 @@ internal sealed class AdminAuditLogEntryConfiguration : IEntityTypeConfiguration
         builder.Property(e => e.TargetEntityId).HasMaxLength(64).IsRequired();
         builder.Property(e => e.PreviousStatus).HasMaxLength(64);
         builder.Property(e => e.NewStatus).HasMaxLength(64);
+        builder.Property(e => e.Note).HasMaxLength(1000);
         builder.Property(e => e.CorrelationId).HasMaxLength(64);
         builder.Property(e => e.TimestampUtc).HasPrecision(7).IsRequired();
 

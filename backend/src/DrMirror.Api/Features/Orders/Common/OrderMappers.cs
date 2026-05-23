@@ -9,6 +9,49 @@ namespace DrMirror.Api.Features.Orders.Common;
 /// </summary>
 internal static class OrderMappers
 {
+    /// <summary>
+    /// Computes the <see cref="OrderDetailDto.PaymentStatusLabel"/> value
+    /// based on the order's payment method kind and current status.
+    /// </summary>
+    private static string ComputePaymentStatusLabel(Order order)
+    {
+        if (PaymentMethodClassification.Classify(order.PaymentMethodKind) == PaymentMethodGroup.Cod)
+            return "cod";
+
+        return order.Status switch
+        {
+            OrderStatus.Pending => "awaitingPayment",
+            OrderStatus.PendingPaymentReview => "underReview",
+            OrderStatus.Cancelled => "cancelled",
+            _ => "paid",
+        };
+    }
+
+    private static IReadOnlyList<OrderStatus> ComputeAdminActionSet(Order order, OrderStateMachine fsm)
+    {
+        var allowed = fsm.NextStates(order.Status, OrderActor.Admin);
+        var group = PaymentMethodClassification.Classify(order.PaymentMethodKind);
+
+        if (group == PaymentMethodGroup.ProofBased && order.Status == OrderStatus.PendingPaymentReview)
+        {
+            return allowed
+                .Where(s => s is OrderStatus.Paid or OrderStatus.Pending)
+                .ToArray();
+        }
+
+        if (order.Status == OrderStatus.Paid)
+        {
+            return allowed.Where(s => s == OrderStatus.Preparing).ToArray();
+        }
+
+        if (order.Status == OrderStatus.Preparing)
+        {
+            return allowed.Where(s => s == OrderStatus.Shipped).ToArray();
+        }
+
+        return allowed;
+    }
+
     public static ShippingAddressDto ToDto(this ShippingAddress address) => new(
         address.RecipientName,
         address.Phone,
@@ -87,24 +130,26 @@ internal static class OrderMappers
         PaymentMethodKind: order.PaymentMethodKind,
         PaymentMethodNameEn: order.PaymentMethodNameEn,
         PaymentMethodNameAr: order.PaymentMethodNameAr,
-        // The instructions / receiving-account live on the current PaymentMethod
-        // row (kept live so admin can edit Instapay numbers without
-        // re-issuing emails). Falls back to null if the nav wasn't loaded.
-        PaymentInstructionsEn: order.PaymentMethod?.InstructionsEn,
-        PaymentInstructionsAr: order.PaymentMethod?.InstructionsAr,
-        PaymentAccountNumber: order.PaymentMethod?.AccountNumber,
-        PaymentAccountHolder: order.PaymentMethod?.AccountHolder,
+        // Payment-instruction snapshots with live fallback for
+        // pre-migration orders where snapshot fields are null.
+        PaymentInstructionsEn: order.PaymentInstructionsEn ?? order.PaymentMethod?.InstructionsEn,
+        PaymentInstructionsAr: order.PaymentInstructionsAr ?? order.PaymentMethod?.InstructionsAr,
+        PaymentAccountNumber: order.PaymentAccountNumber ?? order.PaymentMethod?.AccountNumber,
+        PaymentAccountHolder: order.PaymentAccountHolder ?? order.PaymentMethod?.AccountHolder,
         BuyerNote: order.BuyerNote,
         CancellationReason: order.CancellationReason,
         CreatedAt: order.CreatedAt,
         UpdatedAt: order.UpdatedAt,
         ConfirmedAt: order.ConfirmedAt,
         PaidAt: order.PaidAt,
+        PreparingAt: order.PreparingAt,
         ShippedAt: order.ShippedAt,
         DeliveredAt: order.DeliveredAt,
         CancelledAt: order.CancelledAt,
+        PendingPaymentReviewAt: order.PendingPaymentReviewAt,
+        PaymentStatusLabel: ComputePaymentStatusLabel(order),
         AllowedNextStatesForBuyer: fsm.NextStates(order.Status, OrderActor.Buyer),
-        AllowedNextStatesForAdmin: fsm.NextStates(order.Status, OrderActor.Admin),
+        AllowedNextStatesForAdmin: ComputeAdminActionSet(order, fsm),
         Items: order.Items.OrderBy(i => i.CreatedAt).Select(i => i.ToDto()).ToList(),
         PaymentProofs: order.PaymentProofs.OrderByDescending(p => p.UploadedAt).Select(p => p.ToDto(order.OrderNumber)).ToList(),
         Buyer: new BuyerSummaryDto(

@@ -12,6 +12,7 @@ public sealed class AdminAuditLogEntry
     public string TargetEntityId { get; private set; } = string.Empty;
     public string? PreviousStatus { get; private set; }
     public string? NewStatus { get; private set; }
+    public string? Note { get; private set; }
     public string? CorrelationId { get; private set; }
     public DateTimeOffset TimestampUtc { get; private set; }
 
@@ -23,7 +24,8 @@ public sealed class AdminAuditLogEntry
         string? previousStatus,
         string? newStatus,
         string? correlationId,
-        DateTimeOffset timestampUtc)
+        DateTimeOffset timestampUtc,
+        string? note = null)
     {
         return new AdminAuditLogEntry
         {
@@ -33,6 +35,7 @@ public sealed class AdminAuditLogEntry
             TargetEntityId = targetEntityId,
             PreviousStatus = previousStatus,
             NewStatus = newStatus,
+            Note = string.IsNullOrWhiteSpace(note) ? null : note.Trim(),
             CorrelationId = correlationId,
             TimestampUtc = timestampUtc.ToUniversalTime(),
         };

@@ -21,8 +21,9 @@ import { OrderTimeline } from './components/OrderTimeline';
 import { PaymentInstructionsCard } from './components/PaymentInstructionsCard';
 import { PaymentProofUpload } from './components/PaymentProofUpload';
 import { PaymentProofsList } from './components/PaymentProofsList';
+import { paymentMethodGroup } from './lib/paymentMethodGroup';
 import { useMyOrderQuery } from './hooks';
-import { ORDER_STATUSES, PAYMENT_METHOD_KIND } from './types';
+import { ORDER_STATUSES, PAYMENT_PROOF_STATUS } from './types';
 
 export function OrderDetailPage() {
   const { t, i18n } = useTranslation();
@@ -89,15 +90,19 @@ export function OrderDetailPage() {
   }
 
   const order = query.data;
-  const isNonCod = order.paymentMethodKind !== PAYMENT_METHOD_KIND.Cod;
+  const group = paymentMethodGroup(order.paymentMethodKind);
+  const isProofBased = group === 'proof';
   const showInstructions =
-    isNonCod &&
+    isProofBased &&
     (order.status === ORDER_STATUSES.Pending ||
       order.status === ORDER_STATUSES.PendingPaymentReview);
+  const hasPendingProof = order.paymentProofs.some(
+    (p) => p.status === PAYMENT_PROOF_STATUS.Pending,
+  );
   const canUploadProof =
-    isNonCod &&
+    isProofBased &&
     (order.status === ORDER_STATUSES.Pending ||
-      order.status === ORDER_STATUSES.PendingPaymentReview);
+      (order.status === ORDER_STATUSES.PendingPaymentReview && !hasPendingProof));
 
   return (
     <section className="space-y-8">
@@ -134,9 +139,17 @@ export function OrderDetailPage() {
         <div className="space-y-6">
           {showInstructions ? <PaymentInstructionsCard order={order} /> : null}
 
-          {canUploadProof ? <PaymentProofUpload orderNumber={order.orderNumber} /> : null}
+          {canUploadProof ? (
+            <PaymentProofUpload orderNumber={order.orderNumber} />
+          ) : isProofBased && order.status === ORDER_STATUSES.PendingPaymentReview && hasPendingProof ? (
+            <Card>
+              <Card.Content className="text-sm text-default-600">
+                <p>{t('orders.upload.awaitingReview')}</p>
+              </Card.Content>
+            </Card>
+          ) : null}
 
-          {order.paymentProofs.length > 0 ? (
+          {group === 'proof' && order.paymentProofs.length > 0 ? (
             <PaymentProofsList orderNumber={order.orderNumber} proofs={order.paymentProofs} />
           ) : null}
 

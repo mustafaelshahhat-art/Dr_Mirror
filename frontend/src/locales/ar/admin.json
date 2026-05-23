@@ -60,6 +60,9 @@
     "total": "الإجمالي",
     "paymentMethod": "طريقة الدفع",
     "timeline": "تتبع الطلب",
+    "auditHeading": "سجل التدقيق",
+    "auditLoading": "جارٍ تحميل سجل التدقيق...",
+    "auditEmpty": "لا توجد إدخالات تدقيق لهذا الطلب بعد.",
     "sizeLabel": "المقاس",
     "floorShort": "الدور",
     "apartmentShort": "شقة",
@@ -69,13 +72,29 @@
     "heading": "تحريك الطلب للمرحلة التالية",
     "terminalState": "هذا الطلب في حالة نهائية ولا يمكن تغييرها.",
     "confirmHeading": "تأكيد الانتقال إلى {{status}}؟",
+    "actions": {
+      "approvePayment": "قبول الدفع",
+      "rejectPaymentProof": "رفض إثبات الدفع",
+      "markPreparing": "بدء التحضير",
+      "markShipped": "تم الشحن",
+      "markDelivered": "تم التوصيل",
+      "cancel": "إلغاء الطلب"
+    },
     "reasonPlaceholderOptional": "ملاحظة اختيارية (تظهر في سجل الطلب).",
     "reasonPlaceholderRequired": "لماذا تم إلغاء الطلب؟ (مطلوب، يظهر للمشتري)",
     "reasonRequired": "السبب مطلوب عند إلغاء الطلب.",
     "confirm": "تأكيد",
     "submitting": "جاري العمل...",
     "dismiss": "إلغاء",
-    "errorUnknown": "تعذّر تحديث الطلب. حاول مرة أخرى."
+    "errorUnknown": "تعذّر تحديث الطلب. حاول مرة أخرى.",
+    "actions": {
+      "approvePayment": "قبول الدفع",
+      "rejectPaymentProof": "رفض إثبات الدفع",
+      "markPreparing": "بدء التحضير",
+      "markShipped": "تم الشحن",
+      "markDelivered": "تم التوصيل",
+      "cancel": "إلغاء الطلب"
+    }
   },
   "hub": {
     "title": "لوحة الإدارة",
@@ -354,6 +373,13 @@
       "displayOrderInteger": "الترتيب يجب أن يكون رقمًا صحيحًا."
     }
   },
+  "paymentStatus": {
+    "cod": "الدفع عند الاستلام",
+    "awaitingPayment": "في انتظار الدفع",
+    "underReview": "قيد المراجعة",
+    "paid": "تم الدفع",
+    "cancelled": "ملغي"
+  },
   "proofs": {
     "noneYet": "المشتري لم يرفع إثبات دفع حتى الآن.",
     "imageAlt": "صورة إثبات الدفع",
@@ -464,6 +490,7 @@
       "target": "الهدف",
       "status": "الحالة"
     },
+    "noteQuoted": "«{{note}}»",
     "empty": "لا توجد إدخالات تدقيق بعد.",
     "errorLoad": "تعذّر تحميل سجل التدقيق. حاول مرة أخرى.",
     "actionTypes": {

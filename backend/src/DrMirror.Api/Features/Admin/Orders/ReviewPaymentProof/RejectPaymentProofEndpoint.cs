@@ -108,14 +108,26 @@ public static class RejectPaymentProofEndpoint
 
         await audit.WriteAsync(
             "PaymentProof.Reject",
-            "PaymentProof",
-            proof.Id.ToString(),
+            "Order",
+            order.Id.ToString(),
             PaymentProofStatus.Pending.ToString(),
             proof.Status.ToString(),
-            ct);
+            ct,
+            request.ReviewNote);
 
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
-        await db.SaveChangesAsync(ct);
+
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Results.Problem(
+                title: "Order state conflict",
+                detail: "The order was modified by another request. Please refresh and try again.",
+                statusCode: StatusCodes.Status409Conflict);
+        }
 
         return Results.Ok(order.ToDetail(fsm));
     }

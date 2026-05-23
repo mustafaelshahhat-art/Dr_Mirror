@@ -1,4 +1,4 @@
-import { Card, Separator, Tabs } from '@heroui/react';
+import { Card, Chip, Separator, Tabs } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, ImageOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -8,8 +8,10 @@ import { Snippet } from '../../shared/components/Snippet';
 
 import { OrderStatusBadge } from '../orders/components/OrderStatusBadge';
 import { OrderTimeline } from '../orders/components/OrderTimeline';
-import { PAYMENT_METHOD_KIND } from '../orders/types';
+import { paymentMethodGroup } from '../orders/lib/paymentMethodGroup';
+import { ORDER_STATUSES, type OrderDetailDto, type OrderStatus } from '../orders/types';
 
+import { useAuditLogs } from './audit/hooks';
 import { AdminProofReview } from './components/AdminProofReview';
 import { AdminTransitionActions } from './components/AdminTransitionActions';
 import { useAdminOrderQuery } from './hooks';
@@ -105,7 +107,12 @@ export function AdminOrderDetailPage() {
   }
 
   const order = query.data;
-  const isNonCod = order.paymentMethodKind !== PAYMENT_METHOD_KIND.Cod;
+  const group = paymentMethodGroup(order.paymentMethodKind);
+  const isProofBased = group === 'proof';
+  const visibleActionOrder: OrderDetailDto = {
+    ...order,
+    allowedNextStatesForAdmin: visibleAdminNextStates(order),
+  };
 
   return (
     <section className="space-y-8">
@@ -136,6 +143,19 @@ export function AdminOrderDetailPage() {
           </p>
         </div>
         <OrderStatusBadge status={order.status} />
+        <Chip
+          variant="soft"
+          size="sm"
+          color={
+            order.paymentStatusLabel === 'cod' || order.paymentStatusLabel === 'paid'
+              ? 'success'
+              : order.paymentStatusLabel === 'cancelled'
+                ? 'danger'
+                : 'warning'
+          }
+        >
+          {t(`admin.paymentStatus.${order.paymentStatusLabel}`)}
+        </Chip>
       </header>
 
       <Card>
@@ -157,13 +177,13 @@ export function AdminOrderDetailPage() {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
-          <AdminTransitionActions order={order} />
+          <AdminTransitionActions order={visibleActionOrder} />
 
           <Tabs variant="secondary" defaultSelectedKey="items" className="space-y-4">
             <Tabs.ListContainer>
               <Tabs.List aria-label={t('admin.detail.summary')}>
                 <Tabs.Tab id="timeline">{t('admin.detail.timeline')}</Tabs.Tab>
-                {isNonCod ? (
+                {isProofBased ? (
                   <Tabs.Tab id="proofs">{t('admin.detail.proofsHeading')}</Tabs.Tab>
                 ) : null}
                 <Tabs.Tab id="items">{t('admin.detail.itemsHeading')}</Tabs.Tab>
@@ -176,7 +196,7 @@ export function AdminOrderDetailPage() {
                 </Card.Content>
               </Card>
             </Tabs.Panel>
-            {isNonCod ? (
+            {isProofBased ? (
               <Tabs.Panel id="proofs">
                 <Card aria-labelledby="admin-proofs-heading">
                   <Card.Header>
@@ -319,6 +339,8 @@ export function AdminOrderDetailPage() {
               </Card>
             </section>
           ) : null}
+
+          <AdminOrderAuditTimeline orderId={order.id} />
         </div>
 
         <Card className="h-fit lg:sticky lg:top-20">
@@ -363,4 +385,84 @@ export function AdminOrderDetailPage() {
       </div>
     </section>
   );
+}
+
+function AdminOrderAuditTimeline({ orderId }: { orderId: string }) {
+  const { t, i18n } = useTranslation();
+  const query = useAuditLogs({ pageSize: 10, targetType: 'Order', targetId: orderId });
+  const dateFmt = new Intl.DateTimeFormat(
+    i18n.language?.startsWith('ar') ? 'ar-EG' : 'en-US',
+    { dateStyle: 'medium', timeStyle: 'short', numberingSystem: 'latn' },
+  );
+
+  return (
+    <section aria-labelledby="admin-order-audit-heading" className="space-y-2">
+      <h2 id="admin-order-audit-heading" className="text-base font-semibold text-foreground">
+        {t('admin.detail.auditHeading')}
+      </h2>
+      <Card>
+        <Card.Content>
+          {query.isLoading ? (
+            <p className="text-sm text-default-500">{t('admin.detail.auditLoading')}</p>
+          ) : query.data?.items.length ? (
+            <ol className="space-y-3">
+              {query.data.items.map((entry) => (
+                <li key={entry.id} className="rounded-medium border border-divider/60 bg-content2 p-3">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <p className="text-sm font-medium text-foreground">{entry.actionType}</p>
+                    <time className="text-xs text-default-500 tabular-nums" dateTime={entry.timestampUtc}>
+                      {dateFmt.format(new Date(entry.timestampUtc))}
+                    </time>
+                  </div>
+                  {entry.previousStatus && entry.newStatus ? (
+                    <p className="mt-1 text-xs text-default-500">
+                      {entry.previousStatus} -&gt; {entry.newStatus}
+                    </p>
+                  ) : null}
+                  {entry.note ? (
+                    <p className="mt-2 rounded-xl bg-content1 px-2 py-1 text-xs text-foreground">
+                      {t('admin.audit.noteQuoted', { note: entry.note })}
+                    </p>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-sm text-default-500">{t('admin.detail.auditEmpty')}</p>
+          )}
+        </Card.Content>
+      </Card>
+    </section>
+  );
+}
+
+function visibleAdminNextStates(order: OrderDetailDto): OrderStatus[] {
+  const allowed = order.allowedNextStatesForAdmin;
+  const group = paymentMethodGroup(order.paymentMethodKind);
+
+  if (group === 'proof' && order.status === ORDER_STATUSES.PendingPaymentReview) {
+    return allowed.filter((status) =>
+      status === ORDER_STATUSES.Paid || status === ORDER_STATUSES.Pending,
+    );
+  }
+
+  if (group === 'proof' && order.status === ORDER_STATUSES.Pending) {
+    return allowed.filter((status) => !isFulfillmentStatus(status));
+  }
+
+  if (order.status === ORDER_STATUSES.Paid) {
+    return allowed.filter((status) => status === ORDER_STATUSES.Preparing);
+  }
+
+  if (order.status === ORDER_STATUSES.Preparing) {
+    return allowed.filter((status) => status === ORDER_STATUSES.Shipped);
+  }
+
+  return allowed;
+}
+
+function isFulfillmentStatus(status: OrderStatus): boolean {
+  return status === ORDER_STATUSES.Preparing
+    || status === ORDER_STATUSES.Shipped
+    || status === ORDER_STATUSES.Delivered;
 }

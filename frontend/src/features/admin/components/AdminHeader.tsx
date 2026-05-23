@@ -11,7 +11,7 @@ import { ADMIN_HEADER_HEIGHT_CLASS } from './adminShellTokens';
 
 export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
   const { t } = useTranslation();
-  const { user, logout, isAdmin } = useAuth();
+  const { logout, isAdmin } = useAuth();
   const location = useLocation();
   const titleKeys = getAdminHeaderTitleKeys(location.pathname);
 

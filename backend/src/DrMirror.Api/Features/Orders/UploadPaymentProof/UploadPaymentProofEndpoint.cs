@@ -127,7 +127,7 @@ public static class UploadPaymentProofEndpoint
         }
 
         // COD orders never need a proof.
-        if (order.PaymentMethodKind == PaymentMethodKind.Cod)
+        if (PaymentMethodClassification.Classify(order.PaymentMethodKind) == PaymentMethodGroup.Cod)
         {
             return Results.Problem(
                 title: "Proof not required",
@@ -191,7 +191,18 @@ public static class UploadPaymentProofEndpoint
         }
 
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForPaymentReviewNeeded(order.Id));
-        await db.SaveChangesAsync(ct);
+
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Results.Problem(
+                title: "Order state conflict",
+                detail: "The order was modified by another request. Please refresh and try again.",
+                statusCode: StatusCodes.Status409Conflict);
+        }
 
         // Refresh PaymentProofs nav so the response includes the just-saved row.
         await db.Entry(order).Collection(ord => ord.PaymentProofs)

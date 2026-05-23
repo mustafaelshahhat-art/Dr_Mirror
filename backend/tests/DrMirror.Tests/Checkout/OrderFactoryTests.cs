@@ -57,15 +57,19 @@ public class OrderFactoryTests
             MakePayment(PaymentMethodKind.Cod), MakeAddress(), null, Fsm);
 
         Assert.Equal(OrderStatus.Confirmed, order.Status);
+        Assert.Equal(PaymentMethodKind.Cod, order.PaymentMethodKind);
+        Assert.NotNull(order.ConfirmedAt);
     }
 
     [Fact]
     public void Non_cod_order_stays_pending_after_build()
     {
         var order = OrderFactory.Build("DM-001", Guid.NewGuid(), MakeCartItems(),
-            MakePayment(PaymentMethodKind.BankTransfer), MakeAddress(), null, Fsm);
+            MakePayment(PaymentMethodKind.Instapay), MakeAddress(), null, Fsm);
 
         Assert.Equal(OrderStatus.Pending, order.Status);
+        Assert.Equal(PaymentMethodKind.Instapay, order.PaymentMethodKind);
+        Assert.Null(order.ConfirmedAt);
     }
 
     [Fact]

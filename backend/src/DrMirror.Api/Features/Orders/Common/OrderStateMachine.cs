@@ -73,10 +73,15 @@ public sealed class OrderStateMachine
         {
             case OrderStatus.Confirmed: order.ConfirmedAt = now; break;
             case OrderStatus.Paid: order.PaidAt = now; break;
+            case OrderStatus.Preparing: order.PreparingAt = now; break;
             case OrderStatus.Shipped: order.ShippedAt = now; break;
             case OrderStatus.Delivered: order.DeliveredAt = now; break;
             case OrderStatus.Pending:
-                if (!string.IsNullOrWhiteSpace(reason)) order.CancellationReason = reason;
+                // No side effects. Proof rejection bounces here; CancellationReason is not
+                // appropriate for a non-cancellation transition.
+                break;
+            case OrderStatus.PendingPaymentReview:
+                order.PendingPaymentReviewAt = now;
                 break;
             case OrderStatus.Cancelled:
                 order.CancelledAt = now;

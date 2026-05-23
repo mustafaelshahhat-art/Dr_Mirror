@@ -8,5 +8,6 @@ public interface IAdminAuditWriter
         string targetEntityId,
         string? previousStatus,
         string? newStatus,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken,
+        string? note = null);
 }

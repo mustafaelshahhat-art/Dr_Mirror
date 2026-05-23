@@ -15,7 +15,6 @@ import { Link } from 'react-router-dom';
 
 import { EmptyState } from '../../shared/components/EmptyState';
 
-import { useAuth } from '../auth/useAuth';
 import type { OrderStatus } from '../orders/types';
 import { ORDER_STATUSES } from '../orders/types';
 import { queryKeys } from '../../shared/lib/query-keys';
@@ -36,7 +35,6 @@ const KPI_STATUSES: { key: string; status: OrderStatus }[] = [
 
 export function AdminHubPage() {
   const { t } = useTranslation();
-  const { user } = useAuth();
 
   const statsQuery = useQuery({
     queryKey: queryKeys.admin.orders.stats(),

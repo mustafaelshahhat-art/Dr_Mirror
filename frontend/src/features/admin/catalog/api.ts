@@ -124,11 +124,13 @@ export const adminCatalogApi = {
   async uploadImage(productId: string, file: File): Promise<AdminProductImageDto> {
     const form = new FormData();
     form.append('file', file);
-    // Same rule as ordersApi.uploadPaymentProof — let Axios generate the
-    // multipart boundary; don't set Content-Type manually.
+    // The shared axios instance defaults to `Content-Type: application/json`,
+    // which prevents the FormData branch from emitting a multipart boundary.
+    // Clearing it here lets the browser set `multipart/form-data; boundary=…`.
     const { data } = await api.post<AdminProductImageDto>(
       `/admin/products/${productId}/images`,
       form,
+      { headers: { 'Content-Type': undefined } },
     );
     return data;
   },

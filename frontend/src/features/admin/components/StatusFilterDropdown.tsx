@@ -28,7 +28,7 @@ export function StatusFilterDropdown({ value, onChange }: StatusFilterDropdownPr
       hideLabel
       value={value === undefined ? '' : String(value)}
       emptyLabel={t('admin.filters.all')}
-      onChange={(next) => onChange(next === '' ? undefined : (Number(next) as OrderStatus))}
+      onChange={(next) => onChange(next === '' ? undefined : (next as OrderStatus))}
       options={ALL_STATUSES.map((status) => ({
         value: String(status),
         label: t(orderStatusTranslationKey(status)),
