@@ -53,7 +53,8 @@ export function OrdersListPage() {
         message={t('orders.list.errorLoad')}
         retryLabel={t('common.query.retry')}
         onRetry={() => void query.refetch()}
-      />
+      error={query.error}
+        />
     );
   }
 

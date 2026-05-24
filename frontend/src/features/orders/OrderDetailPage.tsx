@@ -90,6 +90,7 @@ export function OrderDetailPage() {
           message={t('orders.detail.errorSubtitle')}
           retryLabel={t('common.query.retry')}
           onRetry={() => void query.refetch()}
+        error={query.error}
         />
       );
     }
@@ -198,7 +199,8 @@ export function OrderDetailPage() {
                     message={t('returns.messages.errorLoad')}
                     retryLabel={t('returns.messages.retry')}
                     onRetry={() => void returnsQuery.refetch()}
-                  />
+                  error={returnsQuery.error}
+        />
                 ) : returns.length > 0 ? (
                   <div className="space-y-3">
                     {returns.map((request) => (

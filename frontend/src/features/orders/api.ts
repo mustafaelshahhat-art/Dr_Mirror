@@ -111,4 +111,9 @@ export const ordersApi = {
     );
     return data;
   },
+
+  async listAllMyReturns(params?: { page?: number; pageSize?: number }): Promise<PagedResult<ReturnRequestDto>> {
+    const { data } = await api.get<PagedResult<ReturnRequestDto>>('/orders/returns', { params });
+    return data;
+  },
 };

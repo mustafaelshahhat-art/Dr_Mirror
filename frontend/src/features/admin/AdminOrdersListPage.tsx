@@ -74,6 +74,7 @@ export function AdminOrdersListPage() {
           message={t('admin.list.errorLoad')}
           retryLabel={t('admin.query.retry')}
           onRetry={() => void query.refetch()}
+        error={query.error}
         />
       ) : !query.data?.items || query.data.items.length === 0 ? (
         <EmptyState

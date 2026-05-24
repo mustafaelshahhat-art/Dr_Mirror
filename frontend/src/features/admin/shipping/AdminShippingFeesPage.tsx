@@ -59,6 +59,7 @@ export function AdminShippingFeesPage() {
           message={t('shipping.admin.errorLoad')}
           retryLabel={t('admin.query.retry')}
           onRetry={() => void query.refetch()}
+        error={query.error}
         />
       </section>
     );

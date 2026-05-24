@@ -120,6 +120,7 @@ export function AdminProductsListPage() {
           message={t('admin.products.list.errorLoad')}
           retryLabel={t('admin.query.retry')}
           onRetry={() => void products.refetch()}
+        error={products.error}
         />
       ) : (products.data?.items ?? []).length === 0 ? (
         <EmptyState icon={Package} title={t('admin.products.list.empty')} />

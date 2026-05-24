@@ -4,6 +4,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '../../test/utils';
 import testI18n from '../../test/testI18n';
 import { QueryErrorState } from './QueryErrorState';
+import * as Sentry from '@sentry/react';
+
+vi.mock('@sentry/react', () => ({
+  captureException: vi.fn(),
+}));
 
 describe('QueryErrorState', () => {
   it('renders the message prop', () => {
@@ -65,5 +70,14 @@ describe('QueryErrorState', () => {
     );
 
     expect(screen.getByRole('alert')).toBeInTheDocument();
+  });
+
+  it('captures exception in Sentry when error is passed', () => {
+    const error = new Error('Test API error');
+    renderWithProviders(
+      <QueryErrorState message="Error" retryLabel="Retry" onRetry={vi.fn()} error={error} />,
+    );
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(error);
   });
 });

@@ -47,6 +47,7 @@ const AdminAuditPage = lazy(() => import('../features/admin/audit/AuditLogPage')
 const AdminShippingLabelPage = lazy(() => import('../features/admin/AdminShippingLabelPage').then((m) => ({ default: m.AdminShippingLabelPage })));
 const AdminReturnsListPage = lazy(() => import('../features/admin/AdminReturnsListPage').then((m) => ({ default: m.AdminReturnsListPage })));
 const AdminReturnDetailPage = lazy(() => import('../features/admin/AdminReturnDetailPage').then((m) => ({ default: m.AdminReturnDetailPage })));
+const ReturnsListPage = lazy(() => import('../features/orders/ReturnsListPage').then((m) => ({ default: m.ReturnsListPage })));
 
 function PageFallback() {
   const { t } = useTranslation();
@@ -86,6 +87,7 @@ export function AppRoutes() {
             <Route path="account" element={<ShellPage />} />
             <Route path="account/orders" element={<OrdersListPage />} />
             <Route path="account/orders/:orderNumber" element={<OrderDetailPage />} />
+            <Route path="account/returns" element={<ReturnsListPage />} />
             <Route path="account/addresses" element={<AddressBookPage />} />
           </Route>
 

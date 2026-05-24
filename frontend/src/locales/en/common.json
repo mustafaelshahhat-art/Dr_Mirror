@@ -32,6 +32,10 @@
       "title": "Saved addresses",
       "subtitle": "Add and manage your delivery addresses."
     },
+    "myReturns": {
+      "title": "My returns",
+      "subtitle": "Track and view your return requests."
+    },
     "subtitle": "Your account home. More tools land in the next milestones.",
     "fields": {
       "fullName": "Full name",

@@ -31,7 +31,8 @@ export function AdminProductEditPage() {
         message={t('admin.products.edit.errorLoad')}
         retryLabel={t('admin.query.retry')}
         onRetry={() => void query.refetch()}
-      />
+      error={query.error}
+        />
     );
   }
   return <Inner product={query.data} />;

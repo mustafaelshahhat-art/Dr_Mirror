@@ -1,7 +1,7 @@
 import { Button } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, Check, MessageSquare, PackageX, ShoppingBag } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
@@ -38,6 +38,21 @@ export function ProductDetailPage() {
   const description = useLocalizedDescription(product);
   const categoryName = useLocalizedField(product?.category);
   const variantSelection = useVariantSelection(product);
+
+  const outOfStockColors = useMemo(() => {
+    if (!product || !product.variants) return new Set<string>();
+    return new Set(
+      product.variants
+        .filter(v => v.stock === 0 || !v.isActive)
+        .map(v => v.colorName)
+        .filter(colorName =>
+          product.variants
+            .filter(v => v.colorName === colorName)
+            .every(v => v.stock === 0 || !v.isActive)
+        )
+    );
+  }, [product]);
+
   const { cart } = useCart();
   const { addState, addError, handleAddToCart } = useAddToCart();
   const [showInquiry, setShowInquiry] = useState(false);
@@ -134,6 +149,7 @@ export function ProductDetailPage() {
               colors={variantSelection.colors}
               selected={variantSelection.selectedColor}
               onSelect={variantSelection.setColor}
+              outOfStockColors={outOfStockColors}
             />
           ) : null}
 

@@ -1,4 +1,5 @@
-import { LayoutDashboard, MapPin, Package, ShoppingBag } from 'lucide-react';
+import { LayoutDashboard, MapPin, Package, RotateCcw, ShoppingBag } from 'lucide-react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -7,11 +8,6 @@ import { useMyOrdersQuery } from '../../features/orders/hooks';
 import { ORDER_STATUSES, type OrderStatus } from '../../features/orders/types';
 
 import { OrderRowSkeleton } from './Skeleton';
-
-const dateFmt = new Intl.DateTimeFormat(undefined, {
-  dateStyle: 'long',
-  numberingSystem: 'latn',
-});
 
 const STATUS_I18N_KEY: Record<OrderStatus, string> = {
   [ORDER_STATUSES.Pending]: 'pending',
@@ -25,9 +21,17 @@ const STATUS_I18N_KEY: Record<OrderStatus, string> = {
 };
 
 export function ShellPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const ordersQuery = useMyOrdersQuery(1, 3);
+
+  const dateFmt = useMemo(
+    () => new Intl.DateTimeFormat(
+      i18n.language.startsWith('ar') ? 'ar-EG' : 'en-US',
+      { dateStyle: 'long' },
+    ),
+    [i18n.language],
+  );
 
   if (!user) return null;
 
@@ -95,6 +99,23 @@ export function ShellPage() {
             </span>
             <span className="block text-sm text-default-500">
               {t('common.account.addresses.subtitle')}
+            </span>
+          </span>
+        </Link>
+
+        <Link
+          to="/account/returns"
+          className="group flex items-center gap-3 content-surface p-4 transition-colors hover:bg-surface-secondary"
+        >
+          <span className="grid size-10 place-items-center rounded-medium bg-default-200 text-default-600 dark:bg-default-100/10 dark:text-default-400">
+            <RotateCcw className="size-5" aria-hidden />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-base font-semibold text-foreground">
+              {t('common.account.myReturns.title')}
+            </span>
+            <span className="block text-sm text-default-500">
+              {t('common.account.myReturns.subtitle')}
             </span>
           </span>
         </Link>

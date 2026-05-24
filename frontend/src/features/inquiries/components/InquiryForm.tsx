@@ -1,49 +1,62 @@
-import { Alert, Button, Fieldset, Form, Heading, Input, Label, Paragraph, TextArea, TextField } from '@heroui/react';
+import { Alert, Button, FieldError, Fieldset, Form, Heading, Input, Label, Paragraph, TextArea, TextField } from '@heroui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, Send } from 'lucide-react';
 import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 
 import { useSubmitInquiryMutation } from '../hooks';
 
+const egyptPhoneRegex = /^\+?2?01[0125]\d{8}$/;
+
+const inquirySchema = z.object({
+  fullName: z.string().trim().min(2, 'inquiries.validation.fullNameMin').max(100, 'inquiries.validation.fullNameMax'),
+  email: z.string().trim().email('inquiries.validation.emailInvalid'),
+  phone: z.string().trim()
+    .refine(v => v === '' || egyptPhoneRegex.test(v), 'inquiries.validation.phoneInvalid'),
+  subject: z.string().trim().min(5, 'inquiries.validation.subjectMin').max(100, 'inquiries.validation.subjectMax'),
+  message: z.string().trim().min(10, 'inquiries.validation.messageMin').max(1000, 'inquiries.validation.messageMax'),
+});
+
+type InquiryFormValues = z.infer<typeof inquirySchema>;
+
 interface InquiryFormProps {
-  /** When set, ties the inquiry to this product. Omit for a general inquiry. */
   productId?: string;
-  /** Pre-filled subject line — typically the product name. */
   defaultSubject?: string;
 }
 
-/**
- * Inline inquiry form. Validates client-side, submits to <c>POST /api/inquiries</c>,
- * and shows a success state on completion. Used both on product detail pages
- * (with productId/defaultSubject) and as a standalone "Contact us" form.
- */
 export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
   const { t } = useTranslation();
   const submit = useSubmitInquiryMutation();
   const [success, setSuccess] = useState(false);
-  const [form, setForm] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    subject: defaultSubject ?? '',
-    message: '',
+
+  const { control, handleSubmit, formState: { errors }, reset } = useForm<InquiryFormValues>({
+    resolver: zodResolver(inquirySchema),
+    mode: 'onBlur',
+    reValidateMode: 'onChange',
+    defaultValues: {
+      fullName: '',
+      email: '',
+      phone: '',
+      subject: defaultSubject ?? '',
+      message: '',
+    },
   });
 
-  // Field-name strings below are RHF programmatic identifiers, not user copy.
-  function update<K extends keyof typeof form>(key: K, value: string) {
-    setForm((prev) => ({ ...prev, [key]: value }));
+  function errMsg(key: string | undefined) {
+    return key ? t(key) : null;
   }
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function onSubmit(values: InquiryFormValues) {
     try {
       await submit.mutateAsync({
         productId: productId ?? null,
-        fullName: form.fullName.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim() || null,
-        subject: form.subject.trim(),
-        message: form.message.trim(),
+        fullName: values.fullName,
+        email: values.email,
+        phone: values.phone || null,
+        subject: values.subject,
+        message: values.message,
       });
       setSuccess(true);
     } catch {
@@ -51,9 +64,9 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
     }
   }
 
-  function reset() {
+  function onReset() {
     setSuccess(false);
-    setForm({
+    reset({
       fullName: '',
       email: '',
       phone: '',
@@ -72,7 +85,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
           <Alert.Title>{t('inquiries.form.successTitle')}</Alert.Title>
           <Alert.Description>{t('inquiries.form.successSubtitle')}</Alert.Description>
         </Alert.Content>
-        <Button type="button" variant="ghost" size="sm" onPress={reset}>
+        <Button type="button" variant="ghost" size="sm" onPress={onReset}>
           {t('inquiries.form.sendAnother')}
         </Button>
       </Alert>
@@ -81,7 +94,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
 
   return (
     <Form
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       className="content-surface space-y-4 p-4"
     >
       <header className="space-y-1">
@@ -96,43 +109,103 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
           {t('inquiries.form.contactLegend')}
         </Fieldset.Legend>
         <Fieldset.Group className="grid gap-3 sm:grid-cols-2">
-          <Field
-            label={t('inquiries.form.fullName')}
-            value={form.fullName}
-            // eslint-disable-next-line i18next/no-literal-string
-            onChange={(v) => update('fullName', v)}
-            required
-            maxLength={100}
-            autoComplete="name"
+          <Controller
+            name="fullName"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                isRequired
+                isInvalid={!!errors.fullName}
+                className="flex flex-col gap-1"
+              >
+                <Label className="text-xs font-medium text-default-700 dark:text-default-300">
+                  {t('inquiries.form.fullName')}
+                </Label>
+                <Input
+                  {...field}
+                  maxLength={100}
+                  autoComplete="name"
+                  className="border border-default-400 dark:border-default-300"
+                />
+                {errMsg(errors.fullName?.message) && (
+                  <FieldError className="text-xs text-danger">{errMsg(errors.fullName?.message)}</FieldError>
+                )}
+              </TextField>
+            )}
           />
-          <Field
-            label={t('inquiries.form.email')}
-            type="email"
-            value={form.email}
-            // eslint-disable-next-line i18next/no-literal-string
-            onChange={(v) => update('email', v)}
-            required
-            maxLength={200}
-            autoComplete="email"
-            dir="ltr"
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                isRequired
+                isInvalid={!!errors.email}
+                className="flex flex-col gap-1"
+              >
+                <Label className="text-xs font-medium text-default-700 dark:text-default-300">
+                  {t('inquiries.form.email')}
+                </Label>
+                <Input
+                  {...field}
+                  type="email"
+                  maxLength={200}
+                  autoComplete="email"
+                  dir="ltr"
+                  className="border border-default-400 dark:border-default-300"
+                />
+                {errMsg(errors.email?.message) && (
+                  <FieldError className="text-xs text-danger">{errMsg(errors.email?.message)}</FieldError>
+                )}
+              </TextField>
+            )}
           />
-          <Field
-            label={t('inquiries.form.phone')}
-            type="tel"
-            value={form.phone}
-            // eslint-disable-next-line i18next/no-literal-string
-            onChange={(v) => update('phone', v)}
-            maxLength={30}
-            autoComplete="tel"
-            dir="ltr"
+          <Controller
+            name="phone"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                isInvalid={!!errors.phone}
+                className="flex flex-col gap-1"
+              >
+                <Label className="text-xs font-medium text-default-700 dark:text-default-300">
+                  {t('inquiries.form.phone')}
+                </Label>
+                <Input
+                  {...field}
+                  type="tel"
+                  maxLength={30}
+                  autoComplete="tel"
+                  dir="ltr"
+                  className="border border-default-400 dark:border-default-300"
+                />
+                {errMsg(errors.phone?.message) && (
+                  <FieldError className="text-xs text-danger">{errMsg(errors.phone?.message)}</FieldError>
+                )}
+              </TextField>
+            )}
           />
-          <Field
-            label={t('inquiries.form.subject')}
-            value={form.subject}
-            // eslint-disable-next-line i18next/no-literal-string
-            onChange={(v) => update('subject', v)}
-            required
-            maxLength={200}
+          <Controller
+            name="subject"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                isRequired
+                isInvalid={!!errors.subject}
+                className="flex flex-col gap-1"
+              >
+                <Label className="text-xs font-medium text-default-700 dark:text-default-300">
+                  {t('inquiries.form.subject')}
+                </Label>
+                <Input
+                  {...field}
+                  maxLength={100}
+                  className="border border-default-400 dark:border-default-300"
+                />
+                {errMsg(errors.subject?.message) && (
+                  <FieldError className="text-xs text-danger">{errMsg(errors.subject?.message)}</FieldError>
+                )}
+              </TextField>
+            )}
           />
         </Fieldset.Group>
       </Fieldset>
@@ -142,19 +215,30 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
           {t('inquiries.form.messageLegend')}
         </Fieldset.Legend>
         <Fieldset.Group>
-          <TextField isRequired className="flex flex-col gap-1">
-            <Label className="text-xs font-medium text-default-700 dark:text-default-300">
-              {t('inquiries.form.message')}
-            </Label>
-            <TextArea
-              rows={4}
-              maxLength={2000}
-              value={form.message}
-              // eslint-disable-next-line i18next/no-literal-string
-              onChange={(e) => update('message', (e.target as HTMLTextAreaElement).value)}
-              className="border border-default-400 dark:border-default-300"
-            />
-          </TextField>
+          <Controller
+            name="message"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                isRequired
+                isInvalid={!!errors.message}
+                className="flex flex-col gap-1"
+              >
+                <Label className="text-xs font-medium text-default-700 dark:text-default-300">
+                  {t('inquiries.form.message')}
+                </Label>
+                <TextArea
+                  {...field}
+                  rows={4}
+                  maxLength={1000}
+                  className="border border-default-400 dark:border-default-300"
+                />
+                {errMsg(errors.message?.message) && (
+                  <FieldError className="text-xs text-danger">{errMsg(errors.message?.message)}</FieldError>
+                )}
+              </TextField>
+            )}
+          />
         </Fieldset.Group>
       </Fieldset>
 
@@ -169,33 +253,5 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
         </span>
       </Button>
     </Form>
-  );
-}
-
-interface FieldProps {
-  label: string;
-  value: string;
-  onChange: (next: string) => void;
-  type?: 'text' | 'email' | 'tel';
-  required?: boolean;
-  maxLength?: number;
-  autoComplete?: string;
-  dir?: 'ltr' | 'rtl';
-}
-
-function Field({ label, value, onChange, type = 'text', required, maxLength, autoComplete, dir }: FieldProps) {
-  return (
-    <TextField isRequired={required} className="flex flex-col gap-1">
-      <Label className="text-xs font-medium text-default-700 dark:text-default-300">{label}</Label>
-      <Input
-        type={type}
-        value={value}
-        onChange={(e) => onChange((e.target as HTMLInputElement).value)}
-        maxLength={maxLength}
-        autoComplete={autoComplete}
-        dir={dir}
-        className="border border-default-400 dark:border-default-300"
-      />
-    </TextField>
   );
 }

@@ -4,6 +4,8 @@
   "title": "Saved addresses",
   "subtitle": "Manage your delivery addresses. The default address is pre-selected at checkout.",
   "empty": "You haven't saved any addresses yet.",
+  "emptyTitle": "No saved addresses",
+  "emptySubtitle": "Add a shipping address to easily and quickly complete your orders.",
   "defaultBadge": "Default",
   "apartmentShort": "apt.",
   "floorShort": "fl.",
@@ -22,6 +24,11 @@
     "edit": "Edit",
     "setDefault": "Set as default",
     "delete": "Delete",
+    "cancel": "Cancel"
+  },
+  "delete": {
+    "confirmPrompt": "Delete this address?",
+    "confirm": "Delete",
     "cancel": "Cancel"
   },
   "fields": {

@@ -458,6 +458,17 @@
 }
 
 @layer utilities {
+  .is-oos {
+    position: relative;
+  }
+  .is-oos::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom right, transparent calc(50% - 1.5px), currentColor calc(50% - 1.5px) calc(50% + 1.5px), transparent calc(50% + 1.5px));
+    pointer-events: none;
+  }
+
   .skeleton-base {
     background-color: var(--surface-secondary);
   }

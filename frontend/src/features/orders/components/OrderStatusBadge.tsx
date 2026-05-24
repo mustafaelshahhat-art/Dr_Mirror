@@ -1,17 +1,13 @@
-import { Chip } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-
 import { ORDER_STATUSES, type OrderStatus } from '../types';
-
 import { orderStatusTranslationKey } from './orderStatusTranslationKey';
-
-type ChipColor = 'accent' | 'danger' | 'default' | 'success' | 'warning';
+import { StatusBadge, type StatusColor } from '../../../shared/components/StatusPill';
 
 function assertNever(_: never): never {
   throw new Error(`Unhandled OrderStatus: ${String(_)}`);
 }
 
-function statusColor(status: OrderStatus): ChipColor {
+function statusColor(status: OrderStatus): StatusColor {
   switch (status) {
     case ORDER_STATUSES.Pending:
     case ORDER_STATUSES.PendingPaymentReview:
@@ -34,8 +30,9 @@ function statusColor(status: OrderStatus): ChipColor {
 export function OrderStatusBadge({ status }: { status: OrderStatus }) {
   const { t } = useTranslation();
   return (
-    <Chip color={statusColor(status)} variant="soft" size="sm">
-      <Chip.Label>{t(orderStatusTranslationKey(status))}</Chip.Label>
-    </Chip>
+    <StatusBadge 
+      color={statusColor(status)} 
+      label={t(orderStatusTranslationKey(status))} 
+    />
   );
 }

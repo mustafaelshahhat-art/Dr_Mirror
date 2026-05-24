@@ -3,6 +3,7 @@ using DrMirror.Api.Features.Orders.GetMyOrderByNumber;
 using DrMirror.Api.Features.Orders.GetMyOrders;
 using DrMirror.Api.Features.Orders.GetPaymentProofFile;
 using DrMirror.Api.Features.Orders.Returns.CancelMyReturn;
+using DrMirror.Api.Features.Orders.Returns.GetAllMyReturns;
 using DrMirror.Api.Features.Orders.Returns.GetMyReturns;
 using DrMirror.Api.Features.Orders.Returns.SubmitReturn;
 using DrMirror.Api.Features.Orders.UploadPaymentProof;
@@ -20,6 +21,7 @@ public static class OrderEndpoints
         var group = app.MapGroup("/api/orders").WithTags("Orders");
 
         group.MapGetMyOrders();
+        group.MapGetAllMyReturns();
         group.MapGetMyOrderByNumber();
         group.MapCancelMyOrder();
         group.MapSubmitReturn();

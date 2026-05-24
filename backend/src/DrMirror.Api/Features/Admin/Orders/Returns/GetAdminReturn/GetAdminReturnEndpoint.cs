@@ -25,6 +25,7 @@ public static class GetAdminReturnEndpoint
         CancellationToken ct)
     {
         var returnRequest = await db.ReturnRequests
+            .AsNoTracking()
             .Include(r => r.Order)
             .Include(r => r.BuyerUser)
             .Include(r => r.ReviewedByAdmin)

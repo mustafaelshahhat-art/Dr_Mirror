@@ -1,7 +1,6 @@
-import { Chip } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
-
 import type { ReturnStatus } from '../types';
+import { StatusBadge, type StatusColor } from '../../../shared/components/StatusPill';
 
 const STATUS_KEY: Record<ReturnStatus, string> = {
   Requested: 'returns.status.requested',
@@ -12,7 +11,7 @@ const STATUS_KEY: Record<ReturnStatus, string> = {
   Cancelled: 'returns.status.cancelled',
 };
 
-const STATUS_COLOR: Record<ReturnStatus, 'default' | 'success' | 'warning' | 'danger'> = {
+const STATUS_COLOR: Record<ReturnStatus, StatusColor> = {
   Requested: 'warning',
   Approved: 'success',
   Rejected: 'danger',
@@ -25,8 +24,9 @@ export function ReturnStatusBadge({ status }: { status: ReturnStatus }) {
   const { t } = useTranslation();
 
   return (
-    <Chip variant="soft" size="sm" color={STATUS_COLOR[status]}>
-      {t(STATUS_KEY[status])}
-    </Chip>
+    <StatusBadge 
+      color={STATUS_COLOR[status]} 
+      label={t(STATUS_KEY[status])} 
+    />
   );
 }

@@ -57,7 +57,9 @@ export function Field({
         <Description className={DESCRIPTION_CLASS}>{description}</Description>
       ) : null}
       {errorMessage ? (
-        <FieldError className="text-xs text-danger">{errorMessage}</FieldError>
+        <FieldError className="text-xs text-danger">
+          <span role="alert">{errorMessage}</span>
+        </FieldError>
       ) : null}
     </TextField>
   );
@@ -99,7 +101,9 @@ export function TextAreaField({
         className="border border-default-400 dark:border-default-300"
       />
       {errorMessage ? (
-        <FieldError className="text-xs text-danger">{errorMessage}</FieldError>
+        <FieldError className="text-xs text-danger">
+          <span role="alert">{errorMessage}</span>
+        </FieldError>
       ) : null}
     </TextField>
   );

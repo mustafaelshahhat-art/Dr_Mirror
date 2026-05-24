@@ -9,6 +9,8 @@ interface ColorPickerProps {
   colors: ProductVariantDto[];
   selected: string | null;
   onSelect: (colorName: string) => void;
+  /** colorName values that are fully out of stock — all variants of that color have stock=0 or !isActive. */
+  outOfStockColors?: Set<string>;
 }
 
 /**
@@ -16,7 +18,7 @@ interface ColorPickerProps {
  * keyboard-accessible button; the selected one shows a check overlay (white
  * on dark hexes, dark on light hexes via CSS color-mix-style luminance).
  */
-export function ColorPicker({ colors, selected, onSelect }: ColorPickerProps) {
+export function ColorPicker({ colors, selected, onSelect, outOfStockColors = new Set() }: ColorPickerProps) {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
   const selectedColor = colors.find((c) => c.colorName === selected);
@@ -33,11 +35,13 @@ export function ColorPicker({ colors, selected, onSelect }: ColorPickerProps) {
     const len = colors.length;
     if (len === 0) return;
     const current = selectedIdx === -1 ? 0 : selectedIdx;
+    
     // Direction-aware horizontal arrows: in RTL the visual "next" swatch sits
     // to the left, so ArrowLeft must advance.
     const forwardKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
     const backwardKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
     let next = -1;
+    
     if (e.key === forwardKey || e.key === 'ArrowDown') {
       e.preventDefault();
       next = (current + 1) % len;
@@ -51,7 +55,14 @@ export function ColorPicker({ colors, selected, onSelect }: ColorPickerProps) {
       e.preventDefault();
       next = len - 1;
     }
-    if (next !== -1) onSelect(colors[next].colorName);
+    
+    if (next !== -1) {
+      const nextColor = colors[next].colorName;
+      // Skip selecting if it's out of stock
+      if (!outOfStockColors.has(nextColor)) {
+        onSelect(nextColor);
+      }
+    }
   }
 
   return (
@@ -70,21 +81,32 @@ export function ColorPicker({ colors, selected, onSelect }: ColorPickerProps) {
         {colors.map((c, idx) => {
           const isSelected = c.colorName === selected;
           const onLight = isLightHex(c.colorHex);
+          const isOOS = outOfStockColors.has(c.colorName);
+          
           return (
             <button
               key={c.colorName}
               type="button"
               role="radio"
               aria-checked={isSelected}
-              aria-label={isAr ? c.colorNameAr : c.colorName}
-              title={isAr ? c.colorNameAr : c.colorName}
+              aria-disabled={isOOS ? "true" : undefined}
+              aria-label={`${isAr ? c.colorNameAr : c.colorName}${isOOS ? ' (Out of Stock)' : ''}`}
+              title={`${isAr ? c.colorNameAr : c.colorName}${isOOS ? ' (Out of Stock)' : ''}`}
               tabIndex={selectedIdx === -1 ? (idx === 0 ? 0 : -1) : isSelected ? 0 : -1}
-              onClick={() => onSelect(c.colorName)}
-              className={
+              onClick={() => {
+                if (!isOOS) {
+                  onSelect(c.colorName);
+                }
+              }}
+              className={[
+                'relative size-11 rounded-full transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                 isSelected
-                  ? 'relative size-10 rounded-full border-2 border-foreground transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-                  : 'relative size-10 rounded-full border border-divider/60 transition-transform hover:scale-105 hover:border-default-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-              }
+                  ? 'border-2 border-foreground scale-105'
+                  : 'border border-divider/60 hover:scale-105 hover:border-default-400',
+                isOOS
+                  ? 'opacity-40 cursor-not-allowed is-oos'
+                  : ''
+              ].join(' ')}
               style={{ backgroundColor: c.colorHex }}
             >
               {isSelected ? (

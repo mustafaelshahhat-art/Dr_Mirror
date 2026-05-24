@@ -55,6 +55,7 @@ export function AdminPaymentMethodsPage() {
           message={t('admin.payments.errorLoad')}
           retryLabel={t('admin.query.retry')}
           onRetry={() => void query.refetch()}
+        error={query.error}
         />
       </section>
     );

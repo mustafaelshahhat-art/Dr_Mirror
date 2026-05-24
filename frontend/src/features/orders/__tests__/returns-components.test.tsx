@@ -90,6 +90,6 @@ describe('returns components', () => {
     await user.click(screen.getByRole('button', { name: 'Submit return request' }));
     await user.click(screen.getAllByRole('button', { name: 'Submit return request' }).at(-1)!);
 
-    expect(await screen.findByText('Enter a return reason.')).toBeInTheDocument();
+    expect(await screen.findByText('Please select a return reason')).toBeInTheDocument();
   });
 });

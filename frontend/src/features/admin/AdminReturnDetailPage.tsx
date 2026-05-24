@@ -109,6 +109,7 @@ export function AdminReturnDetailPage() {
           message={t('admin.returns.detail.error')}
           retryLabel={t('admin.query.retry')}
           onRetry={() => void query.refetch()}
+        error={query.error}
         />
       );
     }

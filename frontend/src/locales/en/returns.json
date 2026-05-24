@@ -7,6 +7,13 @@
     "completed": "Completed",
     "cancelled": "Cancelled"
   },
+  "reasons": {
+    "defect": "Defect in tailoring or quality",
+    "wrongSize": "Incorrect size",
+    "wrongColor": "Color different from picture",
+    "wrongProduct": "Wrong product received",
+    "other": "Other"
+  },
   "eligibility": {
     "title": "Return request",
     "eligible": "You can request a return for this order within the return window.",
@@ -23,7 +30,10 @@
   },
   "form": {
     "reasonLabel": "Return reason",
-    "reasonPlaceholder": "Write the reason for your return request",
+    "reasonPlaceholder": "Select a reason",
+    "notesLabel": "Additional notes (optional)",
+    "notesPlaceholder": "Write any additional details here",
+    "charCount": "{{count}}/500",
     "adminNoteLabel": "Admin note",
     "adminNotePlaceholder": "Write the rejection reason or processing note"
   },
@@ -44,11 +54,23 @@
     "retry": "Retry"
   },
   "errors": {
-    "reasonRequired": "Enter a return reason.",
+    "reasonRequired": "Please select a return reason",
     "reasonTooLong": "Return reason must be 1000 characters or fewer.",
+    "notesTooLong": "Notes must not exceed 500 characters",
+    "notesRequiredForOther": "Please clarify the reason when choosing 'Other'",
     "adminNoteRequired": "Enter an admin note.",
     "adminNoteTooLong": "Admin note must be 1000 characters or fewer.",
     "submitFailed": "Could not submit the return request. Try again.",
     "cancelFailed": "Could not cancel the return request. Try again."
+  },
+  "list": {
+    "title": "My returns",
+    "subtitle": "All return requests you've submitted.",
+    "empty": "You haven't submitted any return requests yet.",
+    "emptyAction": "Browse your orders",
+    "orderLabel": "Order #{{number}}",
+    "submittedOn": "Submitted {{date}}",
+    "loading": "Loading your returns…",
+    "error": "Couldn't load your returns."
   }
 }

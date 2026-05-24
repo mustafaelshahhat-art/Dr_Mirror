@@ -72,6 +72,7 @@ export function AdminCategoriesPage() {
           message={t('admin.catalog.categories.errorLoad')}
           retryLabel={t('admin.query.retry')}
           onRetry={() => void query.refetch()}
+        error={query.error}
         />
       </section>
     );

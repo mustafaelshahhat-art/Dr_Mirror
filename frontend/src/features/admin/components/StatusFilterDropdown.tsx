@@ -26,6 +26,7 @@ export function StatusFilterDropdown({ value, onChange }: StatusFilterDropdownPr
     <SelectField
       label={t('admin.filters.status')}
       hideLabel
+      isFilter
       value={value === undefined ? '' : String(value)}
       emptyLabel={t('admin.filters.all')}
       onChange={(next) => onChange(next === '' ? undefined : (next as OrderStatus))}

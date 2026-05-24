@@ -7,6 +7,13 @@
     "completed": "اكتمل الإرجاع",
     "cancelled": "تم الإلغاء"
   },
+  "reasons": {
+    "defect": "عيب في الخياطة أو الجودة",
+    "wrongSize": "مقاس غير مناسب",
+    "wrongColor": "لون مختلف عن الصورة",
+    "wrongProduct": "منتج خاطئ استُلم",
+    "other": "أخرى"
+  },
   "eligibility": {
     "title": "طلب إرجاع",
     "eligible": "يمكنك طلب إرجاع هذا الطلب خلال نافذة الإرجاع.",
@@ -23,7 +30,10 @@
   },
   "form": {
     "reasonLabel": "سبب الإرجاع",
-    "reasonPlaceholder": "اكتب سبب طلب الإرجاع",
+    "reasonPlaceholder": "اختر سبباً",
+    "notesLabel": "ملاحظات إضافية (اختياري)",
+    "notesPlaceholder": "اكتب أي تفاصيل إضافية هنا",
+    "charCount": "{{count}}/500",
     "adminNoteLabel": "ملاحظة الإدارة",
     "adminNotePlaceholder": "اكتب سبب الرفض أو ملاحظة المعالجة"
   },
@@ -44,11 +54,23 @@
     "retry": "إعادة المحاولة"
   },
   "errors": {
-    "reasonRequired": "يرجى كتابة سبب الإرجاع.",
+    "reasonRequired": "يرجى اختيار سبب الإرجاع",
     "reasonTooLong": "سبب الإرجاع يجب ألا يتجاوز 1000 حرف.",
+    "notesTooLong": "يجب ألا تتجاوز الملاحظات 500 حرف",
+    "notesRequiredForOther": "يرجى توضيح السبب عند اختيار «أخرى»",
     "adminNoteRequired": "يرجى كتابة ملاحظة الإدارة.",
     "adminNoteTooLong": "ملاحظة الإدارة يجب ألا تتجاوز 1000 حرف.",
-    "submitFailed": "تعذر إرسال طلب الإرجاع. حاول مرة أخرى.",
+    "submitFailed": "فشل إرسال طلب الإرجاع",
     "cancelFailed": "تعذر إلغاء طلب الإرجاع. حاول مرة أخرى."
+  },
+  "list": {
+    "title": "مرتجعاتي",
+    "subtitle": "جميع طلبات الإرجاع التي أرسلتها.",
+    "empty": "لم تقدم أي طلبات إرجاع حتى الآن.",
+    "emptyAction": "تصفح طلباتك",
+    "orderLabel": "طلب #{{number}}",
+    "submittedOn": "أُرسل في {{date}}",
+    "loading": "جار تحميل المرتجعات…",
+    "error": "تعذّر تحميل المرتجعات."
   }
 }

@@ -11,6 +11,8 @@ export const queryKeys = {
     list: (page: number, pageSize: number) => ['orders', 'mine', { page, pageSize }] as const,
     detail: (orderNumber: string) => ['orders', 'mine', orderNumber] as const,
     returns: (orderNumber: string) => ['orders', 'mine', orderNumber, 'returns'] as const,
+    allReturns: (page: number, pageSize: number) =>
+      ['orders', 'mine', 'all-returns', { page, pageSize }] as const,
   },
   paymentMethods: () => ['payment-methods'] as const,
   shipping: {

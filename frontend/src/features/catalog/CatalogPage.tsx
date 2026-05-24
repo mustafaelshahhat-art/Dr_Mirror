@@ -100,6 +100,19 @@ export function CatalogPage() {
     [setSearchParams],
   );
 
+  const activeCategory = useMemo(
+    () => categoriesQuery.data?.find(c => c.id === filter.categoryId),
+    [categoriesQuery.data, filter.categoryId],
+  );
+  const categoryName = activeCategory
+    ? (i18n.language.startsWith('ar') ? activeCategory.nameAr || activeCategory.nameEn : activeCategory.nameEn || activeCategory.nameAr)
+    : null;
+
+  const pageTitle = categoryName ?? t('catalog.hero.title');
+  const pageSubtitle = filter.q
+    ? t('catalog.hero.searchSubtitle', { term: filter.q })
+    : t('catalog.hero.subtitle');
+
   const isInitialLoad = productsQuery.isLoading && productsQuery.data === undefined;
   const items = productsQuery.data?.items ?? [];
   const hasActiveFilters = Boolean(
@@ -125,8 +138,8 @@ export function CatalogPage() {
         <div className="w-full space-y-4">
           <PageHeader
             eyebrow={t('catalog.hero.eyebrow')}
-            title={t('catalog.hero.title')}
-            subtitle={t('catalog.hero.subtitle')}
+            title={pageTitle}
+            subtitle={pageSubtitle}
             className={i18n.language === 'ar' ? '[&_.page-title]:text-balance' : undefined}
           />
           {/* Trust strip */}
@@ -169,6 +182,7 @@ export function CatalogPage() {
           message={t('catalog.errors.loadFailed')}
           retryLabel={t('common.query.retry')}
           onRetry={() => void productsQuery.refetch()}
+        error={productsQuery.error}
         />
       ) : items.length === 0 ? (
         <EmptyState

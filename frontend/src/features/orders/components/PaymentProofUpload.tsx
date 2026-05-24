@@ -1,5 +1,5 @@
 import { Button, ProgressBar } from '@heroui/react';
-import { UploadCloud } from 'lucide-react';
+import { ScrollText, UploadCloud } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -126,12 +126,27 @@ export function PaymentProofUpload({ orderNumber }: PaymentProofUploadProps) {
         />
       </label>
 
-      {previewUrl ? (
-        <img
-          src={previewUrl}
-          alt={t('orders.upload.previewAlt')}
-          className="max-h-56 w-full rounded-medium border border-divider/60 object-contain"
-        />
+      {selected ? (
+        <div className="flex flex-col gap-1.5 p-3 rounded-medium bg-default-50/50 border border-divider/40 text-xs">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-semibold text-foreground truncate">{selected.name}</span>
+            <span className="text-default-500 tabular-nums shrink-0">
+              {formatFileSize(selected.size, i18n.language)}
+            </span>
+          </div>
+          {previewUrl ? (
+            <img
+              src={previewUrl}
+              alt={t('orders.upload.previewAlt')}
+              className="max-h-48 w-full rounded-medium border border-divider/40 object-contain bg-bone"
+            />
+          ) : (
+            <div className="flex items-center gap-2 text-default-500 py-1">
+              <ScrollText className="size-4 shrink-0" />
+              <span>{selected.type === 'application/pdf' ? (i18n.language?.startsWith('ar') ? 'مستند PDF' : 'PDF Document') : selected.type}</span>
+            </div>
+          )}
+        </div>
       ) : null}
 
       {clientError ? (
@@ -182,4 +197,14 @@ function formatUploadLimitMb(bytes: number, language: string | undefined) {
     maximumFractionDigits: Number.isInteger(value) ? 0 : 1,
     numberingSystem: 'latn',
   }).format(value);
+}
+
+function formatFileSize(bytes: number, language: string | undefined) {
+  const isAr = language?.startsWith('ar');
+  const sizeInMb = bytes / BYTES_PER_MEGABYTE;
+  if (sizeInMb >= 0.1) {
+    return `${sizeInMb.toFixed(1)} ${isAr ? 'ميجابايت' : 'MB'}`;
+  }
+  const sizeInKb = bytes / 1024;
+  return `${sizeInKb.toFixed(0)} ${isAr ? 'كيلوبايت' : 'KB'}`;
 }

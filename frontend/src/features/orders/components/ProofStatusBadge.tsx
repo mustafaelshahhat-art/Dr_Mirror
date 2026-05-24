@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-
 import { PAYMENT_PROOF_STATUS, type PaymentProofStatus } from '../types';
+import { StatusBadge, type StatusColor } from '../../../shared/components/StatusPill';
 
 /**
  * Status pill for a payment-proof record. Used in two surfaces with slightly
@@ -16,12 +16,13 @@ export function ProofStatusBadge({
   tone?: 'admin' | 'buyer';
 }) {
   const { t } = useTranslation();
-  const classes =
+  
+  const color: StatusColor =
     status === PAYMENT_PROOF_STATUS.Approved
-      ? 'bg-success/15 text-success border-success/30'
+      ? 'success'
       : status === PAYMENT_PROOF_STATUS.Rejected
-        ? 'bg-danger/15 text-danger border-danger/30'
-        : 'bg-warning/15 text-warning border-warning/30';
+        ? 'danger'
+        : 'warning';
 
   const prefix = tone === 'admin' ? 'admin.proofs.status' : 'orders.proofs.status';
   const label =
@@ -32,13 +33,6 @@ export function ProofStatusBadge({
         : t(`${prefix}.pending`);
 
   return (
-    <span
-      className={[
-        'inline-flex items-center rounded-medium border px-2 py-0.5 text-xs font-medium leading-none',
-        classes,
-      ].join(' ')}
-    >
-      {label}
-    </span>
+    <StatusBadge color={color} label={label} />
   );
 }

@@ -87,6 +87,7 @@ export function AdminOrderDetailPage() {
           message={t('admin.detail.errorSubtitle')}
           retryLabel={t('admin.query.retry')}
           onRetry={() => void query.refetch()}
+        error={query.error}
         />
       );
     }

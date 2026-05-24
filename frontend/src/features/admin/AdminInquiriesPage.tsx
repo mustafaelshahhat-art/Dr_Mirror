@@ -89,6 +89,7 @@ export function AdminInquiriesPage() {
           message={t('inquiries.admin.errorLoad')}
           retryLabel={t('admin.query.retry')}
           onRetry={() => void query.refetch()}
+        error={query.error}
         />
       ) : query.data?.items?.length ? (
         <div className="space-y-4">

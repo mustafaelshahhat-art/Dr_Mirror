@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useApiErrorToast } from '../../shared/hooks/useApiErrorToast';
 import { queryKeys } from '../../shared/lib/query-keys';
@@ -140,5 +140,14 @@ export function useCancelReturnMutation(orderNumber: string) {
       void queryClient.invalidateQueries({ queryKey: queryKeys.orders.detail(orderNumber) });
     },
     onError: errorToast,
+  });
+}
+
+export function useAllMyReturnsQuery(page = 1, pageSize = 10) {
+  return useQuery<PagedResult<ReturnRequestDto>>({
+    queryKey: queryKeys.orders.allReturns(page, pageSize),
+    queryFn: () => ordersApi.listAllMyReturns({ page, pageSize }),
+    staleTime: 30_000,
+    placeholderData: keepPreviousData,
   });
 }

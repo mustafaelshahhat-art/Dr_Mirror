@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 
 import { PageHeader } from '../../shared/components/PageHeader';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
+import { EmptyState } from '../../shared/components/EmptyState';
 import { AddressCardSkeleton, Skeleton } from '../../shared/components/Skeleton';
 import { AddressForm } from './components/AddressForm';
 import {
@@ -32,6 +33,7 @@ export function AddressBookPage() {
 
   const [creating, setCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
 
   if (query.isLoading) {
     return (
@@ -63,6 +65,7 @@ export function AddressBookPage() {
           message={t('addresses.errors.unknown')}
           retryLabel={t('common.query.retry')}
           onRetry={() => void query.refetch()}
+          error={query.error}
         />
       </section>
     );
@@ -107,10 +110,15 @@ export function AddressBookPage() {
       ) : null}
 
       {addresses.length === 0 && !creating ? (
-        <div className="content-surface p-10 text-center">
-          <MapPin className="enter-fade-up mx-auto mb-3 size-6 text-default-400" aria-hidden />
-          <p className="enter-fade-up text-sm text-default-500">{t('addresses.empty')}</p>
-        </div>
+        <EmptyState
+          icon={MapPin}
+          title={t('addresses.emptyTitle')}
+          subtitle={t('addresses.emptySubtitle')}
+          action={{
+            label: t('addresses.actions.add'),
+            onPress: () => setCreating(true)
+          }}
+        />
       ) : (
         <ul
           className="space-y-2"
@@ -138,7 +146,13 @@ export function AddressBookPage() {
                 <AddressCard
                   address={a}
                   onEdit={() => setEditingId(a.id)}
-                  onDelete={() => void deleteMutation.mutateAsync(a.id)}
+                  onDelete={() => setConfirmingDeleteId(a.id)}
+                  onConfirmDelete={() => {
+                    void deleteMutation.mutateAsync(a.id);
+                    setConfirmingDeleteId(null);
+                  }}
+                  onCancelDelete={() => setConfirmingDeleteId(null)}
+                  isConfirmingDelete={confirmingDeleteId === a.id}
                   onSetDefault={() => void setDefaultMutation.mutateAsync(a.id)}
                   isMutating={
                     deleteMutation.isPending ||
@@ -158,12 +172,18 @@ function AddressCard({
   address: a,
   onEdit,
   onDelete,
+  onConfirmDelete,
+  onCancelDelete,
+  isConfirmingDelete,
   onSetDefault,
   isMutating,
 }: {
   address: BuyerAddressDto;
   onEdit: () => void;
   onDelete: () => void;
+  onConfirmDelete: () => void;
+  onCancelDelete: () => void;
+  isConfirmingDelete: boolean;
   onSetDefault: () => void;
   isMutating: boolean;
 }) {
@@ -233,17 +253,39 @@ function AddressCard({
                 <Star className="size-4" aria-hidden />
               </Button>
             ) : null}
-            <Button
-              isIconOnly
-              variant="ghost"
-              size="md"
-              onPress={onDelete}
-              isDisabled={isMutating}
-              aria-label={t('addresses.actions.delete')}
-              className="min-h-11 min-w-11 text-default-500 hover:text-danger"
-            >
-              <Trash2 className="size-4" aria-hidden />
-            </Button>
+            {isConfirmingDelete ? (
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-default-500 px-1 hidden sm:inline">{t('addresses.delete.confirmPrompt')}</span>
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onPress={onConfirmDelete}
+                  className="min-h-11 text-danger bg-danger-50 dark:bg-danger-950/20 hover:bg-danger/20"
+                >
+                  {t('addresses.delete.confirm')}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onPress={onCancelDelete}
+                  className="min-h-11"
+                >
+                  {t('addresses.delete.cancel')}
+                </Button>
+              </div>
+            ) : (
+              <Button
+                isIconOnly
+                variant="ghost"
+                size="md"
+                onPress={onDelete}
+                isDisabled={isMutating}
+                aria-label={t('addresses.actions.delete')}
+                className="min-h-11 min-w-11 text-default-500 hover:text-danger"
+              >
+                <Trash2 className="size-4" aria-hidden />
+              </Button>
+            )}
           </div>
         </div>
       </Card.Content>
