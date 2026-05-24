@@ -70,4 +70,15 @@ public static class EmailOutboxHelper
 
     public sealed record StatusChangedPayload(Guid OrderId, OrderStatus Status);
     public sealed record ReturnStatusChangedPayload(Guid ReturnRequestId, ReturnStatus Status);
+    public sealed record PasswordResetPayload(string ToEmail, string ResetUrl, string Language);
+
+    public static EmailOutboxMessage ForPasswordReset(string toEmail, string resetUrl, string language) => new()
+    {
+        Id = Guid.NewGuid(),
+        EventType = "PasswordReset",
+        Payload = JsonSerializer.Serialize(new PasswordResetPayload(toEmail, resetUrl, language)),
+        IdempotencyKey = $"PasswordReset:{toEmail}:{DateTimeOffset.UtcNow.Ticks}",
+        NextRetryAt = DateTimeOffset.UtcNow,
+        CreatedAt = DateTimeOffset.UtcNow,
+    };
 }

@@ -11,9 +11,25 @@ import type {
 export interface AdminReturnRequestDto extends ReturnRequestDto {
   buyerFullName: string;
   buyerEmail: string | null;
+  buyerPhone: string | null;
   reviewedByAdminName: string | null;
   itemCount: number;
   totalValue: number;
+  shippingRecipientName: string;
+  shippingPhone: string;
+  shippingGovernorate: string;
+  shippingCity: string;
+  shippingStreetAddress: string;
+  shippingFloor: string | null;
+  shippingApartment: string | null;
+  shippingLandmark: string | null;
+  shippingNotes: string | null;
+  orderSubTotal: number;
+  orderShippingFee: number;
+  orderTotal: number;
+  paymentMethodNameEn: string;
+  paymentMethodNameAr: string;
+  paymentStatusLabel: string;
 }
 
 export interface OrderStatsResponse {

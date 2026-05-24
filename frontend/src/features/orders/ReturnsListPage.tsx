@@ -79,35 +79,34 @@ export function ReturnsListPage() {
         <ul className="space-y-3" aria-busy={query.isFetching}>
           {returns.map((r) => (
             <li key={r.id}>
-              <Card className="border border-divider/60">
-                <Card.Content className="space-y-3 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <Link
-                      to={`/account/orders/${encodeURIComponent(r.orderNumber)}`}
-                      className="text-sm font-semibold text-foreground transition-colors hover:text-primary"
-                    >
-                      {t('returns.list.orderLabel', { number: r.orderNumber })}
-                    </Link>
-                    <ReturnStatusBadge status={r.status} />
-                  </div>
-                  {r.items.length > 0 ? (
+              <Link to={`/account/orders/${encodeURIComponent(r.orderNumber)}`} className="block">
+                <Card className="border border-divider/60 transition-colors hover:bg-content2">
+                  <Card.Content className="space-y-3 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm font-semibold text-foreground">
+                        {t('returns.list.orderLabel', { number: r.orderNumber })}
+                      </span>
+                      <ReturnStatusBadge status={r.status} />
+                    </div>
+                    {r.items.length > 0 ? (
+                      <p className="text-xs text-default-500">
+                        {r.items.map((item) => {
+                          const name = i18n.language.startsWith('ar') ? item.nameAr : item.nameEn;
+                          return `${name} × ${item.quantity}`;
+                        }).join(' · ')}
+                      </p>
+                    ) : null}
+                    {r.customerReason ? (
+                      <p className="text-sm text-default-700 dark:text-default-300 line-clamp-2">
+                        {r.customerReason}
+                      </p>
+                    ) : null}
                     <p className="text-xs text-default-500">
-                      {r.items.map((item) => {
-                        const name = i18n.language.startsWith('ar') ? item.nameAr : item.nameEn;
-                        return `${name} × ${item.quantity}`;
-                      }).join(' · ')}
+                      {t('returns.list.submittedOn', { date: dateFmt.format(new Date(r.createdAt)) })}
                     </p>
-                  ) : null}
-                  {r.customerReason ? (
-                    <p className="text-sm text-default-700 dark:text-default-300 line-clamp-2">
-                      {r.customerReason}
-                    </p>
-                  ) : null}
-                  <p className="text-xs text-default-500">
-                    {t('returns.list.submittedOn', { date: dateFmt.format(new Date(r.createdAt)) })}
-                  </p>
-                </Card.Content>
-              </Card>
+                  </Card.Content>
+                </Card>
+              </Link>
             </li>
           ))}
         </ul>

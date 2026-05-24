@@ -54,4 +54,10 @@ public static class RateLimitPolicies
     /// 60 requests per minute per authenticated user — fixed window.
     /// </summary>
     public const string AddressBook = "address-book";
+
+    /// <summary>
+    /// Password reset requests — prevents email-bomb abuse on forgot-password.
+    /// 3 requests per 5 minutes per IP — fixed window.
+    /// </summary>
+    public const string PasswordReset = "password-reset";
 }

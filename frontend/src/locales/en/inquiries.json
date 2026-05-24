@@ -19,6 +19,8 @@
     "successTitle": "Inquiry sent!",
     "successSubtitle": "We'll get back to you as soon as possible.",
     "sendAnother": "Send another",
+    "messageCounter": "{{current}} / 2000",
+    "submitError": "Couldn't send your inquiry. Please try again.",
     "errors": {
       "unknown": "Couldn't send your inquiry. Please try again."
     }
@@ -29,9 +31,9 @@
     "emailInvalid": "Enter a valid email address.",
     "phoneInvalid": "Enter a valid Egyptian mobile number (e.g. 01012345678).",
     "subjectMin": "Subject must be at least 5 characters.",
-    "subjectMax": "Subject must be 100 characters or fewer.",
+    "subjectMax": "Subject must be 200 characters or fewer.",
     "messageMin": "Message must be at least 10 characters.",
-    "messageMax": "Message must be 1000 characters or fewer."
+    "messageMax": "Message must be 2000 characters or fewer."
   },
   "admin": {
     "title": "Inquiries",

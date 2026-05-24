@@ -7,6 +7,18 @@
       "empty": "لا توجد طلبات بعد. ابدأ التسوق!",
       "viewAll": "عرض كل الطلبات",
       "orderLabel": "طلب رقم {{number}}"
+    },
+    "security": {
+      "title": "الأمان",
+      "changePasswordTitle": "تغيير كلمة المرور",
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "submit": "تغيير كلمة المرور",
+      "submitting": "جاري التغيير...",
+      "success": "تم تغيير كلمة المرور بنجاح.",
+      "errorIncorrectPassword": "كلمة المرور الحالية غير صحيحة.",
+      "errorUnknown": "حدث خطأ أثناء تغيير كلمة المرور. حاول مرة أخرى."
     }
   }
 }

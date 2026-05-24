@@ -106,11 +106,43 @@ public class OptionsValidationTests
         var opts = new EmailOptions
         {
             Provider = "mailkit",
+            FromAddress = "no-reply@drmirror.shop",
+            SmtpHost = "smtp.gmail.com",
+            SmtpUsername = "user@example.com",
+            SmtpPassword = "app-password",
+            FrontendBaseUrl = "https://drmirror.shop",
+        };
+        Assert.Empty(Validate(opts));
+    }
+
+    [Fact]
+    public void Email_mailkit_with_local_from_address_is_rejected()
+    {
+        var opts = new EmailOptions
+        {
+            Provider = "mailkit",
+            FromAddress = "no-reply@drmirror.local",
+            SmtpHost = "smtp.gmail.com",
+            SmtpUsername = "user@example.com",
+            SmtpPassword = "app-password",
+            FrontendBaseUrl = "https://drmirror.shop",
+        };
+        var results = Validate(opts);
+        Assert.Contains(results, r => r.ErrorMessage!.Contains("real FromAddress domain"));
+    }
+
+    [Fact]
+    public void Email_mailkit_without_frontend_base_url_is_rejected()
+    {
+        var opts = new EmailOptions
+        {
+            Provider = "mailkit",
             SmtpHost = "smtp.gmail.com",
             SmtpUsername = "user@example.com",
             SmtpPassword = "app-password",
         };
-        Assert.Empty(Validate(opts));
+        var results = Validate(opts);
+        Assert.Contains(results, r => r.ErrorMessage!.Contains("FrontendBaseUrl"));
     }
 
     [Theory]
@@ -123,9 +155,11 @@ public class OptionsValidationTests
         var opts = new EmailOptions
         {
             Provider = provider,
+            FromAddress = "no-reply@drmirror.shop",
             SmtpHost = "smtp.example.com",
             SmtpUsername = "u",
             SmtpPassword = "p",
+            FrontendBaseUrl = "https://drmirror.shop",
         };
         Assert.DoesNotContain(Validate(opts), r => r.ErrorMessage!.Contains("Unknown Email:Provider"));
     }

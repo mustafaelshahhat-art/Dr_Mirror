@@ -4,6 +4,7 @@
    list-style: none (the default for Tailwind utility classes). */
 
 import { AlertDialog, Button, Card, Chip } from '@heroui/react';
+import { KeyRound } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,15 +14,16 @@ import { useDisableUserMutation, useEnableUserMutation } from './users/hooks';
 interface AdminUsersMobileCardsProps {
   users: AdminUserDto[];
   dateFmt: Intl.DateTimeFormat;
+  authUserId?: string;
 }
 
-export function AdminUsersMobileCards({ users, dateFmt }: AdminUsersMobileCardsProps) {
+export function AdminUsersMobileCards({ users, dateFmt, authUserId }: AdminUsersMobileCardsProps) {
   const { t } = useTranslation();
 
   return (
     <ul role="list" className="space-y-3">
       {users.map((user) => (
-        <AdminUsersMobileCard key={user.id} user={user} dateFmt={dateFmt} t={t} />
+        <AdminUsersMobileCard key={user.id} user={user} dateFmt={dateFmt} t={t} authUserId={authUserId} />
       ))}
     </ul>
   );
@@ -31,15 +33,18 @@ function AdminUsersMobileCard({
   user,
   dateFmt,
   t,
+  authUserId,
 }: {
   user: AdminUserDto;
   dateFmt: Intl.DateTimeFormat;
   t: ReturnType<typeof useTranslation>['t'];
+  authUserId?: string;
 }) {
   const disableUser = useDisableUserMutation();
   const enableUser = useEnableUserMutation();
   const isStatusPending = disableUser.isPending || enableUser.isPending;
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const isOwnRow = user.id === authUserId && user.roles.includes('Admin');
 
   async function toggleAccountStatus() {
     try {
@@ -73,6 +78,17 @@ function AdminUsersMobileCard({
                 {user.isDisabled ? t('admin.users.statusBlocked') : t('admin.users.statusActive')}
               </Chip.Label>
             </Chip>
+            {isOwnRow ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                onPress={() => { /* navigate to /account/security */ }}
+              >
+                <KeyRound className="size-3.5" aria-hidden />
+                {t('account.account.security.changePasswordTitle')}
+              </Button>
+            ) : null}
             {!user.roles.includes('Admin') ? (
               <>
                 <Button

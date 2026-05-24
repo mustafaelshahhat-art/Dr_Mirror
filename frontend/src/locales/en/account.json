@@ -7,6 +7,18 @@
       "empty": "No orders yet. Start shopping!",
       "viewAll": "View all orders",
       "orderLabel": "Order #{{number}}"
+    },
+    "security": {
+      "title": "Security",
+      "changePasswordTitle": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Change password",
+      "submitting": "Changing...",
+      "success": "Password changed successfully.",
+      "errorIncorrectPassword": "The current password you entered is incorrect.",
+      "errorUnknown": "Something went wrong while changing your password. Please try again."
     }
   }
 }

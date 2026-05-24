@@ -38,6 +38,10 @@ internal static class OutboxMessageDispatcher
             SendReturnCreatedAsync(Guid.Parse(msg.Payload), db, email, ct),
         "InquiryReceived" =>
             SendInquiryReceivedAsync(Guid.Parse(msg.Payload), db, email, emailOptions, ct),
+        "PasswordReset" =>
+            SendPasswordResetAsync(
+                JsonSerializer.Deserialize<EmailOutboxHelper.PasswordResetPayload>(msg.Payload)!,
+                email, ct),
         _ => throw new InvalidOperationException($"Unknown outbox event type: {msg.EventType}"),
     };
 
@@ -127,5 +131,19 @@ internal static class OutboxMessageDispatcher
 
         var adminEmail = opts.AdminNotificationEmail ?? opts.FromAddress;
         await email.SendAsync(OrderEmailMessages.InquiryReceived(inquiry, adminEmail));
+    }
+
+    private static Task SendPasswordResetAsync(
+        EmailOutboxHelper.PasswordResetPayload p, IEmailSender email, CancellationToken ct)
+    {
+        var content = p.Language == "ar"
+            ? PasswordResetEmailMessages.ResetLinkArabic(p.ResetUrl)
+            : PasswordResetEmailMessages.ResetLinkEnglish(p.ResetUrl);
+        var message = new EmailMessage(
+            To: p.ToEmail,
+            Subject: content.Subject,
+            TextBody: content.TextBody,
+            HtmlBody: content.HtmlBody);
+        return email.SendAsync(message, ct);
     }
 }

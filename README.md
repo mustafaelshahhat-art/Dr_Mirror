@@ -93,7 +93,8 @@ Secrets are never committed. Configure via environment variables:
 | `FileStorage__Provider` | `local` (dev) or `cloudinary` (prod) |
 | `FileStorage__CloudinaryCloudName`, `...ApiKey`, `...ApiSecret` | Required when provider is `cloudinary` |
 | `Email__Provider` | `logonly` (dev) or `mailkit` (prod) |
-| `Email__FromAddress`, `Email__FromName`, `Email__SmtpHost`, `Email__SmtpPort`, `Email__SmtpUseStartTls`, `Email__SmtpUsername`, `Email__SmtpPassword` | Required when provider is `mailkit` |
+| `Email__FromAddress`, `Email__FromName`, `Email__FrontendBaseUrl`, `Email__SmtpHost`, `Email__SmtpPort`, `Email__SmtpUseStartTls`, `Email__SmtpUsername`, `Email__SmtpPassword` | Required when provider is `mailkit` |
+| `Email__ReplyToAddress`, `Email__MessageIdDomain` | Recommended for production deliverability. Use the same authenticated sending domain as `FromAddress`. |
 | `Retention__EnableProofPurge` | `true` enables background purge of old payment proof files (default: prod=true) |
 | `Retention__ProofPurgeIntervalHours` | How often the proof purge runs (default: 24) |
 | `Retention__OutboxRetentionDays` | Days to keep processed outbox messages (default: 90) |
@@ -107,6 +108,17 @@ Secrets are never committed. Configure via environment variables:
 | `VITE_API_BASE_URL` | Backend root URL in production (e.g. `https://api.drmirror.com`); `/api` appended automatically. Leave blank in dev (Vite proxy). |
 | `VITE_SENTRY_DSN` | Sentry DSN for frontend error tracking. Omit to disable Sentry entirely. |
 | `VITE_APP_RELEASE` | Release tag passed to Sentry (e.g. `v1.2.3`). |
+
+### Email deliverability
+
+Transactional email will still land in spam if the sending domain is not authenticated. For production:
+
+- Send from a real mailbox on your domain, for example `no-reply@drmirror.shop` or `support@drmirror.shop`, not a `.local` address.
+- Use an SMTP provider that signs DKIM for the same domain as `Email__FromAddress`.
+- Add SPF for the SMTP provider to the sending domain DNS.
+- Add DKIM records exactly as the SMTP provider gives them.
+- Add DMARC, starting with `p=none`, then move to `quarantine` or `reject` after successful monitoring.
+- Keep `Email__FrontendBaseUrl` on the public storefront domain, not `localhost`, in production emails.
 
 ### Dev secrets
 

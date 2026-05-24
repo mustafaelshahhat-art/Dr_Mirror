@@ -9,6 +9,7 @@ public sealed record AdminReturnRequestDto(
     string OrderNumber,
     string BuyerFullName,
     string? BuyerEmail,
+    string? BuyerPhone,
     string? ReviewedByAdminName,
     ReturnStatus Status,
     string CustomerReason,
@@ -21,7 +22,22 @@ public sealed record AdminReturnRequestDto(
     DateTimeOffset? CancelledAt,
     int ItemCount,
     decimal TotalValue,
-    IReadOnlyList<ReturnRequestItemDto> Items);
+    IReadOnlyList<ReturnRequestItemDto> Items,
+    string ShippingRecipientName,
+    string ShippingPhone,
+    string ShippingGovernorate,
+    string ShippingCity,
+    string ShippingStreetAddress,
+    string? ShippingFloor,
+    string? ShippingApartment,
+    string? ShippingLandmark,
+    string? ShippingNotes,
+    decimal OrderSubTotal,
+    decimal OrderShippingFee,
+    decimal OrderTotal,
+    string PaymentMethodNameEn,
+    string PaymentMethodNameAr,
+    string PaymentStatusLabel);
 
 public sealed record TransitionReturnRequest(string Action, string? AdminNote);
 

@@ -1,8 +1,11 @@
+using DrMirror.Api.Features.Auth.ChangePassword;
+using DrMirror.Api.Features.Auth.ForgotPassword;
 using DrMirror.Api.Features.Auth.Login;
 using DrMirror.Api.Features.Auth.Logout;
 using DrMirror.Api.Features.Auth.Me;
 using DrMirror.Api.Features.Auth.Refresh;
 using DrMirror.Api.Features.Auth.Register;
+using DrMirror.Api.Features.Auth.ResetPassword;
 
 namespace DrMirror.Api.Features.Auth;
 
@@ -16,6 +19,9 @@ public static class AuthEndpoints
     ///   POST /api/auth/logout
     ///   GET  /api/auth/me
     ///   PUT  /api/auth/me
+    ///   POST /api/auth/forgot-password
+    ///   POST /api/auth/reset-password
+    ///   POST /api/auth/change-password
     /// </summary>
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
     {
@@ -26,6 +32,9 @@ public static class AuthEndpoints
         group.MapRefresh();
         group.MapLogout();
         group.MapMe();
+        group.MapForgotPassword();
+        group.MapResetPassword();
+        group.MapChangePassword();
 
         return app;
     }

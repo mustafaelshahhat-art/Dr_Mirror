@@ -20,11 +20,25 @@ public sealed class EmailOptions : IValidatableObject
     /// <summary>Sender display name.</summary>
     public string FromName { get; set; } = "Dr. Mirror";
 
+    /// <summary>Optional reply-to mailbox. Defaults to <see cref="FromAddress"/>.</summary>
+    public string? ReplyToAddress { get; set; }
+
+    /// <summary>
+    /// Domain used for generated Message-ID headers. Defaults to the domain in <see cref="FromAddress"/>.
+    /// </summary>
+    public string? MessageIdDomain { get; set; }
+
     /// <summary>
     /// Where to send admin-directed notifications (new inquiries, etc.).
     /// Falls back to <see cref="FromAddress"/> when not set.
     /// </summary>
     public string? AdminNotificationEmail { get; set; }
+
+    /// <summary>
+    /// Frontend base URL used to build links in outbound emails (e.g. password reset).
+    /// Required when <c>Provider == "mailkit"</c>.
+    /// </summary>
+    public string? FrontendBaseUrl { get; set; }
 
     // -- MailKit/SMTP-specific. --
     public string? SmtpHost { get; set; }
@@ -55,6 +69,18 @@ public sealed class EmailOptions : IValidatableObject
             {
                 yield return new ValidationResult(
                     "Email:Provider=mailkit requires SmtpHost, SmtpUsername, and SmtpPassword.");
+            }
+
+            if (string.IsNullOrWhiteSpace(FrontendBaseUrl))
+            {
+                yield return new ValidationResult(
+                    "Email:Provider=mailkit requires FrontendBaseUrl (e.g. https://drmirror.shop).");
+            }
+
+            if (FromAddress.EndsWith(".local", StringComparison.OrdinalIgnoreCase))
+            {
+                yield return new ValidationResult(
+                    "Email:Provider=mailkit requires a real FromAddress domain, not .local. Use a mailbox on an SPF/DKIM/DMARC-authenticated domain.");
             }
         }
 

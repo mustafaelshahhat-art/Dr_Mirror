@@ -15,8 +15,8 @@ const inquirySchema = z.object({
   email: z.string().trim().email('inquiries.validation.emailInvalid'),
   phone: z.string().trim()
     .refine(v => v === '' || egyptPhoneRegex.test(v), 'inquiries.validation.phoneInvalid'),
-  subject: z.string().trim().min(5, 'inquiries.validation.subjectMin').max(100, 'inquiries.validation.subjectMax'),
-  message: z.string().trim().min(10, 'inquiries.validation.messageMin').max(1000, 'inquiries.validation.messageMax'),
+  subject: z.string().trim().min(5, 'inquiries.validation.subjectMin').max(200, 'inquiries.validation.subjectMax'),
+  message: z.string().trim().min(10, 'inquiries.validation.messageMin').max(2000, 'inquiries.validation.messageMax'),
 });
 
 type InquiryFormValues = z.infer<typeof inquirySchema>;
@@ -30,6 +30,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
   const { t } = useTranslation();
   const submit = useSubmitInquiryMutation();
   const [success, setSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const { control, handleSubmit, formState: { errors }, reset } = useForm<InquiryFormValues>({
     resolver: zodResolver(inquirySchema),
@@ -49,6 +50,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
   }
 
   async function onSubmit(values: InquiryFormValues) {
+    setSubmitError(null);
     try {
       await submit.mutateAsync({
         productId: productId ?? null,
@@ -60,12 +62,14 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
       });
       setSuccess(true);
     } catch {
+      setSubmitError(t('inquiries.form.submitError'));
       // Toast emitted by mutation onError.
     }
   }
 
   function onReset() {
     setSuccess(false);
+    setSubmitError(null);
     reset({
       fullName: '',
       email: '',
@@ -198,7 +202,7 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
                 </Label>
                 <Input
                   {...field}
-                  maxLength={100}
+                  maxLength={200}
                   className="border border-default-400 dark:border-default-300"
                 />
                 {errMsg(errors.subject?.message) && (
@@ -218,34 +222,50 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
           <Controller
             name="message"
             control={control}
-            render={({ field }) => (
-              <TextField
-                isRequired
-                isInvalid={!!errors.message}
-                className="flex flex-col gap-1"
-              >
-                <Label className="text-xs font-medium text-default-700 dark:text-default-300">
-                  {t('inquiries.form.message')}
-                </Label>
-                <TextArea
-                  {...field}
-                  rows={4}
-                  maxLength={1000}
-                  className="border border-default-400 dark:border-default-300"
-                />
-                {errMsg(errors.message?.message) && (
-                  <FieldError className="text-xs text-danger">{errMsg(errors.message?.message)}</FieldError>
-                )}
-              </TextField>
-            )}
+            render={({ field }) => {
+              const length = field.value?.length ?? 0;
+
+              return (
+                <TextField
+                  isRequired
+                  isInvalid={!!errors.message}
+                  className="flex flex-col gap-1"
+                >
+                  <Label className="text-xs font-medium text-default-700 dark:text-default-300">
+                    {t('inquiries.form.message')}
+                  </Label>
+                  <TextArea
+                    {...field}
+                    rows={4}
+                    maxLength={2000}
+                    className="border border-default-400 dark:border-default-300"
+                  />
+                  <p className="text-sm text-default-400 text-end">
+                    {t('inquiries.form.messageCounter', { current: length })}
+                  </p>
+                  {errMsg(errors.message?.message) && (
+                    <FieldError className="text-xs text-danger">{errMsg(errors.message?.message)}</FieldError>
+                  )}
+                </TextField>
+              );
+            }}
           />
         </Fieldset.Group>
       </Fieldset>
+
+      {submitError && (
+        <Alert status="danger" role="alert">
+          <Alert.Content>
+            <Alert.Description>{submitError}</Alert.Description>
+          </Alert.Content>
+        </Alert>
+      )}
 
       <Button
         type="submit"
         variant="primary"
         isPending={submit.isPending}
+        isDisabled={submit.isPending}
       >
         <span className="inline-flex items-center gap-2">
           <Send className="size-4" aria-hidden />

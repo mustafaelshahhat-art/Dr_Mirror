@@ -333,6 +333,15 @@ internal static class ServiceCollectionExtensions
                 });
             });
 
+            // Password reset — 3 req/5 min per IP (fixed window, prevents email-bomb abuse).
+            options.AddFixedWindowLimiter(RateLimitPolicies.PasswordReset, o =>
+            {
+                o.Window = TimeSpan.FromMinutes(5);
+                o.PermitLimit = 3 * multiplier;
+                o.QueueLimit = 0;
+                o.AutoReplenishment = true;
+            });
+
             // Emit RFC 7807 ProblemDetails so the SPA's shared
             // isAxiosError&lt;ProblemDetails&gt; path handles 429 like every other
             // failure (rather than seeing an opaque text body).

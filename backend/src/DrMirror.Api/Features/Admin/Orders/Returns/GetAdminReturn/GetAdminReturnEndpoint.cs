@@ -24,6 +24,10 @@ public static class GetAdminReturnEndpoint
         AppDbContext db,
         CancellationToken ct)
     {
+        // ShippingAddress is an owned entity on Order (loaded with the owner),
+        // so no extra Include is needed. All new DTO fields (buyer phone,
+        // shipping address, order totals, payment info) are sourced from the
+        // already-loaded Order and BuyerUser navigation properties.
         var returnRequest = await db.ReturnRequests
             .AsNoTracking()
             .Include(r => r.Order)

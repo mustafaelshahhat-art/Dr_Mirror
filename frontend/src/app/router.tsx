@@ -19,6 +19,8 @@ import { useAuth } from '../features/auth/useAuth';
 
 const LoginPage = lazy(() => import('../features/auth/LoginPage').then((m) => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('../features/auth/RegisterPage').then((m) => ({ default: m.RegisterPage })));
+const ForgotPasswordPage = lazy(() => import('../features/auth/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage })));
+const ResetPasswordPage = lazy(() => import('../features/auth/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage })));
 const AuthShell = lazy(() => import('../features/auth/components/AuthShell').then((m) => ({ default: m.AuthShell })));
 
 const CatalogPage = lazy(() => import('../features/catalog/CatalogPage').then((m) => ({ default: m.CatalogPage })));
@@ -48,6 +50,7 @@ const AdminShippingLabelPage = lazy(() => import('../features/admin/AdminShippin
 const AdminReturnsListPage = lazy(() => import('../features/admin/AdminReturnsListPage').then((m) => ({ default: m.AdminReturnsListPage })));
 const AdminReturnDetailPage = lazy(() => import('../features/admin/AdminReturnDetailPage').then((m) => ({ default: m.AdminReturnDetailPage })));
 const ReturnsListPage = lazy(() => import('../features/orders/ReturnsListPage').then((m) => ({ default: m.ReturnsListPage })));
+const AccountSecurityPage = lazy(() => import('../features/account/AccountSecurityPage').then((m) => ({ default: m.AccountSecurityPage })));
 
 function PageFallback() {
   const { t } = useTranslation();
@@ -71,7 +74,12 @@ export function AppRoutes() {
           <Route element={<AuthShell />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           </Route>
+        </Route>
+
+        <Route element={<AuthShell />}>
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Route>
 
         <Route element={<Layout />}>
@@ -89,6 +97,7 @@ export function AppRoutes() {
             <Route path="account/orders/:orderNumber" element={<OrderDetailPage />} />
             <Route path="account/returns" element={<ReturnsListPage />} />
             <Route path="account/addresses" element={<AddressBookPage />} />
+            <Route path="account/security" element={<AccountSecurityPage />} />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />

@@ -2,6 +2,7 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using MimeKit.Utils;
 
 namespace DrMirror.Api.Infrastructure.Email;
 
@@ -31,8 +32,16 @@ public sealed class MailKitEmailSender : IEmailSender
     {
         var mime = new MimeMessage();
         mime.From.Add(new MailboxAddress(_opts.FromName, _opts.FromAddress));
+        mime.ReplyTo.Add(MailboxAddress.Parse(string.IsNullOrWhiteSpace(_opts.ReplyToAddress)
+            ? _opts.FromAddress
+            : _opts.ReplyToAddress));
         mime.To.Add(MailboxAddress.Parse(message.To));
         mime.Subject = message.Subject;
+        mime.Date = DateTimeOffset.UtcNow;
+        mime.MessageId = MimeUtils.GenerateMessageId(GetMessageIdDomain());
+        mime.Headers.Add(HeaderId.AutoSubmitted, "auto-generated");
+        mime.Headers.Add("X-Auto-Response-Suppress", "All");
+        mime.Headers.Add("X-Entity-Ref-ID", Guid.NewGuid().ToString("N"));
 
         var builder = new BodyBuilder { TextBody = message.TextBody };
         if (!string.IsNullOrWhiteSpace(message.HtmlBody))
@@ -56,5 +65,16 @@ public sealed class MailKitEmailSender : IEmailSender
         await client.DisconnectAsync(true, ct);
 
         _logger.LogInformation("Sent email to {To} subject={Subject}", message.To, message.Subject);
+    }
+
+    private string GetMessageIdDomain()
+    {
+        if (!string.IsNullOrWhiteSpace(_opts.MessageIdDomain))
+            return _opts.MessageIdDomain.Trim();
+
+        var atIndex = _opts.FromAddress.LastIndexOf('@');
+        return atIndex >= 0 && atIndex < _opts.FromAddress.Length - 1
+            ? _opts.FromAddress[(atIndex + 1)..]
+            : "drmirror.shop";
     }
 }
