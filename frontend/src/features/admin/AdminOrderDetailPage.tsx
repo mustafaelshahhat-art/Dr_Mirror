@@ -9,11 +9,13 @@ import { Snippet } from '../../shared/components/Snippet';
 import { OrderStatusBadge } from '../orders/components/OrderStatusBadge';
 import { OrderTimeline } from '../orders/components/OrderTimeline';
 import { paymentMethodGroup } from '../orders/lib/paymentMethodGroup';
-import { ORDER_STATUSES, type OrderDetailDto, type OrderStatus } from '../orders/types';
+import type { OrderDetailDto } from '../orders/types';
 
 import { useAuditLogs } from './audit/hooks';
 import { AdminProofReview } from './components/AdminProofReview';
+import { AdminReturnSection } from './components/AdminReturnSection';
 import { AdminTransitionActions } from './components/AdminTransitionActions';
+import { visibleAdminNextStates } from './components/adminTransitionUtils';
 import { useAdminOrderQuery } from './hooks';
 
 import { formatCurrency } from '../../shared/lib/format';
@@ -193,6 +195,7 @@ export function AdminOrderDetailPage() {
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
           <AdminTransitionActions order={visibleActionOrder} />
+          <AdminReturnSection orderNumber={order.orderNumber} lang={lang} />
 
           <Tabs variant="secondary" defaultSelectedKey="items" className="space-y-4">
             <Tabs.ListContainer>
@@ -451,33 +454,3 @@ function AdminOrderAuditTimeline({ orderId }: { orderId: string }) {
   );
 }
 
-function visibleAdminNextStates(order: OrderDetailDto): OrderStatus[] {
-  const allowed = order.allowedNextStatesForAdmin;
-  const group = paymentMethodGroup(order.paymentMethodKind);
-
-  if (group === 'proof' && order.status === ORDER_STATUSES.PendingPaymentReview) {
-    return allowed.filter((status) =>
-      status === ORDER_STATUSES.Paid || status === ORDER_STATUSES.Pending,
-    );
-  }
-
-  if (group === 'proof' && order.status === ORDER_STATUSES.Pending) {
-    return allowed.filter((status) => !isFulfillmentStatus(status));
-  }
-
-  if (order.status === ORDER_STATUSES.Paid) {
-    return allowed.filter((status) => status === ORDER_STATUSES.Preparing);
-  }
-
-  if (order.status === ORDER_STATUSES.Preparing) {
-    return allowed.filter((status) => status === ORDER_STATUSES.Shipped);
-  }
-
-  return allowed;
-}
-
-function isFulfillmentStatus(status: OrderStatus): boolean {
-  return status === ORDER_STATUSES.Preparing
-    || status === ORDER_STATUSES.Shipped
-    || status === ORDER_STATUSES.Delivered;
-}

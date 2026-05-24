@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 
 import { formatCurrency } from '../../../shared/lib/format';
 import type { AppLang } from '../../../shared/lib/theme-storage';
+import { StatusPill } from '../../../shared/components/StatusPill';
 
 import { genderTranslationKey } from '../../catalog/hooks';
 
@@ -44,16 +45,11 @@ export function AdminProductsListMobileCards({ products, lang }: AdminProductsLi
                   </p>
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1.5">
-                  <span
-                    className={[
-                      'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
-                      p.isPublished
-                        ? 'border-success/30 bg-success/15 text-success'
-                        : 'border-warning/30 bg-warning/15 text-warning',
-                    ].join(' ')}
-                  >
-                    {p.isPublished ? t('admin.products.list.published') : t('admin.products.list.draft')}
-                  </span>
+                  <StatusPill
+                    active={p.isPublished}
+                    activeLabel={t('admin.products.list.published')}
+                    inactiveLabel={t('admin.products.list.draft')}
+                  />
                   <span className="tabular-nums font-medium text-foreground">
                     {formatCurrency(p.price, lang)}
                   </span>

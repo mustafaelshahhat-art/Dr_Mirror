@@ -11,58 +11,11 @@ import { EmptyState } from '../../../shared/components/EmptyState';
 import { TableRowSkeleton, TableSkeletonHeader } from '../../../shared/components/TableRowSkeleton';
 import { SelectField } from '../../../shared/components/SelectField';
 import { AuditLogMobileCards } from './AuditLogMobileCards';
+import { auditStatusLabel } from './auditUtils';
 import { useAuditLogs } from './hooks';
 
 const ACTION_TYPES = ['OrderStatusChanged', 'PaymentReviewed', 'ProductUpdated', 'UserRoleUpdated'];
 const TARGET_TYPES = ['Order', 'Payment', 'Product', 'User'];
-
-const ORDER_STATUS_KEYS: Record<string, string> = {
-  Pending: 'orders.status.pending',
-  Confirmed: 'orders.status.confirmed',
-  PendingPaymentReview: 'orders.status.pendingPaymentReview',
-  Paid: 'orders.status.paid',
-  Preparing: 'orders.status.preparing',
-  Shipped: 'orders.status.shipped',
-  Delivered: 'orders.status.delivered',
-  Cancelled: 'orders.status.cancelled',
-};
-const PROOF_STATUS_KEYS: Record<string, string> = {
-  Pending: 'orders.proofs.status.pending',
-  Approved: 'orders.proofs.status.approved',
-  Rejected: 'orders.proofs.status.rejected',
-};
-const CATALOG_STATUS_KEYS: Record<string, string> = {
-  Active: 'admin.catalog.status.active',
-  Enabled: 'admin.catalog.status.active',
-  Inactive: 'admin.catalog.status.inactive',
-  Disabled: 'admin.catalog.status.inactive',
-};
-const INQUIRY_STATUS_KEYS: Record<string, string> = {
-  New: 'inquiries.admin.status.new',
-  Read: 'inquiries.admin.status.read',
-  Responded: 'inquiries.admin.status.responded',
-};
-
-function auditStatusLabel(
-  t: (key: string) => string,
-  actionType: string,
-  status: string | null,
-): string | null {
-  if (!status) return null;
-  let map: Record<string, string>;
-  switch (actionType) {
-    case 'OrderStatusChanged': map = ORDER_STATUS_KEYS; break;
-    case 'PaymentReviewed':    map = PROOF_STATUS_KEYS; break;
-    case 'ProductUpdated':     map = CATALOG_STATUS_KEYS; break;
-    default:
-      map = {
-        ...ORDER_STATUS_KEYS, ...PROOF_STATUS_KEYS,
-        ...CATALOG_STATUS_KEYS, ...INQUIRY_STATUS_KEYS,
-      };
-  }
-  const key = map[status];
-  return key ? t(key) : status;
-}
 
 export function AuditLogPage() {
   const { t } = useTranslation();

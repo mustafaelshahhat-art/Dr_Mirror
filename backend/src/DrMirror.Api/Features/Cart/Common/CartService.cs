@@ -16,10 +16,13 @@ internal sealed class CartService
     public CartService(AppDbContext db) => _db = db;
 
     /// <summary>Find or create the open cart for the given user.</summary>
-    public async Task<Domain.Entities.Cart> GetOrCreateCartAsync(Guid userId, CancellationToken ct)
+    public async Task<Domain.Entities.Cart> GetOrCreateCartAsync(
+        Guid userId,
+        CancellationToken ct,
+        bool trackExisting = true)
     {
-        var cart = await _db.Carts
-            .FirstOrDefaultAsync(c => c.UserId == userId, ct);
+        var carts = trackExisting ? _db.Carts : _db.Carts.AsNoTracking();
+        var cart = await carts.FirstOrDefaultAsync(c => c.UserId == userId, ct);
 
         if (cart is not null) return cart;
 
@@ -107,6 +110,7 @@ internal sealed class CartService
     public async Task<ProductVariant?> FindVariantForBuyerAsync(Guid variantId, CancellationToken ct)
     {
         return await _db.ProductVariants
+            .AsNoTracking()
             .Include(v => v.Product)
                 .ThenInclude(p => p!.Category)
             .FirstOrDefaultAsync(v =>

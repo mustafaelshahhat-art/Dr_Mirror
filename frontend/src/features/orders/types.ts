@@ -49,6 +49,52 @@ export const PAYMENT_PROOF_STATUS = {
   Rejected: 'Rejected',
 } as const satisfies Record<string, PaymentProofStatus>;
 
+export type ReturnStatus =
+  | 'Requested'
+  | 'Approved'
+  | 'Rejected'
+  | 'Received'
+  | 'Completed'
+  | 'Cancelled';
+
+export const RETURN_STATUSES = {
+  Requested: 'Requested',
+  Approved: 'Approved',
+  Rejected: 'Rejected',
+  Received: 'Received',
+  Completed: 'Completed',
+  Cancelled: 'Cancelled',
+} as const satisfies Record<string, ReturnStatus>;
+
+export interface ReturnRequestItemDto {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  sku: string;
+  size: string;
+  colorName: string;
+  colorNameAr: string;
+  colorHex: string;
+  primaryImageUrl: string | null;
+  unitPrice: number;
+  quantity: number;
+}
+
+export interface ReturnRequestDto {
+  id: string;
+  orderNumber: string;
+  status: ReturnStatus;
+  customerReason: string;
+  adminNote: string | null;
+  createdAt: string;
+  updatedAt: string;
+  reviewedAt: string | null;
+  receivedAt: string | null;
+  completedAt: string | null;
+  cancelledAt: string | null;
+  items: ReturnRequestItemDto[];
+}
+
 export interface PaymentMethodDto {
   id: string;
   code: string;
@@ -193,4 +239,8 @@ export interface CreateOrderRequest {
 
 export interface CancelOrderRequest {
   reason: string | null;
+}
+
+export interface SubmitReturnRequest {
+  customerReason: string;
 }

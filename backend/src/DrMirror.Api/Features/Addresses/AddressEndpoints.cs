@@ -226,12 +226,21 @@ public static class AddressEndpoints
 
         if (!entity.IsDefault)
         {
-            await ClearOtherDefaults(db, userId, exceptId: entity.Id, ct);
-            entity.IsDefault = true;
-            entity.UpdatedAt = DateTimeOffset.UtcNow;
             try
             {
+                await using var transaction = db.Database.IsRelational()
+                    ? await db.Database.BeginTransactionAsync(ct)
+                    : null;
+
+                await ClearOtherDefaults(db, userId, exceptId: entity.Id, ct);
+                entity.IsDefault = true;
+                entity.UpdatedAt = DateTimeOffset.UtcNow;
+
                 await db.SaveChangesAsync(ct);
+                if (transaction is not null)
+                {
+                    await transaction.CommitAsync(ct);
+                }
             }
             catch (DbUpdateException)
             {

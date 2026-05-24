@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { PageHeader } from '../../../shared/components/PageHeader';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { Skeleton } from '../../../shared/components/Skeleton';
+import { StatusPill } from '../../../shared/components/StatusPill';
 
 import {
   useAdminCategoriesQuery,
@@ -165,18 +166,7 @@ export function AdminCategoriesPage() {
                     </p>
                   </button>
                   <div className="flex shrink-0 flex-col items-end gap-2">
-                    <span
-                      className={[
-                        'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
-                        cat.isActive
-                          ? 'border-success/30 bg-success/15 text-success'
-                          : 'border-divider/60 bg-content2 text-default-500',
-                      ].join(' ')}
-                    >
-                      {cat.isActive
-                        ? t('admin.catalog.status.active')
-                        : t('admin.catalog.status.inactive')}
-                    </span>
+                    <StatusPill active={cat.isActive} />
                     <Tooltip delay={300} closeDelay={0}>
                       <Switch
                         size="sm"

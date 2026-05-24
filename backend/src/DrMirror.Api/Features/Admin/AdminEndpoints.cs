@@ -5,6 +5,7 @@ using DrMirror.Api.Features.Admin.Catalog.Products;
 using DrMirror.Api.Features.Admin.Orders.GetOrderByNumber;
 using DrMirror.Api.Features.Admin.Orders.ListOrders;
 using DrMirror.Api.Features.Admin.Orders.ReviewPaymentProof;
+using DrMirror.Api.Features.Admin.Orders.Returns;
 using DrMirror.Api.Features.Admin.Orders.TransitionOrder;
 using DrMirror.Api.Features.Admin.Inquiries;
 using DrMirror.Api.Features.Admin.Payments;
@@ -45,6 +46,7 @@ public static class AdminEndpoints
         orders.MapTransitionOrder();
         orders.MapApprovePaymentProof();
         orders.MapRejectPaymentProof();
+        orders.MapAdminReturns();
 
         var categories = admin.MapGroup("/categories").WithTags("Admin: Catalog");
         categories.MapAdminCategories();

@@ -22,6 +22,7 @@ public static class OrderStatsEndpoint
         CancellationToken ct)
     {
         var counts = await db.Orders
+            .AsNoTracking()
             .GroupBy(o => o.Status)
             .Select(g => new StatusCount(g.Key, g.Count()))
             .ToListAsync(ct);
