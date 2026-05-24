@@ -7,6 +7,7 @@ import { z } from 'zod';
 import type { ProductGender } from '../../../catalog/types';
 import { Field, TextAreaField } from '../../../../shared/components/Field';
 import { SelectField } from '../../../../shared/components/SelectField';
+import { StatusPill } from '../../../../shared/components/StatusPill';
 import {
   useAdminCategoriesQuery,
   useTogglePublishMutation,
@@ -73,18 +74,11 @@ export function ProductMasterForm({
           </div>
         )}
         <div className="flex items-center gap-2">
-          <span
-            className={[
-              'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
-              product.isPublished
-                ? 'border-success/30 bg-success/15 text-success'
-                : 'border-warning/30 bg-warning/15 text-warning',
-            ].join(' ')}
-          >
-            {product.isPublished
-              ? t('admin.products.list.published')
-              : t('admin.products.list.draft')}
-          </span>
+          <StatusPill
+            active={product.isPublished}
+            activeLabel={t('admin.products.list.published')}
+            inactiveLabel={t('admin.products.list.draft')}
+          />
           <Button
             type="button"
             variant={product.isPublished ? 'outline' : 'primary'}

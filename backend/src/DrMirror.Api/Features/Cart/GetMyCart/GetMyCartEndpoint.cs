@@ -28,7 +28,7 @@ public static class GetMyCartEndpoint
             return Results.Unauthorized();
         }
 
-        var cart = await cartService.GetOrCreateCartAsync(userId, ct);
+        var cart = await cartService.GetOrCreateCartAsync(userId, ct, trackExisting: false);
         var dto = await cartService.ToDtoAsync(cart.Id, ct);
         return Results.Ok(dto);
     }

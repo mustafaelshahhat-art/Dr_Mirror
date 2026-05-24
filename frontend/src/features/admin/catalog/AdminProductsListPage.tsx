@@ -20,6 +20,7 @@ import { formatCurrency } from '../../../shared/lib/format';
 import type { AppLang } from '../../../shared/lib/theme-storage';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { EmptyState } from '../../../shared/components/EmptyState';
+import { StatusPill } from '../../../shared/components/StatusPill';
 
 export function AdminProductsListPage() {
   const { t, i18n } = useTranslation();
@@ -165,18 +166,11 @@ export function AdminProductsListPage() {
                           {t('admin.products.list.totalStock', { count: p.totalStock })}
                         </Table.Cell>
                         <Table.Cell className="px-4 py-3">
-                          <span
-                            className={[
-                              'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
-                              p.isPublished
-                                ? 'border-success/30 bg-success/15 text-success'
-                                : 'border-warning/30 bg-warning/15 text-warning',
-                            ].join(' ')}
-                          >
-                            {p.isPublished
-                              ? t('admin.products.list.published')
-                              : t('admin.products.list.draft')}
-                          </span>
+                          <StatusPill
+                            active={p.isPublished}
+                            activeLabel={t('admin.products.list.published')}
+                            inactiveLabel={t('admin.products.list.draft')}
+                          />
                         </Table.Cell>
                         <Table.Cell className="px-4 py-3 text-end tabular-nums font-medium">
                           {formatCurrency(p.price, lang)}

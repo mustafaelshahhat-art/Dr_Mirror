@@ -7,6 +7,7 @@ import { useAdminProductQuery } from './hooks';
 import type { AdminProductDetailDto } from './types';
 
 import { PageHeader } from '../../../shared/components/PageHeader';
+import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 
 import { ProductImagesSection } from './components/ProductImagesSection';
 import { ProductMasterForm } from './components/ProductMasterForm';
@@ -26,9 +27,11 @@ export function AdminProductEditPage() {
   }
   if (query.isError || !query.data) {
     return (
-      <div className="content-surface p-10 text-center text-sm text-default-500">
-        {t('admin.products.edit.errorLoad')}
-      </div>
+      <QueryErrorState
+        message={t('admin.products.edit.errorLoad')}
+        retryLabel={t('admin.query.retry')}
+        onRetry={() => void query.refetch()}
+      />
     );
   }
   return <Inner product={query.data} />;

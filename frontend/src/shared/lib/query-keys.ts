@@ -10,6 +10,7 @@ export const queryKeys = {
     listRoot: () => ['orders', 'mine'] as const,
     list: (page: number, pageSize: number) => ['orders', 'mine', { page, pageSize }] as const,
     detail: (orderNumber: string) => ['orders', 'mine', orderNumber] as const,
+    returns: (orderNumber: string) => ['orders', 'mine', orderNumber, 'returns'] as const,
   },
   paymentMethods: () => ['payment-methods'] as const,
   shipping: {
@@ -22,6 +23,8 @@ export const queryKeys = {
       list: (status: unknown, page: number, pageSize: number) =>
         ['admin', 'orders', 'list', { status, page, pageSize }] as const,
       detail: (orderNumber: string) => ['admin', 'orders', 'detail', orderNumber] as const,
+      returns: (orderNumber: string) => ['admin', 'orders', 'detail', orderNumber, 'returns'] as const,
+      returnsList: (params: unknown) => ['admin', 'orders', 'returns', params] as const,
       stats: () => ['admin', 'orders', 'stats'] as const,
       recent: () => ['admin', 'orders', 'recent'] as const,
     },

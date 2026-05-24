@@ -3,8 +3,18 @@ import type { PagedResult } from '../../shared/types/paged-result';
 import type {
   OrderDetailDto,
   OrderStatus,
+  ReturnRequestDto,
+  ReturnStatus,
   OrderSummaryDto,
 } from '../orders/types';
+
+export interface AdminReturnRequestDto extends ReturnRequestDto {
+  buyerFullName: string;
+  buyerEmail: string | null;
+  reviewedByAdminName: string | null;
+  itemCount: number;
+  totalValue: number;
+}
 
 export interface OrderStatsResponse {
   totalOrders: number;
@@ -68,6 +78,29 @@ export const adminOrdersApi = {
   ): Promise<OrderDetailDto> {
     const { data } = await api.post<OrderDetailDto>(
       `/admin/orders/${encodeURIComponent(orderNumber)}/proof/${proofId}/reject`,
+      body,
+    );
+    return data;
+  },
+};
+
+export const adminReturnsApi = {
+  async listReturns(params?: {
+    status?: ReturnStatus;
+    page?: number;
+    pageSize?: number;
+  }): Promise<PagedResult<AdminReturnRequestDto>> {
+    const { data } = await api.get<PagedResult<AdminReturnRequestDto>>('/admin/orders/returns', { params });
+    return data;
+  },
+
+  async transitionReturn(
+    orderNumber: string,
+    returnId: string,
+    body: { action: 'Approve' | 'Reject' | 'MarkReceived' | 'Complete'; adminNote?: string | null },
+  ): Promise<AdminReturnRequestDto> {
+    const { data } = await api.post<AdminReturnRequestDto>(
+      `/admin/orders/${encodeURIComponent(orderNumber)}/returns/${encodeURIComponent(returnId)}/transitions`,
       body,
     );
     return data;

@@ -1,6 +1,8 @@
 import { Switch, Tooltip } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
+import { StatusPill } from '../../../../../shared/components/StatusPill';
+
 import type { AdminPaymentMethodDto } from '../../types';
 
 const KIND_LABEL_KEY: Record<string, string> = {
@@ -57,18 +59,7 @@ export function PaymentMethodRow({
               {kindKey ? <span className="text-xs text-default-500">{t(kindKey)}</span> : null}
             </>
           )}
-          <span
-            className={[
-              'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
-              method.isActive
-                ? 'border-success/30 bg-success/15 text-success'
-                : 'border-divider/60 bg-content2 text-default-500',
-            ].join(' ')}
-          >
-            {method.isActive
-              ? t('admin.catalog.status.active')
-              : t('admin.catalog.status.inactive')}
-          </span>
+          <StatusPill active={method.isActive} />
         </div>
         {method.accountNumber ? (
           <p className="font-mono text-xs text-default-500">

@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { PageHeader } from '../../../shared/components/PageHeader';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { Skeleton } from '../../../shared/components/Skeleton';
+import { StatusPill } from '../../../shared/components/StatusPill';
 import { formatCurrency } from '../../../shared/lib/format';
 import type { AppLang } from '../../../shared/lib/theme-storage';
 
@@ -146,16 +147,11 @@ function ShippingFeeRow({
         <div className="flex flex-wrap items-center gap-2">
           <Truck className="size-4 shrink-0 text-default-400" aria-hidden />
           <p className="font-semibold text-foreground">{name}</p>
-          <span
-            className={[
-              'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium leading-none',
-              governorate.isActive
-                ? 'border-success/30 bg-success/15 text-success'
-                : 'border-divider/60 bg-content2 text-default-500',
-            ].join(' ')}
-          >
-            {governorate.isActive ? t('shipping.admin.active') : t('shipping.admin.inactive')}
-          </span>
+          <StatusPill
+            active={governorate.isActive}
+            activeLabel={t('shipping.admin.active')}
+            inactiveLabel={t('shipping.admin.inactive')}
+          />
         </div>
         <p className="text-xs text-default-500">{secondaryName}</p>
         <p className="text-xs text-default-500">

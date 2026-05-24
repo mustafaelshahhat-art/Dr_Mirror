@@ -6,6 +6,8 @@ import type {
   CancelOrderRequest,
   CreateOrderRequest,
   OrderDetailDto,
+  ReturnRequestDto,
+  SubmitReturnRequest,
   OrderSummaryDto,
   PaymentMethodDto,
 } from './types';
@@ -84,6 +86,28 @@ export const ordersApi = {
     const { data } = await api.get<Blob>(
       `/orders/${encodeURIComponent(orderNumber)}/proof/${encodeURIComponent(proofId)}/file`,
       { responseType: 'blob', signal },
+    );
+    return data;
+  },
+
+  async listReturns(orderNumber: string): Promise<ReturnRequestDto[]> {
+    const { data } = await api.get<ReturnRequestDto[]>(
+      `/orders/${encodeURIComponent(orderNumber)}/returns`,
+    );
+    return data;
+  },
+
+  async submitReturn(orderNumber: string, body: SubmitReturnRequest): Promise<ReturnRequestDto> {
+    const { data } = await api.post<ReturnRequestDto>(
+      `/orders/${encodeURIComponent(orderNumber)}/returns`,
+      body,
+    );
+    return data;
+  },
+
+  async cancelReturn(orderNumber: string, returnId: string): Promise<ReturnRequestDto> {
+    const { data } = await api.delete<ReturnRequestDto>(
+      `/orders/${encodeURIComponent(orderNumber)}/returns/${encodeURIComponent(returnId)}`,
     );
     return data;
   },

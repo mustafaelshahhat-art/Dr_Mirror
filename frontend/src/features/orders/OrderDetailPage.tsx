@@ -21,9 +21,30 @@ import { OrderTimeline } from './components/OrderTimeline';
 import { PaymentInstructionsCard } from './components/PaymentInstructionsCard';
 import { PaymentProofUpload } from './components/PaymentProofUpload';
 import { PaymentProofsList } from './components/PaymentProofsList';
+import { ReturnRequestCard } from './components/ReturnRequestCard';
+import { SubmitReturnDialog } from './components/SubmitReturnDialog';
 import { paymentMethodGroup } from './lib/paymentMethodGroup';
-import { useMyOrderQuery } from './hooks';
-import { ORDER_STATUSES, PAYMENT_PROOF_STATUS } from './types';
+import { useMyOrderQuery, useOrderReturnsQuery } from './hooks';
+import { ORDER_STATUSES, PAYMENT_PROOF_STATUS, RETURN_STATUSES, type OrderDetailDto, type ReturnRequestDto } from './types';
+
+type ReturnEligibility = 'eligible' | 'notDelivered' | 'missingDeliveryDate' | 'expired' | 'activeReturn';
+
+function getReturnEligibility(order: OrderDetailDto, returns: ReturnRequestDto[]): ReturnEligibility {
+  if (order.status !== ORDER_STATUSES.Delivered) return 'notDelivered';
+  if (!order.deliveredAt) return 'missingDeliveryDate';
+
+  const deadline = new Date(order.deliveredAt);
+  deadline.setDate(deadline.getDate() + 14);
+  if (Number.isNaN(deadline.getTime())) return 'missingDeliveryDate';
+  if (new Date() > deadline) return 'expired';
+
+  const hasActiveReturn = returns.some((request) =>
+    request.status === RETURN_STATUSES.Requested
+    || request.status === RETURN_STATUSES.Approved
+    || request.status === RETURN_STATUSES.Received,
+  );
+  return hasActiveReturn ? 'activeReturn' : 'eligible';
+}
 
 export function OrderDetailPage() {
   const { t, i18n } = useTranslation();
@@ -31,6 +52,7 @@ export function OrderDetailPage() {
   const isAr = lang === 'ar';
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const query = useMyOrderQuery(orderNumber);
+  const returnsQuery = useOrderReturnsQuery(orderNumber);
 
   if (query.isLoading) {
     return (
@@ -90,6 +112,8 @@ export function OrderDetailPage() {
   }
 
   const order = query.data;
+  const returns = returnsQuery.data ?? [];
+  const returnEligibility = getReturnEligibility(order, returns);
   const group = paymentMethodGroup(order.paymentMethodKind);
   const isProofBased = group === 'proof';
   const showInstructions =
@@ -152,6 +176,40 @@ export function OrderDetailPage() {
           {group === 'proof' && order.paymentProofs.length > 0 ? (
             <PaymentProofsList orderNumber={order.orderNumber} proofs={order.paymentProofs} />
           ) : null}
+
+          <section aria-labelledby="returns-heading" className="space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 id="returns-heading" className="text-base font-semibold text-foreground">
+                {t('returns.eligibility.title')}
+              </h2>
+              {returnEligibility === 'eligible' ? (
+                <SubmitReturnDialog orderNumber={order.orderNumber} />
+              ) : null}
+            </div>
+            <Card>
+              <Card.Content className="space-y-3">
+                <p className="text-sm text-default-600">
+                  {t(`returns.eligibility.${returnEligibility}`)}
+                </p>
+                {returnsQuery.isLoading ? (
+                  <p className="text-sm text-default-500">{t('returns.messages.loading')}</p>
+                ) : returns.length > 0 ? (
+                  <div className="space-y-3">
+                    {returns.map((request) => (
+                      <ReturnRequestCard
+                        key={request.id}
+                        orderNumber={order.orderNumber}
+                        request={request}
+                        lang={lang}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-default-500">{t('returns.eligibility.none')}</p>
+                )}
+              </Card.Content>
+            </Card>
+          </section>
 
           <section aria-labelledby="items-heading" className="cq space-y-2">
             <h2 id="items-heading" className="text-base font-semibold text-foreground">

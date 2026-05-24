@@ -7,48 +7,8 @@ import { Card } from '@heroui/react';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { auditStatusLabel } from './auditUtils';
 import type { AuditLogEntryDto } from './types';
-
-const AUDIT_STATUS_KEYS: Record<string, Record<string, string>> = {
-  OrderStatusChanged: {
-    Pending: 'orders.status.pending',
-    Confirmed: 'orders.status.confirmed',
-    PendingPaymentReview: 'orders.status.pendingPaymentReview',
-    Paid: 'orders.status.paid',
-    Preparing: 'orders.status.preparing',
-    Shipped: 'orders.status.shipped',
-    Delivered: 'orders.status.delivered',
-    Cancelled: 'orders.status.cancelled',
-  },
-  PaymentReviewed: {
-    Pending: 'orders.proofs.status.pending',
-    Approved: 'orders.proofs.status.approved',
-    Rejected: 'orders.proofs.status.rejected',
-  },
-  ProductUpdated: {
-    Active: 'admin.catalog.status.active',
-    Enabled: 'admin.catalog.status.active',
-    Inactive: 'admin.catalog.status.inactive',
-    Disabled: 'admin.catalog.status.inactive',
-  },
-};
-
-const FALLBACK_KEYS: Record<string, string> = {
-  New: 'inquiries.admin.status.new',
-  Read: 'inquiries.admin.status.read',
-  Responded: 'inquiries.admin.status.responded',
-};
-
-function auditStatusLabel(
-  t: (key: string) => string,
-  actionType: string,
-  status: string | null,
-): string | null {
-  if (!status) return null;
-  const map = AUDIT_STATUS_KEYS[actionType];
-  const key = map?.[status] ?? FALLBACK_KEYS[status];
-  return key ? t(key) : status;
-}
 
 interface AuditLogMobileCardsProps {
   entries: AuditLogEntryDto[];

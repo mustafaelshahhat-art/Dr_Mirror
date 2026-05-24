@@ -14,6 +14,8 @@ import type {
   OrderDetailDto,
   OrderSummaryDto,
   PaymentMethodDto,
+  ReturnRequestDto,
+  SubmitReturnRequest,
 } from './types';
 
 /**
@@ -101,6 +103,41 @@ export function useUploadPaymentProofMutation(orderNumber: string) {
     onSuccess: (order) => {
       queryClient.setQueryData(queryKeys.orders.detail(orderNumber), order);
       void queryClient.invalidateQueries({ queryKey: queryKeys.orders.listRoot(), exact: false });
+    },
+    onError: errorToast,
+  });
+}
+
+export function useOrderReturnsQuery(orderNumber: string | undefined) {
+  return useQuery<ReturnRequestDto[]>({
+    queryKey: queryKeys.orders.returns(orderNumber ?? ''),
+    queryFn: () => ordersApi.listReturns(orderNumber!),
+    enabled: Boolean(orderNumber),
+    staleTime: 15_000,
+  });
+}
+
+export function useSubmitReturnMutation(orderNumber: string) {
+  const queryClient = useQueryClient();
+  const errorToast = useApiErrorToast();
+  return useMutation<ReturnRequestDto, Error, SubmitReturnRequest>({
+    mutationFn: (input) => ordersApi.submitReturn(orderNumber, input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.orders.returns(orderNumber) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.orders.detail(orderNumber) });
+    },
+    onError: errorToast,
+  });
+}
+
+export function useCancelReturnMutation(orderNumber: string) {
+  const queryClient = useQueryClient();
+  const errorToast = useApiErrorToast();
+  return useMutation<ReturnRequestDto, Error, string>({
+    mutationFn: (returnId) => ordersApi.cancelReturn(orderNumber, returnId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.orders.returns(orderNumber) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.orders.detail(orderNumber) });
     },
     onError: errorToast,
   });
