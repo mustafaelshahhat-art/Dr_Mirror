@@ -66,7 +66,40 @@
     "sizeLabel": "المقاس",
     "floorShort": "الدور",
     "apartmentShort": "شقة",
-    "landmark": "علامة مميزة"
+    "landmark": "علامة مميزة",
+    "printLabel": "طباعة ملصق الشحن"
+  },
+  "shippingLabel": {
+    "storeName": "دكتور ميرور",
+    "orderInfo": "بيانات الطلب",
+    "customerInfo": "العميل",
+    "address": "عنوان الشحن",
+    "items": "المنتجات",
+    "totals": "الإجماليات",
+    "subTotal": "المجموع الفرعي",
+    "shipping": "الشحن",
+    "total": "الإجمالي",
+    "buyerNote": "ملاحظة العميل",
+    "shippingNotes": "ملاحظات الشحن",
+    "signature": "توقيع المستلم",
+    "loading": "جارٍ تحميل ملصق الشحن...",
+    "errorLoad": "تعذّر تحميل بيانات الطلب لملصق الشحن.",
+    "orderNumber": "رقم الطلب",
+    "orderDate": "تاريخ الطلب",
+    "paymentMethod": "طريقة الدفع",
+    "paymentStatus": "حالة الدفع",
+    "phone": "رقم الموبايل",
+    "apartment": "الشقة",
+    "floor": "الدور",
+    "landmark": "علامة مميزة",
+    "notes": "ملاحظات",
+    "itemName": "المنتج",
+    "sku": "الكود",
+    "size": "المقاس",
+    "color": "اللون",
+    "quantity": "الكمية",
+    "unitPrice": "سعر الوحدة",
+    "lineTotal": "الإجمالي"
   },
   "transition": {
     "heading": "تحريك الطلب للمرحلة التالية",
@@ -149,7 +182,7 @@
       },
       "users": {
         "title": "المستخدمون",
-        "subtitle": "أدِر الحسابات المسجلة وصلاحيات الفريق."
+        "subtitle": "راجع حسابات العملاء وأدِر إمكانية الوصول."
       }
     }
   },
@@ -160,7 +193,6 @@
       "subtitle": "تصنيفات لتنظيم المنتجات في الكتالوج.",
       "nameAr": "الاسم بالعربي",
       "nameEn": "الاسم بالإنجليزي",
-      "displayOrder": "الترتيب",
       "productCount_zero": "لا توجد منتجات",
       "productCount_one": "منتج واحد",
       "productCount_two": "منتجان",
@@ -191,8 +223,7 @@
       "nameArRequired": "الاسم بالعربي مطلوب.",
       "nameArTooLong": "الاسم بالعربي يجب ألا يزيد عن 120 حرفًا.",
       "nameEnRequired": "الاسم بالإنجليزي مطلوب.",
-      "nameEnTooLong": "الاسم بالإنجليزي يجب ألا يزيد عن 120 حرفًا.",
-      "displayOrderInteger": "الترتيب يجب أن يكون رقمًا صحيحًا."
+      "nameEnTooLong": "الاسم بالإنجليزي يجب ألا يزيد عن 120 حرفًا."
     }
   },
   "products": {
@@ -202,7 +233,7 @@
       "new": "منتج جديد",
       "loading": "جاري تحميل المنتجات...",
       "errorLoad": "تعذّر تحميل المنتجات. حاول مرة أخرى.",
-      "searchPlaceholder": "ابحث بالاسم أو الماركة أو الكود...",
+      "searchPlaceholder": "ابحث بالاسم أو الكود...",
       "allCategories": "كل الفئات",
       "allGenders": "كل الأجناس",
       "allStatuses": "كل الحالات",
@@ -246,7 +277,6 @@
       "price": "السعر (ج.م)",
       "gender": "للجنس",
       "material": "الخامة / القماش",
-      "brand": "الماركة",
       "sku": "الكود الرئيسي",
       "category": "الفئة",
       "pickCategory": "اختر فئة..."
@@ -309,7 +339,6 @@
       "descriptionEnTooLong": "الوصف بالإنجليزي يجب ألا يزيد عن 2000 حرف.",
       "pricePositive": "السعر يجب أن يكون أكبر من صفر.",
       "materialTooLong": "الخامة يجب ألا تزيد عن 100 حرف.",
-      "brandTooLong": "الماركة يجب ألا تزيد عن 100 حرف.",
       "skuTooLong": "الكود يجب ألا يزيد عن 50 حرفًا.",
       "categoryRequired": "اختر فئة."
     }
@@ -455,23 +484,22 @@
   },
   "users": {
     "title": "المستخدمون",
-    "subtitle": "إدارة الحسابات المسجلة وأدوارها.",
+    "subtitle": "إدارة وصول الحسابات المسجلة.",
     "loading": "جارٍ تحميل المستخدمين...",
     "errorLoad": "تعذّر تحميل المستخدمين. حاول مرة أخرى.",
     "empty": "لا يوجد مستخدمون.",
     "searchPlaceholder": "ابحث بالاسم أو البريد الإلكتروني",
     "colName": "الاسم",
     "colJoined": "تاريخ الانضمام",
-    "colRoles": "الأدوار",
-    "roles": {
-      "toggle": "تبديل دور {{role}} للمستخدم {{name}}",
-      "errorUnknown": "تعذّر تحديث الأدوار. حاول مرة أخرى.",
-      "names": {
-        "Admin": "مسؤول",
-        "Vendor": "مورد",
-        "Buyer": "مشتري"
-      }
-    }
+    "colStatus": "الحالة",
+    "statusActive": "نشط",
+    "statusBlocked": "محظور",
+    "block": "حظر",
+    "unblock": "إلغاء الحظر",
+    "blockLabel": "حظر حساب {{name}}",
+    "unblockLabel": "إلغاء حظر حساب {{name}}",
+    "blockError": "تعذّر حظر هذا الحساب. حاول مرة أخرى.",
+    "unblockError": "تعذّر إلغاء حظر هذا الحساب. حاول مرة أخرى."
   },
   "audit": {
     "title": "سجل تدقيق الإدارة",
@@ -497,7 +525,7 @@
       "OrderStatusChanged": "تغيير حالة الطلب",
       "PaymentReviewed": "مراجعة الدفع",
       "ProductUpdated": "تحديث المنتج",
-      "UserRoleUpdated": "تحديث دور المستخدم"
+      "UserRoleUpdated": "تحديث وصول المستخدم"
     },
     "targetTypes": {
       "Order": "طلب",

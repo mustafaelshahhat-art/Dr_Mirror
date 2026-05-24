@@ -54,7 +54,40 @@
     "sizeLabel": "Size",
     "floorShort": "fl.",
     "apartmentShort": "apt.",
-    "landmark": "Landmark"
+    "landmark": "Landmark",
+    "printLabel": "Print shipping label"
+  },
+  "shippingLabel": {
+    "storeName": "Dr. Mirror",
+    "orderInfo": "Order information",
+    "customerInfo": "Customer",
+    "address": "Shipping address",
+    "items": "Items",
+    "totals": "Totals",
+    "subTotal": "Sub-total",
+    "shipping": "Shipping",
+    "total": "Total",
+    "buyerNote": "Customer note",
+    "shippingNotes": "Shipping notes",
+    "signature": "Receiver signature",
+    "loading": "Loading shipping label...",
+    "errorLoad": "Couldn't load order data for the shipping label.",
+    "orderNumber": "Order number",
+    "orderDate": "Order date",
+    "paymentMethod": "Payment method",
+    "paymentStatus": "Payment status",
+    "phone": "Phone",
+    "apartment": "Apartment",
+    "floor": "Floor",
+    "landmark": "Landmark",
+    "notes": "Notes",
+    "itemName": "Item",
+    "sku": "SKU",
+    "size": "Size",
+    "color": "Color",
+    "quantity": "Qty",
+    "unitPrice": "Unit price",
+    "lineTotal": "Line total"
   },
   "transition": {
     "heading": "Move order forward",
@@ -133,7 +166,7 @@
       },
       "users": {
         "title": "Users",
-        "subtitle": "Review registered buyers and staff. Roles are read-only here."
+        "subtitle": "Review registered buyers and manage account access."
       }
     }
   },
@@ -144,7 +177,6 @@
       "subtitle": "Taxonomy nodes used to organise products in the catalog.",
       "nameAr": "Arabic name",
       "nameEn": "English name",
-      "displayOrder": "Order",
       "productCount_one": "1 product",
       "productCount_other": "{{count}} products",
       "empty": "No categories yet. Create your first one above.",
@@ -171,8 +203,7 @@
       "nameArRequired": "Arabic name is required.",
       "nameArTooLong": "Arabic name must be 120 characters or fewer.",
       "nameEnRequired": "English name is required.",
-      "nameEnTooLong": "English name must be 120 characters or fewer.",
-      "displayOrderInteger": "Order must be a whole number."
+      "nameEnTooLong": "English name must be 120 characters or fewer."
     }
   },
   "products": {
@@ -182,7 +213,7 @@
       "new": "New product",
       "loading": "Loading products...",
       "errorLoad": "Couldn't load products. Please try again.",
-      "searchPlaceholder": "Search by name, brand, or SKU...",
+      "searchPlaceholder": "Search by name or SKU...",
       "allCategories": "All categories",
       "allGenders": "All genders",
       "allStatuses": "All statuses",
@@ -218,7 +249,6 @@
       "price": "Price (EGP)",
       "gender": "Gender",
       "material": "Material / fabric",
-      "brand": "Brand",
       "sku": "Master SKU",
       "category": "Category",
       "pickCategory": "Pick a category..."
@@ -277,7 +307,6 @@
       "descriptionEnTooLong": "English description must be 2000 characters or fewer.",
       "pricePositive": "Price must be greater than zero.",
       "materialTooLong": "Material must be 100 characters or fewer.",
-      "brandTooLong": "Brand must be 100 characters or fewer.",
       "skuTooLong": "SKU must be 50 characters or fewer.",
       "categoryRequired": "Pick a category."
     }
@@ -419,23 +448,22 @@
   },
   "users": {
     "title": "Users",
-    "subtitle": "Manage registered accounts and their roles.",
+    "subtitle": "Manage registered account access.",
     "loading": "Loading users...",
     "errorLoad": "Couldn't load users. Please try again.",
     "empty": "No users found.",
     "searchPlaceholder": "Search by name or email",
     "colName": "Name",
     "colJoined": "Joined",
-    "colRoles": "Roles",
-    "roles": {
-      "toggle": "Toggle {{role}} role for {{name}}",
-      "errorUnknown": "Couldn't update roles. Please try again.",
-      "names": {
-        "Admin": "Admin",
-        "Vendor": "Vendor",
-        "Buyer": "Buyer"
-      }
-    }
+    "colStatus": "Status",
+    "statusActive": "Active",
+    "statusBlocked": "Blocked",
+    "block": "Block",
+    "unblock": "Unblock",
+    "blockLabel": "Block account for {{name}}",
+    "unblockLabel": "Unblock account for {{name}}",
+    "blockError": "Couldn't block this account. Please try again.",
+    "unblockError": "Couldn't unblock this account. Please try again."
   },
   "audit": {
     "title": "Admin audit log",
@@ -461,7 +489,7 @@
       "OrderStatusChanged": "Order status changed",
       "PaymentReviewed": "Payment reviewed",
       "ProductUpdated": "Product updated",
-      "UserRoleUpdated": "User role updated"
+      "UserRoleUpdated": "User access updated"
     },
     "targetTypes": {
       "Order": "Order",

@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next';
 
 interface ProductInfoTabsProps {
   description: string;
-  brand?: string | null;
   material?: string | null;
   /** SKU to show: caller resolves variant vs. style-level SKU. */
   sku?: string | null;
@@ -21,7 +20,6 @@ interface ProductInfoTabsProps {
  */
 export function ProductInfoTabs({
   description,
-  brand,
   material,
   sku,
   availability,
@@ -31,7 +29,6 @@ export function ProductInfoTabs({
   return (
     <div className="space-y-4">
       <dl className="content-surface grid grid-cols-2 gap-3 p-4 text-sm sm:grid-cols-3">
-        {brand ? <SpecField label={t('catalog.detail.brand')} value={brand} /> : null}
         {material ? <SpecField label={t('catalog.detail.material')} value={material} /> : null}
         {sku ? <SpecField label={t('catalog.detail.skuVariant')} value={sku} /> : null}
         <SpecField label={t('catalog.detail.availability')} value={availability} />

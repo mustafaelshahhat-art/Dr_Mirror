@@ -21,7 +21,6 @@ export interface AdminCategoryDto {
 export interface AdminCategoryUpsertRequest {
   nameAr: string;
   nameEn: string;
-  displayOrder: number;
 }
 
 export interface AdminProductImageDto {
@@ -96,7 +95,6 @@ export interface AdminProductCreateRequest {
   price: number;
   gender: ProductGender;
   material: string | null;
-  brand: string | null;
   sku: string | null;
   categoryId: string;
 }

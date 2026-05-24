@@ -31,7 +31,7 @@ public class AdminCatalogValidationTests : IClassFixture<AdminCatalogValidationT
     public async Task Create_category_with_whitespace_name_returns_400()
     {
         var client = MakeAdminClient();
-        var payload = new AdminCategoryUpsertRequest("فئة", "   ", 0);
+        var payload = new AdminCategoryUpsertRequest("فئة", "   ");
         var response = await client.PostAsJsonAsync("/api/admin/categories", payload);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }

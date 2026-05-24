@@ -43,6 +43,7 @@ const AdminPaymentMethodsPage = lazy(() => import('../features/admin/catalog/Adm
 const AdminInquiriesPage = lazy(() => import('../features/admin/AdminInquiriesPage').then((m) => ({ default: m.AdminInquiriesPage })));
 const AdminUsersPage = lazy(() => import('../features/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
 const AdminAuditPage = lazy(() => import('../features/admin/audit/AuditLogPage').then((m) => ({ default: m.AuditLogPage })));
+const AdminShippingLabelPage = lazy(() => import('../features/admin/AdminShippingLabelPage').then((m) => ({ default: m.AdminShippingLabelPage })));
 
 function PageFallback() {
   const { t } = useTranslation();
@@ -89,6 +90,7 @@ export function AppRoutes() {
         </Route>
 
         <Route element={<AdminRoute />}>
+          <Route path="admin/orders/:orderNumber/shipping-label" element={<AdminShippingLabelPage />} />
           <Route element={<AdminLayout />}>
             <Route path="admin" element={<AdminHubPage />} />
             <Route path="admin/orders" element={<AdminOrdersListPage />} />

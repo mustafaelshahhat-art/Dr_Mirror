@@ -34,3 +34,40 @@ export function useUpdateUserRolesMutation() {
     onError: errorToast,
   });
 }
+
+export function useDisableUserMutation() {
+  const queryClient = useQueryClient();
+  const errorToast = useApiErrorToast();
+
+  return useMutation<AdminUserDto, Error, { userId: string }>({
+    mutationFn: ({ userId }) => adminUsersApi.disable(userId),
+    onSuccess: (updated) => updateUserInCachedLists(queryClient, updated),
+    onError: errorToast,
+  });
+}
+
+export function useEnableUserMutation() {
+  const queryClient = useQueryClient();
+  const errorToast = useApiErrorToast();
+
+  return useMutation<AdminUserDto, Error, { userId: string }>({
+    mutationFn: ({ userId }) => adminUsersApi.enable(userId),
+    onSuccess: (updated) => updateUserInCachedLists(queryClient, updated),
+    onError: errorToast,
+  });
+}
+
+function updateUserInCachedLists(
+  queryClient: ReturnType<typeof useQueryClient>,
+  updated: AdminUserDto,
+) {
+  queryClient.setQueriesData<PagedResult<AdminUserDto>>(
+    { queryKey: queryKeys.admin.users.root(), exact: false },
+    (current) => current
+      ? {
+          ...current,
+          items: current.items.map((user) => user.id === updated.id ? updated : user),
+        }
+      : current,
+  );
+}

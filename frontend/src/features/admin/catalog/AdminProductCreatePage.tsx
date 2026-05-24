@@ -27,7 +27,6 @@ export function AdminProductCreatePage() {
   const [price, setPrice] = useState('0');
   const [gender, setGender] = useState<ProductGender>(2);
   const [material, setMaterial] = useState('');
-  const [brand, setBrand] = useState('');
   const [sku, setSku] = useState('');
   const [categoryId, setCategoryId] = useState<string>('');
 
@@ -84,7 +83,6 @@ export function AdminProductCreatePage() {
               price: Number.parseFloat(price) || 0,
               gender,
               material: material.trim() || null,
-              brand: brand.trim() || null,
               sku: sku.trim() || null,
               categoryId,
             });
@@ -118,7 +116,6 @@ export function AdminProductCreatePage() {
             ]}
           />
           <Field label={t('admin.products.fields.material')} value={material} onChange={setMaterial} maxLength={200} />
-          <Field label={t('admin.products.fields.brand')} value={brand} onChange={setBrand} maxLength={80} />
           <Field label={t('admin.products.fields.sku')} value={sku} onChange={setSku} maxLength={64} dir="ltr" />
           <SelectField
             label={t('admin.products.fields.category')}

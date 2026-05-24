@@ -84,11 +84,6 @@ export function ProductCard({ product }: { product: ProductSummaryDto }) {
             {name}
           </h3>
 
-          {/* Brand — slightly more visible than muted */}
-          {product.brand ? (
-            <span className="text-xs font-medium text-default-600 dark:text-default-500">{product.brand}</span>
-          ) : null}
-
           {product.availableColors.length > 0 ? (
             <ColorSwatchRow colors={product.availableColors} />
           ) : null}

@@ -1,4 +1,4 @@
-export const ALL_ROLES = ['Admin', 'Vendor', 'Buyer'] as const;
+export const ALL_ROLES = ['Admin', 'Buyer'] as const;
 export type UserRole = (typeof ALL_ROLES)[number];
 
 export interface AdminUserDto {

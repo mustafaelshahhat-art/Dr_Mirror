@@ -162,8 +162,6 @@ export function AdminCategoriesPage() {
                     </p>
                     <p className="text-xs text-default-500">
                       {t('admin.catalog.categories.productCount', { count: cat.productCount })}
-                      {' · '}
-                      {t('admin.catalog.categories.displayOrder')} {cat.displayOrder}
                     </p>
                   </button>
                   <div className="flex shrink-0 flex-col items-end gap-2">
@@ -222,7 +220,7 @@ export function AdminCategoriesPage() {
 }
 
 interface CategoryFormProps {
-  onSubmit: (body: { nameAr: string; nameEn: string; displayOrder: number }) => Promise<boolean>;
+  onSubmit: (body: { nameAr: string; nameEn: string }) => Promise<boolean>;
   onCancel?: () => void;
   isPending: boolean;
 }
@@ -230,7 +228,6 @@ interface CategoryFormProps {
 const categoryFormSchema = z.object({
   nameAr: z.string().trim().min(1, 'admin.catalog.validation.nameArRequired').max(120, 'admin.catalog.validation.nameArTooLong'),
   nameEn: z.string().trim().min(1, 'admin.catalog.validation.nameEnRequired').max(120, 'admin.catalog.validation.nameEnTooLong'),
-  displayOrder: z.number().int('admin.catalog.validation.displayOrderInteger'),
 });
 
 type CategoryFormValues = z.infer<typeof categoryFormSchema>;
@@ -244,7 +241,7 @@ function CreateCategoryForm({ onSubmit, onCancel, isPending }: CategoryFormProps
     formState: { errors, isSubmitting },
   } = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
-    defaultValues: { nameAr: '', nameEn: '', displayOrder: 0 },
+    defaultValues: { nameAr: '', nameEn: '' },
   });
   const pending = isPending || isSubmitting;
   const error = (message?: string) => (message ? t(message) : null);
@@ -255,13 +252,12 @@ function CreateCategoryForm({ onSubmit, onCancel, isPending }: CategoryFormProps
         const ok = await onSubmit({
           nameAr: values.nameAr.trim(),
           nameEn: values.nameEn.trim(),
-          displayOrder: values.displayOrder,
         });
         if (ok) {
           reset();
         }
       })}
-      className="content-surface flex flex-col gap-3 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto_auto] sm:items-end"
+      className="content-surface flex flex-col gap-3 p-3 sm:grid sm:grid-cols-[1fr_1fr_auto_auto] sm:items-end"
     >
       <TextField isRequired isInvalid={Boolean(errors.nameAr)} className="flex flex-col gap-1">
         <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
@@ -284,17 +280,6 @@ function CreateCategoryForm({ onSubmit, onCancel, isPending }: CategoryFormProps
           className="border border-default-400 dark:border-default-300"
         />
         {errors.nameEn?.message ? <p className="text-xs text-danger">{error(errors.nameEn.message)}</p> : null}
-      </TextField>
-      <TextField isInvalid={Boolean(errors.displayOrder)} className="flex flex-col gap-1">
-        <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
-          {t('admin.catalog.categories.displayOrder')}
-        </Label>
-        <Input
-          type="number"
-          {...register('displayOrder', { valueAsNumber: true })}
-          className="tabular-nums border border-default-400 dark:border-default-300"
-        />
-        {errors.displayOrder?.message ? <p className="text-xs text-danger">{error(errors.displayOrder.message)}</p> : null}
       </TextField>
       <Button type="submit" variant="primary" size="sm" isPending={pending}>
         <span className="inline-flex items-center gap-1.5">
@@ -327,7 +312,6 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
     defaultValues: {
       nameAr: category.nameAr,
       nameEn: category.nameEn,
-      displayOrder: category.displayOrder,
     },
   });
   const pending = isPending || isSubmitting;
@@ -339,10 +323,9 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
         await onSubmit({
           nameAr: values.nameAr.trim(),
           nameEn: values.nameEn.trim(),
-          displayOrder: values.displayOrder,
         });
       })}
-      className="flex flex-col gap-3 rounded-large border border-primary/30 bg-primary/5 p-3 sm:grid sm:grid-cols-[1fr_1fr_100px_auto_auto] sm:items-end"
+      className="flex flex-col gap-3 rounded-large border border-primary/30 bg-primary/5 p-3 sm:grid sm:grid-cols-[1fr_1fr_auto_auto] sm:items-end"
     >
       <TextField isRequired isInvalid={Boolean(errors.nameAr)} className="flex flex-col gap-1">
         <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
@@ -365,17 +348,6 @@ function EditCategoryRow({ category, onSubmit, onCancel, isPending }: EditCatego
           className="border border-default-400 dark:border-default-300"
         />
         {errors.nameEn?.message ? <p className="text-xs text-danger">{error(errors.nameEn.message)}</p> : null}
-      </TextField>
-      <TextField isInvalid={Boolean(errors.displayOrder)} className="flex flex-col gap-1">
-        <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
-          {t('admin.catalog.categories.displayOrder')}
-        </Label>
-        <Input
-          type="number"
-          {...register('displayOrder', { valueAsNumber: true })}
-          className="tabular-nums border border-default-400 dark:border-default-300"
-        />
-        {errors.displayOrder?.message ? <p className="text-xs text-danger">{error(errors.displayOrder.message)}</p> : null}
       </TextField>
       <Button type="submit" variant="primary" size="sm" isPending={pending}>
         {pending ? t('admin.catalog.actions.saving') : t('admin.catalog.actions.save')}

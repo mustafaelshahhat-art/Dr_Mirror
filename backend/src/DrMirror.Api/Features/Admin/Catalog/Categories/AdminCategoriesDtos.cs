@@ -17,8 +17,7 @@ public sealed record AdminCategoryDto(
 /// <summary>Create / update payload.</summary>
 public sealed record AdminCategoryUpsertRequest(
     string NameAr,
-    string NameEn,
-    int DisplayOrder);
+    string NameEn);
 
 public sealed class AdminCategoryUpsertValidator : AbstractValidator<AdminCategoryUpsertRequest>
 {
@@ -32,6 +31,5 @@ public sealed class AdminCategoryUpsertValidator : AbstractValidator<AdminCatego
             // SlugGenerator.Slugify() doesn't return an empty string.
             .Matches("[A-Za-z0-9]")
             .WithMessage("Category English name must contain at least one ASCII letter or digit.");
-        RuleFor(r => r.DisplayOrder).InclusiveBetween(0, 9999);
     }
 }

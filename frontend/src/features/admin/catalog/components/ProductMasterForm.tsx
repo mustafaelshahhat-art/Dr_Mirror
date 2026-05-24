@@ -22,7 +22,6 @@ const productMasterSchema = z.object({
   price: z.number().positive('admin.products.validation.pricePositive'),
   gender: z.union([z.literal(0), z.literal(1), z.literal(2)]),
   material: z.string().trim().max(100, 'admin.products.validation.materialTooLong'),
-  brand: z.string().trim().max(100, 'admin.products.validation.brandTooLong'),
   sku: z.string().trim().max(50, 'admin.products.validation.skuTooLong'),
   categoryId: z.string().uuid('admin.products.validation.categoryRequired'),
 });
@@ -56,7 +55,6 @@ export function ProductMasterForm({
       price: product.price,
       gender: product.gender,
       material: product.material ?? '',
-      brand: product.brand ?? '',
       sku: product.sku ?? '',
       categoryId: product.categoryId,
     },
@@ -123,7 +121,6 @@ export function ProductMasterForm({
                 price: values.price,
                 gender: values.gender as ProductGender,
                 material: values.material.trim() || null,
-                brand: values.brand.trim() || null,
                 sku: values.sku.trim() || null,
                 categoryId: values.categoryId,
               },
@@ -180,9 +177,6 @@ export function ProductMasterForm({
         )} />
         <Controller name="material" control={control} render={({ field }) => (
           <Field {...field} label={t('admin.products.fields.material')} maxLength={100} errorMessage={error(errors.material?.message)} />
-        )} />
-        <Controller name="brand" control={control} render={({ field }) => (
-          <Field {...field} label={t('admin.products.fields.brand')} maxLength={100} errorMessage={error(errors.brand?.message)} />
         )} />
         <Controller name="sku" control={control} render={({ field }) => (
           <Field {...field} label={t('admin.products.fields.sku')} maxLength={50} dir="ltr" errorMessage={error(errors.sku?.message)} />

@@ -31,11 +31,6 @@ const AUDIT_STATUS_KEYS: Record<string, Record<string, string>> = {
     Inactive: 'admin.catalog.status.inactive',
     Disabled: 'admin.catalog.status.inactive',
   },
-  UserRoleUpdated: {
-    Admin: 'admin.users.roles.names.Admin',
-    Buyer: 'admin.users.roles.names.Buyer',
-    Vendor: 'admin.users.roles.names.Vendor',
-  },
 };
 
 const FALLBACK_KEYS: Record<string, string> = {

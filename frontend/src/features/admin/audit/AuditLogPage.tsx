@@ -37,11 +37,6 @@ const CATALOG_STATUS_KEYS: Record<string, string> = {
   Inactive: 'admin.catalog.status.inactive',
   Disabled: 'admin.catalog.status.inactive',
 };
-const USER_ROLE_KEYS: Record<string, string> = {
-  Admin: 'admin.users.roles.names.Admin',
-  Buyer: 'admin.users.roles.names.Buyer',
-  Vendor: 'admin.users.roles.names.Vendor',
-};
 const INQUIRY_STATUS_KEYS: Record<string, string> = {
   New: 'inquiries.admin.status.new',
   Read: 'inquiries.admin.status.read',
@@ -59,11 +54,10 @@ function auditStatusLabel(
     case 'OrderStatusChanged': map = ORDER_STATUS_KEYS; break;
     case 'PaymentReviewed':    map = PROOF_STATUS_KEYS; break;
     case 'ProductUpdated':     map = CATALOG_STATUS_KEYS; break;
-    case 'UserRoleUpdated':    map = USER_ROLE_KEYS; break;
     default:
       map = {
         ...ORDER_STATUS_KEYS, ...PROOF_STATUS_KEYS,
-        ...CATALOG_STATUS_KEYS, ...USER_ROLE_KEYS, ...INQUIRY_STATUS_KEYS,
+        ...CATALOG_STATUS_KEYS, ...INQUIRY_STATUS_KEYS,
       };
   }
   const key = map[status];

@@ -194,12 +194,12 @@ describe.each([
     expect(arrow).toHaveClass('rtl:rotate-180');
   });
 
-  it('renders brand and material fields when present', async () => {
+  it('renders material but hides brand fields when present', async () => {
     await testI18n.changeLanguage(lang);
     renderInState();
     renderWithProviders(<ProductDetailPage />);
 
-    expect(screen.getByText('MediWear')).toBeInTheDocument();
+    expect(screen.queryByText('MediWear')).not.toBeInTheDocument();
     expect(screen.getByText('Cotton')).toBeInTheDocument();
   });
 

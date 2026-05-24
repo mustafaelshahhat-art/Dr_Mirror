@@ -7,6 +7,8 @@
   "continue": "Continue",
   "placeOrder": "Place order",
   "placing": "Placing order...",
+  "confirmOrder": "Confirm order",
+  "confirming": "Confirming...",
   "steps": {
     "address": "Shipping",
     "payment": "Payment",

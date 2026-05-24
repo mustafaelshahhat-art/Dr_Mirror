@@ -89,7 +89,6 @@ function CheckoutBody() {
     trigger,
     setValue,
     watch,
-    formState: { isSubmitting },
   } = useForm<CheckoutForm>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
@@ -187,8 +186,9 @@ function CheckoutBody() {
     else if (step === 'payment') setStep('address');
   }
 
-  async function onFormSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handlePlaceOrder() {
+    if (createOrder.isPending) return;
+
     setFormError(null);
 
     const usingSaved = savedAddressId !== null;
@@ -260,7 +260,7 @@ function CheckoutBody() {
       </div>
 
       <Form
-        onSubmit={onFormSubmit}
+        onSubmit={(e) => e.preventDefault()}
         className="grid gap-6 lg:grid-cols-[1fr_320px]"
       >
         <div className="space-y-4">
@@ -327,7 +327,7 @@ function CheckoutBody() {
             <Button
               type="button"
               variant="ghost"
-              isDisabled={step === 'address' || isSubmitting}
+              isDisabled={step === 'address' || createOrder.isPending}
               onPress={previous}
               className="rounded-xl"
             >
@@ -351,8 +351,15 @@ function CheckoutBody() {
                 </span>
               </Button>
             ) : (
-              <Button type="submit" variant="primary" isPending={isSubmitting} className="rounded-xl">
-                {isSubmitting ? t('checkout.placing') : t('checkout.placeOrder')}
+              <Button
+                type="button"
+                variant="primary"
+                isPending={createOrder.isPending}
+                isDisabled={createOrder.isPending}
+                onPress={() => void handlePlaceOrder()}
+                className="rounded-xl"
+              >
+                {createOrder.isPending ? t('checkout.confirming') : t('checkout.confirmOrder')}
               </Button>
             )}
           </div>

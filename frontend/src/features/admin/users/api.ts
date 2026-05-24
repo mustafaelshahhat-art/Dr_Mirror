@@ -15,4 +15,18 @@ export const adminUsersApi = {
     );
     return data;
   },
+
+  async disable(userId: string): Promise<AdminUserDto> {
+    const { data } = await api.post<AdminUserDto>(
+      `/admin/users/${encodeURIComponent(userId)}/disable`,
+    );
+    return data;
+  },
+
+  async enable(userId: string): Promise<AdminUserDto> {
+    const { data } = await api.post<AdminUserDto>(
+      `/admin/users/${encodeURIComponent(userId)}/enable`,
+    );
+    return data;
+  },
 };

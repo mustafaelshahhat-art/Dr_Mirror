@@ -1,6 +1,6 @@
-import { Card, Chip, Separator, Tabs } from '@heroui/react';
+import { Button, Card, Chip, Separator, Tabs } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
-import { ArrowLeft, ImageOff } from 'lucide-react';
+import { ArrowLeft, ImageOff, Printer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
@@ -142,20 +142,35 @@ export function AdminOrderDetailPage() {
             })}
           </p>
         </div>
-        <OrderStatusBadge status={order.status} />
-        <Chip
-          variant="soft"
-          size="sm"
-          color={
-            order.paymentStatusLabel === 'cod' || order.paymentStatusLabel === 'paid'
-              ? 'success'
-              : order.paymentStatusLabel === 'cancelled'
-                ? 'danger'
-                : 'warning'
-          }
-        >
-          {t(`admin.paymentStatus.${order.paymentStatusLabel}`)}
-        </Chip>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            onPress={() => window.open(
+              `/admin/orders/${encodeURIComponent(order.orderNumber)}/shipping-label`,
+              '_blank',
+            )}
+          >
+            <span className="inline-flex items-center gap-2">
+              <Printer className="size-4" aria-hidden />
+              {t('admin.detail.printLabel')}
+            </span>
+          </Button>
+          <OrderStatusBadge status={order.status} />
+          <Chip
+            variant="soft"
+            size="sm"
+            color={
+              order.paymentStatusLabel === 'cod' || order.paymentStatusLabel === 'paid'
+                ? 'success'
+                : order.paymentStatusLabel === 'cancelled'
+                  ? 'danger'
+                  : 'warning'
+            }
+          >
+            {t(`admin.paymentStatus.${order.paymentStatusLabel}`)}
+          </Chip>
+        </div>
       </header>
 
       <Card>

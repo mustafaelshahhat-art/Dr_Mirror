@@ -16,6 +16,8 @@ vi.mock('./users/api', () => ({
   adminUsersApi: {
     list: vi.fn(),
     updateRoles: vi.fn(),
+    disable: vi.fn(),
+    enable: vi.fn(),
   },
 }));
 
@@ -40,20 +42,22 @@ describe('AdminUsersPage', () => {
   beforeEach(() => {
     vi.mocked(adminUsersApi.list).mockReset();
     vi.mocked(adminUsersApi.updateRoles).mockReset();
+    vi.mocked(adminUsersApi.disable).mockReset();
+    vi.mocked(adminUsersApi.enable).mockReset();
     toastDangerMock.mockClear();
   });
 
-  it('updates user roles from the dashboard', async () => {
+  it('blocks customer accounts from the dashboard', async () => {
     vi.mocked(adminUsersApi.list).mockResolvedValue({
       items: [
         {
           id: 'user-1',
-          fullName: 'Admin User',
-          email: 'admin@example.com',
+          fullName: 'Customer User',
+          email: 'customer@example.com',
           phoneNumber: null,
           isDisabled: false,
           createdAt: '2024-01-01T00:00:00.000Z',
-          roles: ['Admin', 'Buyer'],
+          roles: ['Buyer'],
         },
       ],
       page: 1,
@@ -61,27 +65,27 @@ describe('AdminUsersPage', () => {
       totalCount: 1,
       totalPages: 1,
     });
-    vi.mocked(adminUsersApi.updateRoles).mockResolvedValue({
+    vi.mocked(adminUsersApi.disable).mockResolvedValue({
       id: 'user-1',
-      fullName: 'Admin User',
-      email: 'admin@example.com',
+      fullName: 'Customer User',
+      email: 'customer@example.com',
       phoneNumber: null,
-      isDisabled: false,
+      isDisabled: true,
       createdAt: '2024-01-01T00:00:00.000Z',
-      roles: ['Admin', 'Buyer', 'Vendor'],
+      roles: ['Buyer'],
     });
 
     renderWithProviders(<AdminUsersPage />, { authValue: adminAuth });
 
-    // Admin User appears twice — once in the desktop table, once in the
+    // Customer User appears twice — once in the desktop table, once in the
     // mobile card list — so use findAllByText to wait for data to load.
-    expect((await screen.findAllByText('Admin User')).length).toBeGreaterThan(0);
-    await userEvent.click(screen.getByRole('switch', { name: /toggle vendor role/i }));
+    expect((await screen.findAllByText('Customer User')).length).toBeGreaterThan(0);
+    await userEvent.click(screen.getAllByRole('button', { name: /block account for customer user/i })[0]);
 
-    expect(adminUsersApi.updateRoles).toHaveBeenCalledWith('user-1', ['Admin', 'Vendor', 'Buyer']);
+    expect(adminUsersApi.disable).toHaveBeenCalledWith('user-1');
   });
 
-  it('shows backend role update errors through the shared toast helper', async () => {
+  it('does not show block controls for admin accounts', async () => {
     vi.mocked(adminUsersApi.list).mockResolvedValue({
       items: [
         {
@@ -99,25 +103,15 @@ describe('AdminUsersPage', () => {
       totalCount: 1,
       totalPages: 1,
     });
-    vi.mocked(adminUsersApi.updateRoles).mockRejectedValue({
-      isAxiosError: true,
-      response: {
-        data: {
-          title: 'Cannot remove the last admin',
-          detail: 'At least one admin account must remain active.',
-        },
-      },
-    });
 
     renderWithProviders(<AdminUsersPage />, { authValue: adminAuth });
 
     // Only Admin appears twice — once in the desktop table, once in the
     // mobile card list — so use findAllByText to wait for data to load.
     expect((await screen.findAllByText('Only Admin')).length).toBeGreaterThan(0);
-    await userEvent.click(screen.getByRole('switch', { name: /toggle admin role/i }));
 
-    expect(toastDangerMock).toHaveBeenCalledWith('Something went wrong. Please try again.');
-    expect(screen.queryByText('At least one admin account must remain active.')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /block account for only admin/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /unblock account for only admin/i })).not.toBeInTheDocument();
   });
 
   it('shows a retryable error state when users fail to load', async () => {

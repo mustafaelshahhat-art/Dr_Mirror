@@ -19,7 +19,7 @@ public static class AdminCategoriesEndpoints
     {
         group.MapGet("/", List)
             .WithName("Admin.Categories.List")
-            .WithSummary("Every category, including inactive ones. Sorted by DisplayOrder then NameEn.")
+            .WithSummary("Every category, including inactive ones. Sorted by CreatedAt then NameEn.")
             .RequireAuthorization(p => p.RequireRole(UserRoles.Admin))
             .Produces<IReadOnlyList<AdminCategoryDto>>(StatusCodes.Status200OK);
 
@@ -65,7 +65,7 @@ public static class AdminCategoriesEndpoints
     {
         var rows = await db.Categories
             .AsNoTracking()
-            .OrderBy(c => c.DisplayOrder)
+            .OrderBy(c => c.CreatedAt)
             .ThenBy(c => c.NameEn)
             .Select(c => new AdminCategoryDto(
                 c.Id,
@@ -117,7 +117,6 @@ public static class AdminCategoriesEndpoints
             NameAr = request.NameAr.Trim(),
             NameEn = request.NameEn.Trim(),
             Slug = slug,
-            DisplayOrder = request.DisplayOrder,
             IsActive = true,
         };
 
@@ -147,7 +146,6 @@ public static class AdminCategoriesEndpoints
         // rename the display fields freely without invalidating URLs.
         entity.NameAr = request.NameAr.Trim();
         entity.NameEn = request.NameEn.Trim();
-        entity.DisplayOrder = request.DisplayOrder;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
 
         await audit.WriteAsync("Category.Update", "Category", entity.Id.ToString(), null, null, ct);

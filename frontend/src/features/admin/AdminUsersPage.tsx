@@ -1,4 +1,4 @@
-import { Switch, Table, Tooltip } from '@heroui/react';
+import { Button, Chip, Table } from '@heroui/react';
 import { Users } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,8 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { SearchInput } from '../catalog/components/SearchInput';
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import { TableRowSkeleton, TableSkeletonHeader } from '../../shared/components/TableRowSkeleton';
-import { ALL_ROLES, type AdminUserDto, type UserRole } from './users/types';
-import { useAdminUsersQuery, useUpdateUserRolesMutation } from './users/hooks';
+import type { AdminUserDto } from './users/types';
+import { useAdminUsersQuery, useDisableUserMutation, useEnableUserMutation } from './users/hooks';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { EmptyState } from '../../shared/components/EmptyState';
 import { AdminUsersMobileCards } from './AdminUsersMobileCards';
@@ -70,7 +70,7 @@ export function AdminUsersPage() {
                       {t('admin.users.colJoined')}
                     </Table.Column>
                     <Table.Column className="px-4 py-2 text-start text-xs font-semibold uppercase tracking-wide text-default-500">
-                      {t('admin.users.colRoles')}
+                      {t('admin.users.colStatus')}
                     </Table.Column>
                   </Table.Header>
                   <Table.Body className="divide-y divide-divider/60">
@@ -106,18 +106,17 @@ function UserRow({
   dateFmt: Intl.DateTimeFormat;
 }) {
   const { t } = useTranslation();
-  const updateRoles = useUpdateUserRolesMutation();
+  const disableUser = useDisableUserMutation();
+  const enableUser = useEnableUserMutation();
+  const isStatusPending = disableUser.isPending || enableUser.isPending;
 
-  async function toggleRole(role: UserRole, enabled: boolean) {
-    const nextRoles = enabled
-      ? [...user.roles, role]
-      : user.roles.filter((current) => current !== role);
-
+  async function toggleAccountStatus() {
     try {
-      await updateRoles.mutateAsync({
-        userId: user.id,
-        roles: ALL_ROLES.filter((candidate) => nextRoles.includes(candidate)),
-      });
+      if (user.isDisabled) {
+        await enableUser.mutateAsync({ userId: user.id });
+      } else {
+        await disableUser.mutateAsync({ userId: user.id });
+      }
     } catch {
       // Toast emitted by mutation onError.
     }
@@ -133,35 +132,27 @@ function UserRow({
         {dateFmt.format(new Date(user.createdAt))}
       </Table.Cell>
       <Table.Cell className="px-4 py-3">
-        <div className="space-y-2">
-          <div className="flex flex-wrap gap-2">
-            {ALL_ROLES.map((role) => {
-              const label = t('admin.users.roles.toggle', {
-                role: t(`admin.users.roles.names.${role}`),
-                name: user.fullName,
-              });
-              return (
-                <Tooltip key={role} delay={300} closeDelay={0}>
-                  <Switch
-                    size="sm"
-                    isSelected={user.roles.includes(role)}
-                    isDisabled={updateRoles.isPending}
-                    onChange={(enabled) => void toggleRole(role, enabled)}
-                    className="items-center gap-1.5"
-                    aria-label={label}
-                  >
-                    <Switch.Control>
-                      <Switch.Thumb />
-                    </Switch.Control>
-                    <Switch.Content className="text-xs font-medium">
-                      {t(`admin.users.roles.names.${role}`)}
-                    </Switch.Content>
-                  </Switch>
-                  <Tooltip.Content placement="top">{label}</Tooltip.Content>
-                </Tooltip>
-              );
-            })}
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Chip color={user.isDisabled ? 'danger' : 'success'} size="sm" variant="soft">
+            <Chip.Label>
+              {user.isDisabled ? t('admin.users.statusBlocked') : t('admin.users.statusActive')}
+            </Chip.Label>
+          </Chip>
+          {!user.roles.includes('Admin') ? (
+            <Button
+              type="button"
+              size="sm"
+              variant={user.isDisabled ? 'secondary' : 'danger-soft'}
+              isDisabled={isStatusPending}
+              isPending={isStatusPending}
+              aria-label={user.isDisabled
+                ? t('admin.users.unblockLabel', { name: user.fullName })
+                : t('admin.users.blockLabel', { name: user.fullName })}
+              onPress={() => void toggleAccountStatus()}
+            >
+              {user.isDisabled ? t('admin.users.unblock') : t('admin.users.block')}
+            </Button>
+          ) : null}
         </div>
       </Table.Cell>
     </Table.Row>

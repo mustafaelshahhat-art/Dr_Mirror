@@ -150,7 +150,6 @@ export function ProductDetailPage() {
 
           <ProductInfoTabs
             description={description}
-            brand={product.brand}
             material={product.material}
             sku={
               variantSelection.selectedVariant?.sku ??
