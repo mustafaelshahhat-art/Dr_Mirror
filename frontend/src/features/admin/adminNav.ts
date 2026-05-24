@@ -6,6 +6,7 @@ import {
   MessageSquare,
   Package,
   ScrollText,
+  Truck,
   Users,
   type LucideIcon,
 } from 'lucide-react';
@@ -28,6 +29,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     items: [
       { to: '/admin', icon: LayoutDashboard, labelKey: 'admin.shell.nav.dashboard', end: true },
       { to: '/admin/orders', icon: ClipboardList, labelKey: 'admin.shell.nav.orders' },
+      { to: '/admin/shipping-fees', icon: Truck, labelKey: 'admin.shell.nav.shippingFees' },
       { to: '/admin/inquiries', icon: MessageSquare, labelKey: 'admin.shell.nav.inquiries' },
       { to: '/admin/audit', icon: ScrollText, labelKey: 'admin.shell.nav.audit' },
     ],

@@ -3,10 +3,11 @@ import { Plus } from 'lucide-react';
 import type { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { GovernorateSelect } from '../../addresses/components/GovernorateSelect';
 import type { BuyerAddressDto } from '../../addresses/types';
 import { FormField } from '../../auth/components/FormField';
 import type { CheckoutForm } from '../schemas';
+import { GovernorateSelect } from './GovernorateSelect';
+import type { AppLang } from '../../../shared/lib/theme-storage';
 
 interface Props {
   control: Control<CheckoutForm>;
@@ -19,6 +20,7 @@ interface Props {
   setSaveAsNewAddress: (v: boolean) => void;
   newAddressLabel: string;
   setNewAddressLabel: (v: string) => void;
+  lang?: AppLang;
 }
 
 const NEW_ADDRESS_VALUE = '__new-address__';
@@ -34,6 +36,7 @@ export function AddressStep({
   setSaveAsNewAddress,
   newAddressLabel,
   setNewAddressLabel,
+  lang = 'ar',
 }: Props) {
   const { t } = useTranslation();
 
@@ -140,17 +143,16 @@ export function AddressStep({
           />
           <div className="grid gap-4 sm:grid-cols-2">
             <GovernorateSelect
-              label={t('checkout.address.governorate')}
-              // eslint-disable-next-line i18next/no-literal-string
+              // eslint-disable-next-line i18next/no-literal-string -- react-hook-form field path, not user copy
               value={watch('address.governorate')}
-              onChange={(slug) =>
-                // eslint-disable-next-line i18next/no-literal-string
-                setValue('address.governorate', slug, {
+              lang={lang}
+              onChange={(slug, governorate) => {
+                // eslint-disable-next-line i18next/no-literal-string -- react-hook-form field path, not user copy
+                setValue('address.governorate', governorate?.slug ?? slug, {
                   shouldValidate: true,
                   shouldDirty: true,
-                })
-              }
-              required
+                });
+              }}
             />
             <FormField
               name="address.city"

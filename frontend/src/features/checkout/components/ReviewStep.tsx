@@ -2,6 +2,7 @@ import { MapPin, CreditCard, MessageSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import type { PaymentMethodDto } from '../../orders/types';
+import { formatCurrency } from '../../../shared/lib/format';
 
 export interface ReviewAddress {
   recipientName: string;
@@ -18,10 +19,14 @@ interface Props {
   selectedMethod: PaymentMethodDto | undefined;
   buyerNote: string | undefined;
   isAr: boolean;
+  subTotal?: number;
+  shippingFee?: number;
 }
 
-export function ReviewStep({ reviewAddress, selectedMethod, buyerNote, isAr }: Props) {
+export function ReviewStep({ reviewAddress, selectedMethod, buyerNote, isAr, subTotal = 0, shippingFee = 0 }: Props) {
   const { t } = useTranslation();
+  const lang = isAr ? 'ar' : 'en';
+  const total = subTotal + shippingFee;
 
   return (
     <fieldset className="space-y-4">
@@ -54,6 +59,23 @@ export function ReviewStep({ reviewAddress, selectedMethod, buyerNote, isAr }: P
             reviewAddress?.governorate ?? '',
           )}
         </p>
+      </article>
+      <article className="overflow-hidden rounded-2xl border border-separator/60 bg-surface p-4">
+        <h3 className="font-semibold">{t('checkout.summary.heading')}</h3>
+        <dl className="mt-3 space-y-2 text-sm">
+          <div className="flex justify-between gap-3">
+            <dt className="text-muted-strong">{t('shipping.breakdown.subtotal')}</dt>
+            <dd className="tabular-nums">{formatCurrency(subTotal, lang)}</dd>
+          </div>
+          <div className="flex justify-between gap-3">
+            <dt className="text-muted-strong">{t('shipping.breakdown.shippingFee')}</dt>
+            <dd className="tabular-nums">{formatCurrency(shippingFee, lang)}</dd>
+          </div>
+          <div className="flex justify-between gap-3 border-t border-separator/60 pt-2 font-semibold">
+            <dt>{t('shipping.breakdown.total')}</dt>
+            <dd className="tabular-nums">{formatCurrency(total, lang)}</dd>
+          </div>
+        </dl>
       </article>
       <article className="overflow-hidden rounded-2xl border border-separator/60 bg-surface p-4">
         <h3 className="flex items-center gap-2 font-semibold">

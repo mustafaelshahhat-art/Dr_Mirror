@@ -50,11 +50,23 @@ public class OrderFactoryTests
             };
         }).ToList();
 
+    private static Order BuildOrder(PaymentMethodKind kind, ICollection<CartItem>? items = null, string? buyerNote = null) =>
+        OrderFactory.Build(
+            "DM-001",
+            Guid.NewGuid(),
+            items ?? MakeCartItems(),
+            MakePayment(kind),
+            MakeAddress(),
+            50m,
+            "Cairo",
+            "القاهرة",
+            buyerNote,
+            Fsm);
+
     [Fact]
     public void Cod_order_is_confirmed_after_build()
     {
-        var order = OrderFactory.Build("DM-001", Guid.NewGuid(), MakeCartItems(),
-            MakePayment(PaymentMethodKind.Cod), MakeAddress(), null, Fsm);
+        var order = BuildOrder(PaymentMethodKind.Cod);
 
         Assert.Equal(OrderStatus.Confirmed, order.Status);
         Assert.Equal(PaymentMethodKind.Cod, order.PaymentMethodKind);
@@ -64,8 +76,7 @@ public class OrderFactoryTests
     [Fact]
     public void Non_cod_order_stays_pending_after_build()
     {
-        var order = OrderFactory.Build("DM-001", Guid.NewGuid(), MakeCartItems(),
-            MakePayment(PaymentMethodKind.Instapay), MakeAddress(), null, Fsm);
+        var order = BuildOrder(PaymentMethodKind.Instapay);
 
         Assert.Equal(OrderStatus.Pending, order.Status);
         Assert.Equal(PaymentMethodKind.Instapay, order.PaymentMethodKind);
@@ -76,20 +87,19 @@ public class OrderFactoryTests
     public void Order_total_equals_sum_of_line_totals()
     {
         var items = MakeCartItems(2);
-        var order = OrderFactory.Build("DM-001", Guid.NewGuid(), items,
-            MakePayment(PaymentMethodKind.Cod), MakeAddress(), null, Fsm);
+        var order = BuildOrder(PaymentMethodKind.Cod, items);
 
-        // item 1: price=100, qty=2 → lineTotal=200; item 2: price=200, qty=2 → 400; total=600
-        Assert.Equal(600m, order.Total);
+        // item 1: price=100, qty=2 -> lineTotal=200; item 2: price=200, qty=2 -> 400; shipping=50; total=650
+        Assert.Equal(650m, order.Total);
         Assert.Equal(order.Items.Sum(i => i.LineTotal), order.SubTotal);
+        Assert.Equal(50m, order.ShippingFee);
     }
 
     [Fact]
     public void Order_items_count_matches_cart_items()
     {
         var items = MakeCartItems(3);
-        var order = OrderFactory.Build("DM-001", Guid.NewGuid(), items,
-            MakePayment(PaymentMethodKind.Cod), MakeAddress(), null, Fsm);
+        var order = BuildOrder(PaymentMethodKind.Cod, items);
 
         Assert.Equal(3, order.Items.Count);
     }
@@ -98,8 +108,7 @@ public class OrderFactoryTests
     public void Order_item_snapshots_product_name_and_sku()
     {
         var items = MakeCartItems(1);
-        var order = OrderFactory.Build("DM-001", Guid.NewGuid(), items,
-            MakePayment(PaymentMethodKind.Cod), MakeAddress(), null, Fsm);
+        var order = BuildOrder(PaymentMethodKind.Cod, items);
 
         var item = order.Items.Single();
         Assert.Equal("Product 1", item.NameEn);
@@ -110,8 +119,17 @@ public class OrderFactoryTests
     public void Order_number_and_buyer_id_are_set()
     {
         var buyerId = Guid.NewGuid();
-        var order = OrderFactory.Build("DM-TEST-123", buyerId, MakeCartItems(),
-            MakePayment(PaymentMethodKind.Cod), MakeAddress(), "please hurry", Fsm);
+        var order = OrderFactory.Build(
+            "DM-TEST-123",
+            buyerId,
+            MakeCartItems(),
+            MakePayment(PaymentMethodKind.Cod),
+            MakeAddress(),
+            50m,
+            "Cairo",
+            "القاهرة",
+            "please hurry",
+            Fsm);
 
         Assert.Equal("DM-TEST-123", order.OrderNumber);
         Assert.Equal(buyerId, order.BuyerUserId);
@@ -121,8 +139,7 @@ public class OrderFactoryTests
     [Fact]
     public void Currency_is_always_egp()
     {
-        var order = OrderFactory.Build("DM-001", Guid.NewGuid(), MakeCartItems(),
-            MakePayment(PaymentMethodKind.Cod), MakeAddress(), null, Fsm);
+        var order = BuildOrder(PaymentMethodKind.Cod);
 
         Assert.Equal("EGP", order.Currency);
     }

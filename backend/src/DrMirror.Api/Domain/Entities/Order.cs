@@ -36,8 +36,11 @@ public class Order
     /// </summary>
     public decimal SubTotal { get; set; }
 
-    /// <summary>Flat shipping fee added at checkout. Phase 2a: always 0 (free shipping).</summary>
+    /// <summary>Flat shipping fee snapshotted from the selected governorate at checkout.</summary>
     public decimal ShippingFee { get; set; }
+
+    public string? ShippingGovernorateNameEn { get; set; }
+    public string? ShippingGovernorateNameAr { get; set; }
 
     /// <summary><see cref="SubTotal"/> + <see cref="ShippingFee"/>.</summary>
     public decimal Total { get; set; }

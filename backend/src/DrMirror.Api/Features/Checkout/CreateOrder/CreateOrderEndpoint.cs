@@ -109,6 +109,28 @@ public static class CreateOrderEndpoint
             request.BuyerAddressId, request.ShippingAddress, userId, db, ct);
         if (addressError is not null) return addressError;
 
+        var shippingGovernorateSlug = Governorates.TryResolveSlug(shippingAddress!.Governorate);
+        if (shippingGovernorateSlug is null)
+        {
+            return Results.Problem(
+                title: "Shipping address governorate is invalid",
+                detail: "Update the shipping address with a supported delivery governorate before checking out.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        var governorate = await db.GovernorateShippingFees
+            .AsNoTracking()
+            .FirstOrDefaultAsync(g => g.Slug == shippingGovernorateSlug && g.IsActive, ct);
+        if (governorate is null)
+        {
+            return Results.Problem(
+                title: "Selected governorate is not available for delivery",
+                detail: "Delivery is not currently configured for the governorate in the selected shipping address.",
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        shippingAddress.Governorate = shippingGovernorateSlug;
+
         // ---- Initial availability check (pre-decrement). Saves a transaction
         //      round-trip in the common no-contention case. The same check is
         //      repeated inside the retry loop with fresh data.
@@ -126,7 +148,17 @@ public static class CreateOrderEndpoint
 
         // ---- Build the order entity (no DB writes yet). ------------------------
         var orderNumber = await numberGenerator.NextAsync(ct);
-        var order = OrderFactory.Build(orderNumber, userId, cart.Items, paymentMethod, shippingAddress!, request.BuyerNote, fsm);
+        var order = OrderFactory.Build(
+            orderNumber,
+            userId,
+            cart.Items,
+            paymentMethod,
+            shippingAddress!,
+            governorate.Fee,
+            governorate.NameEn,
+            governorate.NameAr,
+            request.BuyerNote,
+            fsm);
 
         db.Orders.Add(order);
         if (idempotencyKey is { } newKey)

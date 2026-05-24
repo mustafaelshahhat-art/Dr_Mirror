@@ -40,6 +40,7 @@ const AdminProductsListPage = lazy(() => import('../features/admin/catalog/Admin
 const AdminProductCreatePage = lazy(() => import('../features/admin/catalog/AdminProductCreatePage').then((m) => ({ default: m.AdminProductCreatePage })));
 const AdminProductEditPage = lazy(() => import('../features/admin/catalog/AdminProductEditPage').then((m) => ({ default: m.AdminProductEditPage })));
 const AdminPaymentMethodsPage = lazy(() => import('../features/admin/catalog/AdminPaymentMethodsPage').then((m) => ({ default: m.AdminPaymentMethodsPage })));
+const AdminShippingFeesPage = lazy(() => import('../features/admin/shipping/AdminShippingFeesPage').then((m) => ({ default: m.AdminShippingFeesPage })));
 const AdminInquiriesPage = lazy(() => import('../features/admin/AdminInquiriesPage').then((m) => ({ default: m.AdminInquiriesPage })));
 const AdminUsersPage = lazy(() => import('../features/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
 const AdminAuditPage = lazy(() => import('../features/admin/audit/AuditLogPage').then((m) => ({ default: m.AuditLogPage })));
@@ -100,6 +101,7 @@ export function AppRoutes() {
             <Route path="admin/products/new" element={<AdminProductCreatePage />} />
             <Route path="admin/products/:id/edit" element={<AdminProductEditPage />} />
             <Route path="admin/payment-methods" element={<AdminPaymentMethodsPage />} />
+            <Route path="admin/shipping-fees" element={<AdminShippingFeesPage />} />
             <Route path="admin/inquiries" element={<AdminInquiriesPage />} />
             <Route path="admin/users" element={<AdminUsersPage />} />
             <Route path="admin/audit" element={<AdminAuditPage />} />

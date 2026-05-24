@@ -8,6 +8,7 @@ using DrMirror.Api.Features.Admin.Orders.ReviewPaymentProof;
 using DrMirror.Api.Features.Admin.Orders.TransitionOrder;
 using DrMirror.Api.Features.Admin.Inquiries;
 using DrMirror.Api.Features.Admin.Payments;
+using DrMirror.Api.Features.Admin.Shipping;
 using DrMirror.Api.Features.Admin.Users;
 using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Shared.RateLimiting;
@@ -60,6 +61,9 @@ public static class AdminEndpoints
 
         var paymentMethods = admin.MapGroup("/payment-methods").WithTags("Admin: Payments");
         paymentMethods.MapAdminPaymentMethods();
+
+        var shipping = admin.MapGroup("/shipping").WithTags("Admin: Shipping");
+        shipping.MapAdminShipping();
 
         var users = admin.MapGroup("/users").WithTags("Admin: Users");
         users.MapListUsers();

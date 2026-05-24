@@ -17,6 +17,8 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.ShippingFee).HasColumnType("decimal(18,2)");
         builder.Property(o => o.Total).HasColumnType("decimal(18,2)");
         builder.Property(o => o.Currency).HasMaxLength(3).IsRequired();
+        builder.Property(o => o.ShippingGovernorateNameEn).HasMaxLength(100).IsUnicode(false);
+        builder.Property(o => o.ShippingGovernorateNameAr).HasMaxLength(100);
 
         // ---- Order number — friendly + unique. --------------------------------
         builder.Property(o => o.OrderNumber).HasMaxLength(32).IsRequired();

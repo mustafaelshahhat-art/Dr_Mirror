@@ -39,6 +39,7 @@ public class ConcurrentCheckoutTests : IClassFixture<ConcurrentCheckoutTests.Fac
         var buyer2 = new User { Id = user2Id, FullName = "Buyer 2", Email = "buyer2@example.com", UserName = "buyer2@example.com" };
 
         var paymentMethod = new PaymentMethod { Id = Guid.NewGuid(), NameEn = "Instapay", NameAr = "Instapay", Kind = DrMirror.Api.Domain.Orders.PaymentMethodKind.Instapay, IsActive = true };
+        var governorate = new GovernorateShippingFee { Id = Guid.NewGuid(), Slug = "cairo", NameEn = "Cairo", NameAr = "القاهرة", Fee = 0m, IsActive = true };
 
         var category = new Category { Id = Guid.NewGuid(), NameEn = "Cat", NameAr = "Cat", Slug = "cat", IsActive = true };
         var product = new Product { Id = Guid.NewGuid(), CategoryId = category.Id, NameEn = "P1", NameAr = "P1", Slug = "p1", IsPublished = true, Price = 100 };
@@ -49,6 +50,7 @@ public class ConcurrentCheckoutTests : IClassFixture<ConcurrentCheckoutTests.Fac
         db.Products.Add(product);
         db.ProductVariants.Add(variant);
         db.PaymentMethods.Add(paymentMethod);
+        db.GovernorateShippingFees.Add(governorate);
 
         var cart1 = new DrMirror.Api.Domain.Entities.Cart { Id = Guid.NewGuid(), UserId = user1Id, Items = new List<CartItem>() };
         var cart1Item = new CartItem { Id = Guid.NewGuid(), CartId = cart1.Id, ProductVariantId = variant.Id, Quantity = 1 };
@@ -81,6 +83,7 @@ public class ConcurrentCheckoutTests : IClassFixture<ConcurrentCheckoutTests.Fac
         var req = new
         {
             PaymentMethodId = paymentMethod.Id,
+            GovernorateId = governorate.Id,
             ShippingAddress = new
             {
                 RecipientName = "Test",

@@ -68,7 +68,7 @@ export function Layout() {
               <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground/70">
                 {t('common.footer.shop.title')}
               </h2>
-              <ul className="space-y-2" role="list">
+              <ul className="space-y-2">
                 <li>
                   <Link to="/" className="text-sm text-muted transition-colors hover:text-foreground">
                     {t('common.footer.browseCatalog')}
@@ -87,7 +87,7 @@ export function Layout() {
               <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground/70">
                 {t('common.footer.accountNav.title')}
               </h2>
-              <ul className="space-y-2" role="list">
+              <ul className="space-y-2">
                 <li>
                   <Link to="/account/orders" className="text-sm text-muted transition-colors hover:text-foreground">
                     {t('common.account.myOrders.title')}

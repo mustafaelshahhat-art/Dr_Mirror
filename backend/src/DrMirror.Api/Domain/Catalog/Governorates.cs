@@ -53,6 +53,32 @@ public static class Governorates
         !string.IsNullOrWhiteSpace(slug) && SlugSet.Contains(slug);
 
     /// <summary>
+    /// Resolve a persisted or legacy free-text governorate value to the
+    /// canonical slug. Accepts slugs plus English/Arabic display names so older
+    /// saved addresses can still checkout when they match a known governorate.
+    /// </summary>
+    public static string? TryResolveSlug(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return null;
+
+        var trimmed = input.Trim();
+        if (SlugSet.TryGetValue(trimmed, out var canonical)) return canonical;
+
+        var key = NormalizeLookupKey(trimmed);
+        foreach (var entry in All)
+        {
+            if (NormalizeLookupKey(entry.Slug) == key ||
+                NormalizeLookupKey(entry.NameEn) == key ||
+                NormalizeLookupKey(entry.NameAr) == key)
+            {
+                return entry.Slug;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Normalize input to the canonical lowercase slug if recognised, otherwise
     /// return the trimmed input unchanged. Lets us migrate the locked-in
     /// validator without breaking existing free-text rows.
@@ -63,4 +89,11 @@ public static class Governorates
         var trimmed = input.Trim();
         return SlugSet.TryGetValue(trimmed, out var canonical) ? canonical : trimmed;
     }
+
+    private static string NormalizeLookupKey(string value) =>
+        new(value
+            .Trim()
+            .ToLowerInvariant()
+            .Where(c => !char.IsWhiteSpace(c) && c is not '-' and not '_' and not '.')
+            .ToArray());
 }

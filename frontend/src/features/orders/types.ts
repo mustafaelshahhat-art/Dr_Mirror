@@ -136,6 +136,8 @@ export interface OrderDetailDto {
   status: OrderStatus;
   subTotal: number;
   shippingFee: number;
+  shippingGovernorateNameEn?: string | null;
+  shippingGovernorateNameAr?: string | null;
   total: number;
   currency: string;
   shippingAddress: ShippingAddressDto;

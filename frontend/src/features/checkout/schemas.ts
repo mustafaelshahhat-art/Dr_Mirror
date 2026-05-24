@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { GOVERNORATE_SLUGS } from '../addresses/types';
+
 /**
  * Shipping-address validation. Mirrors the backend's
  * <c>ShippingAddressValidator</c> in
@@ -18,8 +20,10 @@ export const shippingAddressSchema = z.object({
     .regex(phoneRegex, 'checkout.errors.phoneInvalid'),
   governorate: z
     .string()
-    .min(2, 'checkout.errors.governorateRequired')
-    .max(100, 'checkout.errors.governorateTooLong'),
+    .refine(
+      (value) => GOVERNORATE_SLUGS.includes(value as (typeof GOVERNORATE_SLUGS)[number]),
+      'checkout.errors.governorateRequired',
+    ),
   city: z
     .string()
     .min(2, 'checkout.errors.cityRequired')

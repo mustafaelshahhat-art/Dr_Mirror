@@ -18,6 +18,9 @@ public static class OrderFactory
         ICollection<CartItem> cartItems,
         PaymentMethod paymentMethod,
         ShippingAddress shippingAddress,
+        decimal shippingFee,
+        string shippingGovernorateNameEn,
+        string shippingGovernorateNameAr,
         string? buyerNote,
         OrderStateMachine fsm)
     {
@@ -28,7 +31,9 @@ public static class OrderFactory
             BuyerUserId = buyerUserId,
             Status = OrderStatus.Pending,
             Currency = "EGP",
-            ShippingFee = 0m,
+            ShippingFee = shippingFee,
+            ShippingGovernorateNameEn = shippingGovernorateNameEn,
+            ShippingGovernorateNameAr = shippingGovernorateNameAr,
             PaymentMethodId = paymentMethod.Id,
             PaymentMethodKind = paymentMethod.Kind,
             PaymentMethodNameEn = paymentMethod.NameEn,

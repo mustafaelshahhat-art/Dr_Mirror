@@ -35,6 +35,7 @@ public class ParallelCheckoutTests : IClassFixture<ParallelCheckoutTests.Factory
         var clients = seeded.BuyerIds.Select(MakeClient).ToArray();
         var request = new
         {
+            governorateId = seeded.GovernorateId,
             paymentMethodId = seeded.PaymentMethodId,
             shippingAddress = new
             {
@@ -66,6 +67,7 @@ public class ParallelCheckoutTests : IClassFixture<ParallelCheckoutTests.Factory
         var clients = seeded.BuyerIds.Select(MakeClient).ToArray();
         var request = new
         {
+            governorateId = seeded.GovernorateId,
             paymentMethodId = seeded.PaymentMethodId,
             shippingAddress = new
             {
@@ -121,7 +123,7 @@ public class ParallelCheckoutTests : IClassFixture<ParallelCheckoutTests.Factory
             options.AddInterceptors(new LastStockConcurrencyInterceptor(this));
         }
 
-        public async Task<(Guid PaymentMethodId, Guid VariantId, Guid[] BuyerIds)> SeedLastStockScenarioAsync(int buyerCount)
+        public async Task<(Guid PaymentMethodId, Guid GovernorateId, Guid VariantId, Guid[] BuyerIds)> SeedLastStockScenarioAsync(int buyerCount)
         {
             await using var scope = Services.CreateAsyncScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -131,6 +133,15 @@ public class ParallelCheckoutTests : IClassFixture<ParallelCheckoutTests.Factory
                 NameEn = "Instapay",
                 NameAr = "Instapay",
                 Kind = PaymentMethodKind.Instapay,
+                IsActive = true,
+            };
+            var governorate = new GovernorateShippingFee
+            {
+                Id = Guid.NewGuid(),
+                Slug = "cairo",
+                NameEn = "Cairo",
+                NameAr = "القاهرة",
+                Fee = 0m,
                 IsActive = true,
             };
             var category = new Category
@@ -165,6 +176,7 @@ public class ParallelCheckoutTests : IClassFixture<ParallelCheckoutTests.Factory
             };
 
             db.PaymentMethods.Add(paymentMethod);
+            db.GovernorateShippingFees.Add(governorate);
             db.Categories.Add(category);
             db.Products.Add(product);
             db.ProductVariants.Add(variant);
@@ -192,7 +204,7 @@ public class ParallelCheckoutTests : IClassFixture<ParallelCheckoutTests.Factory
             }
 
             await db.SaveChangesAsync();
-            return (paymentMethod.Id, variant.Id, buyerIds);
+            return (paymentMethod.Id, governorate.Id, variant.Id, buyerIds);
         }
 
         public int IncrementVariantSaveCount() => Interlocked.Increment(ref _variantSaveCount);

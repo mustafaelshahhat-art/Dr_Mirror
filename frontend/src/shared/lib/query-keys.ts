@@ -12,6 +12,9 @@ export const queryKeys = {
     detail: (orderNumber: string) => ['orders', 'mine', orderNumber] as const,
   },
   paymentMethods: () => ['payment-methods'] as const,
+  shipping: {
+    governorates: () => ['shipping', 'governorates'] as const,
+  },
   appConfig: () => ['app-config'] as const,
   admin: {
     orders: {
@@ -36,6 +39,9 @@ export const queryKeys = {
       products: (params: unknown) => ['admin', 'products', params] as const,
       product: (id: string) => ['admin', 'products', 'detail', id] as const,
       paymentMethods: () => ['admin', 'payment-methods'] as const,
+    },
+    shipping: {
+      governorates: () => ['admin', 'shipping', 'governorates'] as const,
     },
   },
   inquiries: {

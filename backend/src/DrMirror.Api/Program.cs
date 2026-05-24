@@ -13,6 +13,7 @@ using DrMirror.Api.Features.Catalog;
 using DrMirror.Api.Features.Checkout;
 using DrMirror.Api.Features.Inquiries;
 using DrMirror.Api.Features.Orders;
+using DrMirror.Api.Features.Shipping;
 using DrMirror.Api.Infrastructure.Extensions;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Shared.HealthChecks;
@@ -388,6 +389,7 @@ try
     app.MapCatalogEndpoints();
     app.MapCartEndpoints();
     app.MapCheckoutEndpoints();
+    app.MapShippingEndpoints();
     app.MapOrderEndpoints();
     app.MapAddressEndpoints();
     app.MapInquiryEndpoints();

@@ -207,6 +207,7 @@ internal static class ServiceCollectionExtensions
         services.AddScoped<RefreshTokenIssuer>();
         services.AddScoped<RefreshCookieWriter>();
         services.AddScoped<DevCatalogSeeder>();
+        services.AddScoped<GovernorateShippingFeeSeeder>();
         services.AddScoped<DatabaseSeeder>();
         services.AddScoped<CartService>();
         services.AddSingleton<OrderStateMachine>();

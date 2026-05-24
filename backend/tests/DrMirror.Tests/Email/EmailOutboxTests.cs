@@ -43,9 +43,11 @@ public class EmailOutboxTests : IClassFixture<EmailOutboxTests.Factory>
 
         var client = MakeClient(userId);
         var paymentMethodId = await _factory.GetCodPaymentMethodIdAsync();
+        var governorateId = await _factory.GetGovernorateIdAsync();
 
         var response = await client.PostAsJsonAsync("/api/checkout", new
         {
+            GovernorateId = governorateId,
             PaymentMethodId = paymentMethodId,
             ShippingAddress = new
             {
@@ -221,6 +223,27 @@ public class EmailOutboxTests : IClassFixture<EmailOutboxTests.Factory>
             var pm = await db.PaymentMethods
                 .FirstAsync(m => m.Kind == PaymentMethodKind.Cod && m.IsActive);
             return pm.Id;
+        }
+
+        public async Task<Guid> GetGovernorateIdAsync()
+        {
+            await using var scope = Services.CreateAsyncScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var existing = await db.GovernorateShippingFees.FirstOrDefaultAsync();
+            if (existing is not null) return existing.Id;
+
+            var governorate = new GovernorateShippingFee
+            {
+                Id = Guid.NewGuid(),
+                Slug = "cairo",
+                NameEn = "Cairo",
+                NameAr = "القاهرة",
+                Fee = 0m,
+                IsActive = true,
+            };
+            db.GovernorateShippingFees.Add(governorate);
+            await db.SaveChangesAsync();
+            return governorate.Id;
         }
     }
 }

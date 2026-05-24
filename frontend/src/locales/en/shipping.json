@@ -1,0 +1,41 @@
+{
+  "governorate": {
+    "label": "Governorate",
+    "placeholder": "Select delivery governorate",
+    "loading": "Loading governorates...",
+    "empty": "No governorates are currently available for delivery",
+    "inactive": "This governorate is not currently available for delivery"
+  },
+  "fee": {
+    "label": "Shipping fee",
+    "free": "Free shipping",
+    "notRecorded": "Not recorded"
+  },
+  "breakdown": {
+    "subtotal": "Subtotal",
+    "shippingFee": "Shipping fee",
+    "total": "Total"
+  },
+  "validation": {
+    "governorateRequired": "Select a delivery governorate.",
+    "governorateUnavailable": "The selected delivery governorate is not currently available.",
+    "feeRequired": "Enter a shipping fee.",
+    "feeNonNegative": "Shipping fee cannot be negative.",
+    "rowVersionRequired": "Refresh the data before saving."
+  },
+  "admin": {
+    "title": "Governorate shipping fees",
+    "description": "Manage delivery fees and availability for each governorate.",
+    "loading": "Loading shipping fees...",
+    "errorLoad": "Couldn't load governorate shipping fees. Please try again.",
+    "empty": "No governorates are configured yet.",
+    "updatedAt": "Last updated",
+    "updatedAtValue": "Last updated: {{value}}",
+    "active": "Available for delivery",
+    "inactive": "Unavailable",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "saved": "Shipping fee saved.",
+    "conflict": "This governorate was changed by another admin. Refresh the list and try again."
+  }
+}

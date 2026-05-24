@@ -1,0 +1,52 @@
+{
+  "status": {
+    "requested": "Requested",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "received": "Received",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "eligibility": {
+    "title": "Return request",
+    "eligible": "You can request a return for this order within the return window.",
+    "notDelivered": "Returns are available only for delivered orders.",
+    "missingDeliveryDate": "The return window cannot be calculated for this order right now.",
+    "expired": "The return window for this order has expired.",
+    "activeReturn": "An active return request already exists for this order.",
+    "none": "No return request is recorded for this order."
+  },
+  "window": {
+    "label": "Return window",
+    "days": "14 days from delivery",
+    "until": "Available until {{date}}"
+  },
+  "form": {
+    "reasonLabel": "Return reason",
+    "reasonPlaceholder": "Write the reason for your return request",
+    "adminNoteLabel": "Admin note",
+    "adminNotePlaceholder": "Write the rejection reason or processing note"
+  },
+  "actions": {
+    "submit": "Submit return request",
+    "cancel": "Cancel return request",
+    "approve": "Approve",
+    "reject": "Reject",
+    "markReceived": "Mark received",
+    "complete": "Complete return"
+  },
+  "messages": {
+    "submitted": "Return request submitted successfully.",
+    "cancelled": "Return request cancelled.",
+    "conflict": "This return request was updated by another operation. Refresh and try again.",
+    "loading": "Loading return details..."
+  },
+  "errors": {
+    "reasonRequired": "Enter a return reason.",
+    "reasonTooLong": "Return reason must be 1000 characters or fewer.",
+    "adminNoteRequired": "Enter an admin note.",
+    "adminNoteTooLong": "Admin note must be 1000 characters or fewer.",
+    "submitFailed": "Could not submit the return request. Try again.",
+    "cancelFailed": "Could not cancel the return request. Try again."
+  }
+}

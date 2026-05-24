@@ -85,6 +85,7 @@ public class AddressSaveOutcomeTests : IClassFixture<AddressSaveOutcomeTests.Fac
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var body = new
         {
+            governorateId = _factory.GovernorateId,
             paymentMethodId,
             shippingAddress = new
             {
@@ -110,11 +111,24 @@ public class AddressSaveOutcomeTests : IClassFixture<AddressSaveOutcomeTests.Fac
     public class Factory : IntegrationWebAppFactory
     {
         public override string DbName { get; } = "AddressSaveOutcomeTests_" + Guid.NewGuid();
+        public Guid GovernorateId { get; } = Guid.NewGuid();
 
         public async Task<Guid> SeedCheckoutCartAsync(Guid buyerId)
         {
             await using var scope = Services.CreateAsyncScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            if (!db.GovernorateShippingFees.Any())
+            {
+                db.GovernorateShippingFees.Add(new GovernorateShippingFee
+                {
+                    Id = GovernorateId,
+                    Slug = "cairo",
+                    NameEn = "Cairo",
+                    NameAr = "القاهرة",
+                    Fee = 0m,
+                    IsActive = true,
+                });
+            }
             var paymentMethod = new PaymentMethod
             {
                 Id = Guid.NewGuid(),

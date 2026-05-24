@@ -123,6 +123,8 @@ internal static class OrderMappers
         Status: order.Status,
         SubTotal: order.SubTotal,
         ShippingFee: order.ShippingFee,
+        ShippingGovernorateNameEn: order.ShippingGovernorateNameEn,
+        ShippingGovernorateNameAr: order.ShippingGovernorateNameAr,
         Total: order.Total,
         Currency: order.Currency,
         ShippingAddress: order.ShippingAddress.ToDto(),

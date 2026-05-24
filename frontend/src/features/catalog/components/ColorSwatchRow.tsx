@@ -45,13 +45,11 @@ export function ColorSwatchRow({
         const colorName = isAr ? c.nameAr : c.name;
         return (
           <Tooltip key={c.name}>
-            {/* tabIndex={0} + role="img" makes each swatch keyboard-reachable
-                and correctly announced by screen readers as an image with a name. */}
+            {/* role="img" gives each decorative swatch an accessible colour name. */}
             <span
               role="img"
               aria-label={colorName}
-              tabIndex={0}
-              className={`${dotSize} inline-block shrink-0 cursor-default rounded-full border border-divider/60 ring-1 ring-inset ring-black/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary`}
+              className={`${dotSize} inline-block shrink-0 cursor-default rounded-full border border-divider/60 ring-1 ring-inset ring-black/5`}
               style={{ backgroundColor: c.hex }}
             />
             <Tooltip.Content placement="top">{colorName}</Tooltip.Content>

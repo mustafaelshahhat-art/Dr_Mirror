@@ -29,7 +29,7 @@ public class IdempotencyKeyTests : IClassFixture<IdempotencyKeyTests.Factory>
         var paymentMethodId = await _factory.SeedCheckoutCartAsync(buyer.Id, stock: 3, unitPrice: 100m);
         var key = Guid.NewGuid();
         var client = await AuthenticatedClientAsync(buyer.Id, key);
-        var request = CheckoutRequest(paymentMethodId);
+        var request = CheckoutRequest(paymentMethodId, _factory.GovernorateId);
 
         var first = await client.PostAsJsonAsync("/api/checkout", request);
         var second = await client.PostAsJsonAsync("/api/checkout", request);
@@ -56,8 +56,8 @@ public class IdempotencyKeyTests : IClassFixture<IdempotencyKeyTests.Factory>
 
         var firstClient = await AuthenticatedClientAsync(buyerA.Id, key);
         var secondClient = await AuthenticatedClientAsync(buyerB.Id, key);
-        var first = await firstClient.PostAsJsonAsync("/api/checkout", CheckoutRequest(paymentMethodId));
-        var second = await secondClient.PostAsJsonAsync("/api/checkout", CheckoutRequest(paymentMethodId));
+        var first = await firstClient.PostAsJsonAsync("/api/checkout", CheckoutRequest(paymentMethodId, _factory.GovernorateId));
+        var second = await secondClient.PostAsJsonAsync("/api/checkout", CheckoutRequest(paymentMethodId, _factory.GovernorateId));
 
         Assert.Equal(HttpStatusCode.Created, first.StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, second.StatusCode);
@@ -72,8 +72,9 @@ public class IdempotencyKeyTests : IClassFixture<IdempotencyKeyTests.Factory>
         return client;
     }
 
-    private static object CheckoutRequest(Guid paymentMethodId) => new
+    private static object CheckoutRequest(Guid paymentMethodId, Guid governorateId) => new
     {
+        governorateId,
         paymentMethodId,
         shippingAddress = new
         {
@@ -94,10 +95,24 @@ public class IdempotencyKeyTests : IClassFixture<IdempotencyKeyTests.Factory>
 
     public class Factory : IntegrationWebAppFactory
     {
+        public Guid GovernorateId { get; } = Guid.NewGuid();
+
         public async Task<Guid> SeedCheckoutCartAsync(Guid buyerId, int stock, decimal unitPrice)
         {
             await using var scope = Services.CreateAsyncScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            if (!db.GovernorateShippingFees.Any())
+            {
+                db.GovernorateShippingFees.Add(new GovernorateShippingFee
+                {
+                    Id = GovernorateId,
+                    Slug = "cairo",
+                    NameEn = "Cairo",
+                    NameAr = "القاهرة",
+                    Fee = 0m,
+                    IsActive = true,
+                });
+            }
             var paymentMethod = new PaymentMethod
             {
                 Id = Guid.NewGuid(),

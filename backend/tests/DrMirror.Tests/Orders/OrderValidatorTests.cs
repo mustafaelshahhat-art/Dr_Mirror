@@ -25,7 +25,7 @@ public class OrderValidatorTests
     public void CreateOrder_accepts_minimal_valid_request()
     {
         var validator = new CreateOrderValidator();
-        var request = new CreateOrderRequest(Guid.NewGuid(), ValidAddress(), BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
+        var request = new CreateOrderRequest(Guid.NewGuid(), Guid.NewGuid(), ValidAddress(), BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
 
         var result = validator.Validate(request);
 
@@ -36,7 +36,7 @@ public class OrderValidatorTests
     public void CreateOrder_rejects_empty_payment_method()
     {
         var validator = new CreateOrderValidator();
-        var request = new CreateOrderRequest(Guid.Empty, ValidAddress(), BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
+        var request = new CreateOrderRequest(Guid.NewGuid(), Guid.Empty, ValidAddress(), BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
 
         var result = validator.Validate(request);
 
@@ -49,6 +49,7 @@ public class OrderValidatorTests
     {
         var validator = new CreateOrderValidator();
         var request = new CreateOrderRequest(
+            Guid.NewGuid(),
             Guid.NewGuid(),
             ValidAddress(),
             BuyerAddressId: null,
@@ -68,6 +69,7 @@ public class OrderValidatorTests
     {
         var validator = new CreateOrderValidator();
         var request = new CreateOrderRequest(
+            Guid.NewGuid(),
             Guid.NewGuid(),
             ValidAddress(),
             BuyerAddressId: null,
@@ -89,6 +91,7 @@ public class OrderValidatorTests
         // BuyerAddressId is set, ShippingAddress is null, but SaveAsNewAddress is true.
         var request = new CreateOrderRequest(
             Guid.NewGuid(),
+            Guid.NewGuid(),
             ShippingAddress: null,
             BuyerAddressId: Guid.NewGuid(),
             SaveAsNewAddress: true,
@@ -109,7 +112,7 @@ public class OrderValidatorTests
     {
         var validator = new CreateOrderValidator();
         var address = ValidAddress() with { RecipientName = "" };
-        var request = new CreateOrderRequest(Guid.NewGuid(), address, BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
+        var request = new CreateOrderRequest(Guid.NewGuid(), Guid.NewGuid(), address, BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
 
         var result = validator.Validate(request);
 
@@ -124,7 +127,7 @@ public class OrderValidatorTests
     {
         var validator = new CreateOrderValidator();
         var address = ValidAddress() with { Phone = phone };
-        var request = new CreateOrderRequest(Guid.NewGuid(), address, BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
+        var request = new CreateOrderRequest(Guid.NewGuid(), Guid.NewGuid(), address, BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
 
         var result = validator.Validate(request);
 
@@ -139,7 +142,7 @@ public class OrderValidatorTests
     {
         var validator = new CreateOrderValidator();
         var address = ValidAddress() with { Phone = phone };
-        var request = new CreateOrderRequest(Guid.NewGuid(), address, BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
+        var request = new CreateOrderRequest(Guid.NewGuid(), Guid.NewGuid(), address, BuyerAddressId: null, SaveAsNewAddress: false, Label: null, BuyerNote: null);
 
         var result = validator.Validate(request);
 

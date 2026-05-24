@@ -8,6 +8,7 @@ import {
   Inbox,
   Package,
   ScrollText,
+  Truck,
   Users,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -181,6 +182,7 @@ export function AdminHubPage() {
               <Heading level={2} className="text-sm font-semibold uppercase tracking-wide text-muted">{t('admin.hub.quickLinks')}</Heading>
               <div className="flex flex-col gap-1.5">
                 <QuickLink to="/admin/orders" icon={ClipboardList} label={t('admin.shell.nav.orders')} />
+                <QuickLink to="/admin/shipping-fees" icon={Truck} label={t('admin.shell.nav.shippingFees')} />
                 <QuickLink to="/admin/products" icon={Package} label={t('admin.shell.nav.products')} />
                 <QuickLink to="/admin/users" icon={Users} label={t('admin.shell.nav.users')} />
                 <QuickLink to="/admin/audit" icon={ScrollText} label={t('admin.shell.nav.audit')} />

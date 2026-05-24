@@ -20,6 +20,8 @@ import { CheckoutSummary } from './components/CheckoutSummary';
 import { PaymentMethodSection } from './components/PaymentMethodSection';
 import { ReviewStep } from './components/ReviewStep';
 import { checkoutSchema, type CheckoutForm } from './schemas';
+import { useGovernoratesQuery } from './hooks';
+import type { GovernorateDto } from './types';
 
 import { FormField } from '../auth/components/FormField';
 import { PageHeader } from '../../shared/components/PageHeader';
@@ -54,6 +56,7 @@ function CheckoutBody() {
   const { user } = useAuth();
   const { cart } = useCart();
   const paymentMethodsQuery = usePaymentMethodsQuery();
+  const governoratesQuery = useGovernoratesQuery();
   const createOrder = useCreateOrderMutation();
   const navigate = useNavigate();
 
@@ -156,16 +159,31 @@ function CheckoutBody() {
     : null;
   const reviewAddress = selectedSavedAddress ?? address;
   const selectedMethod = paymentMethodsQuery.data?.find((m) => m.id === paymentMethodId);
+  const addressGovernorate = selectedSavedAddress?.governorate ?? address.governorate;
+  const selectedGovernorate = findGovernorateForAddress(governoratesQuery.data ?? [], addressGovernorate);
+  const shippingFee = selectedGovernorate?.fee ?? 0;
+  const shippingGovernorateUnavailable = Boolean(addressGovernorate) && governoratesQuery.isSuccess && !selectedGovernorate;
+
+  function hasAvailableShippingGovernorate() {
+    if (selectedGovernorate) {
+      setFormError(null);
+      return true;
+    }
+    setFormError(t('shipping.validation.governorateUnavailable'));
+    return false;
+  }
 
   async function next() {
     if (step === 'address') {
       // If the buyer picked a saved address, skip inline form validation.
       if (savedAddressId !== null) {
+        if (!hasAvailableShippingGovernorate()) return;
         setStep('payment');
         return;
       }
       const ok = await trigger('address');
       if (!ok) return;
+      if (!hasAvailableShippingGovernorate()) return;
       // If they want to save the inline address, we additionally need a label.
       if (saveAsNewAddress && newAddressLabel.trim().length === 0) {
         setFormError(t('checkout.errors.labelRequired'));
@@ -205,6 +223,8 @@ function CheckoutBody() {
         return;
       }
     }
+
+    if (!hasAvailableShippingGovernorate()) return;
 
     const paymentOk = await trigger('paymentMethodId');
     if (!paymentOk) {
@@ -265,9 +285,19 @@ function CheckoutBody() {
       >
         <div className="space-y-4">
           {formError ? (
+            // eslint-disable-next-line i18next/no-literal-string -- component status token, not user copy
             <Alert status="danger" role="alert" className="rounded-xl">
               <Alert.Content>
                 <Alert.Description>{formError}</Alert.Description>
+              </Alert.Content>
+            </Alert>
+          ) : null}
+
+          {shippingGovernorateUnavailable ? (
+            // eslint-disable-next-line i18next/no-literal-string -- component status token, not user copy
+            <Alert status="warning" role="alert" className="rounded-xl">
+              <Alert.Content>
+                <Alert.Description>{t('shipping.validation.governorateUnavailable')}</Alert.Description>
               </Alert.Content>
             </Alert>
           ) : null}
@@ -285,6 +315,7 @@ function CheckoutBody() {
                 setSaveAsNewAddress={setSaveAsNewAddress}
                 newAddressLabel={newAddressLabel}
                 setNewAddressLabel={setNewAddressLabel}
+                lang={lang}
               />
             ) : null}
 
@@ -319,6 +350,8 @@ function CheckoutBody() {
                 selectedMethod={selectedMethod}
                 buyerNote={buyerNote}
                 isAr={isAr}
+                subTotal={cart.subTotal}
+                shippingFee={shippingFee}
               />
             ) : null}
           </div>
@@ -365,8 +398,20 @@ function CheckoutBody() {
           </div>
         </div>
 
-        <CheckoutSummary items={cart.items} subTotal={cart.subTotal} lang={lang} />
+        <CheckoutSummary items={cart.items} subTotal={cart.subTotal} shippingFee={shippingFee} lang={lang} />
       </Form>
     </section>
   );
+}
+
+function findGovernorateForAddress(governorates: GovernorateDto[], value?: string | null) {
+  if (!value) return null;
+  const key = normalizeGovernorateLookup(value);
+  return governorates.find((g) =>
+    [g.slug, g.nameEn, g.nameAr].some((candidate) => normalizeGovernorateLookup(candidate) === key),
+  ) ?? null;
+}
+
+function normalizeGovernorateLookup(value: string) {
+  return value.trim().toLocaleLowerCase('en').replace(/[\s_.-]/g, '');
 }

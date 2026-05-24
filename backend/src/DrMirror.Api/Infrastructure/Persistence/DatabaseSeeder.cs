@@ -27,6 +27,7 @@ public sealed class DatabaseSeeder
     private readonly IHostEnvironment _env;
     private readonly ILogger<DatabaseSeeder> _logger;
     private readonly DevCatalogSeeder _catalogSeeder;
+    private readonly GovernorateShippingFeeSeeder _governorateShippingFeeSeeder;
 
     public DatabaseSeeder(
         AppDbContext db,
@@ -35,7 +36,8 @@ public sealed class DatabaseSeeder
         IConfiguration config,
         IHostEnvironment env,
         ILogger<DatabaseSeeder> logger,
-        DevCatalogSeeder catalogSeeder)
+        DevCatalogSeeder catalogSeeder,
+        GovernorateShippingFeeSeeder governorateShippingFeeSeeder)
     {
         _db = db;
         _userManager = userManager;
@@ -44,6 +46,7 @@ public sealed class DatabaseSeeder
         _env = env;
         _logger = logger;
         _catalogSeeder = catalogSeeder;
+        _governorateShippingFeeSeeder = governorateShippingFeeSeeder;
     }
 
     public async Task SeedAsync(CancellationToken ct = default)
@@ -65,6 +68,7 @@ public sealed class DatabaseSeeder
         await EnsureRolesAsync();
         await EnsureAdminAsync();
         await EnsurePaymentMethodsAsync(ct);
+        await _governorateShippingFeeSeeder.SeedAsync(ct);
         await EnsureCatalogAsync(ct);
         await MigratePicsumImageUrlsAsync(ct);
     }

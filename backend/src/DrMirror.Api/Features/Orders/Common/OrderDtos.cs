@@ -47,6 +47,8 @@ public sealed record OrderDetailDto(
     OrderStatus Status,
     decimal SubTotal,
     decimal ShippingFee,
+    string? ShippingGovernorateNameEn,
+    string? ShippingGovernorateNameAr,
     decimal Total,
     string Currency,
     ShippingAddressDto ShippingAddress,
@@ -125,6 +127,7 @@ public sealed record PaymentMethodDto(
 // -----------------------------------------------------------------------------
 
 public sealed record CreateOrderRequest(
+    Guid? GovernorateId,
     Guid PaymentMethodId,
     ShippingAddressDto? ShippingAddress,
     /// <summary>
