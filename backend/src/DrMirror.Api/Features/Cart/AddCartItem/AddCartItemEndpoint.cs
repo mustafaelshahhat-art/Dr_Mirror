@@ -2,6 +2,7 @@ using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Features.Cart.Common;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.RateLimiting;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ public static class AddCartItemEndpoint
             .WithName("Cart.AddCartItem")
             .WithSummary("Add a variant to the cart, or increment its quantity if it already exists there.")
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.CartMutation)
             .WithValidation<AddCartItemRequest>()
             .Produces<CartDto>(StatusCodes.Status200OK)
             .ProducesValidationProblem()

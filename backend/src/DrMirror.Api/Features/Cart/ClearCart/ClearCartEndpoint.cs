@@ -1,6 +1,7 @@
 using DrMirror.Api.Features.Cart.Common;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,7 @@ public static class ClearCartEndpoint
             .WithName("Cart.ClearCart")
             .WithSummary("Remove every line from the cart, leaving the empty cart in place.")
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.CartMutation)
             .Produces<CartDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 

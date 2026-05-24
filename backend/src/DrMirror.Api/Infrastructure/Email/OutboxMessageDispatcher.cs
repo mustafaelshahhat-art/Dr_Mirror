@@ -30,6 +30,10 @@ internal static class OutboxMessageDispatcher
             SendStatusChangedAsync(
                 JsonSerializer.Deserialize<EmailOutboxHelper.StatusChangedPayload>(msg.Payload)!,
                 db, email, ct),
+        "ReturnStatusChanged" =>
+            SendReturnStatusChangedAsync(
+                JsonSerializer.Deserialize<EmailOutboxHelper.ReturnStatusChangedPayload>(msg.Payload)!,
+                db, email, ct),
         "InquiryReceived" =>
             SendInquiryReceivedAsync(Guid.Parse(msg.Payload), db, email, emailOptions, ct),
         _ => throw new InvalidOperationException($"Unknown outbox event type: {msg.EventType}"),
@@ -76,6 +80,21 @@ internal static class OutboxMessageDispatcher
             return;
 
         await email.SendAsync(OrderEmailMessages.StatusChanged(order, p.Status));
+    }
+
+    private static async Task SendReturnStatusChangedAsync(
+        EmailOutboxHelper.ReturnStatusChangedPayload p, AppDbContext db, IEmailSender email, CancellationToken ct)
+    {
+        var returnRequest = await db.ReturnRequests
+            .AsNoTracking()
+            .Include(r => r.BuyerUser)
+            .Include(r => r.Order)
+            .FirstOrDefaultAsync(r => r.Id == p.ReturnRequestId, ct);
+
+        if (returnRequest is null || returnRequest.BuyerUser is null || string.IsNullOrWhiteSpace(returnRequest.BuyerUser.Email))
+            return;
+
+        await email.SendAsync(OrderEmailMessages.ReturnStatusChanged(returnRequest, p.Status));
     }
 
     private static async Task SendInquiryReceivedAsync(

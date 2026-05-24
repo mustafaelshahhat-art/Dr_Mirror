@@ -2,6 +2,7 @@ using DrMirror.Api.Domain.Catalog;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.RateLimiting;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,17 +21,20 @@ public static class AddressEndpoints
         group.MapGet("/", List)
             .WithName("Addresses.List")
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.AddressBook)
             .Produces<IReadOnlyList<BuyerAddressDto>>(StatusCodes.Status200OK);
 
         group.MapGet("/{id:guid}", Get)
             .WithName("Addresses.Get")
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.AddressBook)
             .Produces<BuyerAddressDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status404NotFound);
 
         group.MapPost("/", Create)
             .WithName("Addresses.Create")
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.AddressBook)
             .WithValidation<BuyerAddressUpsertRequest>()
             .Produces<BuyerAddressDto>(StatusCodes.Status201Created)
             .ProducesValidationProblem()
@@ -39,6 +43,7 @@ public static class AddressEndpoints
         group.MapPut("/{id:guid}", Update)
             .WithName("Addresses.Update")
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.AddressBook)
             .WithValidation<BuyerAddressUpsertRequest>()
             .Produces<BuyerAddressDto>(StatusCodes.Status200OK)
             .ProducesValidationProblem()
@@ -47,12 +52,14 @@ public static class AddressEndpoints
         group.MapDelete("/{id:guid}", Delete)
             .WithName("Addresses.Delete")
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.AddressBook)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound);
 
         group.MapPost("/{id:guid}/set-default", SetDefault)
             .WithName("Addresses.SetDefault")
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.AddressBook)
             .Produces<BuyerAddressDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status404NotFound);
 

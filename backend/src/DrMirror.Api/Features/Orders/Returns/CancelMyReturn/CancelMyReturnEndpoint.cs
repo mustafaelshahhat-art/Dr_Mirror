@@ -17,7 +17,6 @@ public static class CancelMyReturnEndpoint
             .RequireAuthorization()
             .Produces<ReturnRequestDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict);
 
@@ -39,16 +38,15 @@ public static class CancelMyReturnEndpoint
         var returnRequest = await db.ReturnRequests
             .Include(r => r.Order)
             .Include(r => r.Items)
-            .FirstOrDefaultAsync(r => r.Id == returnId && r.Order!.OrderNumber == orderNumber, ct);
+            .FirstOrDefaultAsync(r =>
+                r.Id == returnId &&
+                r.BuyerUserId == userId &&
+                r.Order!.OrderNumber == orderNumber,
+                ct);
 
         if (returnRequest is null)
         {
             return Results.Problem(title: "Return not found", statusCode: StatusCodes.Status404NotFound);
-        }
-
-        if (returnRequest.BuyerUserId != userId)
-        {
-            return Results.Forbid();
         }
 
         if (!ReturnStateMachine.CanBuyerCancel(returnRequest.Status))

@@ -20,6 +20,7 @@ public static class SubmitReturnEndpoint
             .WithValidation<SubmitReturnRequest>()
             .Produces<ReturnRequestDto>(StatusCodes.Status201Created)
             .ProducesValidationProblem()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict);
@@ -53,7 +54,7 @@ public static class SubmitReturnEndpoint
             return Results.Problem(
                 title: "Order is not eligible for return",
                 detail: "Only delivered orders can be returned.",
-                statusCode: StatusCodes.Status409Conflict);
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         var hasActiveReturn = await db.ReturnRequests.AnyAsync(r =>

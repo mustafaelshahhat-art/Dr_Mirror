@@ -31,7 +31,12 @@ public static class ListOrdersEndpoint
         var p = Math.Max(1, page ?? 1);
         var ps = Math.Clamp(pageSize ?? 25, 1, 100);
 
-        var query = db.Orders.AsNoTracking().Include(o => o.Items).AsQueryable();
+        var query = db.Orders
+            .AsNoTracking()
+            .Include(o => o.Items)
+            .Include(o => o.BuyerUser)
+            .Include(o => o.PaymentProofs)
+            .AsQueryable();
         if (status.HasValue) query = query.Where(o => o.Status == status.Value);
 
         var total = await query.CountAsync(ct);

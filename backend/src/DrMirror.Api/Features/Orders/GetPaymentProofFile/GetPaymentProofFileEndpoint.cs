@@ -45,14 +45,12 @@ public static class GetPaymentProofFileEndpoint
 
         var order = await db.Orders
             .Include(o => o.PaymentProofs)
-            .FirstOrDefaultAsync(o => o.OrderNumber == orderNumber, ct);
+            .FirstOrDefaultAsync(o =>
+                o.OrderNumber == orderNumber &&
+                (isAdmin || o.BuyerUserId == userId),
+                ct);
 
         if (order is null)
-        {
-            return Results.Problem(title: "Order not found", statusCode: StatusCodes.Status404NotFound);
-        }
-
-        if (!isAdmin && order.BuyerUserId != userId)
         {
             return Results.Problem(title: "Proof not found", statusCode: StatusCodes.Status404NotFound);
         }

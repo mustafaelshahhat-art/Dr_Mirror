@@ -193,6 +193,12 @@ export function OrderDetailPage() {
                 </p>
                 {returnsQuery.isLoading ? (
                   <p className="text-sm text-default-500">{t('returns.messages.loading')}</p>
+                ) : returnsQuery.isError ? (
+                  <QueryErrorState
+                    message={t('returns.messages.errorLoad')}
+                    retryLabel={t('returns.messages.retry')}
+                    onRetry={() => void returnsQuery.refetch()}
+                  />
                 ) : returns.length > 0 ? (
                   <div className="space-y-3">
                     {returns.map((request) => (

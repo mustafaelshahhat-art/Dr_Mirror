@@ -39,7 +39,9 @@
     "submitted": "Return request submitted successfully.",
     "cancelled": "Return request cancelled.",
     "conflict": "This return request was updated by another operation. Refresh and try again.",
-    "loading": "Loading return details..."
+    "loading": "Loading return details...",
+    "errorLoad": "Couldn't load return details.",
+    "retry": "Retry"
   },
   "errors": {
     "reasonRequired": "Enter a return reason.",

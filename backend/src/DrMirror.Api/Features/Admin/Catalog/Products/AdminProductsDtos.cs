@@ -63,7 +63,8 @@ public sealed record AdminProductDetailDto(
     IReadOnlyList<AdminProductVariantDto> Variants,
     IReadOnlyList<AdminProductImageDto> Images,
     DateTimeOffset CreatedAt,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    string RowVersion);
 
 public sealed record AdminProductCreateRequest(
     string NameAr,
@@ -87,7 +88,8 @@ public sealed record AdminProductUpdateRequest(
     string? Material,
     string? Brand,
     string? Sku,
-    Guid CategoryId);
+    Guid CategoryId,
+    string? RowVersion);
 
 public sealed class AdminProductCreateValidator : AbstractValidator<AdminProductCreateRequest>
 {

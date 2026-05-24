@@ -1,6 +1,7 @@
 using DrMirror.Api.Domain.Orders;
 using DrMirror.Api.Features.Admin.Orders.Returns.Common;
 using DrMirror.Api.Features.Orders.Returns.Common;
+using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Shared.Auditing;
 using DrMirror.Api.Shared.Validation;
@@ -99,6 +100,11 @@ public static class TransitionReturnEndpoint
             nextStatus.ToString(),
             ct,
             request.AdminNote);
+
+        if (nextStatus is ReturnStatus.Approved or ReturnStatus.Rejected or ReturnStatus.Completed)
+        {
+            db.EmailOutboxMessages.Add(EmailOutboxHelper.ForReturnStatusChanged(returnRequest.Id, nextStatus));
+        }
 
         try
         {

@@ -111,6 +111,7 @@ export function AdminProductCreatePage() {
               price: Number.parseFloat(values.price),
               gender: Number(values.gender) as ProductGender,
               material: values.material.trim() || null,
+              brand: null,
               sku: values.sku.trim() || null,
               categoryId: values.categoryId,
             });

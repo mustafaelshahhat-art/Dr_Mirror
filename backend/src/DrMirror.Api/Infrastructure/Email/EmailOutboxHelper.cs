@@ -48,5 +48,16 @@ public static class EmailOutboxHelper
         CreatedAt = DateTimeOffset.UtcNow,
     };
 
+    public static EmailOutboxMessage ForReturnStatusChanged(Guid returnRequestId, ReturnStatus status) => new()
+    {
+        Id = Guid.NewGuid(),
+        EventType = "ReturnStatusChanged",
+        Payload = JsonSerializer.Serialize(new ReturnStatusChangedPayload(returnRequestId, status)),
+        IdempotencyKey = $"ReturnStatusChanged:{returnRequestId}:{(int)status}:{DateTimeOffset.UtcNow.Ticks}",
+        NextRetryAt = DateTimeOffset.UtcNow,
+        CreatedAt = DateTimeOffset.UtcNow,
+    };
+
     public sealed record StatusChangedPayload(Guid OrderId, OrderStatus Status);
+    public sealed record ReturnStatusChangedPayload(Guid ReturnRequestId, ReturnStatus Status);
 }

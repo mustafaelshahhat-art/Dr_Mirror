@@ -28,6 +28,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.IsPublished).HasDefaultValue(false);
         builder.Property(p => p.CreatedAt).HasDefaultValueSql("SYSUTCDATETIME()");
         builder.Property(p => p.UpdatedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+        builder.Property(p => p.RowVersion).IsRowVersion().IsConcurrencyToken();
 
         // Slug → URL contract; must be unique across the catalog.
         builder.HasIndex(p => p.Slug).IsUnique();

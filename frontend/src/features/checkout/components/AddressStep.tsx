@@ -1,4 +1,4 @@
-import { Checkbox, Fieldset, Input, Label, Radio, RadioGroup, TextField } from '@heroui/react';
+import { Checkbox, Fieldset, Radio, RadioGroup } from '@heroui/react';
 import { Plus } from 'lucide-react';
 import type { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -18,8 +18,6 @@ interface Props {
   setSavedAddressId: (id: string | null) => void;
   saveAsNewAddress: boolean;
   setSaveAsNewAddress: (v: boolean) => void;
-  newAddressLabel: string;
-  setNewAddressLabel: (v: string) => void;
   lang?: AppLang;
 }
 
@@ -34,8 +32,6 @@ export function AddressStep({
   setSavedAddressId,
   saveAsNewAddress,
   setSaveAsNewAddress,
-  newAddressLabel,
-  setNewAddressLabel,
   lang = 'ar',
 }: Props) {
   const { t } = useTranslation();
@@ -200,18 +196,12 @@ export function AddressStep({
             <span className="text-sm">{t('checkout.address.saveAsNew')}</span>
           </Checkbox>
           {saveAsNewAddress ? (
-            <TextField className="flex flex-col gap-1.5">
-              <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
-                {t('checkout.address.newLabel')}
-              </Label>
-              <Input
-                value={newAddressLabel}
-                onChange={(e) => setNewAddressLabel((e.target as HTMLInputElement).value)}
-                maxLength={64}
-                placeholder={t('checkout.address.newLabelPlaceholder')}
-                className="rounded-xl border border-default-400 dark:border-default-300"
-              />
-            </TextField>
+            <FormField
+              name="label"
+              control={control}
+              label={t('checkout.address.newLabel')}
+              placeholder={t('checkout.address.newLabelPlaceholder')}
+            />
           ) : null}
         </div>
       ) : null}

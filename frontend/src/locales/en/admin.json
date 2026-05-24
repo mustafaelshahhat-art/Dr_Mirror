@@ -467,6 +467,10 @@
     "unblock": "Unblock",
     "blockLabel": "Block account for {{name}}",
     "unblockLabel": "Unblock account for {{name}}",
+    "blockConfirm": "Block {{name}}?",
+    "blockConfirmMsg": "This user will be unable to log in until unblocked.",
+    "unblockConfirm": "Unblock {{name}}?",
+    "unblockConfirmMsg": "This user will regain access to their account.",
     "blockError": "Couldn't block this account. Please try again.",
     "unblockError": "Couldn't unblock this account. Please try again."
   },

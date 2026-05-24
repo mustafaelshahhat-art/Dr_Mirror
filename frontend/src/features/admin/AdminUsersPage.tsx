@@ -1,4 +1,4 @@
-import { Button, Chip, Table } from '@heroui/react';
+import { AlertDialog, Button, Chip, Table } from '@heroui/react';
 import { Users } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -109,6 +109,7 @@ function UserRow({
   const disableUser = useDisableUserMutation();
   const enableUser = useEnableUserMutation();
   const isStatusPending = disableUser.isPending || enableUser.isPending;
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   async function toggleAccountStatus() {
     try {
@@ -120,6 +121,7 @@ function UserRow({
     } catch {
       // Toast emitted by mutation onError.
     }
+    setConfirmOpen(false);
   }
 
   return (
@@ -139,19 +141,62 @@ function UserRow({
             </Chip.Label>
           </Chip>
           {!user.roles.includes('Admin') ? (
-            <Button
-              type="button"
-              size="sm"
-              variant={user.isDisabled ? 'secondary' : 'danger-soft'}
-              isDisabled={isStatusPending}
-              isPending={isStatusPending}
-              aria-label={user.isDisabled
-                ? t('admin.users.unblockLabel', { name: user.fullName })
-                : t('admin.users.blockLabel', { name: user.fullName })}
-              onPress={() => void toggleAccountStatus()}
-            >
-              {user.isDisabled ? t('admin.users.unblock') : t('admin.users.block')}
-            </Button>
+            <>
+              <Button
+                type="button"
+                size="sm"
+                variant={user.isDisabled ? 'secondary' : 'danger-soft'}
+                isDisabled={isStatusPending}
+                aria-label={user.isDisabled
+                  ? t('admin.users.unblockLabel', { name: user.fullName })
+                  : t('admin.users.blockLabel', { name: user.fullName })}
+                onPress={() => setConfirmOpen(true)}
+              >
+                {user.isDisabled ? t('admin.users.unblock') : t('admin.users.block')}
+              </Button>
+              <AlertDialog>
+                <AlertDialog.Backdrop
+                  isOpen={confirmOpen}
+                  isDismissable={!isStatusPending}
+                  onOpenChange={(open) => { if (!open) setConfirmOpen(false); }}
+                >
+                  <AlertDialog.Container size="xs">
+                    <AlertDialog.Dialog>
+                      {({ close }) => (
+                        <>
+                          <AlertDialog.Header>
+                            <AlertDialog.Heading>
+                              {user.isDisabled
+                                ? t('admin.users.unblockConfirm', { name: user.fullName })
+                                : t('admin.users.blockConfirm', { name: user.fullName })}
+                            </AlertDialog.Heading>
+                          </AlertDialog.Header>
+                          <AlertDialog.Body>
+                            <p className="text-sm text-default-500">
+                              {user.isDisabled
+                                ? t('admin.users.unblockConfirmMsg')
+                                : t('admin.users.blockConfirmMsg')}
+                            </p>
+                          </AlertDialog.Body>
+                          <AlertDialog.Footer>
+                            <Button variant="ghost" isDisabled={isStatusPending} onPress={close}>
+                              {t('admin.catalog.actions.cancel')}
+                            </Button>
+                            <Button
+                              variant={user.isDisabled ? 'secondary' : 'danger'}
+                              isPending={isStatusPending}
+                              onPress={() => void toggleAccountStatus()}
+                            >
+                              {t('admin.transition.confirm')}
+                            </Button>
+                          </AlertDialog.Footer>
+                        </>
+                      )}
+                    </AlertDialog.Dialog>
+                  </AlertDialog.Container>
+                </AlertDialog.Backdrop>
+              </AlertDialog>
+            </>
           ) : null}
         </div>
       </Table.Cell>

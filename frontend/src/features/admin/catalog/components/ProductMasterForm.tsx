@@ -115,8 +115,10 @@ export function ProductMasterForm({
                 price: values.price,
                 gender: values.gender as ProductGender,
                 material: values.material.trim() || null,
+                brand: product.brand,
                 sku: values.sku.trim() || null,
                 categoryId: values.categoryId,
+                rowVersion: product.rowVersion,
               },
             });
             toast.success(t('admin.products.edit.savedToast'));

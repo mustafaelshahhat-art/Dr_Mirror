@@ -58,13 +58,15 @@ function AddressStepHarness({ onSavedChange = vi.fn() }: { onSavedChange?: (id: 
         landmark: '',
         notes: '',
       },
+      buyerAddressId: 'addr-home',
       paymentMethodId: '',
+      saveAsNewAddress: false,
+      label: '',
       buyerNote: '',
     },
   });
   const [savedAddressId, setSavedAddressId] = useState<string | null>('addr-home');
   const [saveAsNewAddress, setSaveAsNewAddress] = useState(false);
-  const [newAddressLabel, setNewAddressLabel] = useState('');
 
   function handleSavedChange(id: string | null) {
     setSavedAddressId(id);
@@ -81,8 +83,6 @@ function AddressStepHarness({ onSavedChange = vi.fn() }: { onSavedChange?: (id: 
       setSavedAddressId={handleSavedChange}
       saveAsNewAddress={saveAsNewAddress}
       setSaveAsNewAddress={setSaveAsNewAddress}
-      newAddressLabel={newAddressLabel}
-      setNewAddressLabel={setNewAddressLabel}
     />
   );
 }
