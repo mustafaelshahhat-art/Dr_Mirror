@@ -104,7 +104,12 @@ public class AuditWriterTests : IClassFixture<AuditWriterTests.Factory>
             sku = $"AUD-{Guid.NewGuid():N}"[..18],
             categoryId,
         }), HttpStatusCode.Created);
-        var productId = await ReadGuidAsync(productResponse, "id");
+        var productBody = await productResponse.Content.ReadAsStringAsync();
+        using var productDoc = JsonDocument.Parse(productBody);
+        var productId = productDoc.RootElement.GetProperty("id").GetGuid();
+        var currentRowVersion = productDoc.RootElement.TryGetProperty("rowVersion", out var rvProp)
+            ? rvProp.GetString()
+            : null;
 
         await AssertOkAsync(client.PutAsJsonAsync($"/api/admin/products/{productId}", new
         {
@@ -118,6 +123,7 @@ public class AuditWriterTests : IClassFixture<AuditWriterTests.Factory>
             brand = "Dr Mirror",
             sku = $"AUDU-{Guid.NewGuid():N}"[..18],
             categoryId,
+            rowVersion = string.IsNullOrEmpty(currentRowVersion) ? (string?)null : currentRowVersion,
         }));
 
         var variantResponse = await AssertStatusAsync(client.PostAsJsonAsync($"/api/admin/products/{productId}/variants", new

@@ -10,7 +10,7 @@ import { PageHeader } from '../../../shared/components/PageHeader';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { Skeleton } from '../../../shared/components/Skeleton';
 import { StatusPill } from '../../../shared/components/StatusPill';
-import { formatCurrency } from '../../../shared/lib/format';
+import { formatCurrency, formatDate } from '../../../shared/lib/format';
 import type { AppLang } from '../../../shared/lib/theme-storage';
 
 import {
@@ -155,7 +155,7 @@ function ShippingFeeRow({
         </div>
         <p className="text-xs text-default-500">{secondaryName}</p>
         <p className="text-xs text-default-500">
-          {t('shipping.admin.updatedAtValue', { value: new Date(governorate.updatedAt).toLocaleString() })}
+          {t('shipping.admin.updatedAtValue', { value: formatDate(governorate.updatedAt, lang, 'YYYY-MM-DD HH:mm') })}
         </p>
       </div>
 

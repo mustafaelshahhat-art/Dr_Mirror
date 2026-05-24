@@ -70,6 +70,28 @@ public static class OrderEmailMessages
         return new EmailMessage(To: order.BuyerUser!.Email!, Subject: subject, TextBody: body);
     }
 
+    public static EmailMessage ReturnStatusChanged(ReturnRequest returnRequest, ReturnStatus eventStatus)
+    {
+        var orderNumber = returnRequest.Order?.OrderNumber ?? returnRequest.OrderId.ToString();
+        var (subject, body) = eventStatus switch
+        {
+            ReturnStatus.Approved => (
+                $"Return for order {orderNumber} — approved",
+                $"Hi {returnRequest.BuyerUser!.FullName},\n\nYour return request for order {orderNumber} was approved. Please follow the return instructions from our team.\n\n— Dr. Mirror"),
+            ReturnStatus.Rejected => (
+                $"Return for order {orderNumber} — rejected",
+                $"Hi {returnRequest.BuyerUser!.FullName},\n\nYour return request for order {orderNumber} was rejected.\n" +
+                (string.IsNullOrWhiteSpace(returnRequest.AdminNote) ? "" : $"Reason: {returnRequest.AdminNote}\n") +
+                $"\n— Dr. Mirror"),
+            ReturnStatus.Completed => (
+                $"Return for order {orderNumber} — completed",
+                $"Hi {returnRequest.BuyerUser!.FullName},\n\nYour return request for order {orderNumber} is complete.\n\n— Dr. Mirror"),
+            _ => ($"Return for order {orderNumber} — status update", $"Status: {eventStatus}"),
+        };
+
+        return new EmailMessage(To: returnRequest.BuyerUser!.Email!, Subject: subject, TextBody: body);
+    }
+
     public static EmailMessage InquiryReceived(Inquiry inquiry, string adminEmail)
     {
         var productLine = inquiry.Product is not null ? $"Product: {inquiry.Product.NameEn}\n" : "";

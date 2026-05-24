@@ -1,6 +1,7 @@
 using DrMirror.Api.Features.Cart.Common;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.RateLimiting;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ public static class UpdateCartItemEndpoint
             .WithName("Cart.UpdateCartItem")
             .WithSummary("Set the absolute quantity of an existing cart line.")
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.CartMutation)
             .WithValidation<UpdateCartItemRequest>()
             .Produces<CartDto>(StatusCodes.Status200OK)
             .ProducesValidationProblem()

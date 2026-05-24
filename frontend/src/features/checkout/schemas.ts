@@ -50,7 +50,10 @@ export type ShippingAddressForm = z.infer<typeof shippingAddressSchema>;
 
 export const checkoutSchema = z.object({
   address: shippingAddressSchema,
+  buyerAddressId: z.string().uuid().nullable().optional(),
   paymentMethodId: z.string().uuid('checkout.errors.paymentMethodRequired'),
+  saveAsNewAddress: z.boolean(),
+  label: z.string().max(64, 'checkout.errors.labelTooLong').optional(),
   buyerNote: z.string().max(1000, 'checkout.errors.buyerNoteTooLong').optional(),
 });
 

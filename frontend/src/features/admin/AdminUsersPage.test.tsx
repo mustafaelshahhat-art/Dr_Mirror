@@ -82,6 +82,9 @@ describe('AdminUsersPage', () => {
     expect((await screen.findAllByText('Customer User')).length).toBeGreaterThan(0);
     await userEvent.click(screen.getAllByRole('button', { name: /block account for customer user/i })[0]);
 
+    const confirmButtons = screen.getAllByRole('button', { name: /confirm/i });
+    await userEvent.click(confirmButtons[0]);
+
     expect(adminUsersApi.disable).toHaveBeenCalledWith('user-1');
   });
 

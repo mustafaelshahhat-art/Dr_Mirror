@@ -90,6 +90,7 @@ const MOCK_ADMIN_PRODUCT: AdminProductDetailDto = {
   price: 599, gender: 0, material: 'Cotton', brand: 'MediWear', sku: 'SCR-001',
   isPublished: true, categoryId: 'cat-1', categoryNameEn: 'Scrubs', categoryNameAr: 'سكرب',
   createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z',
+  rowVersion: 'AAAAAAAAB9M=',
   variants: [
     { id: 'var-1', size: 'M', colorName: 'Navy', colorNameAr: 'كحلي', colorHex: '#000080', sku: 'SCR-001-M-NAV', stock: 10, isActive: true, createdAt: '', updatedAt: '' },
   ],

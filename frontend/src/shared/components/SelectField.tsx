@@ -84,7 +84,7 @@ export function SelectField({
               key={option.value}
               id={option.value}
               textValue={option.label}
-              className="rounded-medium px-3 py-1.5 text-xs font-semibold text-default-700 dark:text-default-300 hover:bg-brand hover:text-white transition-all duration-200 cursor-pointer"
+              className="rounded-medium px-3 py-1.5 text-xs font-semibold text-default-700 dark:text-default-300 hover:bg-brand hover:text-brand-foreground transition-all duration-200 cursor-pointer"
             >
               {option.label}
             </ListBox.Item>

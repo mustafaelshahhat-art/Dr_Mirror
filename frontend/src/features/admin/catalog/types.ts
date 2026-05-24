@@ -85,6 +85,7 @@ export interface AdminProductDetailDto {
   images: AdminProductImageDto[];
   createdAt: string;
   updatedAt: string;
+  rowVersion: string;
 }
 
 export interface AdminProductCreateRequest {
@@ -95,11 +96,14 @@ export interface AdminProductCreateRequest {
   price: number;
   gender: ProductGender;
   material: string | null;
+  brand: string | null;
   sku: string | null;
   categoryId: string;
 }
 
-export type AdminProductUpdateRequest = AdminProductCreateRequest;
+export type AdminProductUpdateRequest = AdminProductCreateRequest & {
+  rowVersion: string;
+};
 
 export interface AdminVariantUpsertRequest {
   size: string;

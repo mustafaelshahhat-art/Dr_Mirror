@@ -54,6 +54,7 @@ public class Product
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public byte[] RowVersion { get; set; } = [];
 
     public Guid CategoryId { get; set; }
     public Category? Category { get; set; }

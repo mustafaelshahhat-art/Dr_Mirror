@@ -180,7 +180,7 @@ export function Header() {
                     {t('header.cartCount', { count: cart.totalQuantity })}
                   </span>
                   {cart.totalQuantity > 0 ? (
-                    <span className="flex size-5 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-white tabular-nums">
+                    <span className="flex size-5 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-brand-foreground tabular-nums">
                       {cart.totalQuantity > 99 ? '99+' : cart.totalQuantity}
                     </span>
                   ) : null}

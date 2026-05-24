@@ -503,6 +503,10 @@
     "unblock": "إلغاء الحظر",
     "blockLabel": "حظر حساب {{name}}",
     "unblockLabel": "إلغاء حظر حساب {{name}}",
+    "blockConfirm": "حظر {{name}}؟",
+    "blockConfirmMsg": "لن يتمكن هذا المستخدم من تسجيل الدخول حتى يتم إلغاء الحظر.",
+    "unblockConfirm": "إلغاء حظر {{name}}؟",
+    "unblockConfirmMsg": "سيستعيد هذا المستخدم الوصول إلى حسابه.",
     "blockError": "تعذّر حظر هذا الحساب. حاول مرة أخرى.",
     "unblockError": "تعذّر إلغاء حظر هذا الحساب. حاول مرة أخرى."
   },

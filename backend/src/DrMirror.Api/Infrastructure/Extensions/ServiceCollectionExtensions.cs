@@ -303,6 +303,36 @@ internal static class ServiceCollectionExtensions
                 });
             });
 
+            // Cart mutations — 60 req/1 min per authenticated user (fixed window).
+            options.AddPolicy(RateLimitPolicies.CartMutation, context =>
+            {
+                var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? context.Connection.RemoteIpAddress?.ToString()
+                    ?? "anonymous";
+                return RateLimitPartition.GetFixedWindowLimiter(userId, _ => new FixedWindowRateLimiterOptions
+                {
+                    Window = TimeSpan.FromMinutes(1),
+                    PermitLimit = 60 * multiplier,
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                });
+            });
+
+            // Address book — 60 req/1 min per authenticated user (fixed window).
+            options.AddPolicy(RateLimitPolicies.AddressBook, context =>
+            {
+                var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? context.Connection.RemoteIpAddress?.ToString()
+                    ?? "anonymous";
+                return RateLimitPartition.GetFixedWindowLimiter(userId, _ => new FixedWindowRateLimiterOptions
+                {
+                    Window = TimeSpan.FromMinutes(1),
+                    PermitLimit = 60 * multiplier,
+                    QueueLimit = 0,
+                    AutoReplenishment = true,
+                });
+            });
+
             // Emit RFC 7807 ProblemDetails so the SPA's shared
             // isAxiosError&lt;ProblemDetails&gt; path handles 429 like every other
             // failure (rather than seeing an opaque text body).

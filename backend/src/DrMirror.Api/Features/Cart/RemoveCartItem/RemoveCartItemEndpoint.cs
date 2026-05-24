@@ -1,6 +1,7 @@
 using DrMirror.Api.Features.Cart.Common;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,7 @@ public static class RemoveCartItemEndpoint
             .WithName("Cart.RemoveCartItem")
             .WithSummary("Remove a line from the cart.")
             .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.CartMutation)
             .Produces<CartDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound);

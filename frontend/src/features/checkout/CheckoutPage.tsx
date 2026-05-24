@@ -64,27 +64,8 @@ function CheckoutBody() {
   const [formError, setFormError] = useState<string | null>(null);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
   const [paymentAvailable, setPaymentAvailable] = useState(false);
-  // Saved-address mode: when set, the inline form is hidden and we send
-  // BuyerAddressId at submit time. null means inline form (which can
-  // optionally be saved as a new address via the checkbox below).
-  const [savedAddressId, setSavedAddressId] = useState<string | null>(null);
-  const [saveAsNewAddress, setSaveAsNewAddress] = useState(false);
-  const [newAddressLabel, setNewAddressLabel] = useState('');
   const addressesQuery = useAddressesQuery();
   const [hasInitializedAddress, setHasInitializedAddress] = useState(false);
-
-  // Auto-select default address or first saved address on initial load
-  useEffect(() => {
-    if (addressesQuery.data && !hasInitializedAddress) {
-      const defaultAddress = addressesQuery.data.find((a) => a.isDefault);
-      if (defaultAddress) {
-        setSavedAddressId(defaultAddress.id);
-      } else if (addressesQuery.data.length > 0) {
-        setSavedAddressId(addressesQuery.data[0].id);
-      }
-      setHasInitializedAddress(true);
-    }
-  }, [addressesQuery.data, hasInitializedAddress]);
 
   const {
     control,
@@ -106,10 +87,28 @@ function CheckoutBody() {
         landmark: '',
         notes: '',
       },
+      buyerAddressId: null,
       paymentMethodId: '',
+      saveAsNewAddress: false,
+      label: '',
       buyerNote: '',
     },
   });
+
+  const savedAddressId = watch('buyerAddressId') ?? null;
+  const saveAsNewAddress = watch('saveAsNewAddress');
+  const addressLabel = watch('label') ?? '';
+
+  // Auto-select default address or first saved address on initial load.
+  useEffect(() => {
+    if (addressesQuery.data && !hasInitializedAddress) {
+      const defaultAddress = addressesQuery.data.find((a) => a.isDefault);
+      setValue('buyerAddressId', defaultAddress?.id ?? addressesQuery.data[0]?.id ?? null, {
+        shouldDirty: false,
+      });
+      setHasInitializedAddress(true);
+    }
+  }, [addressesQuery.data, hasInitializedAddress, setValue]);
 
   // Once the buyer's profile arrives, pre-fill the recipient name if it's empty.
   useEffect(() => {
@@ -185,7 +184,7 @@ function CheckoutBody() {
       if (!ok) return;
       if (!hasAvailableShippingGovernorate()) return;
       // If they want to save the inline address, we additionally need a label.
-      if (saveAsNewAddress && newAddressLabel.trim().length === 0) {
+      if (saveAsNewAddress && addressLabel.trim().length === 0) {
         setFormError(t('checkout.errors.labelRequired'));
         return;
       }
@@ -218,7 +217,7 @@ function CheckoutBody() {
         setFormError(t('checkout.errors.unknown'));
         return;
       }
-      if (saveAsNewAddress && newAddressLabel.trim().length === 0) {
+      if (saveAsNewAddress && addressLabel.trim().length === 0) {
         setFormError(t('checkout.errors.labelRequired'));
         return;
       }
@@ -253,7 +252,7 @@ function CheckoutBody() {
                 notes: values.address.notes || null,
               },
           saveAsNewAddress: !usingSaved && saveAsNewAddress,
-          label: !usingSaved && saveAsNewAddress ? newAddressLabel.trim() : null,
+          label: !usingSaved && saveAsNewAddress ? addressLabel.trim() : null,
           buyerNote: values.buyerNote?.trim() ? values.buyerNote.trim() : null,
         },
       });
@@ -310,11 +309,13 @@ function CheckoutBody() {
                 setValue={setValue}
                 savedAddresses={savedAddresses}
                 savedAddressId={savedAddressId}
-                setSavedAddressId={setSavedAddressId}
+                setSavedAddressId={(id) =>
+                  setValue('buyerAddressId', id, { shouldDirty: true, shouldValidate: false })
+                }
                 saveAsNewAddress={saveAsNewAddress}
-                setSaveAsNewAddress={setSaveAsNewAddress}
-                newAddressLabel={newAddressLabel}
-                setNewAddressLabel={setNewAddressLabel}
+                setSaveAsNewAddress={(value) =>
+                  setValue('saveAsNewAddress', value, { shouldDirty: true, shouldValidate: false })
+                }
                 lang={lang}
               />
             ) : null}

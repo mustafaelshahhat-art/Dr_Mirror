@@ -42,4 +42,16 @@ public static class RateLimitPolicies
     /// 60 requests per minute per IP — sliding window.
     /// </summary>
     public const string ProofFileRead = "proof-file-read";
+
+    /// <summary>
+    /// Cart mutations — prevents automated cart-write abuse.
+    /// 60 requests per minute per authenticated user — fixed window.
+    /// </summary>
+    public const string CartMutation = "cart-mutation";
+
+    /// <summary>
+    /// Address book reads and mutations — protects user-owned address resources.
+    /// 60 requests per minute per authenticated user — fixed window.
+    /// </summary>
+    public const string AddressBook = "address-book";
 }

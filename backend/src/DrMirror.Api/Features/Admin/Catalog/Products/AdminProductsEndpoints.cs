@@ -46,7 +46,8 @@ public static class AdminProductsEndpoints
             .WithValidation<AdminProductUpdateRequest>()
             .Produces<AdminProductDetailDto>(StatusCodes.Status200OK)
             .ProducesValidationProblem()
-            .ProducesProblem(StatusCodes.Status404NotFound);
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
 
         group.MapPost("/{id:guid}/publish", Publish)
             .WithName("Admin.Products.Publish")
@@ -198,6 +199,24 @@ public static class AdminProductsEndpoints
             return Results.Problem(title: "Product not found", statusCode: StatusCodes.Status404NotFound);
         }
 
+        if (!string.IsNullOrWhiteSpace(request.RowVersion))
+        {
+            byte[] originalRowVersion;
+            try
+            {
+                originalRowVersion = Convert.FromBase64String(request.RowVersion);
+            }
+            catch (FormatException)
+            {
+                return Results.Problem(
+                    title: "Invalid product version",
+                    detail: "Refresh the product and try again.",
+                    statusCode: StatusCodes.Status409Conflict);
+            }
+
+            db.Entry(entity).Property(p => p.RowVersion).OriginalValue = originalRowVersion;
+        }
+
         // Validate the target category exists if it changed.
         if (entity.CategoryId != request.CategoryId)
         {
@@ -222,7 +241,17 @@ public static class AdminProductsEndpoints
         // Slug stays stable on rename — locked at M2.
 
         await audit.WriteAsync("Product.Update", "Product", entity.Id.ToString(), null, null, ct);
-        await db.SaveChangesAsync(ct);
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Results.Problem(
+                title: "Product update conflict",
+                detail: "The product was modified by another request. Refresh and try again.",
+                statusCode: StatusCodes.Status409Conflict);
+        }
 
         var reloaded = await LoadDetail(db, entity.Id, ct);
         return Results.Ok(ToDetail(reloaded!));
@@ -343,5 +372,6 @@ public static class AdminProductsEndpoints
                 i.CreatedAt))
             .ToList(),
         p.CreatedAt,
-        p.UpdatedAt);
+        p.UpdatedAt,
+        Convert.ToBase64String(p.RowVersion));
 }
