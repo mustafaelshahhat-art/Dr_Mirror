@@ -22,7 +22,8 @@ const submitReturnSchema = z.object({
     z.string().refine((v) => PREDEFINED_REASONS.includes(v as ReturnReason), {
       message: 'reasonRequired',
     })
-  ) as unknown as z.ZodType<ReturnReason, z.ZodTypeDef, unknown>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ) as unknown as z.ZodType<ReturnReason, any, any>,
   notes: z.string().max(500, 'notesTooLong').optional(),
 }).superRefine((data, ctx) => {
   if (data.reason === 'other' && !data.notes?.trim()) {
