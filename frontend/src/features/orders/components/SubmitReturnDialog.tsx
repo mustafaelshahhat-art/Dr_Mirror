@@ -48,9 +48,13 @@ export function SubmitReturnDialog({ orderNumber }: { orderNumber: string }) {
                 <form
                   noValidate
                   onSubmit={handleSubmit(async (values) => {
-                    await mutation.mutateAsync({ customerReason: values.customerReason.trim() });
-                    reset();
-                    close();
+                    try {
+                      await mutation.mutateAsync({ customerReason: values.customerReason.trim() });
+                      reset();
+                      close();
+                    } catch {
+                      // Handled by mutation hook's onError
+                    }
                   })}
                 >
                   <AlertDialog.Header>
@@ -60,7 +64,7 @@ export function SubmitReturnDialog({ orderNumber }: { orderNumber: string }) {
                     <Controller name="customerReason" control={control} render={({ field }) => (
                       <TextField isInvalid={Boolean(errors.customerReason)} className="flex flex-col gap-1">
                         <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
-                          {t('returns.form.reasonLabel')}
+                           {t('returns.form.reasonLabel')}
                         </Label>
                         <TextArea
                           value={field.value}
@@ -76,6 +80,11 @@ export function SubmitReturnDialog({ orderNumber }: { orderNumber: string }) {
                         ) : null}
                       </TextField>
                     )} />
+                    {mutation.isError ? (
+                      <p role="alert" className="text-xs text-danger mt-2">
+                        {t('returns.errors.submitFailed')}
+                      </p>
+                    ) : null}
                   </AlertDialog.Body>
                   <AlertDialog.Footer>
                     <Button type="button" variant="ghost" size="sm" isDisabled={pending} onPress={close}>

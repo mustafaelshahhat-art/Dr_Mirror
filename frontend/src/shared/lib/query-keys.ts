@@ -25,6 +25,7 @@ export const queryKeys = {
       detail: (orderNumber: string) => ['admin', 'orders', 'detail', orderNumber] as const,
       returns: (orderNumber: string) => ['admin', 'orders', 'detail', orderNumber, 'returns'] as const,
       returnsList: (params: unknown) => ['admin', 'orders', 'returns', params] as const,
+      return: (returnId: string) => ['admin', 'orders', 'returns', 'detail', returnId] as const,
       stats: () => ['admin', 'orders', 'stats'] as const,
       recent: () => ['admin', 'orders', 'recent'] as const,
     },

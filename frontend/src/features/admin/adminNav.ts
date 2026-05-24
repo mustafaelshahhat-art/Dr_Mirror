@@ -1,4 +1,5 @@
 import {
+  ArchiveRestore,
   ClipboardList,
   CreditCard,
   FolderTree,
@@ -29,6 +30,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     items: [
       { to: '/admin', icon: LayoutDashboard, labelKey: 'admin.shell.nav.dashboard', end: true },
       { to: '/admin/orders', icon: ClipboardList, labelKey: 'admin.shell.nav.orders' },
+      { to: '/admin/returns', icon: ArchiveRestore, labelKey: 'admin.shell.nav.returns' },
       { to: '/admin/shipping-fees', icon: Truck, labelKey: 'admin.shell.nav.shippingFees' },
       { to: '/admin/inquiries', icon: MessageSquare, labelKey: 'admin.shell.nav.inquiries' },
       { to: '/admin/audit', icon: ScrollText, labelKey: 'admin.shell.nav.audit' },
@@ -59,6 +61,9 @@ export function getAdminHeaderTitleKeys(pathname: string): string[] {
   }
   if (/^\/admin\/products\/[^/]+\/edit$/.test(pathname)) {
     return ['admin.shell.nav.products', 'admin.products.edit.title'];
+  }
+  if (/^\/admin\/returns\/[^/]+$/.test(pathname)) {
+    return ['admin.shell.nav.returns', 'admin.returns.detail.title'];
   }
 
   const item = ADMIN_NAV_ITEMS.find((navItem) =>

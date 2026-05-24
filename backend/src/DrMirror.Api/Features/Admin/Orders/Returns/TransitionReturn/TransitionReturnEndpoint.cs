@@ -60,68 +60,76 @@ public static class TransitionReturnEndpoint
                 statusCode: StatusCodes.Status409Conflict);
         }
 
-        await using var transaction = db.Database.IsRelational()
-            ? await db.Database.BeginTransactionAsync(ct)
-            : null;
-
-        var previousStatus = returnRequest.Status;
-        var now = DateTimeOffset.UtcNow;
-
-        returnRequest.Status = nextStatus;
-        returnRequest.AdminNote = string.IsNullOrWhiteSpace(request.AdminNote) ? returnRequest.AdminNote : request.AdminNote.Trim();
-        returnRequest.UpdatedAt = now;
-
-        if (nextStatus is ReturnStatus.Approved or ReturnStatus.Rejected)
+        IResult? result = null;
+        var strategy = db.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async ctInner =>
         {
-            returnRequest.ReviewedAt = now;
-        }
-        else if (nextStatus == ReturnStatus.Received)
-        {
-            returnRequest.ReceivedAt = now;
-        }
-        else if (nextStatus == ReturnStatus.Completed)
-        {
-            returnRequest.CompletedAt = now;
-            foreach (var item in returnRequest.Items)
+            await using var transaction = db.Database.IsRelational()
+                ? await db.Database.BeginTransactionAsync(ctInner)
+                : null;
+
+            var previousStatus = returnRequest.Status;
+            var now = DateTimeOffset.UtcNow;
+
+            returnRequest.Status = nextStatus;
+            returnRequest.AdminNote = string.IsNullOrWhiteSpace(request.AdminNote) ? returnRequest.AdminNote : request.AdminNote.Trim();
+            returnRequest.UpdatedAt = now;
+
+            if (nextStatus is ReturnStatus.Approved or ReturnStatus.Rejected)
             {
-                if (item.ProductVariant is { } variant)
+                returnRequest.ReviewedAt = now;
+            }
+            else if (nextStatus == ReturnStatus.Received)
+            {
+                returnRequest.ReceivedAt = now;
+            }
+            else if (nextStatus == ReturnStatus.Completed)
+            {
+                returnRequest.CompletedAt = now;
+                foreach (var item in returnRequest.Items)
                 {
-                    variant.Stock += item.Quantity;
-                    variant.UpdatedAt = now;
+                    if (item.ProductVariant is { } variant)
+                    {
+                        variant.Stock += item.Quantity;
+                        variant.UpdatedAt = now;
+                    }
                 }
             }
-        }
 
-        await audit.WriteAsync(
-            "Return.StatusChange",
-            "ReturnRequest",
-            returnRequest.Id.ToString(),
-            previousStatus.ToString(),
-            nextStatus.ToString(),
-            ct,
-            request.AdminNote);
+            await audit.WriteAsync(
+                "Return.StatusChange",
+                "ReturnRequest",
+                returnRequest.Id.ToString(),
+                previousStatus.ToString(),
+                nextStatus.ToString(),
+                ctInner,
+                request.AdminNote);
 
-        if (nextStatus is ReturnStatus.Approved or ReturnStatus.Rejected or ReturnStatus.Completed)
-        {
-            db.EmailOutboxMessages.Add(EmailOutboxHelper.ForReturnStatusChanged(returnRequest.Id, nextStatus));
-        }
-
-        try
-        {
-            await db.SaveChangesAsync(ct);
-            if (transaction is not null)
+            if (nextStatus is ReturnStatus.Approved or ReturnStatus.Rejected or ReturnStatus.Completed)
             {
-                await transaction.CommitAsync(ct);
+                db.EmailOutboxMessages.Add(EmailOutboxHelper.ForReturnStatusChanged(returnRequest.Id, nextStatus));
             }
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            return Results.Problem(
-                title: "Return state conflict",
-                detail: "The return was modified by another request. Please refresh and try again.",
-                statusCode: StatusCodes.Status409Conflict);
-        }
 
-        return Results.Ok(returnRequest.ToAdminDto());
+            try
+            {
+                await db.SaveChangesAsync(ctInner);
+                if (transaction is not null)
+                {
+                    await transaction.CommitAsync(ctInner);
+                }
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                result = Results.Problem(
+                    title: "Return state conflict",
+                    detail: "The return was modified by another request. Please refresh and try again.",
+                    statusCode: StatusCodes.Status409Conflict);
+                return;
+            }
+
+            result = Results.Ok(returnRequest.ToAdminDto());
+        }, ct);
+
+        return result ?? Results.Problem(title: "Transition failed", statusCode: StatusCodes.Status500InternalServerError);
     }
 }

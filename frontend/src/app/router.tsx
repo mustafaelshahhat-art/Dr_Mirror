@@ -45,6 +45,8 @@ const AdminInquiriesPage = lazy(() => import('../features/admin/AdminInquiriesPa
 const AdminUsersPage = lazy(() => import('../features/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
 const AdminAuditPage = lazy(() => import('../features/admin/audit/AuditLogPage').then((m) => ({ default: m.AuditLogPage })));
 const AdminShippingLabelPage = lazy(() => import('../features/admin/AdminShippingLabelPage').then((m) => ({ default: m.AdminShippingLabelPage })));
+const AdminReturnsListPage = lazy(() => import('../features/admin/AdminReturnsListPage').then((m) => ({ default: m.AdminReturnsListPage })));
+const AdminReturnDetailPage = lazy(() => import('../features/admin/AdminReturnDetailPage').then((m) => ({ default: m.AdminReturnDetailPage })));
 
 function PageFallback() {
   const { t } = useTranslation();
@@ -96,6 +98,8 @@ export function AppRoutes() {
             <Route path="admin" element={<AdminHubPage />} />
             <Route path="admin/orders" element={<AdminOrdersListPage />} />
             <Route path="admin/orders/:orderNumber" element={<AdminOrderDetailPage />} />
+            <Route path="admin/returns" element={<AdminReturnsListPage />} />
+            <Route path="admin/returns/:returnId" element={<AdminReturnDetailPage />} />
             <Route path="admin/categories" element={<AdminCategoriesPage />} />
             <Route path="admin/products" element={<AdminProductsListPage />} />
             <Route path="admin/products/new" element={<AdminProductCreatePage />} />

@@ -427,6 +427,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "orders": "Orders",
+      "returns": "Returns",
       "shippingFees": "Shipping Fees",
       "products": "Products",
       "categories": "Categories",
@@ -505,6 +506,52 @@
       "Payment": "Payment",
       "Product": "Product",
       "User": "User"
+    }
+  },
+  "returns": {
+    "list": {
+      "title": "Returns",
+      "subtitle": "All return requests from customers, newest first.",
+      "loading": "Loading return requests...",
+      "error": "Couldn't load return requests.",
+      "empty": {
+        "title": "No return requests",
+        "subtitle": "Customer return requests will appear here once submitted."
+      },
+      "cols": {
+        "status": "Status",
+        "orderNumber": "Order",
+        "customer": "Customer",
+        "date": "Requested on",
+        "reason": "Reason"
+      }
+    },
+    "detail": {
+      "title": "Return Request Details",
+      "loading": "Loading return request...",
+      "notFoundTitle": "Return request not found",
+      "notFoundSubtitle": "The requested return request could not be found.",
+      "error": "Couldn't load return request details.",
+      "backToList": "Back to returns",
+      "order": "Order #",
+      "customer": "Customer",
+      "email": "Email",
+      "reason": "Customer's reason",
+      "createdAt": "Submitted on",
+      "reviewedAt": "Reviewed on",
+      "items": "Returned items",
+      "cols": {
+        "product": "Product",
+        "variant": "Size / Color",
+        "price": "Price",
+        "qty": "Qty",
+        "subtotal": "Subtotal"
+      },
+      "actions": {
+        "heading": "Actions",
+        "approveConfirm": "Approve return request",
+        "rejectConfirm": "Reject return request"
+      }
     }
   }
 }

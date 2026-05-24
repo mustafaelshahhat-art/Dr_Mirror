@@ -94,6 +94,13 @@ export const adminReturnsApi = {
     return data;
   },
 
+  async getReturn(returnId: string): Promise<AdminReturnRequestDto> {
+    const { data } = await api.get<AdminReturnRequestDto>(
+      `/admin/orders/returns/${encodeURIComponent(returnId)}`,
+    );
+    return data;
+  },
+
   async transitionReturn(
     orderNumber: string,
     returnId: string,

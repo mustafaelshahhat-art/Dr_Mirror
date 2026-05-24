@@ -3,9 +3,31 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useApiErrorToast } from '../../shared/hooks/useApiErrorToast';
 import { queryKeys } from '../../shared/lib/query-keys';
 import type { PagedResult } from '../../shared/types/paged-result';
-import type { OrderDetailDto, OrderStatus, OrderSummaryDto } from '../orders/types';
+import type { OrderDetailDto, OrderStatus, OrderSummaryDto, ReturnStatus } from '../orders/types';
 
-import { adminOrdersApi } from './api';
+import { adminOrdersApi, adminReturnsApi, type AdminReturnRequestDto } from './api';
+
+export function useAdminReturnsQuery(params: {
+  status?: ReturnStatus;
+  page?: number;
+  pageSize?: number;
+}) {
+  const { status, page = 1, pageSize = 25 } = params;
+  return useQuery<PagedResult<AdminReturnRequestDto>>({
+    queryKey: queryKeys.admin.orders.returnsList({ status, page, pageSize }),
+    queryFn: () => adminReturnsApi.listReturns({ status, page, pageSize }),
+    staleTime: 15_000,
+  });
+}
+
+export function useAdminReturnQuery(returnId: string | undefined) {
+  return useQuery<AdminReturnRequestDto>({
+    queryKey: queryKeys.admin.orders.return(returnId ?? ''),
+    queryFn: () => adminReturnsApi.getReturn(returnId!),
+    enabled: Boolean(returnId),
+    staleTime: 10_000,
+  });
+}
 
 export function useAdminOrdersQuery(args: {
   status?: OrderStatus;

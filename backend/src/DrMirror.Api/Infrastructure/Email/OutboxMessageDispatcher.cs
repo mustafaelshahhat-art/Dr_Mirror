@@ -34,10 +34,28 @@ internal static class OutboxMessageDispatcher
             SendReturnStatusChangedAsync(
                 JsonSerializer.Deserialize<EmailOutboxHelper.ReturnStatusChangedPayload>(msg.Payload)!,
                 db, email, ct),
+        "ReturnCreated" =>
+            SendReturnCreatedAsync(Guid.Parse(msg.Payload), db, email, ct),
         "InquiryReceived" =>
             SendInquiryReceivedAsync(Guid.Parse(msg.Payload), db, email, emailOptions, ct),
         _ => throw new InvalidOperationException($"Unknown outbox event type: {msg.EventType}"),
     };
+
+    private static async Task SendReturnCreatedAsync(
+        Guid returnRequestId, AppDbContext db, IEmailSender email, CancellationToken ct)
+    {
+        var returnRequest = await db.ReturnRequests
+            .AsNoTracking()
+            .Include(r => r.BuyerUser)
+            .Include(r => r.Order)
+            .FirstOrDefaultAsync(r => r.Id == returnRequestId, ct);
+
+        if (returnRequest is null || returnRequest.BuyerUser is null
+            || string.IsNullOrWhiteSpace(returnRequest.BuyerUser.Email))
+            return;
+
+        await email.SendAsync(OrderEmailMessages.ReturnCreated(returnRequest));
+    }
 
     private static async Task SendOrderConfirmationAsync(
         Guid orderId, AppDbContext db, IEmailSender email, CancellationToken ct)

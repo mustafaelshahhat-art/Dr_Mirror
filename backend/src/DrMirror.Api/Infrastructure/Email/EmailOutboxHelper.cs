@@ -58,6 +58,16 @@ public static class EmailOutboxHelper
         CreatedAt = DateTimeOffset.UtcNow,
     };
 
+    public static EmailOutboxMessage ForReturnCreated(Guid returnRequestId) => new()
+    {
+        Id = Guid.NewGuid(),
+        EventType = "ReturnCreated",
+        Payload = returnRequestId.ToString(),
+        IdempotencyKey = $"ReturnCreated:{returnRequestId}",
+        NextRetryAt = DateTimeOffset.UtcNow,
+        CreatedAt = DateTimeOffset.UtcNow,
+    };
+
     public sealed record StatusChangedPayload(Guid OrderId, OrderStatus Status);
     public sealed record ReturnStatusChangedPayload(Guid ReturnRequestId, ReturnStatus Status);
 }

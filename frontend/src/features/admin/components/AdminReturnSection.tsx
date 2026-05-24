@@ -1,4 +1,4 @@
-import { Button, Card, Form, Label, TextArea, TextField, Toolbar } from '@heroui/react';
+import { Button, Card, Form, Label, TextArea, TextField } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -93,7 +93,7 @@ export function AdminReturnSection({ orderNumber, lang }: { orderNumber: string;
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <ReturnStatusBadge status={activeReturn.status} />
                 {actions.length > 0 ? (
-                  <Toolbar aria-label={t('returns.eligibility.title')} className="flex flex-wrap gap-2">
+                  <div aria-label={t('returns.eligibility.title')} className="flex flex-wrap gap-2">
                     {actions.map((action) => (
                       <Button
                         key={action}
@@ -110,7 +110,7 @@ export function AdminReturnSection({ orderNumber, lang }: { orderNumber: string;
                         {t(`returns.${ACTION_KEY[action]}`)}
                       </Button>
                     ))}
-                  </Toolbar>
+                  </div>
                 ) : null}
               </div>
 

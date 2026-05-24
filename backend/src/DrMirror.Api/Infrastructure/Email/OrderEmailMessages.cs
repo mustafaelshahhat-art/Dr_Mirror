@@ -92,6 +92,17 @@ public static class OrderEmailMessages
         return new EmailMessage(To: returnRequest.BuyerUser!.Email!, Subject: subject, TextBody: body);
     }
 
+    public static EmailMessage ReturnCreated(ReturnRequest returnRequest)
+    {
+        var orderNumber = returnRequest.Order?.OrderNumber ?? returnRequest.OrderId.ToString();
+        var subject = $"Return request for order {orderNumber} — received";
+        var body =
+            $"Hi {returnRequest.BuyerUser!.FullName},\n\n" +
+            $"We've received your return request for order {orderNumber}.\n" +
+            $"Our team will review it and get back to you shortly.\n\n— Dr. Mirror";
+        return new EmailMessage(To: returnRequest.BuyerUser!.Email!, Subject: subject, TextBody: body);
+    }
+
     public static EmailMessage InquiryReceived(Inquiry inquiry, string adminEmail)
     {
         var productLine = inquiry.Product is not null ? $"Product: {inquiry.Product.NameEn}\n" : "";
