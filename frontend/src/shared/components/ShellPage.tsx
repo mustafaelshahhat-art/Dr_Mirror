@@ -1,4 +1,4 @@
-import { Bell, LayoutDashboard, MapPin, Package, RotateCcw, ShoppingBag } from 'lucide-react';
+import { Bell, LayoutDashboard, MapPin, Package, RotateCcw, ShieldCheck, ShoppingBag, UserRound } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -70,6 +70,23 @@ export function ShellPage() {
           {t('common.account.quickLinks')}
         </h2>
         <Link
+          to="/account/profile"
+          className="group flex items-center gap-3 content-surface p-4 transition-colors hover:bg-surface-secondary"
+        >
+          <span className="grid size-10 place-items-center rounded-medium bg-primary/10 text-primary">
+            <UserRound className="size-5" aria-hidden />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-base font-semibold text-foreground">
+              {t('common.account.profile.title')}
+            </span>
+            <span className="block text-sm text-default-500">
+              {t('common.account.profile.subtitle')}
+            </span>
+          </span>
+        </Link>
+
+        <Link
           to="/account/orders"
           className="group flex items-center gap-3 content-surface p-4 transition-colors hover:bg-surface-secondary"
         >
@@ -133,6 +150,23 @@ export function ShellPage() {
             </span>
             <span className="block text-sm text-default-500">
               {t('common.account.notifications.subtitle')}
+            </span>
+          </span>
+        </Link>
+
+        <Link
+          to="/account/security"
+          className="group flex items-center gap-3 content-surface p-4 transition-colors hover:bg-surface-secondary"
+        >
+          <span className="grid size-10 place-items-center rounded-medium bg-default-200 text-default-600 dark:bg-default-100/10 dark:text-default-400">
+            <ShieldCheck className="size-5" aria-hidden />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-base font-semibold text-foreground">
+              {t('common.account.security.title')}
+            </span>
+            <span className="block text-sm text-default-500">
+              {t('common.account.security.subtitle')}
             </span>
           </span>
         </Link>

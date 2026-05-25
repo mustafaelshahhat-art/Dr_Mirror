@@ -39,8 +39,24 @@ public static class GetWhatsAppStatusEndpoint
             ConnectionState: state,
             QrRequired: state == "qr_required" || serviceStatus?.QrAvailable == true,
             LastSentAt: serviceStatus?.LastSentAt,
-            LastError: serviceStatus?.Error,
+            LastError: PublicStatusError(serviceStatus?.Error),
             Counts: new WhatsAppStatusCountsDto(sent, failed, skipped)));
+    }
+
+    private static string? PublicStatusError(string? error)
+    {
+        if (string.IsNullOrWhiteSpace(error)) return null;
+
+        return error.Trim().ToLowerInvariant() switch
+        {
+            "configuration_error" => "configuration_error",
+            "auth_failed" => "auth_failed",
+            "mongo_connection_failed" => "mongo_connection_failed",
+            "connection_error" => "connection_error",
+            "not_connected" => "connection_error",
+            "startup_failed" => "connection_error",
+            _ => "connection_error",
+        };
     }
 }
 

@@ -18,6 +18,9 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.UpdatedAt)
             .HasDefaultValueSql("SYSUTCDATETIME()");
 
+        builder.Property(u => u.PhoneVerifiedAt)
+            .IsRequired(false);
+
         builder.Property(u => u.IsDisabled)
             .HasDefaultValue(false);
 

@@ -11,12 +11,14 @@ import type {
 import type {
   CancelOrderRequest,
   CreateOrderRequest,
+  CreateOrderResult,
   OrderDetailDto,
   OrderSummaryDto,
   PaymentMethodDto,
   ReturnRequestDto,
   SubmitReturnRequest,
 } from './types';
+import { isCheckoutPhoneVerificationRequired } from './types';
 
 /**
  * Whole app-config query — payment-proof upload limits AND the optional
@@ -68,9 +70,10 @@ export function useMyOrderQuery(orderNumber: string | undefined) {
 export function useCreateOrderMutation() {
   const queryClient = useQueryClient();
   const errorToast = useApiErrorToast();
-  return useMutation<OrderDetailDto, Error, { input: CreateOrderRequest; idempotencyKey?: string }>({
+  return useMutation<CreateOrderResult, Error, { input: CreateOrderRequest; idempotencyKey?: string }>({
     mutationFn: ({ input, idempotencyKey }) => ordersApi.createOrder(input, idempotencyKey),
     onSuccess: (order) => {
+      if (isCheckoutPhoneVerificationRequired(order)) return;
       // Checkout consumes the cart — invalidate so the mini-cart updates.
       void queryClient.invalidateQueries({ queryKey: queryKeys.cart() });
       // Seed the detail query so the post-checkout redirect renders instantly.

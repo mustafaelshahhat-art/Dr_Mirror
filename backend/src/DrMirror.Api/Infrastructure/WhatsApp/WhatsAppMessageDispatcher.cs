@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Diagnostics;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Orders;
 using DrMirror.Api.Infrastructure.Persistence;
@@ -60,7 +61,7 @@ public sealed class WhatsAppMessageDispatcher
 
         var today = new DateTimeOffset(DateTime.UtcNow.Date, TimeSpan.Zero);
         var sentToday = await _db.WhatsAppOutboxMessages.CountAsync(m =>
-            m.RecipientPhoneMasked == message.RecipientPhoneMasked &&
+            m.BuyerUserId == message.BuyerUserId &&
             m.Status == WhatsAppOutboxStatus.Sent &&
             m.CreatedAt >= today,
             ct);
@@ -70,8 +71,14 @@ public sealed class WhatsAppMessageDispatcher
             return;
         }
 
-        await Task.Delay(TimeSpan.FromSeconds(Random.Shared.Next(5, 16)), ct);
-        await _sender.SendAsync(resolved.Phone, resolved.Body, ct);
+        if (message.Priority != WhatsAppMessagePriority.High)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(Random.Shared.Next(5, 16)), ct);
+        }
+
+        var sw = Stopwatch.StartNew();
+        await _sender.SendAsync(resolved.Phone, resolved.Body, message.Priority, ct);
+        sw.Stop();
 
         message.Status = WhatsAppOutboxStatus.Sent;
         message.DeliveredAt = DateTimeOffset.UtcNow;
@@ -79,10 +86,12 @@ public sealed class WhatsAppMessageDispatcher
         message.LockedBy = null;
         message.FailureReason = null;
         _logger.LogInformation(
-            "WhatsAppOutbox: sent {EventType} (id={Id}, phone={MaskedPhone})",
+            "WhatsAppOutbox: sent {EventType} (id={Id}, phone={MaskedPhone}, Priority={Priority}) in {ElapsedMs}ms",
             message.EventType,
             message.Id,
-            message.RecipientPhoneMasked);
+            message.RecipientPhoneMasked,
+            message.Priority,
+            sw.ElapsedMilliseconds);
     }
 
     private async Task<ResolvedMessage?> ResolveAsync(WhatsAppOutboxMessage message, CancellationToken ct) => message.EventType switch

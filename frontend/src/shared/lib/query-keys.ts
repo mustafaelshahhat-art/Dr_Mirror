@@ -56,6 +56,7 @@ export const queryKeys = {
     },
   },
   account: {
+    profile: () => ['account', 'profile'] as const,
     notificationPreferences: () => ['account', 'notification-preferences'] as const,
   },
   inquiries: {

@@ -44,6 +44,7 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<PasswordResetRequest> PasswordResetRequests => Set<PasswordResetRequest>();
     public DbSet<WhatsAppOutboxMessage> WhatsAppOutboxMessages => Set<WhatsAppOutboxMessage>();
     public DbSet<CustomerNotificationPreference> CustomerNotificationPreferences => Set<CustomerNotificationPreference>();
+    public DbSet<PhoneVerificationOtp> PhoneVerificationOtps => Set<PhoneVerificationOtp>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

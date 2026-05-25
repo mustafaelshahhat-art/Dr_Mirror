@@ -563,7 +563,14 @@
       "initializing": "قيد التشغيل",
       "disconnected": "غير متصل",
       "qr_required": "يتطلب رمز QR",
-      "auth_failed": "فشل التوثيق"
+      "auth_failed": "فشل التوثيق",
+      "configuration_error": "خطأ في الإعداد"
+    },
+    "errors": {
+      "connection_error": "فشل اتصال واتساب. ستحاول الخدمة إعادة الاتصال تلقائيًا.",
+      "mongo_connection_failed": "تخزين جلسة واتساب غير متاح. تأكد من MongoDB ثم حاول مرة أخرى.",
+      "auth_failed": "انتهت جلسة واتساب. اربط الجهاز مرة أخرى.",
+      "configuration_error": "إعدادات خدمة واتساب تحتاج إلى مراجعة."
     },
     "attemptStatus": {
       "pending": "منتظر",

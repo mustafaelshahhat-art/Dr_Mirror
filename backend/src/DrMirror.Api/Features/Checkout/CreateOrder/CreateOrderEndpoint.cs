@@ -177,6 +177,7 @@ public static class CreateOrderEndpoint
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForOrderConfirmation(order.Id));
         db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForOrder(
             order.Id,
+            order.BuyerUserId,
             "OrderConfirmation",
             "Placed",
             order.ShippingAddress.Phone));

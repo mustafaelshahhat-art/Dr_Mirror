@@ -20,6 +20,10 @@
   "account": {
     "welcome": "Welcome, {{name}}",
     "quickLinks": "Quick links",
+    "profile": {
+      "title": "Profile",
+      "subtitle": "Edit your name and verified phone."
+    },
     "myOrders": {
       "title": "My orders",
       "subtitle": "View, track, and manage every order you've placed."
@@ -39,6 +43,10 @@
     "notifications": {
       "title": "Notification settings",
       "subtitle": "Choose how you receive order and return updates."
+    },
+    "security": {
+      "title": "Security",
+      "subtitle": "Change your password and manage account security."
     },
     "subtitle": "Your account home. More tools land in the next milestones.",
     "fields": {

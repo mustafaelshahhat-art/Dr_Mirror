@@ -13,7 +13,9 @@ public sealed class WhatsAppOutboxMessageConfiguration : IEntityTypeConfiguratio
 
         builder.Property(x => x.EventType).HasMaxLength(100).IsRequired();
         builder.Property(x => x.Payload).IsRequired();
+        builder.Property(x => x.BuyerUserId).IsRequired();
         builder.Property(x => x.RecipientPhoneMasked).HasMaxLength(30).IsRequired();
+        builder.Property(x => x.Priority).IsRequired();
         builder.Property(x => x.Status).HasDefaultValue(WhatsAppOutboxStatus.Pending);
         builder.Property(x => x.Attempts).HasDefaultValue(0);
         builder.Property(x => x.NextRetryAt).IsRequired();
@@ -27,10 +29,13 @@ public sealed class WhatsAppOutboxMessageConfiguration : IEntityTypeConfiguratio
         builder.HasIndex(x => new { x.Status, x.NextRetryAt })
             .HasFilter("[Status] = 0")
             .HasDatabaseName("IX_WhatsAppOutboxMessages_Status_NextRetryAt");
+        builder.HasIndex(x => new { x.Status, x.Priority, x.NextRetryAt })
+            .HasFilter("[Status] = 0")
+            .HasDatabaseName("IX_WhatsAppOutboxMessages_Status_Priority_NextRetryAt");
         builder.HasIndex(x => new { x.Status, x.LockedAt })
             .HasFilter("[Status] = 1")
             .HasDatabaseName("IX_WhatsAppOutboxMessages_Status_LockedAt");
-        builder.HasIndex(x => new { x.RecipientPhoneMasked, x.CreatedAt })
-            .HasDatabaseName("IX_WhatsAppOutboxMessages_RecipientPhoneMasked_CreatedAt");
+        builder.HasIndex(x => new { x.BuyerUserId, x.CreatedAt })
+            .HasDatabaseName("IX_WhatsAppOutboxMessages_BuyerUserId_CreatedAt");
     }
 }

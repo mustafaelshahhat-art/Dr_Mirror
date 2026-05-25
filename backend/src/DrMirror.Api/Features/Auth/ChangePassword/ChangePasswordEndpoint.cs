@@ -5,6 +5,7 @@ using DrMirror.Api.Shared.Auditing;
 using DrMirror.Api.Shared.Validation;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using DrMirror.Api.Shared.RateLimiting;
 
 namespace DrMirror.Api.Features.Auth.ChangePassword;
 
@@ -37,7 +38,23 @@ public static class ChangePasswordEndpoint
             .WithSummary("Change the authenticated user's password.")
             .RequireAuthorization()
             .WithValidation<ChangePasswordRequest>()
-            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesValidationProblem()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized);
+
+        return group;
+    }
+
+    public static RouteGroupBuilder MapAccountChangePassword(this RouteGroupBuilder group)
+    {
+        group.MapPost("/password", HandleAsync)
+            .WithName("Account.ChangePassword")
+            .WithSummary("Change the authenticated user's password.")
+            .RequireAuthorization()
+            .RequireRateLimiting(RateLimitPolicies.PasswordReset)
+            .WithValidation<ChangePasswordRequest>()
+            .Produces(StatusCodes.Status204NoContent)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized);
@@ -76,10 +93,7 @@ public static class ChangePasswordEndpoint
             var isMismatch = result.Errors.Any(e => e.Code == "PasswordMismatch");
             if (isMismatch)
             {
-                return Results.Problem(
-                    title: "Incorrect current password",
-                    detail: "The current password you entered is incorrect.",
-                    statusCode: StatusCodes.Status400BadRequest);
+                return Results.Json(new { code = "IncorrectCurrentPassword" }, statusCode: StatusCodes.Status400BadRequest);
             }
 
             return Results.ValidationProblem(
@@ -96,7 +110,7 @@ public static class ChangePasswordEndpoint
             await audit.WriteAsync("Auth.PasswordChange", "User", userId.ToString(), null, null, ct);
         }
 
-        return Results.Ok();
+        return Results.NoContent();
     }
 
     private static string MapIdentityErrorToField(string code) => code switch

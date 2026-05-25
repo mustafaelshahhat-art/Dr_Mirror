@@ -54,6 +54,7 @@ const AdminWhatsAppQrPage = lazy(() => import('../features/admin/AdminWhatsAppQr
 const ReturnsListPage = lazy(() => import('../features/orders/ReturnsListPage').then((m) => ({ default: m.ReturnsListPage })));
 const AccountSecurityPage = lazy(() => import('../features/account/AccountSecurityPage').then((m) => ({ default: m.AccountSecurityPage })));
 const AccountNotificationsPage = lazy(() => import('../features/account/AccountNotificationsPage').then((m) => ({ default: m.AccountNotificationsPage })));
+const AccountProfilePage = lazy(() => import('../features/account/AccountProfilePage').then((m) => ({ default: m.AccountProfilePage })));
 
 function PageFallback() {
   const { t } = useTranslation();
@@ -97,6 +98,7 @@ export function AppRoutes() {
             <Route path="checkout" element={<CheckoutPage />} />
             <Route path="account" element={<ShellPage />} />
             <Route path="account/orders" element={<OrdersListPage />} />
+            <Route path="account/profile" element={<AccountProfilePage />} />
             <Route path="account/orders/:orderNumber" element={<OrderDetailPage />} />
             <Route path="account/returns" element={<ReturnsListPage />} />
             <Route path="account/addresses" element={<AddressBookPage />} />

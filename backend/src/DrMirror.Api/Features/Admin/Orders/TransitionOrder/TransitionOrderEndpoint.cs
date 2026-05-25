@@ -111,6 +111,7 @@ public static class TransitionOrderEndpoint
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
         db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForOrder(
             order.Id,
+            order.BuyerUserId,
             "OrderStatusChanged",
             order.Status.ToString(),
             order.ShippingAddress.Phone));

@@ -25,7 +25,7 @@ public static class WhatsAppOutboxHelper
         }
     }
 
-    public static WhatsAppOutboxMessage CreateForOrder(Guid orderId, string eventType, string status, string? phone)
+    public static WhatsAppOutboxMessage CreateForOrder(Guid orderId, Guid buyerUserId, string eventType, string status, string? phone)
     {
         var normalizedStatus = status.Trim();
         var now = DateTimeOffset.UtcNow;
@@ -34,14 +34,16 @@ public static class WhatsAppOutboxHelper
             Id = Guid.NewGuid(),
             EventType = eventType,
             Payload = JsonSerializer.Serialize(new OrderPayload(orderId, normalizedStatus)),
+            BuyerUserId = buyerUserId,
             RecipientPhoneMasked = MaskPhone(phone),
+            Priority = WhatsAppMessagePriority.Normal,
             IdempotencyKey = $"order:{orderId}:{normalizedStatus.ToLowerInvariant()}",
             CreatedAt = now,
             NextRetryAt = now,
         };
     }
 
-    public static WhatsAppOutboxMessage CreateForReturn(Guid returnRequestId, string eventType, string status, string? phone)
+    public static WhatsAppOutboxMessage CreateForReturn(Guid returnRequestId, Guid buyerUserId, string eventType, string status, string? phone)
     {
         var normalizedStatus = status.Trim();
         var now = DateTimeOffset.UtcNow;
@@ -50,7 +52,9 @@ public static class WhatsAppOutboxHelper
             Id = Guid.NewGuid(),
             EventType = eventType,
             Payload = JsonSerializer.Serialize(new ReturnPayload(returnRequestId, normalizedStatus)),
+            BuyerUserId = buyerUserId,
             RecipientPhoneMasked = MaskPhone(phone),
+            Priority = WhatsAppMessagePriority.Normal,
             IdempotencyKey = $"return:{returnRequestId}:{normalizedStatus.ToLowerInvariant()}",
             CreatedAt = now,
             NextRetryAt = now,

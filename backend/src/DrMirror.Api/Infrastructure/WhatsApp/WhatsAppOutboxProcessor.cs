@@ -49,7 +49,8 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
             .Where(m => m.Attempts < maxAttempts
                 && ((m.Status == WhatsAppOutboxStatus.Pending && m.NextRetryAt <= now)
                     || (m.Status == WhatsAppOutboxStatus.Processing && m.LockedAt <= staleBefore)))
-            .OrderBy(m => m.CreatedAt)
+            .OrderBy(m => m.Priority)
+            .ThenBy(m => m.CreatedAt)
             .Select(m => m.Id)
             .Take(20)
             .ToListAsync(ct);
@@ -87,7 +88,8 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
             .Where(m => claimableIds.Contains(m.Id)
                 && m.Status == WhatsAppOutboxStatus.Processing
                 && m.LockedBy == _workerId)
-            .OrderBy(m => m.CreatedAt)
+            .OrderBy(m => m.Priority)
+            .ThenBy(m => m.CreatedAt)
             .ToListAsync(ct);
 
         foreach (var msg in claimed)
@@ -96,7 +98,7 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
             {
                 await dispatcher.DispatchAsync(msg, ct);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 msg.FailureReason = "sidecar_error";
                 msg.LockedAt = null;
@@ -123,6 +125,7 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
             catch (DbUpdateConcurrencyException ex)
             {
                 _logger.LogWarning(ex, "WhatsAppOutbox: concurrency conflict ignored for {Id}", msg.Id);
+                db.Entry(msg).State = EntityState.Detached;
             }
         }
     }

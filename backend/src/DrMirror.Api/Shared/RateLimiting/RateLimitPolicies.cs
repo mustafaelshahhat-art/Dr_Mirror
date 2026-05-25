@@ -60,4 +60,14 @@ public static class RateLimitPolicies
     /// 3 requests per 5 minutes per IP — fixed window.
     /// </summary>
     public const string PasswordReset = "password-reset";
+
+    /// <summary>
+    /// OTP sends — 5 requests per 5 minutes per authenticated user.
+    /// </summary>
+    public const string OtpSend = "otp-send";
+
+    /// <summary>
+    /// OTP verification attempts — 10 requests per 5 minutes per authenticated user.
+    /// </summary>
+    public const string OtpVerify = "otp-verify";
 }

@@ -3,27 +3,28 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, Form } from '@heroui/react';
+import { toast } from '@heroui/react/toast';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import { api } from '../../shared/lib/api-client';
 
 import { FormField } from '../auth/components/FormField';
+import { accountApi } from './api';
 
 const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, 'auth.errors.passwordRequired'),
     newPassword: z
       .string()
-      .min(8, 'auth.errors.passwordTooShort')
-      .max(128, 'auth.errors.passwordTooLong')
-      .regex(/[a-z]/, 'auth.errors.passwordMissingLower')
-      .regex(/[A-Z]/, 'auth.errors.passwordMissingUpper')
-      .regex(/[0-9]/, 'auth.errors.passwordMissingDigit'),
+      .min(8, 'account.account.security.passwordTooWeak')
+      .max(128, 'account.account.security.passwordTooWeak')
+      .regex(/[a-z]/, 'account.account.security.passwordTooWeak')
+      .regex(/[A-Z]/, 'account.account.security.passwordTooWeak')
+      .regex(/[0-9]/, 'account.account.security.passwordTooWeak'),
     confirmPassword: z.string().min(1, 'auth.errors.passwordRequired'),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {
-    message: 'auth.errors.passwordsMismatch',
+    message: 'account.account.security.passwordMismatch',
     path: ['confirmPassword'],
   });
 
@@ -44,19 +45,15 @@ export function AccountSecurityPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: async (values: ChangePasswordValues) => {
-      await api.post('/auth/change-password', {
-        currentPassword: values.currentPassword,
-        newPassword: values.newPassword,
-        confirmPassword: values.confirmPassword,
-      });
-    },
+    mutationFn: accountApi.changePassword,
     onSuccess: () => {
       reset();
       setServerError(null);
+      toast.success(t('account.account.security.success'));
     },
     onError: (err) => {
-      if (isAxiosError(err) && err.response?.status === 400) {
+      const data = isAxiosError(err) ? err.response?.data as { code?: string } | undefined : undefined;
+      if (data?.code === 'IncorrectCurrentPassword') {
         setServerError(t('account.account.security.errorIncorrectPassword'));
       } else {
         setServerError(t('account.account.security.errorUnknown'));

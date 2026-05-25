@@ -335,6 +335,7 @@ try
                     || path.StartsWithSegments("/api/cart")
                     || path.StartsWithSegments("/api/addresses")
                     || path.StartsWithSegments("/api/auth")
+                    || path.StartsWithSegments("/api/account")
                     || path.StartsWithSegments("/api/admin")
                     || path.StartsWithSegments("/api/health"))
                 {

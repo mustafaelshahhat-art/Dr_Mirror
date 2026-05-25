@@ -131,6 +131,7 @@ public static class SubmitReturnEndpoint
             db.EmailOutboxMessages.Add(EmailOutboxHelper.ForReturnCreated(returnRequest.Id));
             db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForReturn(
                 returnRequest.Id,
+                userId,
                 "ReturnCreated",
                 ReturnStatus.Requested.ToString(),
                 order.ShippingAddress.Phone));

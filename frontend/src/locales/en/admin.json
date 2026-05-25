@@ -527,7 +527,14 @@
       "initializing": "Initializing",
       "disconnected": "Disconnected",
       "qr_required": "QR required",
-      "auth_failed": "Auth failed"
+      "auth_failed": "Auth failed",
+      "configuration_error": "Config error"
+    },
+    "errors": {
+      "connection_error": "WhatsApp connection failed. The service will retry automatically.",
+      "mongo_connection_failed": "WhatsApp session storage is unavailable. Check MongoDB and retry.",
+      "auth_failed": "WhatsApp session expired. Pair the device again.",
+      "configuration_error": "WhatsApp service configuration needs attention."
     },
     "attemptStatus": {
       "pending": "Pending",

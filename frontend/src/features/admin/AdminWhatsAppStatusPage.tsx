@@ -64,7 +64,16 @@ export function AdminWhatsAppStatusPage() {
         <div className="grid gap-3 sm:grid-cols-4">
           <StatusCard
             label={t('admin.whatsapp.status.connection')}
-            value={<ConnectionChip state={statusQuery.data.connectionState} />}
+            value={
+              <div className="flex flex-col gap-1">
+                <ConnectionChip state={statusQuery.data.connectionState} />
+                {statusQuery.data.lastError ? (
+                  <p className="text-xs text-danger-500">
+                    {t(`admin.whatsapp.errors.${statusQuery.data.lastError}`, { defaultValue: statusQuery.data.lastError })}
+                  </p>
+                ) : null}
+              </div>
+            }
           />
           <StatusCard label={t('admin.whatsapp.status.sent')} value={statusQuery.data.counts.sent} />
           <StatusCard label={t('admin.whatsapp.status.failed')} value={statusQuery.data.counts.failed} />

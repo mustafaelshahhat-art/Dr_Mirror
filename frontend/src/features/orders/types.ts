@@ -220,6 +220,23 @@ export interface OrderDetailDto {
   addressSaveOutcome?: AddressSaveOutcome;
 }
 
+export interface CheckoutPhoneVerificationRequiredDto {
+  phoneVerificationRequired: true;
+  sessionId: string;
+  maskedPhone: string;
+  cooldownSeconds: number;
+  resendsRemaining: number;
+  status: 'sending' | 'sent' | 'failed';
+}
+
+export type CreateOrderResult = OrderDetailDto | CheckoutPhoneVerificationRequiredDto;
+
+export function isCheckoutPhoneVerificationRequired(
+  value: CreateOrderResult,
+): value is CheckoutPhoneVerificationRequiredDto {
+  return 'phoneVerificationRequired' in value && value.phoneVerificationRequired === true;
+}
+
 // -----------------------------------------------------------------------------
 // Request payloads
 // -----------------------------------------------------------------------------

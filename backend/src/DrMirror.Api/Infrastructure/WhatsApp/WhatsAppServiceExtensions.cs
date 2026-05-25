@@ -24,7 +24,9 @@ public static class WhatsAppServiceExtensions
             client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
         });
         services.AddScoped<IWhatsAppSender>(sp => sp.GetRequiredService<WhatsAppServiceClient>());
+        services.AddSingleton<IPhoneVerificationOtpSendQueue, PhoneVerificationOtpSendQueue>();
         services.AddScoped<WhatsAppMessageDispatcher>();
+        services.AddHostedService<PhoneVerificationOtpSenderService>();
         services.AddHostedService<WhatsAppOutboxProcessor>();
         services.AddHostedService<WhatsAppSidecarMonitor>();
         services.AddHostedService<WhatsAppOutboxRetentionService>();

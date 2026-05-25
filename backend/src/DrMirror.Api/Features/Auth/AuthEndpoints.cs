@@ -3,6 +3,8 @@ using DrMirror.Api.Features.Auth.ForgotPassword;
 using DrMirror.Api.Features.Auth.Login;
 using DrMirror.Api.Features.Auth.Logout;
 using DrMirror.Api.Features.Auth.Me;
+using DrMirror.Api.Features.Auth.PhoneVerification;
+using DrMirror.Api.Features.Auth.Profile;
 using DrMirror.Api.Features.Auth.Refresh;
 using DrMirror.Api.Features.Auth.Register;
 using DrMirror.Api.Features.Auth.ResetPassword;
@@ -35,6 +37,11 @@ public static class AuthEndpoints
         group.MapForgotPassword();
         group.MapResetPassword();
         group.MapChangePassword();
+
+        var account = app.MapGroup("/api/account").WithTags("Account");
+        account.MapProfileEndpoints();
+        account.MapPhoneVerificationEndpoints();
+        account.MapAccountChangePassword();
 
         return app;
     }
