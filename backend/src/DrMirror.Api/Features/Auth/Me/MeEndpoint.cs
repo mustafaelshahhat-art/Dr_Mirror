@@ -23,7 +23,7 @@ public sealed class UpdateMeValidator : AbstractValidator<UpdateMeRequest>
 
         RuleFor(x => x.Phone)
             .MaximumLength(30)
-            .Must(p => string.IsNullOrWhiteSpace(p) || PhoneRegex.IsMatch(p))
+            .Must(p => string.IsNullOrWhiteSpace(p) || PhoneRegex.IsMatch(p.Trim()))
             .WithMessage("Phone number is not valid.");
 
     }
@@ -109,7 +109,13 @@ public static class MeEndpoint
 
         if (request.Phone is not null)
         {
-            user.PhoneNumber = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone.Trim();
+            var phone = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone.Trim();
+            if (!string.Equals(user.PhoneNumber, phone, StringComparison.Ordinal))
+            {
+                user.PhoneNumber = phone;
+                user.PhoneNumberConfirmed = false;
+                user.PhoneVerifiedAt = null;
+            }
         }
 
         user.UpdatedAt = DateTimeOffset.UtcNow;

@@ -6,6 +6,7 @@ using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.RateLimiting;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace DrMirror.Api.Features.Auth.PhoneVerification;
 
@@ -51,6 +52,7 @@ public static class SendOtpEndpoint
         ICurrentUser current,
         AppDbContext db,
         IPhoneVerificationOtpSendQueue otpSendQueue,
+        IOptions<JwtOptions> jwtOptions,
         ILogger<SendOtpRequest> logger,
         CancellationToken ct)
     {
@@ -70,7 +72,7 @@ public static class SendOtpEndpoint
             return Results.Json(new { code = PhoneVerificationErrorCodes.NoPhoneOnFile }, statusCode: StatusCodes.Status400BadRequest);
         }
 
-        return await SendAsync(user, purpose, db, otpSendQueue, logger, ct);
+        return await SendAsync(user, purpose, db, otpSendQueue, jwtOptions.Value.Secret, logger, ct);
     }
 
     private static async Task<IResult> GetSendStatusAsync(
@@ -105,12 +107,25 @@ public static class SendOtpEndpoint
         OtpPurpose purpose,
         AppDbContext db,
         IPhoneVerificationOtpSendQueue otpSendQueue,
+        string otpHashSecret,
         ILogger logger,
-        CancellationToken ct)
+        CancellationToken ct,
+        bool phoneVerificationRequired = false)
     {
         var total = Stopwatch.StartNew();
         var now = DateTimeOffset.UtcNow;
-        var phone = user.PhoneNumber!;
+        var phone = user.PhoneNumber?.Trim();
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            return Results.Json(new { code = PhoneVerificationErrorCodes.NoPhoneOnFile }, statusCode: StatusCodes.Status400BadRequest);
+        }
+        if (!PhoneNormalizer.IsValidEgyptianLocal(phone))
+        {
+            return Results.ValidationProblem(new Dictionary<string, string[]>
+            {
+                [nameof(user.PhoneNumber)] = ["Phone number must be 11 digits and start with 010, 011, 012, or 015."],
+            });
+        }
         var maskedPhone = PhoneVerificationHelpers.MaskPhone(phone);
 
         var lockoutUntil = await db.PhoneVerificationOtps
@@ -166,7 +181,7 @@ public static class SendOtpEndpoint
             PhoneNumber = phone,
             Purpose = purpose,
             ResendCount = latestSession is null ? 0 : latestSession.ResendCount + 1,
-            CodeHash = PhoneVerificationHelpers.HashCode(code),
+            CodeHash = PhoneVerificationHelpers.HashCode(code, otpHashSecret),
             ExpiresAt = now.Add(PhoneVerificationHelpers.OtpLifetime),
             IsUsed = false,
             WrongAttempts = 0,
@@ -207,6 +222,7 @@ public static class SendOtpEndpoint
             maskedPhone,
             PhoneVerificationHelpers.CooldownSeconds,
             Math.Max(0, PhoneVerificationHelpers.MaxResends - session.ResendCount),
-            PhoneVerificationHelpers.SendStatusValue(session.SendStatus)));
+            PhoneVerificationHelpers.SendStatusValue(session.SendStatus),
+            phoneVerificationRequired));
     }
 }

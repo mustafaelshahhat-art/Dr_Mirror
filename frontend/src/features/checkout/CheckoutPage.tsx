@@ -174,6 +174,7 @@ function CheckoutBody() {
   const selectedGovernorate = findGovernorateForAddress(governoratesQuery.data ?? [], addressGovernorate);
   const shippingFee = selectedGovernorate?.fee ?? 0;
   const shippingGovernorateUnavailable = Boolean(addressGovernorate) && governoratesQuery.isSuccess && !selectedGovernorate;
+  const isCheckoutLocked = Boolean(checkoutOtp);
 
   function hasAvailableShippingGovernorate() {
     if (selectedGovernorate) {
@@ -434,7 +435,7 @@ function CheckoutBody() {
               <Button
                 type="button"
                 variant="ghost"
-                isDisabled={step === 'address' || createOrder.isPending}
+                isDisabled={step === 'address' || createOrder.isPending || isCheckoutLocked}
                 onPress={previous}
                 className="rounded-xl"
               >
@@ -448,7 +449,7 @@ function CheckoutBody() {
                 <Button
                   type="button"
                   variant="primary"
-                  isDisabled={step === 'payment' && !paymentAvailable}
+                  isDisabled={isCheckoutLocked || (step === 'payment' && !paymentAvailable)}
                   onPress={() => void next()}
                   className="rounded-xl"
                 >
@@ -462,7 +463,7 @@ function CheckoutBody() {
                   type="button"
                   variant="primary"
                   isPending={createOrder.isPending}
-                  isDisabled={createOrder.isPending}
+                  isDisabled={createOrder.isPending || isCheckoutLocked}
                   onPress={() => void handlePlaceOrder()}
                   className="rounded-xl"
                 >

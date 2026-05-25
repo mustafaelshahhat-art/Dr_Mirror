@@ -5,7 +5,13 @@ using DrMirror.Api.Domain.Entities;
 namespace DrMirror.Api.Features.Auth.PhoneVerification;
 
 public sealed record SendOtpRequest(string Purpose);
-public sealed record SendOtpResponse(Guid SessionId, string MaskedPhone, int CooldownSeconds, int ResendsRemaining, string Status);
+public sealed record SendOtpResponse(
+    Guid SessionId,
+    string MaskedPhone,
+    int CooldownSeconds,
+    int ResendsRemaining,
+    string Status,
+    bool PhoneVerificationRequired = false);
 public sealed record OtpSendStatusResponse(string Status, string Message, bool CanRetry);
 public sealed record VerifyOtpRequest(string Code, string Purpose);
 public sealed record VerifyOtpResponse(bool Verified);
@@ -39,8 +45,12 @@ internal static class PhoneVerificationHelpers
         return value?.Trim().ToLowerInvariant() is "profile" or "checkout";
     }
 
-    public static string HashCode(string code) =>
-        Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(code)));
+    public static string HashCode(string code, string secret)
+    {
+        var key = Encoding.UTF8.GetBytes(secret);
+        var message = Encoding.UTF8.GetBytes("phone-otp:" + code);
+        return Convert.ToHexString(HMACSHA256.HashData(key, message));
+    }
 
     public static string GenerateCode() => RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
 

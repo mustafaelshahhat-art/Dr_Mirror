@@ -144,7 +144,14 @@ export function AccountProfilePage() {
     },
   });
 
-  const onSubmit = handleSubmit((values) => updateMutation.mutate(values));
+  const onSubmit = handleSubmit((values) => {
+    if (!values.phoneNumber?.trim() && (query.data?.phoneNumber ?? '')) {
+      setSendError(t('account.account.profile.noPhone'));
+      return;
+    }
+
+    updateMutation.mutate(values);
+  });
 
   async function handleVerifyPhone() {
     if (sendOtpMutation.isPending) return;

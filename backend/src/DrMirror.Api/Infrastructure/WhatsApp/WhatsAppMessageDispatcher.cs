@@ -61,7 +61,7 @@ public sealed class WhatsAppMessageDispatcher
 
         var today = new DateTimeOffset(DateTime.UtcNow.Date, TimeSpan.Zero);
         var sentToday = await _db.WhatsAppOutboxMessages.CountAsync(m =>
-            m.BuyerUserId == message.BuyerUserId &&
+            m.BuyerUserId == resolved.BuyerUserId &&
             m.Status == WhatsAppOutboxStatus.Sent &&
             m.CreatedAt >= today,
             ct);

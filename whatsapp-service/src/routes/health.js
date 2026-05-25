@@ -2,6 +2,9 @@ export function registerHealthRoutes(app, client) {
   app.get('/health', (_req, res) => {
     const s = client.status();
     res.json({
+      ok: true,
+      service: 'drmirror-whatsapp-service',
+      whatsappState: s.state,
       serviceRunning: s.serviceRunning,
       configurationValid: s.configurationValid,
       mongoConnected: s.mongoConnected,

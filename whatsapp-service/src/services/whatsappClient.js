@@ -125,7 +125,13 @@ export class WhatsAppClientService {
           this.lastDisconnectReason = lastDisconnect?.error?.message ?? 'connection_closed';
           this.lastError = this.lastDisconnectReason;
           logger.warn({ statusCode, loggedOut }, 'WhatsApp connection closed');
-          if (!loggedOut) this.scheduleReconnect();
+          if (loggedOut) {
+            await collection.deleteMany({});
+            this.qrDataUri = null;
+            this.scheduleReconnect();
+          } else {
+            this.scheduleReconnect();
+          }
         }
       });
     } catch (err) {
@@ -201,32 +207,36 @@ export class WhatsAppClientService {
       throw err;
     }
 
-    const rate = this.rateLimiter.check(phone);
-    if (!rate.ok) {
-      const err = new Error(rate.reason);
+    const reservation = this.rateLimiter.reserve(phone);
+    if (!reservation.ok) {
+      const err = new Error(reservation.reason);
       err.statusCode = 429;
       throw err;
     }
 
-    const priority = String(options.priority ?? 'normal').toLowerCase();
-    if (priority !== 'high') {
-      await randomDelay(this.config.sendDelayMinMs, this.config.sendDelayMaxMs);
-    }
+    try {
+      const priority = String(options.priority ?? 'normal').toLowerCase();
+      if (priority !== 'high') {
+        await randomDelay(this.config.sendDelayMinMs, this.config.sendDelayMaxMs);
+      }
 
-    // Re-check after the delay — the connection may have dropped while waiting.
-    const sock = this.sock;
-    if (!sock || this.state !== 'connected') {
-      const err = new Error('not_connected');
-      err.statusCode = 503;
+      // Re-check after the delay — the connection may have dropped while waiting.
+      const sock = this.sock;
+      if (!sock || this.state !== 'connected') {
+        const err = new Error('not_connected');
+        err.statusCode = 503;
+        throw err;
+      }
+
+      const sendStartedAt = Date.now();
+      await sock.sendMessage(jid, { text: String(message) });
+      this.lastSentAt = new Date().toISOString();
+      this.lastError = null;
+      logger.info({ phone: maskPhone(phone), priority, elapsedMs: Date.now() - sendStartedAt }, 'WhatsApp Baileys sendMessage completed');
+    } catch (err) {
+      reservation.release();
       throw err;
     }
-
-    const sendStartedAt = Date.now();
-    await sock.sendMessage(jid, { text: String(message) });
-    this.rateLimiter.record(phone);
-    this.lastSentAt = new Date().toISOString();
-    this.lastError = null;
-    logger.info({ phone: maskPhone(phone), priority, elapsedMs: Date.now() - sendStartedAt }, 'WhatsApp Baileys sendMessage completed');
   }
 
   async shutdown() {

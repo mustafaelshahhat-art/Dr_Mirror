@@ -1,6 +1,7 @@
 using DrMirror.Api.Domain.Catalog;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Orders;
+using DrMirror.Api.Features.Auth.PhoneVerification;
 using DrMirror.Api.Features.Orders.Common;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Identity;
@@ -9,6 +10,7 @@ using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace DrMirror.Api.Features.Checkout.CreateOrder;
 
@@ -21,6 +23,7 @@ public static class CreateOrderEndpoint
             .WithSummary("Convert the signed-in buyer's open cart into a new order.")
             .RequireAuthorization()
             .WithValidation<CreateOrderRequest>()
+            .Produces<SendOtpResponse>(StatusCodes.Status200OK)
             .Produces<OrderDetailDto>(StatusCodes.Status201Created)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -35,13 +38,35 @@ public static class CreateOrderEndpoint
         [FromHeader(Name = "X-Idempotency-Key")] Guid? idempotencyKey,
         ICurrentUser current,
         AppDbContext db,
+        [FromServices] IPhoneVerificationOtpSendQueue otpSendQueue,
+        [FromServices] IOptions<JwtOptions> jwtOptions,
         [FromServices] OrderStateMachine fsm,
         [FromServices] OrderNumberGenerator numberGenerator,
+        [FromServices] ILogger<CreateOrderRequest> logger,
         CancellationToken ct)
     {
         if (!current.IsAuthenticated || current.UserId is not { } userId)
         {
             return Results.Unauthorized();
+        }
+
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId, ct);
+        if (user is null || user.IsDisabled)
+        {
+            return Results.Unauthorized();
+        }
+
+        if (string.IsNullOrWhiteSpace(user.PhoneNumber) || !user.PhoneNumberConfirmed)
+        {
+            return await SendOtpEndpoint.SendAsync(
+                user,
+                OtpPurpose.Checkout,
+                db,
+                otpSendQueue,
+                jwtOptions.Value.Secret,
+                logger,
+                ct,
+                phoneVerificationRequired: true);
         }
 
         if (idempotencyKey is { } key)

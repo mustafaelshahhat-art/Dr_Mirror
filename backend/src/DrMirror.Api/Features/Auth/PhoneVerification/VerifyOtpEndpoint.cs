@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace DrMirror.Api.Features.Auth.PhoneVerification;
 
@@ -14,6 +15,7 @@ public static partial class VerifyOtpEndpoint
         VerifyOtpRequest request,
         ICurrentUser current,
         AppDbContext db,
+        IOptions<JwtOptions> jwtOptions,
         ILogger<VerifyOtpRequest> logger,
         CancellationToken ct)
     {
@@ -74,7 +76,7 @@ public static partial class VerifyOtpEndpoint
             return Results.Json(new { code = PhoneVerificationErrorCodes.OtpExpiredOrUsed }, statusCode: StatusCodes.Status400BadRequest);
         }
 
-        var codeHash = PhoneVerificationHelpers.HashCode(request.Code);
+        var codeHash = PhoneVerificationHelpers.HashCode(request.Code, jwtOptions.Value.Secret);
         var session = activeSessions.FirstOrDefault(o => string.Equals(o.CodeHash, codeHash, StringComparison.Ordinal));
         if (session is null)
         {
