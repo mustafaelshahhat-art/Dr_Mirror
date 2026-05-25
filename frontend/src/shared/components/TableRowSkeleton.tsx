@@ -25,7 +25,7 @@ export function TableSkeletonHeader({ cols = 4, label }: { cols?: number; label:
   return (
     <Table.Header>
       {Array.from({ length: cols }).map((_, i) => (
-        <Table.Column key={i} className="sr-only">
+        <Table.Column key={i} isRowHeader={i === 0} className="sr-only">
           {label}
         </Table.Column>
       ))}

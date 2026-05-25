@@ -1,4 +1,4 @@
-import { LayoutDashboard, MapPin, Package, RotateCcw, ShoppingBag } from 'lucide-react';
+import { Bell, LayoutDashboard, MapPin, Package, RotateCcw, ShoppingBag } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -116,6 +116,23 @@ export function ShellPage() {
             </span>
             <span className="block text-sm text-default-500">
               {t('common.account.myReturns.subtitle')}
+            </span>
+          </span>
+        </Link>
+
+        <Link
+          to="/account/notifications"
+          className="group flex items-center gap-3 content-surface p-4 transition-colors hover:bg-surface-secondary"
+        >
+          <span className="grid size-10 place-items-center rounded-medium bg-default-200 text-default-600 dark:bg-default-100/10 dark:text-default-400">
+            <Bell className="size-5" aria-hidden />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-base font-semibold text-foreground">
+              {t('common.account.notifications.title')}
+            </span>
+            <span className="block text-sm text-default-500">
+              {t('common.account.notifications.subtitle')}
             </span>
           </span>
         </Link>

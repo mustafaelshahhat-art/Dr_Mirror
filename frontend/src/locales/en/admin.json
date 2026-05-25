@@ -433,6 +433,7 @@
       "categories": "Categories",
       "paymentMethods": "Payment methods",
       "inquiries": "Inquiries",
+      "whatsapp": "WhatsApp",
       "users": "Users",
       "audit": "Audit log",
       "groups": {
@@ -506,6 +507,58 @@
       "Payment": "Payment",
       "Product": "Product",
       "User": "User"
+    }
+  },
+  "whatsapp": {
+    "status": {
+      "title": "WhatsApp status",
+      "subtitle": "Monitor the WhatsApp channel and delivery attempts without exposing full phone numbers.",
+      "loading": "Loading WhatsApp status...",
+      "errorLoad": "Couldn't load WhatsApp status. Please try again.",
+      "connection": "Connection",
+      "sent": "Sent",
+      "failed": "Failed",
+      "skipped": "Skipped",
+      "pairDevice": "Pair device",
+      "lastSentAt": "Last sent: {{date}}"
+    },
+    "states": {
+      "connected": "Connected",
+      "initializing": "Initializing",
+      "disconnected": "Disconnected",
+      "qr_required": "QR required",
+      "auth_failed": "Auth failed"
+    },
+    "attemptStatus": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "sent": "Sent",
+      "failed": "Failed",
+      "skipped": "Skipped"
+    },
+    "attempts": {
+      "title": "Notification attempts",
+      "loading": "Loading attempts...",
+      "errorLoad": "Couldn't load WhatsApp attempts. Please try again.",
+      "empty": "No WhatsApp attempts yet.",
+      "event": "Event",
+      "phone": "Masked phone",
+      "status": "Status",
+      "attempts": "Attempts",
+      "failure": "Failure reason",
+      "createdAt": "Created",
+      "key": "Idempotency key",
+      "none": "None"
+    },
+    "qr": {
+      "title": "Pair WhatsApp",
+      "subtitle": "Scan the QR code from WhatsApp Business to restore the notification channel.",
+      "imageAlt": "QR code for WhatsApp pairing",
+      "waiting": "Waiting for a QR code from the sidecar...",
+      "instructions": "Open WhatsApp on the phone, go to Linked devices, then scan this code.",
+      "refresh": "Refresh code",
+      "sidecarUnavailable": "The WhatsApp sidecar is unavailable. Check Node.js and try again.",
+      "connectedToast": "WhatsApp connected successfully."
     }
   },
   "returns": {

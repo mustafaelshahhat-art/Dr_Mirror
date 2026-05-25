@@ -49,8 +49,11 @@ const AdminAuditPage = lazy(() => import('../features/admin/audit/AuditLogPage')
 const AdminShippingLabelPage = lazy(() => import('../features/admin/AdminShippingLabelPage').then((m) => ({ default: m.AdminShippingLabelPage })));
 const AdminReturnsListPage = lazy(() => import('../features/admin/AdminReturnsListPage').then((m) => ({ default: m.AdminReturnsListPage })));
 const AdminReturnDetailPage = lazy(() => import('../features/admin/AdminReturnDetailPage').then((m) => ({ default: m.AdminReturnDetailPage })));
+const AdminWhatsAppStatusPage = lazy(() => import('../features/admin/AdminWhatsAppStatusPage').then((m) => ({ default: m.AdminWhatsAppStatusPage })));
+const AdminWhatsAppQrPage = lazy(() => import('../features/admin/AdminWhatsAppQrPage').then((m) => ({ default: m.AdminWhatsAppQrPage })));
 const ReturnsListPage = lazy(() => import('../features/orders/ReturnsListPage').then((m) => ({ default: m.ReturnsListPage })));
 const AccountSecurityPage = lazy(() => import('../features/account/AccountSecurityPage').then((m) => ({ default: m.AccountSecurityPage })));
+const AccountNotificationsPage = lazy(() => import('../features/account/AccountNotificationsPage').then((m) => ({ default: m.AccountNotificationsPage })));
 
 function PageFallback() {
   const { t } = useTranslation();
@@ -98,6 +101,7 @@ export function AppRoutes() {
             <Route path="account/returns" element={<ReturnsListPage />} />
             <Route path="account/addresses" element={<AddressBookPage />} />
             <Route path="account/security" element={<AccountSecurityPage />} />
+            <Route path="account/notifications" element={<AccountNotificationsPage />} />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />
@@ -120,6 +124,8 @@ export function AppRoutes() {
             <Route path="admin/inquiries" element={<AdminInquiriesPage />} />
             <Route path="admin/users" element={<AdminUsersPage />} />
             <Route path="admin/audit" element={<AdminAuditPage />} />
+            <Route path="admin/whatsapp" element={<AdminWhatsAppStatusPage />} />
+            <Route path="admin/whatsapp/pair" element={<AdminWhatsAppQrPage />} />
             <Route path="admin/*" element={<NotFoundPage />} />
           </Route>
         </Route>

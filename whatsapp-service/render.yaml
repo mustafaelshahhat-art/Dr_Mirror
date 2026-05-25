@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: drmirror-whatsapp-service
+    runtime: node
+    plan: free
+    rootDir: whatsapp-service
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: INTERNAL_API_KEY
+        sync: false
+      - key: PAIRING_ADMIN_TOKEN
+        sync: false
+      - key: ENABLE_PAIRING_UI
+        value: "false"
+      - key: SEND_DELAY_MIN_MS
+        value: "5000"
+      - key: SEND_DELAY_MAX_MS
+        value: "15000"
+      - key: DAILY_PHONE_LIMIT
+        value: "10"
+      - key: GLOBAL_SEND_LIMIT_PER_MINUTE
+        value: "60"

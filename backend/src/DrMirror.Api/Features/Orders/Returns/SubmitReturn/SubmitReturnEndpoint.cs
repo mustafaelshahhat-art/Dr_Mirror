@@ -4,6 +4,7 @@ using DrMirror.Api.Features.Orders.Returns.Common;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -127,16 +128,22 @@ public static class SubmitReturnEndpoint
             };
 
             db.ReturnRequests.Add(returnRequest);
+            db.EmailOutboxMessages.Add(EmailOutboxHelper.ForReturnCreated(returnRequest.Id));
+            db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForReturn(
+                returnRequest.Id,
+                "ReturnCreated",
+                ReturnStatus.Requested.ToString(),
+                order.ShippingAddress.Phone));
 
             try
             {
-                await db.SaveChangesAsync(ctInner);
+                await WhatsAppOutboxHelper.SaveChangesIgnoringDuplicateAsync(db, ctInner);
                 if (transaction is not null)
                 {
                     await transaction.CommitAsync(ctInner);
                 }
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex) when (IsReturnDuplicate(ex))
             {
                 result = Results.Problem(
                     title: "Active return already exists",
@@ -145,13 +152,18 @@ public static class SubmitReturnEndpoint
                 return;
             }
 
-            db.EmailOutboxMessages.Add(EmailOutboxHelper.ForReturnCreated(returnRequest.Id));
-            await db.SaveChangesAsync(ctInner);
-
             returnRequest.Order = order;
             result = Results.Created($"/api/orders/{orderNumber}/returns/{returnRequest.Id}", returnRequest.ToDto());
         }, ct);
 
         return result ?? Results.Problem(title: "Return request creation failed", statusCode: StatusCodes.Status500InternalServerError);
+    }
+
+    private static bool IsReturnDuplicate(DbUpdateException ex)
+    {
+        var message = ex.InnerException?.Message ?? ex.Message;
+        // SQL Server unique constraint on the ReturnRequests table (one active return per order).
+        return message.Contains("ReturnRequests", StringComparison.OrdinalIgnoreCase)
+            && (message.Contains("UQ_") || message.Contains("UNIQUE") || message.Contains("duplicate key"));
     }
 }

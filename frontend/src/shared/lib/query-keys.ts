@@ -49,6 +49,14 @@ export const queryKeys = {
     shipping: {
       governorates: () => ['admin', 'shipping', 'governorates'] as const,
     },
+    whatsapp: {
+      status: () => ['admin', 'whatsapp', 'status'] as const,
+      attempts: (page: number, limit: number) => ['admin', 'whatsapp', 'attempts', { page, limit }] as const,
+      qr: () => ['admin', 'whatsapp', 'qr'] as const,
+    },
+  },
+  account: {
+    notificationPreferences: () => ['account', 'notification-preferences'] as const,
   },
   inquiries: {
     list: () => ['inquiries', 'list'] as const,

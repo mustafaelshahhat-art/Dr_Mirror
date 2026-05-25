@@ -1,6 +1,7 @@
 using DrMirror.Api.BackgroundServices;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Infrastructure.WhatsApp;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -125,5 +126,22 @@ public abstract class IntegrationWebAppFactory : WebApplicationFactory<Program>
             d => d.ImplementationType == typeof(EmailOutboxRetentionService));
         if (outboxRetention is not null)
             services.Remove(outboxRetention);
+
+        // Remove WhatsApp background services so they don't fire HTTP calls
+        // against a blank ServiceUrl and race with test teardown.
+        var whatsappProcessor = services.FirstOrDefault(
+            d => d.ImplementationType == typeof(WhatsAppOutboxProcessor));
+        if (whatsappProcessor is not null)
+            services.Remove(whatsappProcessor);
+
+        var whatsappMonitor = services.FirstOrDefault(
+            d => d.ImplementationType == typeof(WhatsAppSidecarMonitor));
+        if (whatsappMonitor is not null)
+            services.Remove(whatsappMonitor);
+
+        var whatsappRetention = services.FirstOrDefault(
+            d => d.ImplementationType == typeof(WhatsAppOutboxRetentionService));
+        if (whatsappRetention is not null)
+            services.Remove(whatsappRetention);
     }
 }

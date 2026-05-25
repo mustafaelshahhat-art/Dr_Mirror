@@ -1,5 +1,6 @@
 import { api } from '../../shared/lib/api-client';
 import type { PagedResult } from '../../shared/types/paged-result';
+import type { WhatsAppAttemptDto, WhatsAppStatusDto } from './types';
 import type {
   OrderDetailDto,
   OrderStatus,
@@ -126,6 +127,25 @@ export const adminReturnsApi = {
       `/admin/orders/${encodeURIComponent(orderNumber)}/returns/${encodeURIComponent(returnId)}/transitions`,
       body,
     );
+    return data;
+  },
+};
+
+export const adminWhatsAppApi = {
+  async getWhatsAppStatus(): Promise<WhatsAppStatusDto> {
+    const { data } = await api.get<WhatsAppStatusDto>('/admin/whatsapp/status');
+    return data;
+  },
+
+  async getWhatsAppAttempts(page: number, limit: number): Promise<PagedResult<WhatsAppAttemptDto>> {
+    const { data } = await api.get<PagedResult<WhatsAppAttemptDto>>('/admin/whatsapp/attempts', {
+      params: { page, limit },
+    });
+    return data;
+  },
+
+  async getWhatsAppQr(): Promise<{ qrDataUri: string | null }> {
+    const { data } = await api.get<{ qrDataUri: string | null }>('/admin/whatsapp/qr');
     return data;
   },
 };

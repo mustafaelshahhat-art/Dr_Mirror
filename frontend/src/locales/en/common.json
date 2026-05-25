@@ -36,6 +36,10 @@
       "title": "My returns",
       "subtitle": "Track and view your return requests."
     },
+    "notifications": {
+      "title": "Notification settings",
+      "subtitle": "Choose how you receive order and return updates."
+    },
     "subtitle": "Your account home. More tools land in the next milestones.",
     "fields": {
       "fullName": "Full name",

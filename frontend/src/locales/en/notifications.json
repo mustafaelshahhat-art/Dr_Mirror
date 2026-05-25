@@ -1,0 +1,10 @@
+{
+  "preference": {
+    "title": "Notification settings",
+    "subtitle": "Choose the channels that fit how you track orders and returns.",
+    "whatsappLabel": "WhatsApp notifications",
+    "whatsappDescription": "Receive order confirmation and status updates on the shipping phone saved with each order.",
+    "success": "Notification settings updated.",
+    "errorLoad": "Couldn't load notification settings. Please try again."
+  }
+}

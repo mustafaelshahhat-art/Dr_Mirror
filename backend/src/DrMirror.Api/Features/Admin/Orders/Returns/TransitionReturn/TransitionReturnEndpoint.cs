@@ -3,6 +3,7 @@ using DrMirror.Api.Features.Admin.Orders.Returns.Common;
 using DrMirror.Api.Features.Orders.Returns.Common;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.Auditing;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
@@ -109,10 +110,15 @@ public static class TransitionReturnEndpoint
             {
                 db.EmailOutboxMessages.Add(EmailOutboxHelper.ForReturnStatusChanged(returnRequest.Id, nextStatus));
             }
+            db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForReturn(
+                returnRequest.Id,
+                "ReturnStatusChanged",
+                nextStatus.ToString(),
+                returnRequest.Order?.ShippingAddress.Phone));
 
             try
             {
-                await db.SaveChangesAsync(ctInner);
+                await WhatsAppOutboxHelper.SaveChangesIgnoringDuplicateAsync(db, ctInner);
                 if (transaction is not null)
                 {
                     await transaction.CommitAsync(ctInner);

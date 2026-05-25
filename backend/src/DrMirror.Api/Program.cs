@@ -12,10 +12,12 @@ using DrMirror.Api.Features.Cart;
 using DrMirror.Api.Features.Catalog;
 using DrMirror.Api.Features.Checkout;
 using DrMirror.Api.Features.Inquiries;
+using DrMirror.Api.Features.Notifications;
 using DrMirror.Api.Features.Orders;
 using DrMirror.Api.Features.Shipping;
 using DrMirror.Api.Infrastructure.Extensions;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.HealthChecks;
 using DrMirror.Api.Shared.Http;
 using DrMirror.Api.Shared.Logging;
@@ -155,6 +157,9 @@ try
     // Includes durable outbox processor.
     // -----------------------------------------------------------------------
     builder.Services.AddEmailServices(builder.Configuration);
+
+    // WhatsApp — Baileys sidecar + durable outbox. Sidecar startup is non-fatal.
+    builder.Services.AddWhatsAppServices(builder.Configuration);
 
     // FluentValidation — discover validators in this assembly.
     builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -393,6 +398,7 @@ try
     app.MapOrderEndpoints();
     app.MapAddressEndpoints();
     app.MapInquiryEndpoints();
+    app.MapNotificationEndpoints();
     app.MapAdminEndpoints();
 
     Log.Information("Dr_Mirror API starting up — env={Env}", app.Environment.EnvironmentName);

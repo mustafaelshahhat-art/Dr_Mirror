@@ -14,6 +14,7 @@ import arErrors from '../../locales/ar/errors.json';
 import arGovernates from '../../locales/ar/governorates.json';
 import arInquiries from '../../locales/ar/inquiries.json';
 import arOrders from '../../locales/ar/orders.json';
+import arNotifications from '../../locales/ar/notifications.json';
 import arReturns from '../../locales/ar/returns.json';
 import arShipping from '../../locales/ar/shipping.json';
 import enAccount from '../../locales/en/account.json';
@@ -28,6 +29,7 @@ import enErrors from '../../locales/en/errors.json';
 import enGovernates from '../../locales/en/governorates.json';
 import enInquiries from '../../locales/en/inquiries.json';
 import enOrders from '../../locales/en/orders.json';
+import enNotifications from '../../locales/en/notifications.json';
 import enReturns from '../../locales/en/returns.json';
 import enShipping from '../../locales/en/shipping.json';
 
@@ -51,6 +53,7 @@ void i18n
         checkout: arCheckout,
         errors: arErrors,
         orders: arOrders,
+        notifications: arNotifications,
         admin: arAdmin,
         addresses: arAddresses,
         governorates: arGovernates,
@@ -67,6 +70,7 @@ void i18n
         checkout: enCheckout,
         errors: enErrors,
         orders: enOrders,
+        notifications: enNotifications,
         admin: enAdmin,
         addresses: enAddresses,
         governorates: enGovernates,
@@ -80,7 +84,7 @@ void i18n
     // Flat key lookup: t('auth.signIn') reads from the 'auth' namespace.
     fallbackNS: 'common',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'catalog', 'cart', 'checkout', 'errors', 'orders', 'admin', 'addresses', 'governorates', 'inquiries', 'account', 'returns', 'shipping'],
+    ns: ['common', 'auth', 'catalog', 'cart', 'checkout', 'errors', 'orders', 'notifications', 'admin', 'addresses', 'governorates', 'inquiries', 'account', 'returns', 'shipping'],
     // Allow t('auth.signIn') to resolve via nsSeparator on the key.
     nsSeparator: '.',
     interpolation: { escapeValue: false },

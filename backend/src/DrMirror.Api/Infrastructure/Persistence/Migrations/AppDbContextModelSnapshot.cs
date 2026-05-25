@@ -281,6 +281,32 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("Categories", (string)null);
                 });
 
+            modelBuilder.Entity("DrMirror.Api.Domain.Entities.CustomerNotificationPreference", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("WhatsAppEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CustomerNotificationPreferences_UserId");
+
+                    b.ToTable("CustomerNotificationPreferences", (string)null);
+                });
+
             modelBuilder.Entity("DrMirror.Api.Domain.Entities.EmailOutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1397,6 +1423,83 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("DrMirror.Api.Domain.Entities.WhatsAppOutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Attempts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DeliveredAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FailureReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset?>("LastAttemptAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("LockedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("LockedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTimeOffset>("NextRetryAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecipientPhoneMasked")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique()
+                        .HasDatabaseName("UX_WhatsAppOutboxMessages_IdempotencyKey");
+
+                    b.HasIndex("RecipientPhoneMasked", "CreatedAt")
+                        .HasDatabaseName("IX_WhatsAppOutboxMessages_RecipientPhoneMasked_CreatedAt");
+
+                    b.HasIndex("Status", "LockedAt")
+                        .HasDatabaseName("IX_WhatsAppOutboxMessages_Status_LockedAt")
+                        .HasFilter("[Status] = 1");
+
+                    b.HasIndex("Status", "NextRetryAt")
+                        .HasDatabaseName("IX_WhatsAppOutboxMessages_Status_NextRetryAt")
+                        .HasFilter("[Status] = 0");
+
+                    b.ToTable("WhatsAppOutboxMessages", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1578,6 +1681,17 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.Navigation("Cart");
 
                     b.Navigation("ProductVariant");
+                });
+
+            modelBuilder.Entity("DrMirror.Api.Domain.Entities.CustomerNotificationPreference", b =>
+                {
+                    b.HasOne("DrMirror.Api.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DrMirror.Api.Domain.Entities.GovernorateShippingFee", b =>

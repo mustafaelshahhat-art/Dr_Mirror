@@ -11,6 +11,9 @@ using DrMirror.Api.Features.Admin.Inquiries;
 using DrMirror.Api.Features.Admin.Payments;
 using DrMirror.Api.Features.Admin.Shipping;
 using DrMirror.Api.Features.Admin.Users;
+using DrMirror.Api.Features.Admin.WhatsApp.GetWhatsAppAttempts;
+using DrMirror.Api.Features.Admin.WhatsApp.GetWhatsAppQr;
+using DrMirror.Api.Features.Admin.WhatsApp.GetWhatsAppStatus;
 using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Shared.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
@@ -74,6 +77,11 @@ public static class AdminEndpoints
 
         var audit = admin.MapGroup("/audit").WithTags("Admin: Audit");
         audit.MapAuditEndpoints();
+
+        var whatsapp = admin.MapGroup("/whatsapp").WithTags("Admin: WhatsApp");
+        whatsapp.MapGetWhatsAppStatus();
+        whatsapp.MapGetWhatsAppAttempts();
+        whatsapp.MapGetWhatsAppQr();
 
         return app;
     }

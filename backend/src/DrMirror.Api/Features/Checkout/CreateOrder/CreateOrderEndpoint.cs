@@ -5,6 +5,7 @@ using DrMirror.Api.Features.Orders.Common;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -174,6 +175,11 @@ public static class CreateOrderEndpoint
         db.CartItems.RemoveRange(cart.Items);
         cart.UpdatedAt = DateTimeOffset.UtcNow;
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForOrderConfirmation(order.Id));
+        db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForOrder(
+            order.Id,
+            "OrderConfirmation",
+            "Placed",
+            order.ShippingAddress.Phone));
 
         // ---- Optional: save the inline address to the buyer's address book. ----
         var addressSaveOutcome = AddressSaveOutcome.NotRequested;
@@ -236,7 +242,7 @@ public static class CreateOrderEndpoint
 
             try
             {
-                await db.SaveChangesAsync(ct);
+                await WhatsAppOutboxHelper.SaveChangesIgnoringDuplicateAsync(db, ct);
                 break; // success
             }
             catch (DbUpdateConcurrencyException ex) when (attempt < 3)

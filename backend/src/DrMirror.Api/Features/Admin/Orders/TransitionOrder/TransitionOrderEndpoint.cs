@@ -3,6 +3,7 @@ using DrMirror.Api.Domain.Orders;
 using DrMirror.Api.Features.Orders.Common;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.Auditing;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
@@ -108,9 +109,14 @@ public static class TransitionOrderEndpoint
             request.Reason);
 
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
+        db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForOrder(
+            order.Id,
+            "OrderStatusChanged",
+            order.Status.ToString(),
+            order.ShippingAddress.Phone));
         try
         {
-            await db.SaveChangesAsync(ct);
+            await WhatsAppOutboxHelper.SaveChangesIgnoringDuplicateAsync(db, ct);
         }
         catch (DbUpdateConcurrencyException)
         {
