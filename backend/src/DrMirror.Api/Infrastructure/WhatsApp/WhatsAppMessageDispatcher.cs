@@ -71,7 +71,25 @@ public sealed class WhatsAppMessageDispatcher
         }
 
         await Task.Delay(TimeSpan.FromSeconds(Random.Shared.Next(5, 16)), ct);
-        await _sender.SendAsync(resolved.Phone, resolved.Body, ct);
+
+        // Per-message send timeout — prevents Processing/Retrying records from getting stuck
+        // when the sidecar is slow or Baileys hangs on sendMessage().
+        using var sendCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        sendCts.CancelAfter(TimeSpan.FromSeconds(_options.SendTimeoutSeconds));
+        try
+        {
+            await _sender.SendAsync(resolved.Phone, resolved.Body, sendCts.Token);
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            // App is still running — this is a per-message timeout, not shutdown.
+            MarkFailed(message, "sidecar_timeout");
+            _logger.LogWarning(
+                "WhatsAppOutbox: send timeout after {Timeout}s (id={Id})",
+                _options.SendTimeoutSeconds,
+                message.Id);
+            return;
+        }
 
         message.Status = WhatsAppOutboxStatus.Sent;
         message.DeliveredAt = DateTimeOffset.UtcNow;
@@ -85,14 +103,23 @@ public sealed class WhatsAppMessageDispatcher
             message.RecipientPhoneMasked);
     }
 
-    private async Task<ResolvedMessage?> ResolveAsync(WhatsAppOutboxMessage message, CancellationToken ct) => message.EventType switch
+    private async Task<ResolvedMessage?> ResolveAsync(WhatsAppOutboxMessage message, CancellationToken ct)
     {
-        "OrderConfirmation" => await ResolveOrderConfirmationAsync(message.Payload, ct),
-        "OrderStatusChanged" => await ResolveOrderStatusChangedAsync(message.Payload, ct),
-        "ReturnCreated" => await ResolveReturnCreatedAsync(message.Payload, ct),
-        "ReturnStatusChanged" => await ResolveReturnStatusChangedAsync(message.Payload, ct),
-        _ => null,
-    };
+        var snapshot = TryReadSnapshot(message.Payload);
+        if (snapshot?.MessageBody is { Length: > 0 })
+        {
+            return new ResolvedMessage(snapshot.BuyerUserId, snapshot.RecipientPhone, snapshot.MessageBody);
+        }
+
+        return message.EventType switch
+        {
+            "OrderConfirmation" => await ResolveOrderConfirmationAsync(message.Payload, ct),
+            "OrderStatusChanged" => await ResolveOrderStatusChangedAsync(message.Payload, ct),
+            "ReturnCreated" => await ResolveReturnCreatedAsync(message.Payload, ct),
+            "ReturnStatusChanged" => await ResolveReturnStatusChangedAsync(message.Payload, ct),
+            _ => null,
+        };
+    }
 
     private async Task<ResolvedMessage?> ResolveOrderConfirmationAsync(string payload, CancellationToken ct)
     {
@@ -159,10 +186,32 @@ public sealed class WhatsAppMessageDispatcher
         message.LockedBy = null;
     }
 
+    private static void MarkFailed(WhatsAppOutboxMessage message, string reason)
+    {
+        message.Status = WhatsAppOutboxStatus.Failed;
+        message.FailureReason = reason;
+        message.LockedAt = null;
+        message.LockedBy = null;
+    }
+
     private static string ReturnRef(Guid id) => id.ToString("N")[..8].ToUpperInvariant();
 
     private static bool IsKnownEventType(string eventType) => eventType is
         "OrderConfirmation" or "OrderStatusChanged" or "ReturnCreated" or "ReturnStatusChanged";
+
+    private static WhatsAppOutboxHelper.MessagePayload? TryReadSnapshot(string payload)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<WhatsAppOutboxHelper.MessagePayload>(
+                payload,
+                new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
 
     private sealed record ResolvedMessage(Guid BuyerUserId, string? Phone, string Body);
 }

@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-import type { LoginInput, RegisterInput } from './api';
+import type { LoginInput, RegisterInput, SendOtpInput, SendOtpResponse, UpdateProfileInput, VerifyOtpInput, VerifyOtpResponse } from './api';
 import type { AuthUser } from './types';
 
 export interface AuthContextValue {
@@ -12,6 +12,11 @@ export interface AuthContextValue {
   isAdmin: boolean;
   login: (input: LoginInput) => Promise<AuthUser>;
   register: (input: RegisterInput) => Promise<AuthUser>;
+  updateProfile: (input: UpdateProfileInput) => Promise<AuthUser>;
+  sendPhoneOtp: (input: SendOtpInput) => Promise<SendOtpResponse>;
+  verifyPhoneOtp: (input: VerifyOtpInput) => Promise<VerifyOtpResponse>;
+  /** Refresh user state from server (e.g. after phone verification). */
+  refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
 }
 

@@ -60,4 +60,16 @@ public static class RateLimitPolicies
     /// 3 requests per 5 minutes per IP — fixed window.
     /// </summary>
     public const string PasswordReset = "password-reset";
+
+    /// <summary>
+    /// Phone OTP send — prevents WhatsApp spam and OTP brute-force.
+    /// 3 requests per 5 minutes per authenticated user — fixed window.
+    /// </summary>
+    public const string OtpSend = "otp-send";
+
+    /// <summary>
+    /// Phone OTP verify — prevents brute-force guessing of the 6-digit code.
+    /// 10 attempts per 10 minutes per authenticated user — fixed window.
+    /// </summary>
+    public const string OtpVerify = "otp-verify";
 }

@@ -20,6 +20,9 @@ public sealed class WhatsAppOutboxMessageConfiguration : IEntityTypeConfiguratio
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.LockedBy).HasMaxLength(100);
         builder.Property(x => x.IdempotencyKey).HasMaxLength(200).IsRequired();
+        builder.Property(x => x.EntityType).HasMaxLength(32).IsRequired(false);
+        builder.Property(x => x.EntityId).IsRequired(false);
+        builder.Property(x => x.ParentMessageId).IsRequired(false);
 
         builder.HasIndex(x => x.IdempotencyKey)
             .IsUnique()
@@ -32,5 +35,7 @@ public sealed class WhatsAppOutboxMessageConfiguration : IEntityTypeConfiguratio
             .HasDatabaseName("IX_WhatsAppOutboxMessages_Status_LockedAt");
         builder.HasIndex(x => new { x.RecipientPhoneMasked, x.CreatedAt })
             .HasDatabaseName("IX_WhatsAppOutboxMessages_RecipientPhoneMasked_CreatedAt");
+        builder.HasIndex(x => x.ParentMessageId)
+            .HasDatabaseName("IX_WhatsAppOutboxMessages_ParentMessageId");
     }
 }

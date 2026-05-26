@@ -4,7 +4,6 @@ import qrcode from 'qrcode';
 
 import { useMongoAuthState } from '../auth/mongoAuthState.js';
 import { logger } from '../config/logger.js';
-import { randomDelay } from '../utils/delay.js';
 import { maskPhone, toWhatsAppJid } from '../utils/phone.js';
 
 export class WhatsAppClientService {
@@ -19,6 +18,17 @@ export class WhatsAppClientService {
     this.lastSentAt = null;
     this.lastError = config.mongodbUri ? null : 'MONGODB_URI is required';
     this.reconnectTimer = null;
+  }
+
+  authCollection() {
+    if (!this.config.mongodbUri) {
+      const err = new Error('mongodb_uri_required');
+      err.statusCode = 503;
+      throw err;
+    }
+
+    this.mongo ??= new MongoClient(this.config.mongodbUri, { maxPoolSize: 5 });
+    return this.mongo.db().collection('baileys_auth_state');
   }
 
   async initialize() {
@@ -36,8 +46,7 @@ export class WhatsAppClientService {
       this.state = 'initializing';
       this.mongo ??= new MongoClient(this.config.mongodbUri, { maxPoolSize: 5 });
       await this.mongo.connect();
-      const db = this.mongo.db();
-      const collection = db.collection('baileys_auth_state');
+      const collection = this.authCollection();
       const { state, saveCreds } = await useMongoAuthState(collection);
       const { version } = await fetchLatestBaileysVersion();
 
@@ -130,12 +139,51 @@ export class WhatsAppClientService {
       throw err;
     }
 
-    await randomDelay(this.config.sendDelayMinMs, this.config.sendDelayMaxMs);
-    await this.sock.sendMessage(jid, { text: String(message) });
+    // Bounded timeout on Baileys sendMessage to prevent indefinitely-stuck Processing rows.
+    const timeoutMs = this.config.sendTimeoutMs ?? 30000;
+    const sendWithTimeout = Promise.race([
+      this.sock.sendMessage(jid, { text: String(message) }),
+      new Promise((_, reject) =>
+        setTimeout(() => {
+          const err = new Error('send_timeout');
+          err.statusCode = 503;
+          reject(err);
+        }, timeoutMs),
+      ),
+    ]);
+    await sendWithTimeout;
+
     this.rateLimiter.record(phone);
     this.lastSentAt = new Date().toISOString();
     this.lastError = null;
     logger.info({ phone: maskPhone(phone) }, 'WhatsApp message sent');
+  }
+
+  async logout() {
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+    this.reconnectTimer = null;
+
+    try {
+      await this.sock?.logout?.();
+    } catch (err) {
+      logger.warn({ err }, 'WhatsApp socket logout failed; clearing auth state anyway');
+    }
+
+    try {
+      this.sock?.end?.();
+    } catch {
+      // Socket may already be closed after logout.
+    }
+
+    this.sock = null;
+    this.mongo ??= new MongoClient(this.config.mongodbUri, { maxPoolSize: 5 });
+    await this.mongo.connect();
+    await this.authCollection().deleteMany({});
+    this.state = 'disconnected';
+    this.qrDataUri = null;
+    this.lastError = null;
+    logger.info('WhatsApp auth state cleared by logout');
+    await this.initialize();
   }
 
   async shutdown() {

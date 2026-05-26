@@ -1,3 +1,4 @@
+import { isAxiosError } from 'axios';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useApiErrorToast } from '../../shared/hooks/useApiErrorToast';
@@ -65,6 +66,14 @@ export function useMyOrderQuery(orderNumber: string | undefined) {
   });
 }
 
+export function isPhoneNotVerifiedError(error: unknown): boolean {
+  return (
+    isAxiosError(error) &&
+    error.response?.status === 400 &&
+    (error.response?.data as { code?: string })?.code === 'PHONE_NOT_VERIFIED'
+  );
+}
+
 export function useCreateOrderMutation() {
   const queryClient = useQueryClient();
   const errorToast = useApiErrorToast();
@@ -78,7 +87,10 @@ export function useCreateOrderMutation() {
       // Bust any cached lists so the new order appears in /account/orders.
       void queryClient.invalidateQueries({ queryKey: queryKeys.orders.listRoot(), exact: false });
     },
-    onError: errorToast,
+    onError: (error) => {
+      if (isPhoneNotVerifiedError(error)) return; // CheckoutPage handles this inline
+      errorToast(error);
+    },
   });
 }
 

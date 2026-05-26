@@ -14,6 +14,9 @@ using DrMirror.Api.Features.Admin.Users;
 using DrMirror.Api.Features.Admin.WhatsApp.GetWhatsAppAttempts;
 using DrMirror.Api.Features.Admin.WhatsApp.GetWhatsAppQr;
 using DrMirror.Api.Features.Admin.WhatsApp.GetWhatsAppStatus;
+using DrMirror.Api.Features.Admin.WhatsApp.DisconnectWhatsApp;
+using DrMirror.Api.Features.Admin.WhatsApp.RetryAllFailedWhatsApp;
+using DrMirror.Api.Features.Admin.WhatsApp.RetryWhatsAppAttempt;
 using DrMirror.Api.Domain.Identity;
 using DrMirror.Api.Shared.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
@@ -82,6 +85,9 @@ public static class AdminEndpoints
         whatsapp.MapGetWhatsAppStatus();
         whatsapp.MapGetWhatsAppAttempts();
         whatsapp.MapGetWhatsAppQr();
+        whatsapp.MapDisconnectWhatsApp();
+        whatsapp.MapRetryWhatsAppAttempt();
+        whatsapp.MapRetryAllFailedWhatsApp();
 
         return app;
     }

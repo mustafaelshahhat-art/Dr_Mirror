@@ -1,4 +1,5 @@
 import { Alert, Button, Form } from '@heroui/react';
+import { toast } from '@heroui/react/toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -7,9 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../auth/useAuth';
+import { PhoneVerificationModal, maskPhone } from '../auth/components/PhoneVerificationModal';
 import { useAddressesQuery } from '../addresses/hooks';
 import { useCart } from '../cart/useCart';
-import { useCreateOrderMutation, usePaymentMethodsQuery } from '../orders/hooks';
+import { isPhoneNotVerifiedError, useCreateOrderMutation, usePaymentMethodsQuery } from '../orders/hooks';
 
 import { AddressStep } from './components/AddressStep';
 import { CheckoutAuthGate } from './components/CheckoutAuthGate';
@@ -53,7 +55,7 @@ function CheckoutBody() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const isAr = lang === 'ar';
-  const { user } = useAuth();
+  const { user, sendPhoneOtp, verifyPhoneOtp, refreshUser } = useAuth();
   const { cart } = useCart();
   const paymentMethodsQuery = usePaymentMethodsQuery();
   const governoratesQuery = useGovernoratesQuery();
@@ -64,6 +66,7 @@ function CheckoutBody() {
   const [formError, setFormError] = useState<string | null>(null);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
   const [paymentAvailable, setPaymentAvailable] = useState(false);
+  const [phoneOtpOpen, setPhoneOtpOpen] = useState(false);
   const addressesQuery = useAddressesQuery();
   const [hasInitializedAddress, setHasInitializedAddress] = useState(false);
 
@@ -260,8 +263,11 @@ function CheckoutBody() {
       // portal lives at the app root so it survives the route change.
       fireAddressSaveOutcomeToast(order.addressSaveOutcome, t);
       navigate(`/account/orders/${encodeURIComponent(order.orderNumber)}`);
-    } catch {
-      // Toast emitted by mutation onError.
+    } catch (error) {
+      if (isPhoneNotVerifiedError(error)) {
+        setPhoneOtpOpen(true);
+      }
+      // Other errors: toast was emitted by mutation onError.
     }
   }
 
@@ -401,6 +407,21 @@ function CheckoutBody() {
 
         <CheckoutSummary items={cart.items} subTotal={cart.subTotal} shippingFee={shippingFee} lang={lang} />
       </Form>
+
+      {user?.phone && (
+        <PhoneVerificationModal
+          isOpen={phoneOtpOpen}
+          onClose={() => setPhoneOtpOpen(false)}
+          maskedPhone={maskPhone(user.phone)}
+          sendOtp={() => sendPhoneOtp({ purpose: 'checkout' })}
+          verifyOtp={verifyPhoneOtp}
+          onVerified={() => {
+            setPhoneOtpOpen(false);
+            void refreshUser();
+            toast.success(t('checkout.phoneVerifiedRetry'));
+          }}
+        />
+      )}
     </section>
   );
 }

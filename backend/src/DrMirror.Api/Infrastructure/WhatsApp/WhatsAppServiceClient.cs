@@ -7,6 +7,8 @@ namespace DrMirror.Api.Infrastructure.WhatsApp;
 
 public sealed class WhatsAppServiceClient : IWhatsAppSender
 {
+    private const string LogoutPath = "/api/logout";
+
     private readonly HttpClient _http;
     private readonly WhatsAppOptions _options;
 
@@ -46,9 +48,11 @@ public sealed class WhatsAppServiceClient : IWhatsAppSender
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, "/status");
             ApplyInternalApiKey(request);
-            using var response = await _http.SendAsync(request, ct);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(TimeSpan.FromSeconds(_options.TimeoutSeconds));
+            using var response = await _http.SendAsync(request, cts.Token);
             if (!response.IsSuccessStatusCode) return null;
-            return await response.Content.ReadFromJsonAsync<WhatsAppServiceStatusDto>(cancellationToken: ct);
+            return await response.Content.ReadFromJsonAsync<WhatsAppServiceStatusDto>(cancellationToken: cts.Token);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
@@ -64,18 +68,35 @@ public sealed class WhatsAppServiceClient : IWhatsAppSender
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, "/qr");
             ApplyInternalApiKey(request);
-            using var response = await _http.SendAsync(request, ct);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(TimeSpan.FromSeconds(_options.TimeoutSeconds));
+            using var response = await _http.SendAsync(request, cts.Token);
             if (response.StatusCode == HttpStatusCode.Conflict)
             {
                 return new WhatsAppServiceQrDto(null, "already_connected");
             }
             if (!response.IsSuccessStatusCode) return null;
-            return await response.Content.ReadFromJsonAsync<WhatsAppServiceQrDto>(cancellationToken: ct);
+            return await response.Content.ReadFromJsonAsync<WhatsAppServiceQrDto>(cancellationToken: cts.Token);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             return null;
         }
+    }
+
+    public async Task DisconnectAsync(CancellationToken ct)
+    {
+        if (!_options.Enabled)
+        {
+            throw new InvalidOperationException("whatsapp_disabled");
+        }
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, LogoutPath);
+        ApplyInternalApiKey(request);
+        using var disconnectCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        disconnectCts.CancelAfter(TimeSpan.FromSeconds(_options.TimeoutSeconds));
+        using var response = await _http.SendAsync(request, disconnectCts.Token);
+        response.EnsureSuccessStatusCode();
     }
 
     public async Task<bool> HealthAsync(CancellationToken ct)
@@ -84,7 +105,9 @@ public sealed class WhatsAppServiceClient : IWhatsAppSender
 
         try
         {
-            using var response = await _http.GetAsync("/health", ct);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(TimeSpan.FromSeconds(_options.TimeoutSeconds));
+            using var response = await _http.GetAsync("/health", cts.Token);
             return response.IsSuccessStatusCode;
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)

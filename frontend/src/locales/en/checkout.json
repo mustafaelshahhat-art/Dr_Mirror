@@ -9,6 +9,7 @@
   "placing": "Placing order...",
   "confirmOrder": "Confirm order",
   "confirming": "Confirming...",
+  "phoneVerifiedRetry": "Phone verified! Click Place Order to continue.",
   "steps": {
     "address": "Shipping",
     "payment": "Payment",

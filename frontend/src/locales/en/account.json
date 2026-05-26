@@ -2,6 +2,59 @@
   "account": {
     "loading": "Loading your account…",
     "memberSince": "Member since {{date}}",
+    "header": {
+      "title": "Welcome, {{name}}",
+      "memberSince": "Member since {{date}}"
+    },
+    "tabs": {
+      "label": "Account sections",
+      "personalData": "Personal Data",
+      "orders": "Orders",
+      "returns": "Returns",
+      "addresses": "Addresses",
+      "security": "Password & Security"
+    },
+    "profile": {
+      "title": "Personal Data",
+      "name": "Full name",
+      "phone": "Phone number",
+      "email": "Email",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "saved": "Profile updated.",
+      "phoneVerified": "Phone number verified",
+      "phoneNotVerified": "Phone number not verified",
+      "verifyPhone": "Verify now",
+      "phoneSaveToVerify": "Save your changes first to verify the new phone number.",
+      "phoneVerifiedSuccess": "Phone number verified successfully.",
+      "errors": {
+        "nameRequired": "Enter your full name.",
+        "nameTooLong": "Name must be 120 characters or fewer.",
+        "phoneTooLong": "Phone number must be 30 characters or fewer.",
+        "emailInvalid": "Enter a valid email address.",
+        "emailTooLong": "Email must be 254 characters or fewer.",
+        "emailRequired": "Enter your email address."
+      },
+      "otp": {
+        "title": "Verify phone number",
+        "sendDescription": "We will send a 6-digit verification code to {{phone}}.",
+        "enterDescription": "Enter the 6-digit code sent to {{phone}}.",
+        "codeLabel": "Verification code",
+        "sendButton": "Send code",
+        "resend": "Resend code",
+        "verifyButton": "Verify",
+        "sendFailed": "Failed to send the verification code. Please try again.",
+        "whatsappUnavailable": "WhatsApp is not currently available. Please try again later or contact support.",
+        "expired": "The verification code has expired. Request a new one.",
+        "tooManyAttempts": "Too many failed attempts. Please request a new code.",
+        "invalid": "Invalid verification code. Please try again."
+      }
+    },
+    "emptyStates": {
+      "orders": "You have no orders yet.",
+      "returns": "You have no return requests yet.",
+      "addresses": "You have no saved addresses yet."
+    },
     "recentOrders": {
       "title": "Recent orders",
       "empty": "No orders yet. Start shopping!",

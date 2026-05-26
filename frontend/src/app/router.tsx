@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Spinner } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
@@ -29,10 +29,8 @@ const CartPage = lazy(() => import('../features/cart/CartPage').then((m) => ({ d
 const InquiriesPage = lazy(() => import('../features/inquiries/InquiriesPage').then((m) => ({ default: m.InquiriesPage })));
 
 const CheckoutPage = lazy(() => import('../features/checkout/CheckoutPage').then((m) => ({ default: m.CheckoutPage })));
-const ShellPage = lazy(() => import('../shared/components/ShellPage').then((m) => ({ default: m.ShellPage })));
-const OrdersListPage = lazy(() => import('../features/orders/OrdersListPage').then((m) => ({ default: m.OrdersListPage })));
+const AccountPage = lazy(() => import('../features/account/AccountPage').then((m) => ({ default: m.AccountPage })));
 const OrderDetailPage = lazy(() => import('../features/orders/OrderDetailPage').then((m) => ({ default: m.OrderDetailPage })));
-const AddressBookPage = lazy(() => import('../features/addresses/AddressBookPage').then((m) => ({ default: m.AddressBookPage })));
 
 const AdminHubPage = lazy(() => import('../features/admin/AdminHubPage').then((m) => ({ default: m.AdminHubPage })));
 const AdminOrdersListPage = lazy(() => import('../features/admin/AdminOrdersListPage').then((m) => ({ default: m.AdminOrdersListPage })));
@@ -51,8 +49,6 @@ const AdminReturnsListPage = lazy(() => import('../features/admin/AdminReturnsLi
 const AdminReturnDetailPage = lazy(() => import('../features/admin/AdminReturnDetailPage').then((m) => ({ default: m.AdminReturnDetailPage })));
 const AdminWhatsAppStatusPage = lazy(() => import('../features/admin/AdminWhatsAppStatusPage').then((m) => ({ default: m.AdminWhatsAppStatusPage })));
 const AdminWhatsAppQrPage = lazy(() => import('../features/admin/AdminWhatsAppQrPage').then((m) => ({ default: m.AdminWhatsAppQrPage })));
-const ReturnsListPage = lazy(() => import('../features/orders/ReturnsListPage').then((m) => ({ default: m.ReturnsListPage })));
-const AccountSecurityPage = lazy(() => import('../features/account/AccountSecurityPage').then((m) => ({ default: m.AccountSecurityPage })));
 const AccountNotificationsPage = lazy(() => import('../features/account/AccountNotificationsPage').then((m) => ({ default: m.AccountNotificationsPage })));
 
 function PageFallback() {
@@ -95,12 +91,13 @@ export function AppRoutes() {
 
           <Route element={<ProtectedRoute />}>
             <Route path="checkout" element={<CheckoutPage />} />
-            <Route path="account" element={<ShellPage />} />
-            <Route path="account/orders" element={<OrdersListPage />} />
+            <Route path="account" element={<AccountPage />} />
+            <Route path="account/profile" element={<Navigate to="/account?tab=personal-data" replace />} />
+            <Route path="account/orders" element={<Navigate to="/account?tab=orders" replace />} />
             <Route path="account/orders/:orderNumber" element={<OrderDetailPage />} />
-            <Route path="account/returns" element={<ReturnsListPage />} />
-            <Route path="account/addresses" element={<AddressBookPage />} />
-            <Route path="account/security" element={<AccountSecurityPage />} />
+            <Route path="account/returns" element={<Navigate to="/account?tab=returns" replace />} />
+            <Route path="account/addresses" element={<Navigate to="/account?tab=addresses" replace />} />
+            <Route path="account/security" element={<Navigate to="/account?tab=security" replace />} />
             <Route path="account/notifications" element={<AccountNotificationsPage />} />
           </Route>
 

@@ -104,6 +104,7 @@ public static class SubmitReturnEndpoint
             {
                 Id = Guid.NewGuid(),
                 OrderId = order.Id,
+                Order = order,
                 BuyerUserId = userId,
                 Status = ReturnStatus.Requested,
                 CustomerReason = request.CustomerReason.Trim(),
@@ -129,11 +130,7 @@ public static class SubmitReturnEndpoint
 
             db.ReturnRequests.Add(returnRequest);
             db.EmailOutboxMessages.Add(EmailOutboxHelper.ForReturnCreated(returnRequest.Id));
-            db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForReturn(
-                returnRequest.Id,
-                "ReturnCreated",
-                ReturnStatus.Requested.ToString(),
-                order.ShippingAddress.Phone));
+            db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForReturn(returnRequest, "ReturnCreated", ReturnStatus.Requested.ToString()));
 
             try
             {

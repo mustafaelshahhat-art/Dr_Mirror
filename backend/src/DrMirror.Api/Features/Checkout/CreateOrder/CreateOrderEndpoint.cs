@@ -7,6 +7,7 @@ using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.Validation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,11 +38,25 @@ public static class CreateOrderEndpoint
         AppDbContext db,
         [FromServices] OrderStateMachine fsm,
         [FromServices] OrderNumberGenerator numberGenerator,
+        [FromServices] UserManager<User> userManager,
         CancellationToken ct)
     {
         if (!current.IsAuthenticated || current.UserId is not { } userId)
         {
             return Results.Unauthorized();
+        }
+
+        // Backend enforcement: phone must be verified before placing an order.
+        var buyer = await userManager.FindByIdAsync(userId.ToString());
+        if (buyer is null || buyer.IsDisabled)
+        {
+            return Results.Unauthorized();
+        }
+        if (!buyer.PhoneNumberConfirmed || string.IsNullOrWhiteSpace(buyer.PhoneNumber))
+        {
+            return Results.Json(
+                new { code = "PHONE_NOT_VERIFIED", detail = "Your phone number must be verified before placing an order." },
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         if (idempotencyKey is { } key)
@@ -175,11 +190,7 @@ public static class CreateOrderEndpoint
         db.CartItems.RemoveRange(cart.Items);
         cart.UpdatedAt = DateTimeOffset.UtcNow;
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForOrderConfirmation(order.Id));
-        db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForOrder(
-            order.Id,
-            "OrderConfirmation",
-            "Placed",
-            order.ShippingAddress.Phone));
+        db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForOrder(order, "OrderConfirmation", "Placed"));
 
         // ---- Optional: save the inline address to the buyer's address book. ----
         var addressSaveOutcome = AddressSaveOutcome.NotRequested;

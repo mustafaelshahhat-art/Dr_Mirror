@@ -116,6 +116,8 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
                 }
             }
 
+            await ReconcileRetryParentAsync(db, msg, ct);
+
             try
             {
                 await db.SaveChangesAsync(ct);
@@ -135,5 +137,32 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
         msg.Attempts++;
         msg.LastAttemptAt = now;
         msg.FailureReason = null;
+    }
+
+    private static async Task ReconcileRetryParentAsync(AppDbContext db, WhatsAppOutboxMessage child, CancellationToken ct)
+    {
+        if (child.ParentMessageId is not { } parentId)
+        {
+            return;
+        }
+
+        var parent = await db.WhatsAppOutboxMessages.FirstOrDefaultAsync(m => m.Id == parentId, ct);
+        if (parent is null || parent.Status != WhatsAppOutboxStatus.Retrying)
+        {
+            return;
+        }
+
+        if (child.Status == WhatsAppOutboxStatus.Sent)
+        {
+            parent.Status = WhatsAppOutboxStatus.Sent;
+            parent.FailureReason = null;
+            return;
+        }
+
+        if (child.Status is WhatsAppOutboxStatus.Failed or WhatsAppOutboxStatus.Skipped)
+        {
+            parent.Status = WhatsAppOutboxStatus.Failed;
+            parent.FailureReason = child.FailureReason;
+        }
     }
 }

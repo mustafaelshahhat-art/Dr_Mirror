@@ -27,6 +27,7 @@ export function loadConfig() {
     sendDelayMaxMs: intFromEnv('SEND_DELAY_MAX_MS', 15000),
     dailyPhoneLimit: intFromEnv('DAILY_PHONE_LIMIT', 10),
     globalSendLimitPerMinute: intFromEnv('GLOBAL_SEND_LIMIT_PER_MINUTE', 60),
+    sendTimeoutMs: intFromEnv('SEND_TIMEOUT_MS', 30000),
   };
 }
 

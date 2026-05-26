@@ -109,11 +109,14 @@ public static class TransitionOrderEndpoint
             request.Reason);
 
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
-        db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForOrder(
-            order.Id,
-            "OrderStatusChanged",
-            order.Status.ToString(),
-            order.ShippingAddress.Phone));
+        var isRedundantConfirmation =
+            request.ToStatus == OrderStatus.Confirmed &&
+            previousStatus == OrderStatus.Pending;
+        if (!isRedundantConfirmation)
+        {
+            db.WhatsAppOutboxMessages.Add(
+                WhatsAppOutboxHelper.CreateForOrder(order, "OrderStatusChanged", order.Status.ToString()));
+        }
         try
         {
             await WhatsAppOutboxHelper.SaveChangesIgnoringDuplicateAsync(db, ct);

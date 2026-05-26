@@ -21,7 +21,7 @@ public static class WhatsAppServiceExtensions
             {
                 client.BaseAddress = new Uri(options.ServiceUrl.TrimEnd('/'));
             }
-            client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+            client.Timeout = Timeout.InfiniteTimeSpan;
         });
         services.AddScoped<IWhatsAppSender>(sp => sp.GetRequiredService<WhatsAppServiceClient>());
         services.AddScoped<WhatsAppMessageDispatcher>();

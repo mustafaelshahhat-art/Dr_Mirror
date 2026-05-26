@@ -16,4 +16,7 @@ public class WhatsAppOutboxMessage
     public string? LockedBy { get; set; }
     public string? FailureReason { get; set; }
     public string IdempotencyKey { get; set; } = string.Empty;
+    public string? EntityType { get; set; }
+    public Guid? EntityId { get; set; }
+    public Guid? ParentMessageId { get; set; }
 }

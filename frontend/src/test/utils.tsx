@@ -18,6 +18,8 @@ export function makeAdminUser(): AuthUser {
     id: 'admin-1',
     email: 'admin@example.com',
     fullName: 'Admin User',
+    phone: null,
+    phoneNumberConfirmed: false,
     roles: ['Admin'],
     createdAt: '2024-01-01T00:00:00+00:00',
   };
@@ -28,6 +30,8 @@ export function makeBuyerUser(): AuthUser {
     id: 'buyer-1',
     email: 'buyer@example.com',
     fullName: 'Buyer User',
+    phone: null,
+    phoneNumberConfirmed: false,
     roles: ['Buyer'],
     createdAt: '2024-01-01T00:00:00+00:00',
   };
@@ -41,6 +45,10 @@ export function makeAuthValue(overrides?: Partial<AuthContextValue>): AuthContex
     isAdmin: false,
     login: async () => makeBuyerUser(),
     register: async () => makeBuyerUser(),
+    updateProfile: async () => makeBuyerUser(),
+    sendPhoneOtp: async () => ({ sessionId: '', status: 'sent', maskedPhone: null }),
+    verifyPhoneOtp: async () => ({ verified: false }),
+    refreshUser: async () => {},
     logout: async () => {},
     ...overrides,
   };

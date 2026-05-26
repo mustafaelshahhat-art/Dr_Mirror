@@ -2,6 +2,7 @@ export interface WhatsAppStatusCountsDto {
   sent: number;
   failed: number;
   skipped: number;
+  retrying: number;
 }
 
 export interface WhatsAppStatusDto {
@@ -16,11 +17,15 @@ export interface WhatsAppAttemptDto {
   id: string;
   eventType: string;
   recipientPhoneMasked: string;
-  status: 'pending' | 'processing' | 'sent' | 'failed' | 'skipped' | string;
+  status: 'pending' | 'processing' | 'sent' | 'failed' | 'skipped' | 'retrying' | string;
   attempts: number;
   failureReason: string | null;
   idempotencyKey: string;
   createdAt: string;
   deliveredAt: string | null;
   lastAttemptAt: string | null;
+  entityType: 'Order' | 'Return' | null;
+  entityId: string | null;
+  entityReference: string | null;
+  parentMessageId: string | null;
 }

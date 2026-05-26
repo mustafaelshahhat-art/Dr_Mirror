@@ -51,6 +51,7 @@ export const queryKeys = {
     },
     whatsapp: {
       status: () => ['admin', 'whatsapp', 'status'] as const,
+      attemptsRoot: () => ['admin', 'whatsapp', 'attempts'] as const,
       attempts: (page: number, limit: number) => ['admin', 'whatsapp', 'attempts', { page, limit }] as const,
       qr: () => ['admin', 'whatsapp', 'qr'] as const,
     },

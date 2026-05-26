@@ -33,6 +33,7 @@ public static class GetWhatsAppStatusEndpoint
         var sent = counts.FirstOrDefault(c => c.Status == WhatsAppOutboxStatus.Sent)?.Count ?? 0;
         var failed = counts.FirstOrDefault(c => c.Status == WhatsAppOutboxStatus.Failed)?.Count ?? 0;
         var skipped = counts.FirstOrDefault(c => c.Status == WhatsAppOutboxStatus.Skipped)?.Count ?? 0;
+        var retrying = counts.FirstOrDefault(c => c.Status == WhatsAppOutboxStatus.Retrying)?.Count ?? 0;
         var state = serviceStatus?.State ?? "disconnected";
 
         return Results.Ok(new WhatsAppStatusDto(
@@ -40,7 +41,7 @@ public static class GetWhatsAppStatusEndpoint
             QrRequired: state == "qr_required" || serviceStatus?.QrAvailable == true,
             LastSentAt: serviceStatus?.LastSentAt,
             LastError: serviceStatus?.Error,
-            Counts: new WhatsAppStatusCountsDto(sent, failed, skipped)));
+            Counts: new WhatsAppStatusCountsDto(sent, failed, skipped, retrying)));
     }
 }
 
@@ -51,4 +52,4 @@ public sealed record WhatsAppStatusDto(
     string? LastError,
     WhatsAppStatusCountsDto Counts);
 
-public sealed record WhatsAppStatusCountsDto(int Sent, int Failed, int Skipped);
+public sealed record WhatsAppStatusCountsDto(int Sent, int Failed, int Skipped, int Retrying);

@@ -110,11 +110,7 @@ public static class TransitionReturnEndpoint
             {
                 db.EmailOutboxMessages.Add(EmailOutboxHelper.ForReturnStatusChanged(returnRequest.Id, nextStatus));
             }
-            db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForReturn(
-                returnRequest.Id,
-                "ReturnStatusChanged",
-                nextStatus.ToString(),
-                returnRequest.Order?.ShippingAddress.Phone));
+            db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForReturn(returnRequest, "ReturnStatusChanged", nextStatus.ToString()));
 
             try
             {
