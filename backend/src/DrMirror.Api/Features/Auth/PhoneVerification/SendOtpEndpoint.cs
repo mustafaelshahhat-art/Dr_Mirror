@@ -1,10 +1,8 @@
 using DrMirror.Api.Domain.Entities;
-using DrMirror.Api.Infrastructure;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.RateLimiting;
-using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -16,33 +14,22 @@ public static class SendOtpEndpoint
     {
         group.MapPost("/phone/verify/send", HandleAsync)
             .WithName("Account.SendPhoneVerificationOtp")
-            .WithSummary("Send or resend a WhatsApp phone verification OTP.")
+            .WithSummary("Send a WhatsApp OTP to the authenticated customer's phone.")
             .RequireAuthorization()
             .RequireRateLimiting(RateLimitPolicies.OtpSend)
             .Produces<SendOtpResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status409Conflict)
-            .ProducesProblem(StatusCodes.Status429TooManyRequests)
             .ProducesProblem(StatusCodes.Status503ServiceUnavailable);
-
-        group.MapGet("/phone/verify/send-status/{sessionId:guid}", GetSendStatusAsync)
-            .WithName("Account.GetPhoneVerificationOtpSendStatus")
-            .WithSummary("Check WhatsApp OTP send status for the authenticated customer.")
-            .RequireAuthorization()
-            .Produces<OtpSendStatusResponse>(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status404NotFound);
 
         group.MapPost("/phone/verify", VerifyOtpEndpoint.HandleAsync)
             .WithName("Account.VerifyPhoneOtp")
-            .WithSummary("Verify the authenticated customer's phone with a WhatsApp OTP.")
+            .WithSummary("Verify the authenticated customer's phone with the WhatsApp OTP.")
             .RequireAuthorization()
             .RequireRateLimiting(RateLimitPolicies.OtpVerify)
             .Produces<VerifyOtpResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status429TooManyRequests);
+            .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         return group;
     }
@@ -51,178 +38,85 @@ public static class SendOtpEndpoint
         SendOtpRequest request,
         ICurrentUser current,
         AppDbContext db,
-        IPhoneVerificationOtpSendQueue otpSendQueue,
-        IOptions<JwtOptions> jwtOptions,
+        IWhatsAppSender sender,
+        IOptions<WhatsAppOptions> whatsAppOptions,
         ILogger<SendOtpRequest> logger,
         CancellationToken ct)
     {
         if (current.UserId is not { } userId) return Results.Unauthorized();
         if (!PhoneVerificationHelpers.TryParsePurpose(request.Purpose, out var purpose))
         {
-            return Results.ValidationProblem(new Dictionary<string, string[]>
-            {
-                [nameof(request.Purpose)] = ["Purpose must be profile or checkout."],
-            });
+            return Results.Problem(
+                title: "Invalid purpose",
+                detail: "Purpose must be 'profile' or 'checkout'.",
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId, ct);
         if (user is null || user.IsDisabled) return Results.Unauthorized();
+
         if (string.IsNullOrWhiteSpace(user.PhoneNumber))
         {
-            return Results.Json(new { code = PhoneVerificationErrorCodes.NoPhoneOnFile }, statusCode: StatusCodes.Status400BadRequest);
+            return Results.Json(
+                new { code = PhoneVerificationErrorCodes.NoPhoneOnFile },
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
-        return await SendAsync(user, purpose, db, otpSendQueue, jwtOptions.Value.Secret, logger, ct);
-    }
-
-    private static async Task<IResult> GetSendStatusAsync(
-        Guid sessionId,
-        ICurrentUser current,
-        AppDbContext db,
-        CancellationToken ct)
-    {
-        if (current.UserId is not { } userId) return Results.Unauthorized();
-
-        var session = await db.PhoneVerificationOtps
-            .AsNoTracking()
-            .FirstOrDefaultAsync(o => o.Id == sessionId && o.UserId == userId, ct);
-        if (session is null) return Results.NotFound();
-
-        var status = PhoneVerificationHelpers.SendStatusValue(session.SendStatus);
-        var message = session.SendStatus switch
+        // Invalidate any previous non-expired OTPs for this user/purpose
+        var stale = await db.PhoneVerificationOtps
+            .Where(o => o.UserId == userId && o.Purpose == purpose && o.UsedAt == null && o.ExpiresAt > DateTimeOffset.UtcNow)
+            .ToListAsync(ct);
+        foreach (var s in stale)
         {
-            PhoneVerificationOtpSendStatus.Sent => "Verification code sent via WhatsApp.",
-            PhoneVerificationOtpSendStatus.Failed => "Could not send the WhatsApp code. Please try again.",
-            _ => "Sending verification code via WhatsApp...",
-        };
-
-        return Results.Ok(new OtpSendStatusResponse(
-            status,
-            message,
-            session.SendStatus == PhoneVerificationOtpSendStatus.Failed && session.ResendCount < PhoneVerificationHelpers.MaxResends));
-    }
-
-    internal static async Task<IResult> SendAsync(
-        User user,
-        OtpPurpose purpose,
-        AppDbContext db,
-        IPhoneVerificationOtpSendQueue otpSendQueue,
-        string otpHashSecret,
-        ILogger logger,
-        CancellationToken ct,
-        bool phoneVerificationRequired = false)
-    {
-        var total = Stopwatch.StartNew();
-        var now = DateTimeOffset.UtcNow;
-        var phone = user.PhoneNumber?.Trim();
-        if (string.IsNullOrWhiteSpace(phone))
-        {
-            return Results.Json(new { code = PhoneVerificationErrorCodes.NoPhoneOnFile }, statusCode: StatusCodes.Status400BadRequest);
-        }
-        if (!PhoneNormalizer.IsValidEgyptianLocal(phone))
-        {
-            return Results.ValidationProblem(new Dictionary<string, string[]>
-            {
-                [nameof(user.PhoneNumber)] = ["Phone number must be 11 digits and start with 010, 011, 012, or 015."],
-            });
-        }
-        var maskedPhone = PhoneVerificationHelpers.MaskPhone(phone);
-
-        var lockoutUntil = await db.PhoneVerificationOtps
-            .Where(o => o.UserId == user.Id && o.PhoneNumber == phone && o.LockedUntil > now)
-            .MaxAsync(o => (DateTimeOffset?)o.LockedUntil, ct);
-        if (lockoutUntil is { } locked)
-        {
-            return Results.Json(new
-            {
-                code = PhoneVerificationErrorCodes.OtpSessionLocked,
-                retryAfterSeconds = PhoneVerificationHelpers.RetryAfterSeconds(locked, now),
-            }, statusCode: StatusCodes.Status429TooManyRequests);
+            s.ExpiresAt = DateTimeOffset.UtcNow.AddSeconds(-1);
         }
 
-        var latestSession = await db.PhoneVerificationOtps
-            .Where(o => o.UserId == user.Id
-                && o.PhoneNumber == phone
-                && o.Purpose == purpose
-                && !o.IsUsed
-                && o.ExpiresAt > now)
-            .OrderByDescending(o => o.CreatedAt)
-            .FirstOrDefaultAsync(ct);
-
-        if (latestSession is not null)
-        {
-            var cooldownUntil = latestSession.CreatedAt.AddSeconds(PhoneVerificationHelpers.CooldownSeconds);
-            if (cooldownUntil > now && latestSession.SendStatus != PhoneVerificationOtpSendStatus.Failed)
-            {
-                return Results.Json(new
-                {
-                    code = PhoneVerificationErrorCodes.OtpCooldownActive,
-                    retryAfterSeconds = PhoneVerificationHelpers.RetryAfterSeconds(cooldownUntil, now),
-                }, statusCode: StatusCodes.Status409Conflict);
-            }
-
-            if (latestSession.ResendCount >= PhoneVerificationHelpers.MaxResends)
-            {
-                latestSession.LockedUntil = now.Add(PhoneVerificationHelpers.LockoutDuration);
-                await db.SaveChangesAsync(ct);
-                return Results.Json(new
-                {
-                    code = PhoneVerificationErrorCodes.OtpSessionLocked,
-                    retryAfterSeconds = (int)PhoneVerificationHelpers.LockoutDuration.TotalSeconds,
-                }, statusCode: StatusCodes.Status429TooManyRequests);
-            }
-        }
-
-        var code = PhoneVerificationHelpers.GenerateCode();
-        var session = new PhoneVerificationOtp
+        var code = GenerateCode();
+        var otp = new PhoneVerificationOtp
         {
             Id = Guid.NewGuid(),
-            UserId = user.Id,
-            PhoneNumber = phone,
+            UserId = userId,
+            Code = code,
+            Phone = user.PhoneNumber,
             Purpose = purpose,
-            ResendCount = latestSession is null ? 0 : latestSession.ResendCount + 1,
-            CodeHash = PhoneVerificationHelpers.HashCode(code, otpHashSecret),
-            ExpiresAt = now.Add(PhoneVerificationHelpers.OtpLifetime),
-            IsUsed = false,
-            WrongAttempts = 0,
-            LockedUntil = null,
-            SendStatus = PhoneVerificationOtpSendStatus.Sending,
-            SendQueuedAt = now,
-            CreatedAt = now,
+            ExpiresAt = DateTimeOffset.UtcNow.AddMinutes(10),
+            CreatedAt = DateTimeOffset.UtcNow,
         };
-        db.PhoneVerificationOtps.Add(session);
-
-        var saveSw = Stopwatch.StartNew();
+        db.PhoneVerificationOtps.Add(otp);
         await db.SaveChangesAsync(ct);
-        saveSw.Stop();
 
-        var enqueueSw = Stopwatch.StartNew();
-        await otpSendQueue.EnqueueAsync(new PhoneVerificationOtpSendJob(
-            session.Id,
-            user.Id,
-            purpose,
-            PhoneNormalizer.ToE164(phone),
-            maskedPhone,
-            PhoneVerificationHelpers.MessageBody(code)), ct);
-        enqueueSw.Stop();
-        total.Stop();
+        var options = whatsAppOptions.Value;
+        // Send OTP via WhatsApp directly (not via outbox — OTP must be immediate)
+        if (!options.Enabled)
+        {
+            logger.LogWarning("PhoneVerification: WhatsApp disabled, OTP will not be sent (userId={UserId})", userId);
+            return Results.Json(
+                new { code = PhoneVerificationErrorCodes.SendFailed, detail = "WhatsApp notifications are not configured." },
+                statusCode: StatusCodes.Status503ServiceUnavailable);
+        }
 
-        logger.LogInformation(
-            "Phone OTP session queued for UserId={UserId}, Phone={MaskedPhone}, Purpose={Purpose}, SessionId={SessionId}, SaveMs={SaveMs}, EnqueueMs={EnqueueMs}, TotalMs={TotalMs}",
-            user.Id,
-            maskedPhone,
-            purpose,
-            session.Id,
-            saveSw.ElapsedMilliseconds,
-            enqueueSw.ElapsedMilliseconds,
-            total.ElapsedMilliseconds);
+        try
+        {
+            var body = $"رمز التحقق لـ Dr. Mirror هو: {code}\nصالح لمدة 10 دقائق.\nDr. Mirror verification code: {code}\nValid for 10 minutes.";
+            using var sendCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            sendCts.CancelAfter(TimeSpan.FromSeconds(options.TimeoutSeconds + 5));
+            await sender.SendAsync(user.PhoneNumber, body, sendCts.Token);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "PhoneVerification: OTP send failed for userId={UserId}", userId);
+            return Results.Json(
+                new { code = PhoneVerificationErrorCodes.SendFailed },
+                statusCode: StatusCodes.Status503ServiceUnavailable);
+        }
 
-        return Results.Ok(new SendOtpResponse(
-            session.Id,
-            maskedPhone,
-            PhoneVerificationHelpers.CooldownSeconds,
-            Math.Max(0, PhoneVerificationHelpers.MaxResends - session.ResendCount),
-            PhoneVerificationHelpers.SendStatusValue(session.SendStatus),
-            phoneVerificationRequired));
+        logger.LogInformation("PhoneVerification: OTP sent (sessionId={SessionId}, userId={UserId}, purpose={Purpose})", otp.Id, userId, purpose);
+        return Results.Ok(new SendOtpResponse(otp.Id, "sent", PhoneVerificationHelpers.MaskPhone(user.PhoneNumber)));
+    }
+
+    private static string GenerateCode()
+    {
+        var value = Random.Shared.Next(100_000, 999_999);
+        return value.ToString();
     }
 }

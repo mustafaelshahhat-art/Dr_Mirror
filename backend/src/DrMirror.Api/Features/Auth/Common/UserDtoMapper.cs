@@ -8,6 +8,8 @@ internal static class UserDtoMapper
         Id: user.Id,
         Email: user.Email ?? string.Empty,
         FullName: user.FullName,
+        Phone: user.PhoneNumber,
+        PhoneNumberConfirmed: user.PhoneNumberConfirmed,
         Roles: roles.ToArray(),
         CreatedAt: user.CreatedAt);
 }

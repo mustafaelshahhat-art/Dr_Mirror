@@ -1,3 +1,4 @@
+import { isAxiosError } from 'axios';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useApiErrorToast } from '../../shared/hooks/useApiErrorToast';
@@ -11,14 +12,12 @@ import type {
 import type {
   CancelOrderRequest,
   CreateOrderRequest,
-  CreateOrderResult,
   OrderDetailDto,
   OrderSummaryDto,
   PaymentMethodDto,
   ReturnRequestDto,
   SubmitReturnRequest,
 } from './types';
-import { isCheckoutPhoneVerificationRequired } from './types';
 
 /**
  * Whole app-config query — payment-proof upload limits AND the optional
@@ -67,13 +66,20 @@ export function useMyOrderQuery(orderNumber: string | undefined) {
   });
 }
 
+export function isPhoneNotVerifiedError(error: unknown): boolean {
+  return (
+    isAxiosError(error) &&
+    error.response?.status === 400 &&
+    (error.response?.data as { code?: string })?.code === 'PHONE_NOT_VERIFIED'
+  );
+}
+
 export function useCreateOrderMutation() {
   const queryClient = useQueryClient();
   const errorToast = useApiErrorToast();
-  return useMutation<CreateOrderResult, Error, { input: CreateOrderRequest; idempotencyKey?: string }>({
+  return useMutation<OrderDetailDto, Error, { input: CreateOrderRequest; idempotencyKey?: string }>({
     mutationFn: ({ input, idempotencyKey }) => ordersApi.createOrder(input, idempotencyKey),
     onSuccess: (order) => {
-      if (isCheckoutPhoneVerificationRequired(order)) return;
       // Checkout consumes the cart — invalidate so the mini-cart updates.
       void queryClient.invalidateQueries({ queryKey: queryKeys.cart() });
       // Seed the detail query so the post-checkout redirect renders instantly.
@@ -81,7 +87,10 @@ export function useCreateOrderMutation() {
       // Bust any cached lists so the new order appears in /account/orders.
       void queryClient.invalidateQueries({ queryKey: queryKeys.orders.listRoot(), exact: false });
     },
-    onError: errorToast,
+    onError: (error) => {
+      if (isPhoneNotVerifiedError(error)) return; // CheckoutPage handles this inline
+      errorToast(error);
+    },
   });
 }
 

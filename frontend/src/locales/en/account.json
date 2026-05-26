@@ -2,60 +2,64 @@
   "account": {
     "loading": "Loading your account…",
     "memberSince": "Member since {{date}}",
+    "header": {
+      "title": "Welcome, {{name}}",
+      "memberSince": "Member since {{date}}"
+    },
+    "tabs": {
+      "label": "Account sections",
+      "personalData": "Personal Data",
+      "orders": "Orders",
+      "returns": "Returns",
+      "addresses": "Addresses",
+      "security": "Password & Security"
+    },
+    "profile": {
+      "title": "Personal Data",
+      "name": "Full name",
+      "phone": "Phone number",
+      "email": "Email",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "saved": "Profile updated.",
+      "phoneVerified": "Phone number verified",
+      "phoneNotVerified": "Phone number not verified",
+      "verifyPhone": "Verify now",
+      "phoneSaveToVerify": "Save your changes first to verify the new phone number.",
+      "phoneVerifiedSuccess": "Phone number verified successfully.",
+      "errors": {
+        "nameRequired": "Enter your full name.",
+        "nameTooLong": "Name must be 120 characters or fewer.",
+        "phoneTooLong": "Phone number must be 30 characters or fewer.",
+        "emailInvalid": "Enter a valid email address.",
+        "emailTooLong": "Email must be 254 characters or fewer.",
+        "emailRequired": "Enter your email address."
+      },
+      "otp": {
+        "title": "Verify phone number",
+        "sendDescription": "We will send a 6-digit verification code to {{phone}}.",
+        "enterDescription": "Enter the 6-digit code sent to {{phone}}.",
+        "codeLabel": "Verification code",
+        "sendButton": "Send code",
+        "resend": "Resend code",
+        "verifyButton": "Verify",
+        "sendFailed": "Failed to send the verification code. Please try again.",
+        "whatsappUnavailable": "WhatsApp is not currently available. Please try again later or contact support.",
+        "expired": "The verification code has expired. Request a new one.",
+        "tooManyAttempts": "Too many failed attempts. Please request a new code.",
+        "invalid": "Invalid verification code. Please try again."
+      }
+    },
+    "emptyStates": {
+      "orders": "You have no orders yet.",
+      "returns": "You have no return requests yet.",
+      "addresses": "You have no saved addresses yet."
+    },
     "recentOrders": {
       "title": "Recent orders",
       "empty": "No orders yet. Start shopping!",
       "viewAll": "View all orders",
       "orderLabel": "Order #{{number}}"
-    },
-    "profile": {
-      "title": "Profile",
-      "subtitle": "Manage your display name and Egyptian mobile number.",
-      "nameLabel": "Full name",
-      "phoneLabel": "Mobile phone",
-      "phoneHint": "Use local Egyptian format, for example 01012345678.",
-      "saveButton": "Save profile",
-      "saveSuccess": "Profile updated successfully.",
-      "saveError": "Could not update your profile. Please try again.",
-      "loadError": "Could not load your profile.",
-      "nameLength": "Enter a name between 2 and 120 characters.",
-      "phoneInvalidFormat": "Enter an 11-digit Egyptian mobile number starting with 010, 011, 012, or 015.",
-      "verifiedBadge": "Verified",
-      "unverifiedBadge": "Unverified",
-      "verifyViaWhatsApp": "Verify via WhatsApp",
-      "verifiedAt": "Verified on {{date}}",
-      "noPhone": "Add a phone number to enable WhatsApp verification and checkout.",
-      "savePhoneBeforeVerify": "Save your phone number first to verify it."
-    },
-    "phone": {
-      "verifyTitle": "Verify your phone",
-      "verifyPageTitle": "Phone verification",
-      "verifyPageSubtitle": "Enter the 6-digit code sent to your WhatsApp number.",
-      "otpPrompt": "We'll send the verification code to {{phone}}.",
-      "sending": "We're sending your verification code on WhatsApp...",
-      "sent": "Verification code sent via WhatsApp.",
-      "enterWhenArrives": "Enter the 6-digit code once it arrives.",
-      "mayTakeSeconds": "This may take a few seconds.",
-      "sendFailed": "Could not send the code. Please try again.",
-      "codeLabel": "6-digit code",
-      "codeInvalidFormat": "Enter the 6-digit code.",
-      "verifySubmit": "Verify phone",
-      "resend": "Resend code",
-      "cooldown": "You can request another code in {{seconds}} seconds.",
-      "resendsRemaining": "{{count}} resend attempts remaining.",
-      "locked": "Too many incorrect attempts. Please try again later.",
-      "expired": "This code expired or was already used. Request a new code.",
-      "wrongCode": "Incorrect code. {{count}} attempts remaining.",
-      "verifiedSuccess": "Phone verified successfully.",
-      "whatsappUnavailable": "Phone verification through WhatsApp is temporarily unavailable. Please try again shortly.",
-      "errorUnknown": "Could not verify your phone. Please try again."
-    },
-    "checkout": {
-      "noPhoneOnFile": "Please add a phone number to your account before completing checkout.",
-      "noPhoneCta": "Add phone number",
-      "phoneVerificationRequired": "Verify your account phone to complete this order.",
-      "whatsappUnavailable": "Phone verification through WhatsApp is temporarily unavailable. Please try again shortly.",
-      "retryCheckout": "Try checkout again"
     },
     "security": {
       "title": "Security",
@@ -66,8 +70,6 @@
       "submit": "Change password",
       "submitting": "Changing...",
       "success": "Password changed successfully.",
-      "passwordMismatch": "Passwords do not match.",
-      "passwordTooWeak": "Password does not meet the security requirements.",
       "errorIncorrectPassword": "The current password you entered is incorrect.",
       "errorUnknown": "Something went wrong while changing your password. Please try again."
     }

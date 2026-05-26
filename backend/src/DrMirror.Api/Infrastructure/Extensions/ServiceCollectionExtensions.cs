@@ -342,6 +342,7 @@ internal static class ServiceCollectionExtensions
                 o.AutoReplenishment = true;
             });
 
+            // Phone OTP send — 3 req/5 min per authenticated user (prevents WhatsApp spam).
             options.AddPolicy(RateLimitPolicies.OtpSend, context =>
             {
                 var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
@@ -350,12 +351,13 @@ internal static class ServiceCollectionExtensions
                 return RateLimitPartition.GetFixedWindowLimiter(userId, _ => new FixedWindowRateLimiterOptions
                 {
                     Window = TimeSpan.FromMinutes(5),
-                    PermitLimit = 5 * multiplier,
+                    PermitLimit = 3 * multiplier,
                     QueueLimit = 0,
                     AutoReplenishment = true,
                 });
             });
 
+            // Phone OTP verify — 10 req/10 min per authenticated user (prevents brute-force).
             options.AddPolicy(RateLimitPolicies.OtpVerify, context =>
             {
                 var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
@@ -363,7 +365,7 @@ internal static class ServiceCollectionExtensions
                     ?? "anonymous";
                 return RateLimitPartition.GetFixedWindowLimiter(userId, _ => new FixedWindowRateLimiterOptions
                 {
-                    Window = TimeSpan.FromMinutes(5),
+                    Window = TimeSpan.FromMinutes(10),
                     PermitLimit = 10 * multiplier,
                     QueueLimit = 0,
                     AutoReplenishment = true,

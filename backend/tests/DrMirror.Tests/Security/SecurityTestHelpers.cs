@@ -33,9 +33,6 @@ internal static class SecurityTestHelpers
             Email = email,
             FullName = email,
             EmailConfirmed = true,
-            PhoneNumber = "01000000000",
-            PhoneNumberConfirmed = true,
-            PhoneVerifiedAt = DateTimeOffset.UtcNow,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow,
         };

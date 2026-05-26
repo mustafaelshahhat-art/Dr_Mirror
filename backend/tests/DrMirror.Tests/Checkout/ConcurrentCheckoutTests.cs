@@ -35,8 +35,8 @@ public class ConcurrentCheckoutTests : IClassFixture<ConcurrentCheckoutTests.Fac
         var user1Id = Guid.NewGuid();
         var user2Id = Guid.NewGuid();
 
-        var buyer1 = new User { Id = user1Id, FullName = "Buyer 1", Email = "buyer1@example.com", UserName = "buyer1@example.com", PhoneNumber = "01000000000", PhoneNumberConfirmed = true, PhoneVerifiedAt = DateTimeOffset.UtcNow };
-        var buyer2 = new User { Id = user2Id, FullName = "Buyer 2", Email = "buyer2@example.com", UserName = "buyer2@example.com", PhoneNumber = "01100000000", PhoneNumberConfirmed = true, PhoneVerifiedAt = DateTimeOffset.UtcNow };
+        var buyer1 = new User { Id = user1Id, FullName = "Buyer 1", Email = "buyer1@example.com", UserName = "buyer1@example.com" };
+        var buyer2 = new User { Id = user2Id, FullName = "Buyer 2", Email = "buyer2@example.com", UserName = "buyer2@example.com" };
 
         var paymentMethod = new PaymentMethod { Id = Guid.NewGuid(), NameEn = "Instapay", NameAr = "Instapay", Kind = DrMirror.Api.Domain.Orders.PaymentMethodKind.Instapay, IsActive = true };
         var governorate = new GovernorateShippingFee { Id = Guid.NewGuid(), Slug = "cairo", NameEn = "Cairo", NameAr = "القاهرة", Fee = 0m, IsActive = true };

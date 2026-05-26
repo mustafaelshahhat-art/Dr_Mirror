@@ -21,12 +21,10 @@ public static class WhatsAppServiceExtensions
             {
                 client.BaseAddress = new Uri(options.ServiceUrl.TrimEnd('/'));
             }
-            client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+            client.Timeout = Timeout.InfiniteTimeSpan;
         });
         services.AddScoped<IWhatsAppSender>(sp => sp.GetRequiredService<WhatsAppServiceClient>());
-        services.AddSingleton<IPhoneVerificationOtpSendQueue, PhoneVerificationOtpSendQueue>();
         services.AddScoped<WhatsAppMessageDispatcher>();
-        services.AddHostedService<PhoneVerificationOtpSenderService>();
         services.AddHostedService<WhatsAppOutboxProcessor>();
         services.AddHostedService<WhatsAppSidecarMonitor>();
         services.AddHostedService<WhatsAppOutboxRetentionService>();

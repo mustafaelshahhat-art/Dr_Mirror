@@ -13,7 +13,7 @@ import {
   setAuthExpiredHandler,
 } from '../../shared/lib/auth-storage';
 
-import { authApi, type LoginInput, type RegisterInput } from './api';
+import { authApi, type LoginInput, type RegisterInput, type SendOtpInput, type VerifyOtpInput } from './api';
 import { AuthContext, type AuthContextValue } from './AuthContext';
 import type { AuthUser } from './types';
 
@@ -83,6 +83,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [finishWithSession],
   );
 
+  const updateProfile = useCallback(async (input: Parameters<typeof authApi.updateProfile>[0]) => {
+    const next = await authApi.updateProfile(input);
+    setUser(next);
+    return next;
+  }, []);
+
+  const sendPhoneOtp = useCallback(async (input: SendOtpInput) => {
+    return authApi.sendPhoneOtp(input);
+  }, []);
+
+  const verifyPhoneOtp = useCallback(async (input: VerifyOtpInput) => {
+    const result = await authApi.verifyPhoneOtp(input);
+    if (result.verified) {
+      // Reload user state so phoneNumberConfirmed updates in the UI
+      const refreshed = await authApi.me();
+      setUser(refreshed);
+    }
+    return result;
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    const refreshed = await authApi.me();
+    setUser(refreshed);
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await authApi.logout();
@@ -102,9 +127,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAdmin,
       login,
       register,
+      updateProfile,
+      sendPhoneOtp,
+      verifyPhoneOtp,
+      refreshUser,
       logout,
     }),
-    [user, isBootstrapping, isAdmin, login, register, logout],
+    [user, isBootstrapping, isAdmin, login, register, updateProfile, sendPhoneOtp, verifyPhoneOtp, refreshUser, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

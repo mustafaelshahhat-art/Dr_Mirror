@@ -5,7 +5,6 @@ import { appConfigApi } from '../app-config/api';
 import type {
   CancelOrderRequest,
   CreateOrderRequest,
-  CreateOrderResult,
   OrderDetailDto,
   ReturnRequestDto,
   SubmitReturnRequest,
@@ -33,8 +32,8 @@ export const ordersApi = {
    * The backend route group is mounted at "/api/checkout" and the handler
    * is registered as MapPost("/"), so the effective path is "/api/checkout".
    */
-  async createOrder(input: CreateOrderRequest, idempotencyKey?: string): Promise<CreateOrderResult> {
-    const { data } = await api.post<CreateOrderResult>('/checkout', input, {
+  async createOrder(input: CreateOrderRequest, idempotencyKey?: string): Promise<OrderDetailDto> {
+    const { data } = await api.post<OrderDetailDto>('/checkout', input, {
       headers: idempotencyKey ? { 'X-Idempotency-Key': idempotencyKey } : undefined,
     });
     return data;

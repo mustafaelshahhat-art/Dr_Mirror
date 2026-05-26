@@ -7,4 +7,5 @@ public enum WhatsAppOutboxStatus
     Sent = 2,
     Failed = 3,
     Skipped = 4,
+    Retrying = 5,
 }

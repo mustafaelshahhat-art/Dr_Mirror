@@ -148,4 +148,20 @@ export const adminWhatsAppApi = {
     const { data } = await api.get<{ qrDataUri: string | null }>('/admin/whatsapp/qr');
     return data;
   },
+
+  async disconnectWhatsApp(): Promise<void> {
+    await api.post('/admin/whatsapp/disconnect');
+  },
+
+  async retryAttempt(id: string): Promise<{ originalId: string; retryId: string }> {
+    const { data } = await api.post<{ originalId: string; retryId: string }>(
+      `/admin/whatsapp/attempts/${encodeURIComponent(id)}/retry`,
+    );
+    return data;
+  },
+
+  async retryAllFailed(): Promise<{ queued: number }> {
+    const { data } = await api.post<{ queued: number }>('/admin/whatsapp/attempts/retry-all-failed');
+    return data;
+  },
 };

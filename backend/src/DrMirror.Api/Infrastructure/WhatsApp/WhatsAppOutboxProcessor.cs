@@ -49,8 +49,7 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
             .Where(m => m.Attempts < maxAttempts
                 && ((m.Status == WhatsAppOutboxStatus.Pending && m.NextRetryAt <= now)
                     || (m.Status == WhatsAppOutboxStatus.Processing && m.LockedAt <= staleBefore)))
-            .OrderBy(m => m.Priority)
-            .ThenBy(m => m.CreatedAt)
+            .OrderBy(m => m.CreatedAt)
             .Select(m => m.Id)
             .Take(20)
             .ToListAsync(ct);
@@ -88,8 +87,7 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
             .Where(m => claimableIds.Contains(m.Id)
                 && m.Status == WhatsAppOutboxStatus.Processing
                 && m.LockedBy == _workerId)
-            .OrderBy(m => m.Priority)
-            .ThenBy(m => m.CreatedAt)
+            .OrderBy(m => m.CreatedAt)
             .ToListAsync(ct);
 
         foreach (var msg in claimed)
@@ -98,7 +96,7 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
             {
                 await dispatcher.DispatchAsync(msg, ct);
             }
-            catch (Exception ex) when (ex is not OperationCanceledException)
+            catch (Exception ex)
             {
                 msg.FailureReason = "sidecar_error";
                 msg.LockedAt = null;
@@ -118,6 +116,8 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
                 }
             }
 
+            await ReconcileRetryParentAsync(db, msg, ct);
+
             try
             {
                 await db.SaveChangesAsync(ct);
@@ -125,7 +125,6 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
             catch (DbUpdateConcurrencyException ex)
             {
                 _logger.LogWarning(ex, "WhatsAppOutbox: concurrency conflict ignored for {Id}", msg.Id);
-                db.Entry(msg).State = EntityState.Detached;
             }
         }
     }
@@ -138,5 +137,32 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
         msg.Attempts++;
         msg.LastAttemptAt = now;
         msg.FailureReason = null;
+    }
+
+    private static async Task ReconcileRetryParentAsync(AppDbContext db, WhatsAppOutboxMessage child, CancellationToken ct)
+    {
+        if (child.ParentMessageId is not { } parentId)
+        {
+            return;
+        }
+
+        var parent = await db.WhatsAppOutboxMessages.FirstOrDefaultAsync(m => m.Id == parentId, ct);
+        if (parent is null || parent.Status != WhatsAppOutboxStatus.Retrying)
+        {
+            return;
+        }
+
+        if (child.Status == WhatsAppOutboxStatus.Sent)
+        {
+            parent.Status = WhatsAppOutboxStatus.Sent;
+            parent.FailureReason = null;
+            return;
+        }
+
+        if (child.Status is WhatsAppOutboxStatus.Failed or WhatsAppOutboxStatus.Skipped)
+        {
+            parent.Status = WhatsAppOutboxStatus.Failed;
+            parent.FailureReason = child.FailureReason;
+        }
     }
 }

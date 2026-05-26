@@ -9,6 +9,8 @@ public sealed record UserDto(
     Guid Id,
     string Email,
     string FullName,
+    string? Phone,
+    bool PhoneNumberConfirmed,
     IReadOnlyList<string> Roles,
     DateTimeOffset CreatedAt);
 

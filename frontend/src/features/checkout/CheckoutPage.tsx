@@ -1,6 +1,6 @@
 import { Alert, Button, Form } from '@heroui/react';
+import { toast } from '@heroui/react/toast';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { isAxiosError } from 'axios';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -8,11 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../auth/useAuth';
+import { PhoneVerificationModal, maskPhone } from '../auth/components/PhoneVerificationModal';
 import { useAddressesQuery } from '../addresses/hooks';
-import { OtpEntryForm } from '../account/components/OtpEntryForm';
 import { useCart } from '../cart/useCart';
-import { useCreateOrderMutation, usePaymentMethodsQuery } from '../orders/hooks';
-import { isCheckoutPhoneVerificationRequired, type CreateOrderRequest } from '../orders/types';
+import { isPhoneNotVerifiedError, useCreateOrderMutation, usePaymentMethodsQuery } from '../orders/hooks';
 
 import { AddressStep } from './components/AddressStep';
 import { CheckoutAuthGate } from './components/CheckoutAuthGate';
@@ -56,7 +55,7 @@ function CheckoutBody() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const isAr = lang === 'ar';
-  const { user } = useAuth();
+  const { user, sendPhoneOtp, verifyPhoneOtp, refreshUser } = useAuth();
   const { cart } = useCart();
   const paymentMethodsQuery = usePaymentMethodsQuery();
   const governoratesQuery = useGovernoratesQuery();
@@ -65,17 +64,9 @@ function CheckoutBody() {
 
   const [step, setStep] = useState<CheckoutStep>('address');
   const [formError, setFormError] = useState<string | null>(null);
-  const [checkoutErrorAction, setCheckoutErrorAction] = useState<'noPhone' | 'whatsapp' | null>(null);
-  const [checkoutOtp, setCheckoutOtp] = useState<{
-    sessionId: string;
-    maskedPhone: string;
-    cooldownSeconds: number;
-    resendsRemaining: number;
-    status: 'sending' | 'sent' | 'failed';
-    payload: CreateOrderRequest;
-  } | null>(null);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
   const [paymentAvailable, setPaymentAvailable] = useState(false);
+  const [phoneOtpOpen, setPhoneOtpOpen] = useState(false);
   const addressesQuery = useAddressesQuery();
   const [hasInitializedAddress, setHasInitializedAddress] = useState(false);
 
@@ -174,7 +165,6 @@ function CheckoutBody() {
   const selectedGovernorate = findGovernorateForAddress(governoratesQuery.data ?? [], addressGovernorate);
   const shippingFee = selectedGovernorate?.fee ?? 0;
   const shippingGovernorateUnavailable = Boolean(addressGovernorate) && governoratesQuery.isSuccess && !selectedGovernorate;
-  const isCheckoutLocked = Boolean(checkoutOtp);
 
   function hasAvailableShippingGovernorate() {
     if (selectedGovernorate) {
@@ -220,7 +210,6 @@ function CheckoutBody() {
     if (createOrder.isPending) return;
 
     setFormError(null);
-    setCheckoutErrorAction(null);
 
     const usingSaved = savedAddressId !== null;
 
@@ -245,68 +234,40 @@ function CheckoutBody() {
       return;
     }
 
-    const values = getValues();
-    await submitCheckoutPayload({
-      paymentMethodId: values.paymentMethodId,
-      buyerAddressId: usingSaved ? savedAddressId : null,
-      shippingAddress: usingSaved
-        ? null
-        : {
-            recipientName: values.address.recipientName,
-            phone: values.address.phone,
-            governorate: values.address.governorate,
-            city: values.address.city,
-            streetAddress: values.address.streetAddress,
-            floor: values.address.floor || null,
-            apartment: values.address.apartment || null,
-            landmark: values.address.landmark || null,
-            notes: values.address.notes || null,
-          },
-      saveAsNewAddress: !usingSaved && saveAsNewAddress,
-      label: !usingSaved && saveAsNewAddress ? addressLabel.trim() : null,
-      buyerNote: values.buyerNote?.trim() ? values.buyerNote.trim() : null,
-    });
-  }
-
-  async function submitCheckoutPayload(input: CreateOrderRequest) {
     try {
-      const result = await createOrder.mutateAsync({ idempotencyKey, input });
-      if (isCheckoutPhoneVerificationRequired(result)) {
-        setCheckoutOtp({
-          sessionId: result.sessionId,
-          maskedPhone: result.maskedPhone,
-          cooldownSeconds: result.cooldownSeconds,
-          resendsRemaining: result.resendsRemaining,
-          status: result.status,
-          payload: input,
-        });
-        setFormError(t('account.account.checkout.phoneVerificationRequired'));
-        return;
-      }
-      setCheckoutOtp(null);
-      fireAddressSaveOutcomeToast(result.addressSaveOutcome, t);
-      navigate(`/account/orders/${encodeURIComponent(result.orderNumber)}`);
+      const values = getValues();
+      const order = await createOrder.mutateAsync({
+        idempotencyKey,
+        input: {
+          paymentMethodId: values.paymentMethodId,
+          buyerAddressId: usingSaved ? savedAddressId : null,
+          shippingAddress: usingSaved
+            ? null
+            : {
+                recipientName: values.address.recipientName,
+                phone: values.address.phone,
+                governorate: values.address.governorate,
+                city: values.address.city,
+                streetAddress: values.address.streetAddress,
+                floor: values.address.floor || null,
+                apartment: values.address.apartment || null,
+                landmark: values.address.landmark || null,
+                notes: values.address.notes || null,
+              },
+          saveAsNewAddress: !usingSaved && saveAsNewAddress,
+          label: !usingSaved && saveAsNewAddress ? addressLabel.trim() : null,
+          buyerNote: values.buyerNote?.trim() ? values.buyerNote.trim() : null,
+        },
+      });
+      // Surface the address-book-full notice before navigating; the toast
+      // portal lives at the app root so it survives the route change.
+      fireAddressSaveOutcomeToast(order.addressSaveOutcome, t);
+      navigate(`/account/orders/${encodeURIComponent(order.orderNumber)}`);
     } catch (error) {
-      const data = isAxiosError(error) ? error.response?.['data'] as { code?: string; retryAfterSeconds?: number } | undefined : undefined;
-      if (data?.code === 'NoPhoneOnFile') {
-        setCheckoutErrorAction('noPhone');
-        setFormError(t('account.account.checkout.noPhoneOnFile'));
-        return;
+      if (isPhoneNotVerifiedError(error)) {
+        setPhoneOtpOpen(true);
       }
-      if (data?.code === 'WhatsAppUnavailable') {
-        setCheckoutErrorAction('whatsapp');
-        setFormError(t('account.account.checkout.whatsappUnavailable'));
-        return;
-      }
-      if (data?.code === 'OtpCooldownActive') {
-        setFormError(t('account.account.phone.cooldown', { seconds: data.retryAfterSeconds ?? 60 }));
-        return;
-      }
-      if (data?.code === 'OtpSessionLocked') {
-        setFormError(t('account.account.phone.locked'));
-        return;
-      }
-      setFormError(t('checkout.errors.unknown'));
+      // Other errors: toast was emitted by mutation onError.
     }
   }
 
@@ -323,159 +284,144 @@ function CheckoutBody() {
         <CheckoutSteps current={step} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+      <Form
+        onSubmit={(e) => e.preventDefault()}
+        className="grid gap-6 lg:grid-cols-[1fr_320px]"
+      >
         <div className="space-y-4">
           {formError ? (
             // eslint-disable-next-line i18next/no-literal-string -- component status token, not user copy
             <Alert status="danger" role="alert" className="rounded-xl">
               <Alert.Content>
-                <Alert.Description>
-                  <span className="block">{formError}</span>
-                  {checkoutErrorAction === 'noPhone' ? (
-                    <Link to="/account/profile" className="mt-2 inline-flex text-sm font-semibold text-primary underline-offset-4 hover:underline">
-                      {t('account.account.checkout.noPhoneCta')}
-                    </Link>
-                  ) : null}
-                  {checkoutErrorAction === 'whatsapp' ? (
-                    <Button type="button" variant="outline" size="sm" className="mt-2" onPress={() => void handlePlaceOrder()}>
-                      {t('account.account.checkout.retryCheckout')}
-                    </Button>
-                  ) : null}
-                </Alert.Description>
+                <Alert.Description>{formError}</Alert.Description>
               </Alert.Content>
             </Alert>
           ) : null}
 
-          {checkoutOtp ? (
-            <OtpEntryForm
-              key={`${checkoutOtp.sessionId}:${checkoutOtp.status}`}
-              // eslint-disable-next-line i18next/no-literal-string -- API purpose token, not user copy
-              purpose="checkout"
-              sessionId={checkoutOtp.sessionId}
-              maskedPhone={checkoutOtp.maskedPhone}
-              initialCooldownSeconds={checkoutOtp.cooldownSeconds}
-              initialResendsRemaining={checkoutOtp.resendsRemaining}
-              initialSendStatus={checkoutOtp.status}
-              onVerified={async () => {
-                const payload = checkoutOtp.payload;
-                setCheckoutOtp(null);
-                setFormError(null);
-                await submitCheckoutPayload(payload);
-              }}
-            />
+          {shippingGovernorateUnavailable ? (
+            // eslint-disable-next-line i18next/no-literal-string -- component status token, not user copy
+            <Alert status="warning" role="alert" className="rounded-xl">
+              <Alert.Content>
+                <Alert.Description>{t('shipping.validation.governorateUnavailable')}</Alert.Description>
+              </Alert.Content>
+            </Alert>
           ) : null}
 
-          <Form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-            {shippingGovernorateUnavailable ? (
-              // eslint-disable-next-line i18next/no-literal-string -- component status token, not user copy
-              <Alert status="warning" role="alert" className="rounded-xl">
-                <Alert.Content>
-                  <Alert.Description>{t('shipping.validation.governorateUnavailable')}</Alert.Description>
-                </Alert.Content>
-              </Alert>
+          <div key={step} className="checkout-card enter-fade-up">
+            {step === 'address' ? (
+              <AddressStep
+                control={control}
+                watch={watch}
+                setValue={setValue}
+                savedAddresses={savedAddresses}
+                savedAddressId={savedAddressId}
+                setSavedAddressId={(id) =>
+                  setValue('buyerAddressId', id, { shouldDirty: true, shouldValidate: false })
+                }
+                saveAsNewAddress={saveAsNewAddress}
+                setSaveAsNewAddress={(value) =>
+                  setValue('saveAsNewAddress', value, { shouldDirty: true, shouldValidate: false })
+                }
+                lang={lang}
+              />
             ) : null}
 
-            <div key={step} className="checkout-card enter-fade-up">
-              {step === 'address' ? (
-                <AddressStep
+            {step === 'payment' ? (
+              <fieldset className="space-y-4">
+                <legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
+                  {t('checkout.payment.heading')}
+                </legend>
+                <PaymentMethodSection
+                  selectedId={paymentMethodId || null}
+                  onSelect={(id) =>
+                    // eslint-disable-next-line i18next/no-literal-string
+                    setValue('paymentMethodId', id, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    })
+                  }
+                  onAvailabilityChange={setPaymentAvailable}
+                />
+                <FormField
+                  name="buyerNote"
                   control={control}
-                  watch={watch}
-                  setValue={setValue}
-                  savedAddresses={savedAddresses}
-                  savedAddressId={savedAddressId}
-                  setSavedAddressId={(id) =>
-                    setValue('buyerAddressId', id, { shouldDirty: true, shouldValidate: false })
-                  }
-                  saveAsNewAddress={saveAsNewAddress}
-                  setSaveAsNewAddress={(value) =>
-                    setValue('saveAsNewAddress', value, { shouldDirty: true, shouldValidate: false })
-                  }
-                  lang={lang}
+                  label={t('checkout.buyerNote.label')}
+                  description={t('checkout.buyerNote.hint')}
                 />
-              ) : null}
+              </fieldset>
+            ) : null}
 
-              {step === 'payment' ? (
-                <fieldset className="space-y-4">
-                  <legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
-                    {t('checkout.payment.heading')}
-                  </legend>
-                  <PaymentMethodSection
-                    selectedId={paymentMethodId || null}
-                    onSelect={(id) =>
-                      // eslint-disable-next-line i18next/no-literal-string
-                      setValue('paymentMethodId', id, {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                      })
-                    }
-                    onAvailabilityChange={setPaymentAvailable}
-                  />
-                  <FormField
-                    name="buyerNote"
-                    control={control}
-                    label={t('checkout.buyerNote.label')}
-                    description={t('checkout.buyerNote.hint')}
-                  />
-                </fieldset>
-              ) : null}
+            {step === 'review' ? (
+              <ReviewStep
+                reviewAddress={reviewAddress}
+                selectedMethod={selectedMethod}
+                buyerNote={buyerNote}
+                isAr={isAr}
+                subTotal={cart.subTotal}
+                shippingFee={shippingFee}
+              />
+            ) : null}
+          </div>
 
-              {step === 'review' ? (
-                <ReviewStep
-                  reviewAddress={reviewAddress}
-                  selectedMethod={selectedMethod}
-                  buyerNote={buyerNote}
-                  isAr={isAr}
-                  subTotal={cart.subTotal}
-                  shippingFee={shippingFee}
-                />
-              ) : null}
-            </div>
+          <div className="flex items-center justify-between gap-2 rounded-xl pt-2">
+            <Button
+              type="button"
+              variant="ghost"
+              isDisabled={step === 'address' || createOrder.isPending}
+              onPress={previous}
+              className="rounded-xl"
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
+                {t('checkout.back')}
+              </span>
+            </Button>
 
-            <div className="flex items-center justify-between gap-2 rounded-xl pt-2">
+            {step !== 'review' ? (
               <Button
                 type="button"
-                variant="ghost"
-                isDisabled={step === 'address' || createOrder.isPending || isCheckoutLocked}
-                onPress={previous}
+                variant="primary"
+                isDisabled={step === 'payment' && !paymentAvailable}
+                onPress={() => void next()}
                 className="rounded-xl"
               >
                 <span className="inline-flex items-center gap-1.5">
-                  <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
-                  {t('checkout.back')}
+                  {t('checkout.continue')}
+                  <ArrowRight className="size-4 rtl:rotate-180" aria-hidden />
                 </span>
               </Button>
-
-              {step !== 'review' ? (
-                <Button
-                  type="button"
-                  variant="primary"
-                  isDisabled={isCheckoutLocked || (step === 'payment' && !paymentAvailable)}
-                  onPress={() => void next()}
-                  className="rounded-xl"
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    {t('checkout.continue')}
-                    <ArrowRight className="size-4 rtl:rotate-180" aria-hidden />
-                  </span>
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  variant="primary"
-                  isPending={createOrder.isPending}
-                  isDisabled={createOrder.isPending || isCheckoutLocked}
-                  onPress={() => void handlePlaceOrder()}
-                  className="rounded-xl"
-                >
-                  {createOrder.isPending ? t('checkout.confirming') : t('checkout.confirmOrder')}
-                </Button>
-              )}
-            </div>
-          </Form>
+            ) : (
+              <Button
+                type="button"
+                variant="primary"
+                isPending={createOrder.isPending}
+                isDisabled={createOrder.isPending}
+                onPress={() => void handlePlaceOrder()}
+                className="rounded-xl"
+              >
+                {createOrder.isPending ? t('checkout.confirming') : t('checkout.confirmOrder')}
+              </Button>
+            )}
+          </div>
         </div>
 
         <CheckoutSummary items={cart.items} subTotal={cart.subTotal} shippingFee={shippingFee} lang={lang} />
-      </div>
+      </Form>
+
+      {user?.phone && (
+        <PhoneVerificationModal
+          isOpen={phoneOtpOpen}
+          onClose={() => setPhoneOtpOpen(false)}
+          maskedPhone={maskPhone(user.phone)}
+          sendOtp={() => sendPhoneOtp({ purpose: 'checkout' })}
+          verifyOtp={verifyPhoneOtp}
+          onVerified={() => {
+            setPhoneOtpOpen(false);
+            void refreshUser();
+            toast.success(t('checkout.phoneVerifiedRetry'));
+          }}
+        />
+      )}
     </section>
   );
 }

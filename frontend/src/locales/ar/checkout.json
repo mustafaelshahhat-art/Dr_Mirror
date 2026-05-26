@@ -9,6 +9,7 @@
   "placing": "جاري إتمام الطلب...",
   "confirmOrder": "تأكيد الطلب",
   "confirming": "جارٍ التأكيد...",
+  "phoneVerifiedRetry": "تم التحقق من رقم هاتفك. يمكنك الآن إتمام الطلب.",
   "steps": {
     "address": "الشحن",
     "payment": "الدفع",

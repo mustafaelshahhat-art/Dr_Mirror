@@ -1,5 +1,6 @@
 using System.Text.Json;
 using DrMirror.Api.Domain.Entities;
+using DrMirror.Api.Domain.Orders;
 using DrMirror.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,8 @@ namespace DrMirror.Api.Infrastructure.WhatsApp;
 
 public static class WhatsAppOutboxHelper
 {
+    private static readonly JsonSerializerOptions PayloadJsonOptions = new(JsonSerializerDefaults.Web);
+
     public static async Task SaveChangesIgnoringDuplicateAsync(AppDbContext db, CancellationToken ct)
     {
         try
@@ -25,37 +28,68 @@ public static class WhatsAppOutboxHelper
         }
     }
 
-    public static WhatsAppOutboxMessage CreateForOrder(Guid orderId, Guid buyerUserId, string eventType, string status, string? phone)
+    public static WhatsAppOutboxMessage CreateForOrder(Order order, string eventType, string status)
     {
         var normalizedStatus = status.Trim();
         var now = DateTimeOffset.UtcNow;
+        var messageBody = eventType == "OrderConfirmation"
+            ? WhatsAppMessageTemplates.OrderConfirmation(order.OrderNumber)
+            : WhatsAppMessageTemplates.OrderStatusChanged(order.OrderNumber, ParseOrderStatus(normalizedStatus, order.Status));
+
         return new WhatsAppOutboxMessage
         {
             Id = Guid.NewGuid(),
             EventType = eventType,
-            Payload = JsonSerializer.Serialize(new OrderPayload(orderId, normalizedStatus)),
-            BuyerUserId = buyerUserId,
-            RecipientPhoneMasked = MaskPhone(phone),
-            Priority = WhatsAppMessagePriority.Normal,
-            IdempotencyKey = $"order:{orderId}:{normalizedStatus.ToLowerInvariant()}",
+            Payload = JsonSerializer.Serialize(new MessagePayload(
+                eventType,
+                order.Id,
+                order.BuyerUserId,
+                order.OrderNumber,
+                normalizedStatus,
+                order.Total,
+                null,
+                order.ShippingAddress.RecipientName,
+                order.ShippingAddress.Phone,
+                messageBody), PayloadJsonOptions),
+            RecipientPhoneMasked = MaskPhone(order.ShippingAddress.Phone),
+            IdempotencyKey = $"order:{order.Id}:{normalizedStatus.ToLowerInvariant()}",
+            EntityType = "Order",
+            EntityId = order.Id,
             CreatedAt = now,
             NextRetryAt = now,
         };
     }
 
-    public static WhatsAppOutboxMessage CreateForReturn(Guid returnRequestId, Guid buyerUserId, string eventType, string status, string? phone)
+    public static WhatsAppOutboxMessage CreateForReturn(ReturnRequest returnRequest, string eventType, string status)
     {
         var normalizedStatus = status.Trim();
         var now = DateTimeOffset.UtcNow;
+        var returnRef = ReturnRef(returnRequest.Id);
+        var parsedStatus = ParseReturnStatus(normalizedStatus, returnRequest.Status);
+        var phone = returnRequest.Order?.ShippingAddress.Phone;
+        var messageBody = eventType == "ReturnCreated"
+            ? WhatsAppMessageTemplates.ReturnCreated(returnRef)
+            : WhatsAppMessageTemplates.ReturnStatusChanged(returnRef, parsedStatus);
+
         return new WhatsAppOutboxMessage
         {
             Id = Guid.NewGuid(),
             EventType = eventType,
-            Payload = JsonSerializer.Serialize(new ReturnPayload(returnRequestId, normalizedStatus)),
-            BuyerUserId = buyerUserId,
+            Payload = JsonSerializer.Serialize(new MessagePayload(
+                eventType,
+                returnRequest.Id,
+                returnRequest.BuyerUserId,
+                returnRef,
+                normalizedStatus,
+                null,
+                returnRequest.CustomerReason,
+                returnRequest.Order?.ShippingAddress.RecipientName,
+                phone,
+                messageBody), PayloadJsonOptions),
             RecipientPhoneMasked = MaskPhone(phone),
-            Priority = WhatsAppMessagePriority.Normal,
-            IdempotencyKey = $"return:{returnRequestId}:{normalizedStatus.ToLowerInvariant()}",
+            IdempotencyKey = $"return:{returnRequest.Id}:{normalizedStatus.ToLowerInvariant()}",
+            EntityType = "Return",
+            EntityId = returnRequest.Id,
             CreatedAt = now,
             NextRetryAt = now,
         };
@@ -85,6 +119,25 @@ public static class WhatsAppOutboxHelper
 
     public sealed record OrderPayload(Guid OrderId, string Status);
     public sealed record ReturnPayload(Guid ReturnRequestId, string Status);
+    public sealed record MessagePayload(
+        string EventType,
+        Guid EntityId,
+        Guid BuyerUserId,
+        string EntityReference,
+        string Status,
+        decimal? TotalAmount,
+        string? ReturnReason,
+        string? RecipientName,
+        string? RecipientPhone,
+        string MessageBody);
+
+    private static OrderStatus ParseOrderStatus(string status, OrderStatus fallback) =>
+        Enum.TryParse<OrderStatus>(status, ignoreCase: true, out var parsed) ? parsed : fallback;
+
+    private static ReturnStatus ParseReturnStatus(string status, ReturnStatus fallback) =>
+        Enum.TryParse<ReturnStatus>(status, ignoreCase: true, out var parsed) ? parsed : fallback;
+
+    private static string ReturnRef(Guid id) => id.ToString("N")[..8].ToUpperInvariant();
 
     private static bool IsDuplicateOutboxKey(DbUpdateException ex)
     {

@@ -33,30 +33,15 @@ public static class GetWhatsAppStatusEndpoint
         var sent = counts.FirstOrDefault(c => c.Status == WhatsAppOutboxStatus.Sent)?.Count ?? 0;
         var failed = counts.FirstOrDefault(c => c.Status == WhatsAppOutboxStatus.Failed)?.Count ?? 0;
         var skipped = counts.FirstOrDefault(c => c.Status == WhatsAppOutboxStatus.Skipped)?.Count ?? 0;
+        var retrying = counts.FirstOrDefault(c => c.Status == WhatsAppOutboxStatus.Retrying)?.Count ?? 0;
         var state = serviceStatus?.State ?? "disconnected";
 
         return Results.Ok(new WhatsAppStatusDto(
             ConnectionState: state,
             QrRequired: state == "qr_required" || serviceStatus?.QrAvailable == true,
             LastSentAt: serviceStatus?.LastSentAt,
-            LastError: PublicStatusError(serviceStatus?.Error),
-            Counts: new WhatsAppStatusCountsDto(sent, failed, skipped)));
-    }
-
-    private static string? PublicStatusError(string? error)
-    {
-        if (string.IsNullOrWhiteSpace(error)) return null;
-
-        return error.Trim().ToLowerInvariant() switch
-        {
-            "configuration_error" => "configuration_error",
-            "auth_failed" => "auth_failed",
-            "mongo_connection_failed" => "mongo_connection_failed",
-            "connection_error" => "connection_error",
-            "not_connected" => "connection_error",
-            "startup_failed" => "connection_error",
-            _ => "connection_error",
-        };
+            LastError: serviceStatus?.Error,
+            Counts: new WhatsAppStatusCountsDto(sent, failed, skipped, retrying)));
     }
 }
 
@@ -67,4 +52,4 @@ public sealed record WhatsAppStatusDto(
     string? LastError,
     WhatsAppStatusCountsDto Counts);
 
-public sealed record WhatsAppStatusCountsDto(int Sent, int Failed, int Skipped);
+public sealed record WhatsAppStatusCountsDto(int Sent, int Failed, int Skipped, int Retrying);

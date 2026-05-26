@@ -766,6 +766,50 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("OrderItems", (string)null);
                 });
 
+            modelBuilder.Entity("DrMirror.Api.Domain.Entities.PhoneVerificationOtp", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTimeOffset?>("UsedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "ExpiresAt")
+                        .HasDatabaseName("IX_PhoneVerificationOtps_UserId_ExpiresAt");
+
+                    b.ToTable("PhoneVerificationOtps", (string)null);
+                });
+
             modelBuilder.Entity("DrMirror.Api.Domain.Entities.PasswordResetRequest", b =>
                 {
                     b.Property<Guid>("Id")
@@ -929,68 +973,6 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.HasIndex("Status", "UploadedAt");
 
                     b.ToTable("PaymentProofs", (string)null);
-                });
-
-            modelBuilder.Entity("DrMirror.Api.Domain.Entities.PhoneVerificationOtp", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CodeHash")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("ExpiresAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockedUntil")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
-
-                    b.Property<int>("Purpose")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ResendCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SendFailureReason")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTimeOffset?>("SendQueuedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("SendStatus")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
-                    b.Property<DateTimeOffset?>("SentAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("WrongAttempts")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId", "PhoneNumber");
-
-                    b.ToTable("PhoneVerificationOtps", (string)null);
                 });
 
             modelBuilder.Entity("DrMirror.Api.Domain.Entities.Product", b =>
@@ -1457,9 +1439,6 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<DateTimeOffset?>("PhoneVerifiedAt")
-                        .HasColumnType("datetimeoffset");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -1499,14 +1478,18 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(0);
 
-                    b.Property<Guid>("BuyerUserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset?>("DeliveredAt")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("EntityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("EntityType")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("EventType")
                         .IsRequired()
@@ -1534,12 +1517,12 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("NextRetryAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<Guid?>("ParentMessageId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Payload")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
 
                     b.Property<string>("RecipientPhoneMasked")
                         .IsRequired()
@@ -1557,8 +1540,11 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("UX_WhatsAppOutboxMessages_IdempotencyKey");
 
-                    b.HasIndex("BuyerUserId", "CreatedAt")
-                        .HasDatabaseName("IX_WhatsAppOutboxMessages_BuyerUserId_CreatedAt");
+                    b.HasIndex("ParentMessageId")
+                        .HasDatabaseName("IX_WhatsAppOutboxMessages_ParentMessageId");
+
+                    b.HasIndex("RecipientPhoneMasked", "CreatedAt")
+                        .HasDatabaseName("IX_WhatsAppOutboxMessages_RecipientPhoneMasked_CreatedAt");
 
                     b.HasIndex("Status", "LockedAt")
                         .HasDatabaseName("IX_WhatsAppOutboxMessages_Status_LockedAt")
@@ -1566,10 +1552,6 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Status", "NextRetryAt")
                         .HasDatabaseName("IX_WhatsAppOutboxMessages_Status_NextRetryAt")
-                        .HasFilter("[Status] = 0");
-
-                    b.HasIndex("Status", "Priority", "NextRetryAt")
-                        .HasDatabaseName("IX_WhatsAppOutboxMessages_Status_Priority_NextRetryAt")
                         .HasFilter("[Status] = 0");
 
                     b.ToTable("WhatsAppOutboxMessages", (string)null);
@@ -1961,17 +1943,6 @@ namespace DrMirror.Api.Infrastructure.Persistence.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("ReviewedByUser");
-                });
-
-            modelBuilder.Entity("DrMirror.Api.Domain.Entities.PhoneVerificationOtp", b =>
-                {
-                    b.HasOne("DrMirror.Api.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DrMirror.Api.Domain.Entities.Product", b =>

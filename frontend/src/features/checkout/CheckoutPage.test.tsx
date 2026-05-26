@@ -6,7 +6,6 @@ import { CartContext } from '../cart/CartContext';
 import type { CartContextValue, CartView } from '../cart/CartContext';
 import { PAYMENT_METHOD_KIND } from '../orders/types';
 import { CheckoutPage } from './CheckoutPage';
-import checkoutPageSource from './CheckoutPage.tsx?raw';
 
 vi.mock('../orders/api', () => ({
   ordersApi: {
@@ -94,15 +93,5 @@ describe('CheckoutPage', () => {
       { authValue: makeAuthValue({ user: makeBuyerUser(), isAuthenticated: true }) },
     );
     expect(screen.getByRole('group', { name: /shipping address/i })).toBeInTheDocument();
-  });
-
-  it('keeps the checkout OTP form outside the checkout form', () => {
-    const otpIndex = checkoutPageSource.indexOf('<OtpEntryForm');
-    const formIndex = checkoutPageSource.indexOf('<Form onSubmit', otpIndex);
-    const formEndIndex = checkoutPageSource.indexOf('</Form>', formIndex);
-
-    expect(otpIndex).toBeGreaterThan(-1);
-    expect(formIndex).toBeGreaterThan(otpIndex);
-    expect(checkoutPageSource.slice(formIndex, formEndIndex)).not.toContain('<OtpEntryForm');
   });
 });

@@ -519,6 +519,7 @@
       "sent": "Sent",
       "failed": "Failed",
       "skipped": "Skipped",
+      "retrying": "Retrying",
       "pairDevice": "Pair device",
       "lastSentAt": "Last sent: {{date}}"
     },
@@ -527,21 +528,32 @@
       "initializing": "Initializing",
       "disconnected": "Disconnected",
       "qr_required": "QR required",
-      "auth_failed": "Auth failed",
-      "configuration_error": "Config error"
-    },
-    "errors": {
-      "connection_error": "WhatsApp connection failed. The service will retry automatically.",
-      "mongo_connection_failed": "WhatsApp session storage is unavailable. Check MongoDB and retry.",
-      "auth_failed": "WhatsApp session expired. Pair the device again.",
-      "configuration_error": "WhatsApp service configuration needs attention."
+      "auth_failed": "Auth failed"
     },
     "attemptStatus": {
       "pending": "Pending",
       "processing": "Processing",
       "sent": "Sent",
       "failed": "Failed",
-      "skipped": "Skipped"
+      "skipped": "Skipped",
+      "retrying": "Retrying"
+    },
+    "disconnect": {
+      "button": "Disconnect WhatsApp",
+      "title": "Disconnect WhatsApp?",
+      "body": "This removes the active WhatsApp session from the sidecar. QR re-authentication will be required before new notifications can be sent.",
+      "confirm": "Disconnect",
+      "cancel": "Cancel",
+      "submitting": "Disconnecting..."
+    },
+    "retry": {
+      "button": "Retry",
+      "success": "Retry queued."
+    },
+    "retryAll": {
+      "button": "Retry all failed",
+      "submitting": "Queueing...",
+      "success": "Queued {{count}} retry attempts."
     },
     "attempts": {
       "title": "Notification attempts",
@@ -555,6 +567,7 @@
       "failure": "Failure reason",
       "createdAt": "Created",
       "key": "Idempotency key",
+      "actions": "Actions",
       "none": "None"
     },
     "qr": {

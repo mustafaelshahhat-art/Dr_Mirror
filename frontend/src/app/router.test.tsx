@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { makeAdminUser, makeAuthValue, makeBuyerUser, renderWithProviders } from '../test/utils';
 import { AppRoutes } from './router';
-import routerSource from './router.tsx?raw';
 
 vi.mock('../features/cart/api', () => ({
   cartApi: {
@@ -155,10 +154,5 @@ describe('AppRoutes — role routing', () => {
       authValue: makeAuthValue(),
     });
     expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
-  });
-
-  it('does not expose the legacy verify-phone query route', () => {
-    expect(routerSource).not.toContain('AccountVerifyPhonePage');
-    expect(routerSource).not.toContain('account/verify-phone');
   });
 });

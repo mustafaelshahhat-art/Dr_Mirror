@@ -9,6 +9,8 @@ export interface AuthUser {
   id: string;
   email: string;
   fullName: string;
+  phone: string | null;
+  phoneNumberConfirmed: boolean;
   roles: AppRole[];
   createdAt: string; // ISO 8601 with offset
 }

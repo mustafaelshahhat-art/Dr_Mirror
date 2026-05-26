@@ -4,26 +4,21 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DrMirror.Api.Infrastructure.Persistence.Configurations;
 
-internal sealed class PhoneVerificationOtpConfiguration : IEntityTypeConfiguration<PhoneVerificationOtp>
+public sealed class PhoneVerificationOtpConfiguration : IEntityTypeConfiguration<PhoneVerificationOtp>
 {
     public void Configure(EntityTypeBuilder<PhoneVerificationOtp> builder)
     {
         builder.ToTable("PhoneVerificationOtps");
-        builder.HasKey(o => o.Id);
+        builder.HasKey(x => x.Id);
 
-        builder.Property(o => o.PhoneNumber).HasMaxLength(11).IsRequired();
-        builder.Property(o => o.CodeHash).HasMaxLength(64).IsRequired();
-        builder.Property(o => o.Purpose).IsRequired();
-        builder.Property(o => o.ExpiresAt).IsRequired();
-        builder.Property(o => o.CreatedAt).IsRequired();
-        builder.Property(o => o.SendStatus).HasDefaultValue(PhoneVerificationOtpSendStatus.Sending);
-        builder.Property(o => o.SendFailureReason).HasMaxLength(100);
+        builder.Property(x => x.UserId).IsRequired();
+        builder.Property(x => x.Code).HasMaxLength(6).IsRequired();
+        builder.Property(x => x.Phone).HasMaxLength(30).IsRequired();
+        builder.Property(x => x.Purpose).HasMaxLength(20).IsRequired();
+        builder.Property(x => x.ExpiresAt).IsRequired();
+        builder.Property(x => x.CreatedAt).IsRequired();
 
-        builder.HasIndex(o => new { o.UserId, o.PhoneNumber });
-
-        builder.HasOne(o => o.User)
-            .WithMany()
-            .HasForeignKey(o => o.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasIndex(x => new { x.UserId, x.ExpiresAt })
+            .HasDatabaseName("IX_PhoneVerificationOtps_UserId_ExpiresAt");
     }
 }

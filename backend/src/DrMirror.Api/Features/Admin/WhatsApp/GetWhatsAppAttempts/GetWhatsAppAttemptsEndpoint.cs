@@ -1,7 +1,9 @@
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace DrMirror.Api.Features.Admin.WhatsApp.GetWhatsAppAttempts;
 
@@ -30,25 +32,44 @@ public static class GetWhatsAppAttemptsEndpoint
         var total = await db.WhatsAppOutboxMessages.CountAsync(ct);
         var totalPages = Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
 
-        var items = await db.WhatsAppOutboxMessages
+        var messages = await db.WhatsAppOutboxMessages
             .AsNoTracking()
             .OrderByDescending(m => m.CreatedAt)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .Select(m => new WhatsAppAttemptDto(
-                m.Id,
-                m.EventType,
-                m.RecipientPhoneMasked,
-                m.Status.ToString().ToLower(),
-                m.Attempts,
-                m.FailureReason,
-                m.IdempotencyKey,
-                m.CreatedAt,
-                m.DeliveredAt,
-                m.LastAttemptAt))
             .ToListAsync(ct);
 
+        var items = messages.Select(m => new WhatsAppAttemptDto(
+            m.Id,
+            m.EventType,
+            m.RecipientPhoneMasked,
+            m.Status.ToString().ToLowerInvariant(),
+            m.Attempts,
+            m.FailureReason,
+            m.IdempotencyKey,
+            m.CreatedAt,
+            m.DeliveredAt,
+            m.LastAttemptAt,
+            m.EntityType,
+            m.EntityId,
+            ReadEntityReference(m.Payload),
+            m.ParentMessageId)).ToList();
+
         return Results.Ok(new PagedResult<WhatsAppAttemptDto>(items, pageNumber, pageSize, total, totalPages));
+    }
+
+    private static string? ReadEntityReference(string payload)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<WhatsAppOutboxHelper.MessagePayload>(
+                payload,
+                new JsonSerializerOptions(JsonSerializerDefaults.Web))?.EntityReference;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 }
 
@@ -62,4 +83,8 @@ public sealed record WhatsAppAttemptDto(
     string IdempotencyKey,
     DateTimeOffset CreatedAt,
     DateTimeOffset? DeliveredAt,
-    DateTimeOffset? LastAttemptAt);
+    DateTimeOffset? LastAttemptAt,
+    string? EntityType,
+    Guid? EntityId,
+    string? EntityReference,
+    Guid? ParentMessageId);

@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from '@heroui/react/toast';
+import { useTranslation } from 'react-i18next';
 
 import { useApiErrorToast } from '../../shared/hooks/useApiErrorToast';
 import { queryKeys } from '../../shared/lib/query-keys';
 import type { PagedResult } from '../../shared/types/paged-result';
 import type { OrderDetailDto, OrderStatus, OrderSummaryDto, ReturnStatus } from '../orders/types';
 
-import { adminOrdersApi, adminReturnsApi, type AdminReturnRequestDto } from './api';
+import { adminOrdersApi, adminReturnsApi, adminWhatsAppApi, type AdminReturnRequestDto } from './api';
 
 export function useAdminReturnsQuery(params: {
   status?: ReturnStatus;
@@ -107,6 +109,48 @@ export function useRejectProofMutation({ orderNumber }: MutationCommonArgs) {
     onSuccess: (order) => {
       queryClient.setQueryData(queryKeys.admin.orders.detail(orderNumber), order);
       void queryClient.invalidateQueries({ queryKey: queryKeys.admin.orders.listRoot(), exact: false });
+    },
+    onError: errorToast,
+  });
+}
+
+export function useDisconnectMutation() {
+  const queryClient = useQueryClient();
+  const errorToast = useApiErrorToast();
+  return useMutation<void, Error>({
+    mutationFn: adminWhatsAppApi.disconnectWhatsApp,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.admin.whatsapp.status() });
+    },
+    onError: errorToast,
+  });
+}
+
+export function useRetryAttemptMutation() {
+  const queryClient = useQueryClient();
+  const errorToast = useApiErrorToast();
+  const { t } = useTranslation();
+  return useMutation<{ originalId: string; retryId: string }, Error, string>({
+    mutationFn: adminWhatsAppApi.retryAttempt,
+    onSuccess: () => {
+      toast.success(t('admin.whatsapp.retry.success'));
+      void queryClient.invalidateQueries({ queryKey: queryKeys.admin.whatsapp.attemptsRoot(), exact: false });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.admin.whatsapp.status() });
+    },
+    onError: errorToast,
+  });
+}
+
+export function useRetryAllFailedMutation() {
+  const queryClient = useQueryClient();
+  const errorToast = useApiErrorToast();
+  const { t } = useTranslation();
+  return useMutation<{ queued: number }, Error>({
+    mutationFn: adminWhatsAppApi.retryAllFailed,
+    onSuccess: (result) => {
+      toast.success(t('admin.whatsapp.retryAll.success', { count: result.queued }));
+      void queryClient.invalidateQueries({ queryKey: queryKeys.admin.whatsapp.attemptsRoot(), exact: false });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.admin.whatsapp.status() });
     },
     onError: errorToast,
   });

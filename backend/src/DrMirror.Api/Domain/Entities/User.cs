@@ -4,7 +4,9 @@ namespace DrMirror.Api.Domain.Entities;
 
 /// <summary>
 /// Application user. Extends <see cref="IdentityUser{Guid}"/> with the few
-/// product-domain fields we need at M1.
+/// product-domain fields we need at M1. Anything that doesn't logically
+/// belong to "identity" (addresses, phone numbers, KYC, etc.) lives on
+/// separate aggregates and is introduced in later milestones.
 /// </summary>
 public class User : IdentityUser<Guid>
 {
@@ -16,9 +18,6 @@ public class User : IdentityUser<Guid>
 
     /// <summary>UTC last-modified timestamp. Bumped on profile mutations.</summary>
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
-
-    /// <summary>UTC timestamp when the current phone number was last verified.</summary>
-    public DateTimeOffset? PhoneVerifiedAt { get; set; }
 
     /// <summary>Soft-disable flag. When true, login is refused even with valid credentials.</summary>
     public bool IsDisabled { get; set; }

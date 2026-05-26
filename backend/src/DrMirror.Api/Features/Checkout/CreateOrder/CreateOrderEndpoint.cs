@@ -1,16 +1,15 @@
 using DrMirror.Api.Domain.Catalog;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Orders;
-using DrMirror.Api.Features.Auth.PhoneVerification;
 using DrMirror.Api.Features.Orders.Common;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.Validation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace DrMirror.Api.Features.Checkout.CreateOrder;
 
@@ -23,7 +22,6 @@ public static class CreateOrderEndpoint
             .WithSummary("Convert the signed-in buyer's open cart into a new order.")
             .RequireAuthorization()
             .WithValidation<CreateOrderRequest>()
-            .Produces<SendOtpResponse>(StatusCodes.Status200OK)
             .Produces<OrderDetailDto>(StatusCodes.Status201Created)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -38,11 +36,9 @@ public static class CreateOrderEndpoint
         [FromHeader(Name = "X-Idempotency-Key")] Guid? idempotencyKey,
         ICurrentUser current,
         AppDbContext db,
-        [FromServices] IPhoneVerificationOtpSendQueue otpSendQueue,
-        [FromServices] IOptions<JwtOptions> jwtOptions,
         [FromServices] OrderStateMachine fsm,
         [FromServices] OrderNumberGenerator numberGenerator,
-        [FromServices] ILogger<CreateOrderRequest> logger,
+        [FromServices] UserManager<User> userManager,
         CancellationToken ct)
     {
         if (!current.IsAuthenticated || current.UserId is not { } userId)
@@ -50,23 +46,17 @@ public static class CreateOrderEndpoint
             return Results.Unauthorized();
         }
 
-        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId, ct);
-        if (user is null || user.IsDisabled)
+        // Backend enforcement: phone must be verified before placing an order.
+        var buyer = await userManager.FindByIdAsync(userId.ToString());
+        if (buyer is null || buyer.IsDisabled)
         {
             return Results.Unauthorized();
         }
-
-        if (string.IsNullOrWhiteSpace(user.PhoneNumber) || !user.PhoneNumberConfirmed)
+        if (!buyer.PhoneNumberConfirmed || string.IsNullOrWhiteSpace(buyer.PhoneNumber))
         {
-            return await SendOtpEndpoint.SendAsync(
-                user,
-                OtpPurpose.Checkout,
-                db,
-                otpSendQueue,
-                jwtOptions.Value.Secret,
-                logger,
-                ct,
-                phoneVerificationRequired: true);
+            return Results.Json(
+                new { code = "PHONE_NOT_VERIFIED", detail = "Your phone number must be verified before placing an order." },
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
         if (idempotencyKey is { } key)
@@ -200,12 +190,7 @@ public static class CreateOrderEndpoint
         db.CartItems.RemoveRange(cart.Items);
         cart.UpdatedAt = DateTimeOffset.UtcNow;
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForOrderConfirmation(order.Id));
-        db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForOrder(
-            order.Id,
-            order.BuyerUserId,
-            "OrderConfirmation",
-            "Placed",
-            order.ShippingAddress.Phone));
+        db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForOrder(order, "OrderConfirmation", "Placed"));
 
         // ---- Optional: save the inline address to the buyer's address book. ----
         var addressSaveOutcome = AddressSaveOutcome.NotRequested;
