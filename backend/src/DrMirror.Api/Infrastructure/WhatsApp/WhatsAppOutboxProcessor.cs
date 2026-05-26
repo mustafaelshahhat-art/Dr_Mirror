@@ -96,6 +96,40 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
             {
                 await dispatcher.DispatchAsync(msg, ct);
             }
+            catch (WhatsAppPermanentFailureException ex)
+            {
+                msg.Status = WhatsAppOutboxStatus.Failed;
+                msg.FailureReason = ex.Reason;
+                msg.LockedAt = null;
+                msg.LockedBy = null;
+                _logger.LogError(ex, "WhatsAppOutbox: permanent failure {EventType} (id={Id}): {Reason}", msg.EventType, msg.Id, ex.Reason);
+            }
+            catch (WhatsAppTransientFailureException ex)
+            {
+                msg.LockedAt = null;
+                msg.LockedBy = null;
+                msg.FailureReason = ex.Reason;
+
+                // FR-006a: circuit-open does not consume a MaxAttempts slot
+                var effectiveAttempts = ex.Reason == "circuit_open"
+                    ? Math.Max(0, msg.Attempts - 1)
+                    : msg.Attempts;
+
+                if (effectiveAttempts >= maxAttempts)
+                {
+                    msg.Status = WhatsAppOutboxStatus.Failed;
+                    if (ex.Reason == "circuit_open") msg.Attempts = effectiveAttempts;
+                    _logger.LogError(ex, "WhatsAppOutbox: permanently failed {EventType} (id={Id}): {Reason}", msg.EventType, msg.Id, ex.Reason);
+                }
+                else
+                {
+                    msg.Status = WhatsAppOutboxStatus.Pending;
+                    if (ex.Reason == "circuit_open") msg.Attempts = effectiveAttempts;
+                    var rawSeconds = Math.Min(Math.Pow(4, effectiveAttempts) * 30, options.MaxBackoff.TotalSeconds);
+                    msg.NextRetryAt = DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(rawSeconds));
+                    _logger.LogWarning(ex, "WhatsAppOutbox: transient failure, retry scheduled for {EventType} (id={Id}): {Reason}", msg.EventType, msg.Id, ex.Reason);
+                }
+            }
             catch (Exception ex)
             {
                 msg.FailureReason = "sidecar_error";

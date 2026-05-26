@@ -42,6 +42,10 @@ public sealed class RetryWhatsAppAttemptTests : IClassFixture<RetryWhatsAppAttem
         Assert.Equal(WhatsAppOutboxStatus.Pending, child.Status);
         Assert.Equal("Order", child.EntityType);
         Assert.Equal(original.EntityId, child.EntityId);
+        Assert.StartsWith(original.IdempotencyKey + ":retry:", child.IdempotencyKey);
+        var suffix = child.IdempotencyKey[(original.IdempotencyKey.Length + ":retry:".Length)..];
+        Assert.Equal(32, suffix.Length);
+        Assert.True(suffix.All(c => "0123456789abcdef".Contains(c)), "Retry key suffix must be a 32-char hex string");
         Assert.Contains(db.AdminAuditLogEntries, a => a.ActionType == "WhatsApp.Retry" && a.TargetEntityId == originalId.ToString());
     }
 

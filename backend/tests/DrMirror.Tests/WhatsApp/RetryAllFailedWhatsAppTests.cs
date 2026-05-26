@@ -40,7 +40,15 @@ public sealed class RetryAllFailedWhatsAppTests : IClassFixture<RetryAllFailedWh
         Assert.Equal(WhatsAppOutboxStatus.Retrying, all.Single(m => m.Id == failed2).Status);
         Assert.Equal(WhatsAppOutboxStatus.Sent, all.Single(m => m.Id == sent).Status);
         Assert.Equal(2, all.Count(m => m.ParentMessageId == failed1 || m.ParentMessageId == failed2));
-        Assert.All(all.Where(m => m.ParentMessageId is not null), child => Assert.Equal(WhatsAppOutboxStatus.Pending, child.Status));
+        Assert.All(all.Where(m => m.ParentMessageId is not null), child =>
+        {
+            Assert.Equal(WhatsAppOutboxStatus.Pending, child.Status);
+            var parent = all.Single(m => m.Id == child.ParentMessageId);
+            Assert.StartsWith(parent.IdempotencyKey + ":retry:", child.IdempotencyKey);
+            var suffix = child.IdempotencyKey[(parent.IdempotencyKey.Length + ":retry:".Length)..];
+            Assert.Equal(32, suffix.Length);
+            Assert.True(suffix.All(c => "0123456789abcdef".Contains(c)), "Retry key suffix must be a 32-char hex string");
+        });
         Assert.Contains(db.AdminAuditLogEntries, a => a.ActionType == "WhatsApp.RetryAll" && a.Note == "Queued 2 messages");
     }
 

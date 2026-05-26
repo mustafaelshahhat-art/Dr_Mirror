@@ -11,8 +11,10 @@ public static class WhatsAppServiceExtensions
             .Validate(options => !options.Enabled || !string.IsNullOrWhiteSpace(options.ServiceUrl), "WhatsApp:ServiceUrl is required when WhatsApp is enabled.")
             .Validate(options => !options.Enabled || !string.IsNullOrWhiteSpace(options.InternalApiKey), "WhatsApp:InternalApiKey is required when WhatsApp is enabled.")
             .Validate(options => options.TimeoutSeconds > 0, "WhatsApp:TimeoutSeconds must be positive.")
-            .Validate(options => options.MaxAttempts > 0, "WhatsApp:MaxAttempts must be positive.")
+            .Validate(options => options.MaxAttempts >= 2, "WhatsApp:MaxAttempts must be at least 2 (circuit-open exemption requires a minimum of 2 claimable slots).")
             .ValidateOnStart();
+
+        services.AddSingleton<IWhatsAppHealthCache, WhatsAppHealthCache>();
 
         services.AddHttpClient<WhatsAppServiceClient>((sp, client) =>
         {

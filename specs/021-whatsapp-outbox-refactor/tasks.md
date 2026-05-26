@@ -25,8 +25,8 @@ description: "Task list for WhatsApp Outbox Reliability Refactor"
 
 **Purpose**: Create the two new exception classes that all backend error-classification work depends on. No behavioral logic — just type declarations.
 
-- [ ] T001 [P] Create `WhatsAppPermanentFailureException.cs` in `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppPermanentFailureException.cs` — sealed class with `string Reason` property as shown in data-model.md
-- [ ] T002 [P] Create `WhatsAppTransientFailureException.cs` in `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppTransientFailureException.cs` — sealed class with `string Reason` property as shown in data-model.md
+- [x] T001 [P] Create `WhatsAppPermanentFailureException.cs` in `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppPermanentFailureException.cs` — sealed class with `string Reason` property as shown in data-model.md
+- [x] T002 [P] Create `WhatsAppTransientFailureException.cs` in `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppTransientFailureException.cs` — sealed class with `string Reason` property as shown in data-model.md
 
 **Checkpoint**: Two new exception types exist and compile. All other backend phases can begin.
 
@@ -38,7 +38,7 @@ description: "Task list for WhatsApp Outbox Reliability Refactor"
 
 **⚠️ CRITICAL**: No user story backend work can begin until this phase is complete — the C# client parses this body.
 
-- [ ] T003 Add `respondWithError` helper to `whatsapp-service/src/routes/send.js` and update all non-success responses to return `{ success: false, error: "<reason>", retryable: true|false }` per contract (FR-009 – FR-012): HTTP 400 → `retryable: false`; HTTP 429/500/503 → `retryable: true`; HTTP 200 success → `{ success: true }`. Do NOT add circuit-breaker logic yet (that is US3 / Phase 5).
+- [x] T003 Add `respondWithError` helper to `whatsapp-service/src/routes/send.js` and update all non-success responses to return `{ success: false, error: "<reason>", retryable: true|false }` per contract (FR-009 – FR-012): HTTP 400 → `retryable: false`; HTTP 429/500/503 → `retryable: true`; HTTP 200 success → `{ success: true }`. Do NOT add circuit-breaker logic yet (that is US3 / Phase 5).
 
 **Checkpoint**: The sidecar always returns a structured JSON body on every send outcome. Backend error classification (US1) can now begin.
 
@@ -50,9 +50,9 @@ description: "Task list for WhatsApp Outbox Reliability Refactor"
 
 **Independent Test**: Simulate a sidecar 400 response and verify the outbox message reaches Final Failed after one processing cycle; simulate a sidecar 503 response and verify the message stays Pending after the same cycle. Run `dotnet test` after this phase.
 
-- [ ] T004 [US1] Update `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppServiceClient.cs`: add private `SidecarErrorDto(bool Success, string? Error, bool Retryable)` record; in `SendAsync()`, on non-2xx response attempt `ReadFromJsonAsync<SidecarErrorDto>()` (best-effort); throw `WhatsAppPermanentFailureException` when `Retryable == false`; throw `WhatsAppTransientFailureException` otherwise (including parse failure); remove old `EnsureSuccessStatusCode()` and `HttpStatusCode.ServiceUnavailable` special case
-- [ ] T005 [US1] Update `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppMessageDispatcher.cs`: change the `catch (OperationCanceledException) when (!ct.IsCancellationRequested)` block to `throw new WhatsAppTransientFailureException("sidecar_timeout")` instead of calling `MarkFailed` (FR-004)
-- [ ] T006 [US1] Update `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppOutboxProcessor.cs`: replace the single `catch (Exception ex)` block with three ordered catches as specified in data-model.md — (1) `catch (WhatsAppPermanentFailureException ex)` → mark Failed immediately; (2) `catch (WhatsAppTransientFailureException ex)` → Pending+backoff, with `ex.Reason == "circuit_open"` decrementing `msg.Attempts` by 1 before computing backoff (FR-006a); (3) `catch (Exception ex)` → preserve existing behavior (FR-008)
+- [x] T004 [US1] Update `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppServiceClient.cs`: add private `SidecarErrorDto(bool Success, string? Error, bool Retryable)` record; in `SendAsync()`, on non-2xx response attempt `ReadFromJsonAsync<SidecarErrorDto>()` (best-effort); throw `WhatsAppPermanentFailureException` when `Retryable == false`; throw `WhatsAppTransientFailureException` otherwise (including parse failure); remove old `EnsureSuccessStatusCode()` and `HttpStatusCode.ServiceUnavailable` special case
+- [x] T005 [US1] Update `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppMessageDispatcher.cs`: change the `catch (OperationCanceledException) when (!ct.IsCancellationRequested)` block to `throw new WhatsAppTransientFailureException("sidecar_timeout")` instead of calling `MarkFailed` (FR-004)
+- [x] T006 [US1] Update `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppOutboxProcessor.cs`: replace the single `catch (Exception ex)` block with three ordered catches as specified in data-model.md — (1) `catch (WhatsAppPermanentFailureException ex)` → mark Failed immediately; (2) `catch (WhatsAppTransientFailureException ex)` → Pending+backoff, with `ex.Reason == "circuit_open"` decrementing `msg.Attempts` by 1 before computing backoff (FR-006a); (3) `catch (Exception ex)` → preserve existing behavior (FR-008)
 
 **Checkpoint**: User Story 1 is fully functional. A 400 sidecar response permanently fails the message; a 503 or timeout re-queues it. `dotnet test` should pass (idempotency-key tests will fail until US4 is complete).
 
@@ -64,9 +64,9 @@ description: "Task list for WhatsApp Outbox Reliability Refactor"
 
 **Independent Test**: Open the WhatsApp status page with failed messages; click "Retry All Failed"; verify the confirmation dialog appears with the correct count, and that clicking Cancel issues no retry.
 
-- [ ] T007 [P] [US2] Add `admin.whatsapp.retryAll.confirm.*` i18n keys (title, body with `{{count}}`, cancel, confirm) to `public/locales/ar/translation.json` using Arabic translations from quickstart.md
-- [ ] T008 [P] [US2] Add `admin.whatsapp.retryAll.confirm.*` i18n keys (title, body with `{{count}}`, cancel, confirm) to `public/locales/en/translation.json` using English translations from quickstart.md
-- [ ] T009 [US2] Update `frontend/src/features/admin/AdminWhatsAppStatusPage.tsx`: wrap the "Retry All Failed" button in an AlertDialog (HeroUI v3) that shows the count from `status.counts.failed` and the i18n keys from T007/T008; only issue the bulk-retry mutation on explicit confirmation (depends on T007, T008)
+- [x] T007 [P] [US2] Add `admin.whatsapp.retryAll.confirm.*` i18n keys (title, body with `{{count}}`, cancel, confirm) to `public/locales/ar/translation.json` using Arabic translations from quickstart.md
+- [x] T008 [P] [US2] Add `admin.whatsapp.retryAll.confirm.*` i18n keys (title, body with `{{count}}`, cancel, confirm) to `public/locales/en/translation.json` using English translations from quickstart.md
+- [x] T009 [US2] Update `frontend/src/features/admin/AdminWhatsAppStatusPage.tsx`: wrap the "Retry All Failed" button in an AlertDialog (HeroUI v3) that shows the count from `status.counts.failed` and the i18n keys from T007/T008; only issue the bulk-retry mutation on explicit confirmation (depends on T007, T008)
 
 **Checkpoint**: User Story 2 is fully functional. `npm run i18n:check` must pass after T007 and T008.
 
@@ -78,9 +78,9 @@ description: "Task list for WhatsApp Outbox Reliability Refactor"
 
 **Independent Test**: Simulate 3 consecutive non-400/non-429 sidecar errors; verify the 4th send attempt is rejected with `circuit_open` within 60 seconds; verify a successful send resets the counter.
 
-- [ ] T010 [US3] Create `whatsapp-service/src/services/circuitBreaker.js` with `CircuitBreaker` class (threshold=3, cooldownMs=60_000) using the private-field implementation from data-model.md — `isOpen()`, `recordSuccess()`, `recordFailure()` methods
-- [ ] T011 [US3] Update `whatsapp-service/src/server.js` to import `CircuitBreaker` from `./services/circuitBreaker.js`, instantiate one singleton, and pass it to `registerSendRoutes()` (depends on T010)
-- [ ] T012 [US3] Update `whatsapp-service/src/routes/send.js` `/send-message` handler to check `circuitBreaker.isOpen()` at the top and return `{ success: false, error: 'circuit_open', retryable: true }` with HTTP 503 if open; call `circuitBreaker.recordSuccess()` on send success; call `circuitBreaker.recordFailure()` only for non-400, non-429 errors (depends on T010, T011)
+- [x] T010 [US3] Create `whatsapp-service/src/services/circuitBreaker.js` with `CircuitBreaker` class (threshold=3, cooldownMs=60_000) using the private-field implementation from data-model.md — `isOpen()`, `recordSuccess()`, `recordFailure()` methods
+- [x] T011 [US3] Update `whatsapp-service/src/server.js` to import `CircuitBreaker` from `./services/circuitBreaker.js`, instantiate one singleton, and pass it to `registerSendRoutes()` (depends on T010)
+- [x] T012 [US3] Update `whatsapp-service/src/routes/send.js` `/send-message` handler to check `circuitBreaker.isOpen()` at the top and return `{ success: false, error: 'circuit_open', retryable: true }` with HTTP 503 if open; call `circuitBreaker.recordSuccess()` on send success; call `circuitBreaker.recordFailure()` only for non-400, non-429 errors (depends on T010, T011)
 
 **Checkpoint**: User Story 3 is fully functional. The C# backend's T006 circuit-open handling (already in place) correctly exempts these from MaxAttempts.
 
@@ -92,9 +92,9 @@ description: "Task list for WhatsApp Outbox Reliability Refactor"
 
 **Independent Test**: Retry a failed message; verify the child's idempotency key starts with the original message's business key followed by `:retry:` and a 32-char hex GUID.
 
-- [ ] T013 [US4] Update `CreateChild` static method in `backend/src/DrMirror.Api/Features/Admin/WhatsApp/RetryWhatsAppAttempt/RetryWhatsAppAttemptEndpoint.cs`: generate `childId = Guid.NewGuid()` first; set `Id = childId`; set `IdempotencyKey = $"{original.IdempotencyKey}:retry:{childId:N}"`. `RetryAllFailedWhatsAppEndpoint.cs` inherits the fix via `CreateChild`.
-- [ ] T014 [P] [US4] Update `backend/tests/DrMirror.Tests/WhatsApp/RetryWhatsAppAttemptTests.cs` to assert the child's idempotency key starts with `original.IdempotencyKey + ":retry:"` and ends with a 32-char hex string (not the old `retry:{original.Id}:{ticks}` format)
-- [ ] T015 [P] [US4] Update `backend/tests/DrMirror.Tests/WhatsApp/RetryAllFailedWhatsAppTests.cs` to assert the same new key format for all child messages created in bulk retry
+- [x] T013 [US4] Update `CreateChild` static method in `backend/src/DrMirror.Api/Features/Admin/WhatsApp/RetryWhatsAppAttempt/RetryWhatsAppAttemptEndpoint.cs`: generate `childId = Guid.NewGuid()` first; set `Id = childId`; set `IdempotencyKey = $"{original.IdempotencyKey}:retry:{childId:N}"`. `RetryAllFailedWhatsAppEndpoint.cs` inherits the fix via `CreateChild`.
+- [x] T014 [P] [US4] Update `backend/tests/DrMirror.Tests/WhatsApp/RetryWhatsAppAttemptTests.cs` to assert the child's idempotency key starts with `original.IdempotencyKey + ":retry:"` and ends with a 32-char hex string (not the old `retry:{original.Id}:{ticks}` format)
+- [x] T015 [P] [US4] Update `backend/tests/DrMirror.Tests/WhatsApp/RetryAllFailedWhatsAppTests.cs` to assert the same new key format for all child messages created in bulk retry
 
 **Checkpoint**: User Story 4 is fully functional. `dotnet test` should now pass for all three WhatsApp test files (SC-006).
 
@@ -106,11 +106,11 @@ description: "Task list for WhatsApp Outbox Reliability Refactor"
 
 **Independent Test**: Stop the sidecar; wait one monitor cycle (60s); call the status endpoint; verify `sidecarHealth.isHealthy` is `false` and `errorMessage` is non-null, with no timeout on the status call itself.
 
-- [ ] T016 [US5] Create `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppHealthCache.cs` with `SidecarHealthResult(bool IsHealthy, DateTimeOffset LastCheckedAt, string? ErrorMessage)` record, `IWhatsAppHealthCache` interface, and `WhatsAppHealthCache` implementation using `volatile` field as shown in data-model.md
-- [ ] T017 [US5] Register `WhatsAppHealthCache` as `IWhatsAppHealthCache` singleton in `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppServiceExtensions.cs` — must be registered before `AddHostedService<WhatsAppSidecarMonitor>()` (depends on T016)
-- [ ] T018 [P] [US5] Update `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppSidecarMonitor.cs` to inject `IWhatsAppHealthCache healthCache` in constructor and call `healthCache.Update(new SidecarHealthResult(healthy, DateTimeOffset.UtcNow, errorMessage))` after every `HealthAsync()` call (depends on T016, T017)
-- [ ] T019 [P] [US5] Update `backend/src/DrMirror.Api/Features/Admin/WhatsApp/GetWhatsAppStatus/GetWhatsAppStatusEndpoint.cs` to inject `IWhatsAppHealthCache healthCache` and map `healthCache.Latest` to a `SidecarHealthDto` in the response (null if not yet populated); remove any live `/health` call from this endpoint (depends on T016, T017)
-- [ ] T020 [P] [US5] Add `SidecarHealthDto` interface and `sidecarHealth: SidecarHealthDto | null` field to `WhatsAppStatusDto` in `frontend/src/features/admin/types.ts` per contracts/backend-status-api.md
+- [x] T016 [US5] Create `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppHealthCache.cs` with `SidecarHealthResult(bool IsHealthy, DateTimeOffset LastCheckedAt, string? ErrorMessage)` record, `IWhatsAppHealthCache` interface, and `WhatsAppHealthCache` implementation using `volatile` field as shown in data-model.md
+- [x] T017 [US5] Register `WhatsAppHealthCache` as `IWhatsAppHealthCache` singleton in `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppServiceExtensions.cs` — must be registered before `AddHostedService<WhatsAppSidecarMonitor>()` (depends on T016)
+- [x] T018 [P] [US5] Update `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppSidecarMonitor.cs` to inject `IWhatsAppHealthCache healthCache` in constructor and call `healthCache.Update(new SidecarHealthResult(healthy, DateTimeOffset.UtcNow, errorMessage))` after every `HealthAsync()` call (depends on T016, T017)
+- [x] T019 [P] [US5] Update `backend/src/DrMirror.Api/Features/Admin/WhatsApp/GetWhatsAppStatus/GetWhatsAppStatusEndpoint.cs` to inject `IWhatsAppHealthCache healthCache` and map `healthCache.Latest` to a `SidecarHealthDto` in the response (null if not yet populated); remove any live `/health` call from this endpoint (depends on T016, T017)
+- [x] T020 [P] [US5] Add `SidecarHealthDto` interface and `sidecarHealth: SidecarHealthDto | null` field to `WhatsAppStatusDto` in `frontend/src/features/admin/types.ts` per contracts/backend-status-api.md
 
 **Checkpoint**: User Story 5 is fully functional. The status page loads without a live sidecar call and shows cached health state.
 
@@ -120,13 +120,13 @@ description: "Task list for WhatsApp Outbox Reliability Refactor"
 
 **Purpose**: Remaining functional requirements that are standalone and don't block any user story.
 
-- [ ] T021 [P] Add `int? PayloadVersion = 1` to the `MessagePayload` record in `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppOutboxHelper.cs` (FR-017, informational-only, no behavior change, no migration required)
-- [ ] T022 [P] Refactor `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppMessageTemplates.cs` internals to use `static readonly Dictionary<(string, string), string>` keyed by `(eventType, status)` per Decision 7 in research.md — public method signatures unchanged
-- [ ] T023 [P] Add JSDoc comment to `whatsapp-service/src/templates/messages.js` stating that the C# backend is the source of truth for Arabic message content (FR-019)
-- [ ] T024 [P] Add `logger.warn('DEPRECATED: /send-template is not called by the outbox flow…')` at the top of the `/send-template` handler in `whatsapp-service/src/routes/send.js` (FR-020)
-- [ ] T025 Run `dotnet test` in `backend/` and confirm all WhatsApp tests pass (SC-006, FR-025)
-- [ ] T026 Run `npm run build` in `frontend/` and confirm zero TypeScript errors (SC-007, FR-026)
-- [ ] T027 Run `npm run i18n:check` in `frontend/` and confirm all locale keys present in both `ar/` and `en/` (FR-026, constitution check)
+- [x] T021 [P] Add `int? PayloadVersion = 1` to the `MessagePayload` record in `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppOutboxHelper.cs` (FR-017, informational-only, no behavior change, no migration required)
+- [x] T022 [P] Refactor `backend/src/DrMirror.Api/Infrastructure/WhatsApp/WhatsAppMessageTemplates.cs` internals to use `static readonly Dictionary<(string, string), string>` keyed by `(eventType, status)` per Decision 7 in research.md — public method signatures unchanged
+- [x] T023 [P] Add JSDoc comment to `whatsapp-service/src/templates/messages.js` stating that the C# backend is the source of truth for Arabic message content (FR-019)
+- [x] T024 [P] Add `logger.warn('DEPRECATED: /send-template is not called by the outbox flow…')` at the top of the `/send-template` handler in `whatsapp-service/src/routes/send.js` (FR-020)
+- [x] T025 Run `dotnet test` in `backend/` and confirm all WhatsApp tests pass (SC-006, FR-025)
+- [x] T026 Run `npm run build` in `frontend/` and confirm zero TypeScript errors (SC-007, FR-026)
+- [x] T027 Run `npm run i18n:check` in `frontend/` and confirm all locale keys present in both `ar/` and `en/` (FR-026, constitution check)
 
 ---
 

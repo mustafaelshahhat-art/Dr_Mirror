@@ -5,12 +5,19 @@ export interface WhatsAppStatusCountsDto {
   retrying: number;
 }
 
+export interface SidecarHealthDto {
+  isHealthy: boolean;
+  lastCheckedAt: string;
+  errorMessage: string | null;
+}
+
 export interface WhatsAppStatusDto {
   connectionState: 'connected' | 'initializing' | 'disconnected' | 'qr_required' | 'auth_failed' | string;
   qrRequired: boolean;
   lastSentAt: string | null;
   lastError: string | null;
   counts: WhatsAppStatusCountsDto;
+  sidecarHealth: SidecarHealthDto | null;
 }
 
 export interface WhatsAppAttemptDto {

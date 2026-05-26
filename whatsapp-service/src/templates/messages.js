@@ -1,3 +1,8 @@
+/**
+ * NOTE: The C# backend (WhatsAppMessageTemplates.cs) is the source of truth for Arabic
+ * message content. These sidecar templates are retained for the deprecated /send-template
+ * route only and should not be relied upon for production outbox messaging.
+ */
 export function renderTemplate(template, data = {}) {
   switch (template) {
     case 'orderConfirmation':

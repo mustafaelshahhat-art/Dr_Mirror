@@ -50,21 +50,28 @@ public static class RetryWhatsAppAttemptEndpoint
         return Results.Ok(new RetryWhatsAppAttemptResponse(id, child.Id));
     }
 
-    internal static WhatsAppOutboxMessage CreateChild(WhatsAppOutboxMessage original, DateTimeOffset now) => new()
+    internal static WhatsAppOutboxMessage CreateChild(WhatsAppOutboxMessage original, DateTimeOffset now)
     {
-        Id = Guid.NewGuid(),
-        ParentMessageId = original.Id,
-        Status = WhatsAppOutboxStatus.Pending,
-        IdempotencyKey = $"retry:{original.Id}:{now.UtcTicks}",
-        EventType = original.EventType,
-        Payload = original.Payload,
-        RecipientPhoneMasked = original.RecipientPhoneMasked,
-        Attempts = 0,
-        NextRetryAt = now,
-        CreatedAt = now,
-        EntityType = original.EntityType,
-        EntityId = original.EntityId,
-    };
+        var childId = Guid.NewGuid();
+        // Always root the key at the original business key so retry chains don't nest (SC-008, FR-016)
+        var retryIdx = original.IdempotencyKey.IndexOf(":retry:", StringComparison.Ordinal);
+        var rootKey = retryIdx >= 0 ? original.IdempotencyKey[..retryIdx] : original.IdempotencyKey;
+        return new WhatsAppOutboxMessage
+        {
+            Id = childId,
+            ParentMessageId = original.Id,
+            Status = WhatsAppOutboxStatus.Pending,
+            IdempotencyKey = $"{rootKey}:retry:{childId:N}",
+            EventType = original.EventType,
+            Payload = original.Payload,
+            RecipientPhoneMasked = original.RecipientPhoneMasked,
+            Attempts = 0,
+            NextRetryAt = now,
+            CreatedAt = now,
+            EntityType = original.EntityType,
+            EntityId = original.EntityId,
+        };
+    }
 }
 
 public sealed record RetryWhatsAppAttemptResponse(Guid OriginalId, Guid RetryId);

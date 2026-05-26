@@ -4,13 +4,15 @@ import { createServer } from 'node:http';
 import { createApp } from './app.js';
 import { loadConfig } from './config/env.js';
 import { logger } from './config/logger.js';
+import { CircuitBreaker } from './services/circuitBreaker.js';
 import { SendRateLimiter } from './services/rateLimiter.js';
 import { WhatsAppClientService } from './services/whatsappClient.js';
 
 const config = loadConfig();
 const rateLimiter = new SendRateLimiter(config);
 const client = new WhatsAppClientService(config, rateLimiter);
-const app = createApp(config, client);
+const circuitBreaker = new CircuitBreaker();
+const app = createApp(config, client, circuitBreaker);
 const server = createServer(app);
 
 server.listen(config.port, () => {

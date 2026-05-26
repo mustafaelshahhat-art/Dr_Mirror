@@ -5,14 +5,14 @@ import { registerLogoutRoutes } from './routes/logout.js';
 import { registerSendRoutes } from './routes/send.js';
 import { registerStatusRoutes } from './routes/status.js';
 
-export function createApp(config, client) {
+export function createApp(config, client, circuitBreaker) {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.json({ limit: '64kb' }));
 
   registerHealthRoutes(app, client);
   registerStatusRoutes(app, config, client);
-  registerSendRoutes(app, config, client);
+  registerSendRoutes(app, config, client, circuitBreaker);
   registerLogoutRoutes(app, config, client);
 
   app.use((_req, res) => {

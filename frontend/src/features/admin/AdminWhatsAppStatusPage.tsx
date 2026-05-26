@@ -22,6 +22,7 @@ export function AdminWhatsAppStatusPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const disconnectState = useOverlayState({ defaultOpen: false });
+  const retryAllConfirmState = useOverlayState({ defaultOpen: false });
   const disconnectMutation = useDisconnectMutation();
   const retryMutation = useRetryAttemptMutation();
   const retryAllMutation = useRetryAllFailedMutation();
@@ -104,7 +105,7 @@ export function AdminWhatsAppStatusPage() {
               size="sm"
               variant="secondary"
               isDisabled={!statusQuery.data?.counts.failed || retryAllMutation.isPending}
-              onPress={() => retryAllMutation.mutate()}
+              onPress={retryAllConfirmState.open}
             >
               <RefreshCw className={retryAllMutation.isPending ? 'size-4 animate-spin' : 'size-4'} aria-hidden />
               {retryAllMutation.isPending ? t('admin.whatsapp.retryAll.submitting') : t('admin.whatsapp.retryAll.button')}
@@ -197,6 +198,45 @@ export function AdminWhatsAppStatusPage() {
                       onPress={() => disconnectMutation.mutate(undefined, { onSuccess: close })}
                     >
                       {disconnectMutation.isPending ? t('admin.whatsapp.disconnect.submitting') : t('admin.whatsapp.disconnect.confirm')}
+                    </Button>
+                  </AlertDialog.Footer>
+                </>
+              )}
+            </AlertDialog.Dialog>
+          </AlertDialog.Container>
+        </AlertDialog.Backdrop>
+      </AlertDialog>
+
+      <AlertDialog>
+        <AlertDialog.Backdrop
+          isOpen={retryAllConfirmState.isOpen}
+          isDismissable={!retryAllMutation.isPending}
+          onOpenChange={retryAllConfirmState.setOpen}
+        >
+          <AlertDialog.Container size="sm">
+            <AlertDialog.Dialog>
+              {({ close }) => (
+                <>
+                  <AlertDialog.Header>
+                    <AlertDialog.Heading>{t('admin.whatsapp.retryAll.confirm.title')}</AlertDialog.Heading>
+                  </AlertDialog.Header>
+                  <AlertDialog.Body>
+                    <p className="text-sm text-default-500">
+                      {t('admin.whatsapp.retryAll.confirm.body', { count: statusQuery.data?.counts.failed ?? 0 })}
+                    </p>
+                  </AlertDialog.Body>
+                  <AlertDialog.Footer>
+                    <Button type="button" variant="ghost" size="sm" isDisabled={retryAllMutation.isPending} onPress={close}>
+                      {t('admin.whatsapp.retryAll.confirm.cancel')}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      isDisabled={retryAllMutation.isPending}
+                      onPress={() => retryAllMutation.mutate(undefined, { onSuccess: close })}
+                    >
+                      {retryAllMutation.isPending ? t('admin.whatsapp.retryAll.submitting') : t('admin.whatsapp.retryAll.confirm.confirm')}
                     </Button>
                   </AlertDialog.Footer>
                 </>

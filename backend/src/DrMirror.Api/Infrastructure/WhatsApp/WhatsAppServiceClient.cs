@@ -32,13 +32,27 @@ public sealed class WhatsAppServiceClient : IWhatsAppSender
         ApplyInternalApiKey(request);
 
         using var response = await _http.SendAsync(request, ct);
-        if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
+        if (response.IsSuccessStatusCode) return;
+
+        SidecarErrorDto? errorDto = null;
+        try
         {
-            throw new InvalidOperationException("whatsapp_service_unavailable");
+            errorDto = await response.Content.ReadFromJsonAsync<SidecarErrorDto>(cancellationToken: ct);
+        }
+        catch
+        {
+            // Best-effort parse; fall through to transient
         }
 
-        response.EnsureSuccessStatusCode();
+        if (errorDto is { Retryable: false })
+        {
+            throw new WhatsAppPermanentFailureException(errorDto.Error ?? "permanent_failure");
+        }
+
+        throw new WhatsAppTransientFailureException(errorDto?.Error ?? "transient_failure");
     }
+
+    private sealed record SidecarErrorDto(bool Success, string? Error, bool? Retryable);
 
     public async Task<WhatsAppServiceStatusDto?> GetStatusAsync(CancellationToken ct)
     {

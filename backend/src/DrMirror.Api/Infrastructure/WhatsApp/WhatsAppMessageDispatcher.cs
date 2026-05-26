@@ -83,12 +83,7 @@ public sealed class WhatsAppMessageDispatcher
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
             // App is still running — this is a per-message timeout, not shutdown.
-            MarkFailed(message, "sidecar_timeout");
-            _logger.LogWarning(
-                "WhatsAppOutbox: send timeout after {Timeout}s (id={Id})",
-                _options.SendTimeoutSeconds,
-                message.Id);
-            return;
+            throw new WhatsAppTransientFailureException("sidecar_timeout");
         }
 
         message.Status = WhatsAppOutboxStatus.Sent;
@@ -181,14 +176,6 @@ public sealed class WhatsAppMessageDispatcher
     private static void MarkSkipped(WhatsAppOutboxMessage message, string reason)
     {
         message.Status = WhatsAppOutboxStatus.Skipped;
-        message.FailureReason = reason;
-        message.LockedAt = null;
-        message.LockedBy = null;
-    }
-
-    private static void MarkFailed(WhatsAppOutboxMessage message, string reason)
-    {
-        message.Status = WhatsAppOutboxStatus.Failed;
         message.FailureReason = reason;
         message.LockedAt = null;
         message.LockedBy = null;

@@ -553,7 +553,13 @@
     "retryAll": {
       "button": "Retry all failed",
       "submitting": "Queueing...",
-      "success": "Queued {{count}} retry attempts."
+      "success": "Queued {{count}} retry attempts.",
+      "confirm": {
+        "title": "Retry all failed messages?",
+        "body": "This will queue {{count}} failed message(s) for retry.",
+        "cancel": "Cancel",
+        "confirm": "Retry All"
+      }
     },
     "attempts": {
       "title": "Notification attempts",

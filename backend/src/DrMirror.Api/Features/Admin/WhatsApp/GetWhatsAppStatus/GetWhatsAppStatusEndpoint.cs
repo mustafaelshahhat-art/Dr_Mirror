@@ -22,6 +22,7 @@ public static class GetWhatsAppStatusEndpoint
     private static async Task<IResult> HandleAsync(
         AppDbContext db,
         WhatsAppServiceClient service,
+        IWhatsAppHealthCache healthCache,
         CancellationToken ct)
     {
         var serviceStatus = await service.GetStatusAsync(ct);
@@ -36,12 +37,18 @@ public static class GetWhatsAppStatusEndpoint
         var retrying = counts.FirstOrDefault(c => c.Status == WhatsAppOutboxStatus.Retrying)?.Count ?? 0;
         var state = serviceStatus?.State ?? "disconnected";
 
+        var healthResult = healthCache.Latest;
+        var sidecarHealth = healthResult is not null
+            ? new SidecarHealthDto(healthResult.IsHealthy, healthResult.LastCheckedAt, healthResult.ErrorMessage)
+            : null;
+
         return Results.Ok(new WhatsAppStatusDto(
             ConnectionState: state,
             QrRequired: state == "qr_required" || serviceStatus?.QrAvailable == true,
             LastSentAt: serviceStatus?.LastSentAt,
             LastError: serviceStatus?.Error,
-            Counts: new WhatsAppStatusCountsDto(sent, failed, skipped, retrying)));
+            Counts: new WhatsAppStatusCountsDto(sent, failed, skipped, retrying),
+            SidecarHealth: sidecarHealth));
     }
 }
 
@@ -50,6 +57,9 @@ public sealed record WhatsAppStatusDto(
     bool QrRequired,
     DateTimeOffset? LastSentAt,
     string? LastError,
-    WhatsAppStatusCountsDto Counts);
+    WhatsAppStatusCountsDto Counts,
+    SidecarHealthDto? SidecarHealth);
 
 public sealed record WhatsAppStatusCountsDto(int Sent, int Failed, int Skipped, int Retrying);
+
+public sealed record SidecarHealthDto(bool IsHealthy, DateTimeOffset LastCheckedAt, string? ErrorMessage);

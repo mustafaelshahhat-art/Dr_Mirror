@@ -129,7 +129,8 @@ public static class WhatsAppOutboxHelper
         string? ReturnReason,
         string? RecipientName,
         string? RecipientPhone,
-        string MessageBody);
+        string MessageBody,
+        int? PayloadVersion = 1);
 
     private static OrderStatus ParseOrderStatus(string status, OrderStatus fallback) =>
         Enum.TryParse<OrderStatus>(status, ignoreCase: true, out var parsed) ? parsed : fallback;
