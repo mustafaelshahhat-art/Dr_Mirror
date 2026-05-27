@@ -13,6 +13,7 @@ export interface AuthContextValue {
   login: (input: LoginInput) => Promise<AuthUser>;
   register: (input: RegisterInput) => Promise<AuthUser>;
   updateProfile: (input: UpdateProfileInput) => Promise<AuthUser>;
+  deletePhone: () => Promise<AuthUser>;
   sendPhoneOtp: (input: SendOtpInput) => Promise<SendOtpResponse>;
   verifyPhoneOtp: (input: VerifyOtpInput) => Promise<VerifyOtpResponse>;
   /** Refresh user state from server (e.g. after phone verification). */

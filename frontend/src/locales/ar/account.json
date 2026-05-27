@@ -27,6 +27,12 @@
       "verifyPhone": "توثيق الآن",
       "phoneSaveToVerify": "احفظ التغييرات أولًا لتوثيق الرقم الجديد.",
       "phoneVerifiedSuccess": "تم التحقق من رقم الموبايل بنجاح.",
+      "deletePhone": "حذف",
+      "deletePhoneTitle": "إزالة رقم الموبايل",
+      "deletePhoneConfirm": "هل أنت متأكد من رغبتك في إزالة رقم الموبايل؟ ستحتاج إلى توثيق رقم جديد لاستخدام الميزات التي تتطلب التحقق.",
+      "deletePhoneConfirmButton": "نعم، إزالة",
+      "phoneDeleted": "تم إزالة رقم الموبايل بنجاح.",
+      "phoneDeleteError": "فشل إزالة رقم الموبايل. حاول مرة أخرى.",
       "errors": {
         "nameRequired": "اكتب اسمك بالكامل.",
         "nameTooLong": "الاسم يجب ألا يزيد عن 120 حرفًا.",

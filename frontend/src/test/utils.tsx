@@ -46,6 +46,7 @@ export function makeAuthValue(overrides?: Partial<AuthContextValue>): AuthContex
     login: async () => makeBuyerUser(),
     register: async () => makeBuyerUser(),
     updateProfile: async () => makeBuyerUser(),
+    deletePhone: async () => makeBuyerUser(),
     sendPhoneOtp: async () => ({ sessionId: '', status: 'sent', maskedPhone: null }),
     verifyPhoneOtp: async () => ({ verified: false }),
     refreshUser: async () => {},

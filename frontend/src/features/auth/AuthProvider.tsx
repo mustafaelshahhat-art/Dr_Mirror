@@ -89,6 +89,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return next;
   }, []);
 
+  const deletePhone = useCallback(async () => {
+    const next = await authApi.deletePhone();
+    setUser(next);
+    return next;
+  }, []);
+
   const sendPhoneOtp = useCallback(async (input: SendOtpInput) => {
     return authApi.sendPhoneOtp(input);
   }, []);
@@ -128,12 +134,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       register,
       updateProfile,
+      deletePhone,
       sendPhoneOtp,
       verifyPhoneOtp,
       refreshUser,
       logout,
     }),
-    [user, isBootstrapping, isAdmin, login, register, updateProfile, sendPhoneOtp, verifyPhoneOtp, refreshUser, logout],
+    [user, isBootstrapping, isAdmin, login, register, updateProfile, deletePhone, sendPhoneOtp, verifyPhoneOtp, refreshUser, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

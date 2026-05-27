@@ -55,6 +55,14 @@ public static class MeEndpoint
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
+        group.MapDelete("/me/phone", DeletePhoneAsync)
+            .WithName("Auth.DeletePhone")
+            .WithSummary("Remove the authenticated customer's phone number and reset verification status.")
+            .RequireAuthorization()
+            .Produces<UserDto>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound);
+
         return group;
     }
 
@@ -153,6 +161,53 @@ public static class MeEndpoint
                     .GroupBy(e => string.Empty)
                     .ToDictionary(g => g.Key, g => g.Select(e => e.Description).ToArray()),
                 title: "Profile update failed");
+        }
+
+        var roles = await userManager.GetRolesAsync(user);
+        return Results.Ok(UserDtoMapper.ToDto(user, roles));
+    }
+
+    private static async Task<IResult> DeletePhoneAsync(
+        ICurrentUser current,
+        UserManager<User> userManager)
+    {
+        if (current.UserId is not Guid id)
+        {
+            return Results.Problem(
+                title: "Invalid token",
+                detail: "The access token does not identify a known user.",
+                statusCode: StatusCodes.Status401Unauthorized);
+        }
+
+        var user = await userManager.FindByIdAsync(id.ToString());
+        if (user is null || user.IsDisabled)
+        {
+            return Results.Problem(
+                title: "Account not found",
+                detail: "Your account could not be located. Please sign in again.",
+                statusCode: StatusCodes.Status401Unauthorized);
+        }
+
+        if (string.IsNullOrWhiteSpace(user.PhoneNumber))
+        {
+            return Results.Problem(
+                title: "No phone number to delete",
+                detail: "Your account does not have a saved phone number.",
+                statusCode: StatusCodes.Status404NotFound);
+        }
+
+        user.PhoneNumber = null;
+        user.PhoneNumberConfirmed = false;
+        user.UpdatedAt = DateTimeOffset.UtcNow;
+
+        var result = await userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            return Results.ValidationProblem(
+                result.Errors
+                    .GroupBy(e => string.Empty)
+                    .ToDictionary(g => g.Key, g => g.Select(e => e.Description).ToArray()),
+                title: "Phone removal failed");
         }
 
         var roles = await userManager.GetRolesAsync(user);

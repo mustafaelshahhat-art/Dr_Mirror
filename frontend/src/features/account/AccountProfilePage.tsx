@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Form, useOverlayState } from '@heroui/react';
+import { Button, Form, Modal, useOverlayState } from '@heroui/react';
 import { toast } from '@heroui/react/toast';
-import { CheckCircle2, ShieldAlert } from 'lucide-react';
-import { useEffect } from 'react';
+import { CheckCircle2, ShieldAlert, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -21,8 +21,10 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export function AccountProfilePage() {
   const { t } = useTranslation();
-  const { user, updateProfile, sendPhoneOtp, verifyPhoneOtp } = useAuth();
+  const { user, updateProfile, deletePhone, sendPhoneOtp, verifyPhoneOtp } = useAuth();
   const otpState = useOverlayState({ defaultOpen: false });
+  const deleteConfirmState = useOverlayState({ defaultOpen: false });
+  const [isDeletingPhone, setIsDeletingPhone] = useState(false);
 
   const {
     control,
@@ -55,6 +57,20 @@ export function AccountProfilePage() {
     });
     toast.success(t('account.account.profile.saved'));
   });
+
+  const handleDeletePhone = async () => {
+    setIsDeletingPhone(true);
+    try {
+      await deletePhone();
+      toast.success(t('account.account.profile.phoneDeleted'));
+      deleteConfirmState.close();
+      reset({ displayName: user.fullName, phone: '', email: user.email });
+    } catch {
+      toast.danger(t('account.account.profile.phoneDeleteError'));
+    } finally {
+      setIsDeletingPhone(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-lg space-y-6">
@@ -91,27 +107,37 @@ export function AccountProfilePage() {
 
           {/* Phone verification status */}
           {user.phone && !phoneChanged && (
-            <div className="flex items-center gap-2 rounded-medium bg-default-100 p-3 text-sm">
+            <div className="flex items-center justify-between gap-2">
               {user.phoneNumberConfirmed ? (
-                <>
-                  <CheckCircle2 className="size-4 shrink-0 text-success" aria-hidden />
-                  <span className="text-success">{t('account.account.profile.phoneVerified')}</span>
-                </>
+                <div className="inline-flex items-center gap-1.5 rounded-lg bg-success-50 px-3 py-2 text-sm font-medium text-success-700">
+                  <CheckCircle2 className="size-4 shrink-0" aria-hidden />
+                  {t('account.account.profile.phoneVerified')}
+                </div>
               ) : (
-                <>
+                <div className="flex items-center gap-2 text-sm">
                   <ShieldAlert className="size-4 shrink-0 text-warning" aria-hidden />
                   <span className="text-warning-600">{t('account.account.profile.phoneNotVerified')}</span>
                   <Button
                     type="button"
                     size="sm"
                     variant="secondary"
-                    className="ms-auto"
                     onPress={otpState.open}
                   >
                     {t('account.account.profile.verifyPhone')}
                   </Button>
-                </>
+                </div>
               )}
+              <Button
+                type="button"
+                variant="danger"
+                size="sm"
+                className="shrink-0"
+                isDisabled={isDeletingPhone}
+                onPress={deleteConfirmState.open}
+              >
+                <Trash2 className="size-4" aria-hidden />
+                <span>{t('account.account.profile.deletePhone')}</span>
+              </Button>
             </div>
           )}
 
@@ -129,6 +155,34 @@ export function AccountProfilePage() {
           </div>
         </Form>
       </div>
+
+      {/* Delete phone confirmation modal */}
+      <Modal>
+        <Modal.Backdrop isOpen={deleteConfirmState.isOpen} isDismissable={!isDeletingPhone} onOpenChange={(open) => { if (!open) deleteConfirmState.close(); }}>
+          <Modal.Container size="sm">
+            <Modal.Dialog>
+              {() => (
+                <>
+                  <Modal.Header>
+                    <Modal.Heading>{t('account.account.profile.deletePhoneTitle')}</Modal.Heading>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <p className="text-sm text-default-600">{t('account.account.profile.deletePhoneConfirm')}</p>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button type="button" variant="ghost" size="sm" isDisabled={isDeletingPhone} onPress={deleteConfirmState.close}>
+                      {t('common.cancel')}
+                    </Button>
+                    <Button type="button" variant="danger" size="sm" isPending={isDeletingPhone} isDisabled={isDeletingPhone} onPress={handleDeletePhone}>
+                      {t('account.account.profile.deletePhoneConfirmButton')}
+                    </Button>
+                  </Modal.Footer>
+                </>
+              )}
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
 
       {/* Phone OTP verification modal */}
       {phoneUnverified && (

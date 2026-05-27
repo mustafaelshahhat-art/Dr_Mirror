@@ -27,6 +27,12 @@
       "verifyPhone": "Verify now",
       "phoneSaveToVerify": "Save your changes first to verify the new phone number.",
       "phoneVerifiedSuccess": "Phone number verified successfully.",
+      "deletePhone": "Delete",
+      "deletePhoneTitle": "Remove phone number",
+      "deletePhoneConfirm": "Are you sure you want to remove your phone number? You will need to verify a new number to use phone-verified features.",
+      "deletePhoneConfirmButton": "Yes, remove",
+      "phoneDeleted": "Phone number removed successfully.",
+      "phoneDeleteError": "Failed to remove phone number. Please try again.",
       "errors": {
         "nameRequired": "Enter your full name.",
         "nameTooLong": "Name must be 120 characters or fewer.",

@@ -41,6 +41,10 @@ export interface VerifyOtpResponse {
 }
 
 export const authApi = {
+  async deletePhone(): Promise<AuthUser> {
+    const { data } = await api.delete<AuthUser>('/auth/me/phone');
+    return data;
+  },
   async login(input: LoginInput): Promise<AuthResponse> {
     const { data } = await api.post<AuthResponse>('/auth/login', input);
     return data;
