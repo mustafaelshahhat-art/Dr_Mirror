@@ -70,8 +70,6 @@ public sealed class WhatsAppMessageDispatcher
             return;
         }
 
-        await Task.Delay(TimeSpan.FromSeconds(Random.Shared.Next(5, 16)), ct);
-
         // Per-message send timeout — prevents Processing/Retrying records from getting stuck
         // when the sidecar is slow or Baileys hangs on sendMessage().
         using var sendCts = CancellationTokenSource.CreateLinkedTokenSource(ct);

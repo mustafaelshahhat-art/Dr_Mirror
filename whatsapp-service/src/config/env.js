@@ -23,11 +23,9 @@ export function loadConfig() {
     internalApiKey,
     pairingAdminToken,
     enablePairingUi: boolFromEnv('ENABLE_PAIRING_UI', false),
-    sendDelayMinMs: intFromEnv('SEND_DELAY_MIN_MS', 5000),
-    sendDelayMaxMs: intFromEnv('SEND_DELAY_MAX_MS', 15000),
     dailyPhoneLimit: intFromEnv('DAILY_PHONE_LIMIT', 10),
     globalSendLimitPerMinute: intFromEnv('GLOBAL_SEND_LIMIT_PER_MINUTE', 60),
-    sendTimeoutMs: intFromEnv('SEND_TIMEOUT_MS', 30000),
+    sendTimeoutMs: intFromEnv('SEND_TIMEOUT_MS', 15000),
   };
 }
 

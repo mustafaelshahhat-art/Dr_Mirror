@@ -30,16 +30,19 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
                 _logger.LogError(ex, "WhatsAppOutboxProcessor: unexpected batch error");
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(30), ct);
+            await Task.Delay(_pollInterval, ct);
         }
     }
+
+    private TimeSpan _pollInterval = TimeSpan.FromSeconds(1);
 
     private async Task ProcessBatchAsync(CancellationToken ct)
     {
         await using var scope = _scopeFactory.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var dispatcher = scope.ServiceProvider.GetRequiredService<WhatsAppMessageDispatcher>();
         var options = scope.ServiceProvider.GetRequiredService<IOptions<WhatsAppOptions>>().Value;
+
+        _pollInterval = TimeSpan.FromMilliseconds(options.PollIntervalMs);
 
         var now = DateTimeOffset.UtcNow;
         var staleBefore = now.AddMinutes(-5);
@@ -90,76 +93,92 @@ public sealed class WhatsAppOutboxProcessor : BackgroundService
             .OrderBy(m => m.CreatedAt)
             .ToListAsync(ct);
 
-        foreach (var msg in claimed)
+        var parallelOptions = new ParallelOptions
         {
-            try
-            {
-                await dispatcher.DispatchAsync(msg, ct);
-            }
-            catch (WhatsAppPermanentFailureException ex)
+            MaxDegreeOfParallelism = options.MaxSendConcurrency,
+            CancellationToken = ct,
+        };
+
+        await Parallel.ForEachAsync(claimed, parallelOptions, (msg, token) =>
+            ProcessClaimedMessageAsync(msg, token));
+    }
+
+    private async ValueTask ProcessClaimedMessageAsync(WhatsAppOutboxMessage claimedMessage, CancellationToken ct)
+    {
+        await using var scope = _scopeFactory.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var dispatcher = scope.ServiceProvider.GetRequiredService<WhatsAppMessageDispatcher>();
+        var options = scope.ServiceProvider.GetRequiredService<IOptions<WhatsAppOptions>>().Value;
+
+        var msg = await db.WhatsAppOutboxMessages.FirstOrDefaultAsync(m => m.Id == claimedMessage.Id, ct);
+        if (msg is null) return;
+
+        try
+        {
+            await dispatcher.DispatchAsync(msg, ct);
+        }
+        catch (WhatsAppPermanentFailureException ex)
+        {
+            msg.Status = WhatsAppOutboxStatus.Failed;
+            msg.FailureReason = ex.Reason;
+            msg.LockedAt = null;
+            msg.LockedBy = null;
+            _logger.LogError(ex, "WhatsAppOutbox: permanent failure {EventType} (id={Id}): {Reason}", msg.EventType, msg.Id, ex.Reason);
+        }
+        catch (WhatsAppTransientFailureException ex)
+        {
+            msg.LockedAt = null;
+            msg.LockedBy = null;
+            msg.FailureReason = ex.Reason;
+
+            var effectiveAttempts = ex.Reason == "circuit_open"
+                ? Math.Max(0, msg.Attempts - 1)
+                : msg.Attempts;
+
+            if (effectiveAttempts >= options.MaxAttempts)
             {
                 msg.Status = WhatsAppOutboxStatus.Failed;
-                msg.FailureReason = ex.Reason;
-                msg.LockedAt = null;
-                msg.LockedBy = null;
-                _logger.LogError(ex, "WhatsAppOutbox: permanent failure {EventType} (id={Id}): {Reason}", msg.EventType, msg.Id, ex.Reason);
+                if (ex.Reason == "circuit_open") msg.Attempts = effectiveAttempts;
+                _logger.LogError(ex, "WhatsAppOutbox: permanently failed {EventType} (id={Id}): {Reason}", msg.EventType, msg.Id, ex.Reason);
             }
-            catch (WhatsAppTransientFailureException ex)
+            else
             {
-                msg.LockedAt = null;
-                msg.LockedBy = null;
-                msg.FailureReason = ex.Reason;
-
-                // FR-006a: circuit-open does not consume a MaxAttempts slot
-                var effectiveAttempts = ex.Reason == "circuit_open"
-                    ? Math.Max(0, msg.Attempts - 1)
-                    : msg.Attempts;
-
-                if (effectiveAttempts >= maxAttempts)
-                {
-                    msg.Status = WhatsAppOutboxStatus.Failed;
-                    if (ex.Reason == "circuit_open") msg.Attempts = effectiveAttempts;
-                    _logger.LogError(ex, "WhatsAppOutbox: permanently failed {EventType} (id={Id}): {Reason}", msg.EventType, msg.Id, ex.Reason);
-                }
-                else
-                {
-                    msg.Status = WhatsAppOutboxStatus.Pending;
-                    if (ex.Reason == "circuit_open") msg.Attempts = effectiveAttempts;
-                    var rawSeconds = Math.Min(Math.Pow(4, effectiveAttempts) * 30, options.MaxBackoff.TotalSeconds);
-                    msg.NextRetryAt = DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(rawSeconds));
-                    _logger.LogWarning(ex, "WhatsAppOutbox: transient failure, retry scheduled for {EventType} (id={Id}): {Reason}", msg.EventType, msg.Id, ex.Reason);
-                }
+                msg.Status = WhatsAppOutboxStatus.Pending;
+                if (ex.Reason == "circuit_open") msg.Attempts = effectiveAttempts;
+                var rawSeconds = Math.Min(Math.Pow(4, effectiveAttempts) * 30, options.MaxBackoff.TotalSeconds);
+                msg.NextRetryAt = DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(rawSeconds));
+                _logger.LogWarning(ex, "WhatsAppOutbox: transient failure, retry scheduled for {EventType} (id={Id}): {Reason}", msg.EventType, msg.Id, ex.Reason);
             }
-            catch (Exception ex)
+        }
+        catch (Exception ex)
+        {
+            msg.FailureReason = "sidecar_error";
+            msg.LockedAt = null;
+            msg.LockedBy = null;
+
+            if (msg.Attempts >= options.MaxAttempts)
             {
-                msg.FailureReason = "sidecar_error";
-                msg.LockedAt = null;
-                msg.LockedBy = null;
-
-                if (msg.Attempts >= maxAttempts)
-                {
-                    msg.Status = WhatsAppOutboxStatus.Failed;
-                    _logger.LogError(ex, "WhatsAppOutbox: permanently failed {EventType} (id={Id})", msg.EventType, msg.Id);
-                }
-                else
-                {
-                    msg.Status = WhatsAppOutboxStatus.Pending;
-                    var rawSeconds = Math.Min(Math.Pow(4, msg.Attempts) * 30, options.MaxBackoff.TotalSeconds);
-                    msg.NextRetryAt = DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(rawSeconds));
-                    _logger.LogWarning(ex, "WhatsAppOutbox: retry scheduled for {EventType} (id={Id})", msg.EventType, msg.Id);
-                }
+                msg.Status = WhatsAppOutboxStatus.Failed;
+                _logger.LogError(ex, "WhatsAppOutbox: permanently failed {EventType} (id={Id})", msg.EventType, msg.Id);
             }
-
-            await ReconcileRetryParentAsync(db, msg, ct);
-
-            try
+            else
             {
-                await db.SaveChangesAsync(ct);
+                msg.Status = WhatsAppOutboxStatus.Pending;
+                var rawSeconds = Math.Min(Math.Pow(4, msg.Attempts) * 30, options.MaxBackoff.TotalSeconds);
+                msg.NextRetryAt = DateTimeOffset.UtcNow.Add(TimeSpan.FromSeconds(rawSeconds));
+                _logger.LogWarning(ex, "WhatsAppOutbox: retry scheduled for {EventType} (id={Id})", msg.EventType, msg.Id);
             }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                _logger.LogWarning(ex, "WhatsAppOutbox: concurrency conflict ignored for {Id}", msg.Id);
-            }
+        }
+
+        await ReconcileRetryParentAsync(db, msg, ct);
+
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.LogWarning(ex, "WhatsAppOutbox: concurrency conflict ignored for {Id}", msg.Id);
         }
     }
 

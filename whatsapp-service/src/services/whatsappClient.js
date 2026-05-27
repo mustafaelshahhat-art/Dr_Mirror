@@ -140,7 +140,7 @@ export class WhatsAppClientService {
     }
 
     // Bounded timeout on Baileys sendMessage to prevent indefinitely-stuck Processing rows.
-    const timeoutMs = this.config.sendTimeoutMs ?? 30000;
+    const timeoutMs = this.config.sendTimeoutMs ?? 15000;
     const sendWithTimeout = Promise.race([
       this.sock.sendMessage(jid, { text: String(message) }),
       new Promise((_, reject) =>
