@@ -8,11 +8,13 @@ import type { SendOtpResponse, VerifyOtpResponse } from '../api';
 export interface PhoneVerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  maskedPhone: string;
-  sendOtp: () => Promise<SendOtpResponse>;
+  maskedPhone?: string;
+  sendOtp: (input?: { phone?: string }) => Promise<SendOtpResponse>;
   verifyOtp: (input: { code: string; sessionId: string }) => Promise<VerifyOtpResponse>;
   onVerified: () => void;
 }
+
+type Step = 'enter' | 'send' | 'verify';
 
 export function PhoneVerificationModal({
   isOpen,
@@ -23,22 +25,26 @@ export function PhoneVerificationModal({
   onVerified,
 }: PhoneVerificationModalProps) {
   const { t } = useTranslation();
-  const [step, setStep] = useState<'send' | 'verify'>('send');
+  const [step, setStep] = useState<Step>(maskedPhone ? 'send' : 'enter');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [code, setCode] = useState('');
+  const [phoneInput, setPhoneInput] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentMasked, setCurrentMasked] = useState(maskedPhone ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setStep('send');
+      setStep(maskedPhone ? 'send' : 'enter');
       setSessionId(null);
       setCode('');
+      setPhoneInput('');
       setError(null);
+      setCurrentMasked(maskedPhone ?? '');
     }
-  }, [isOpen]);
+  }, [isOpen, maskedPhone]);
 
   useEffect(() => {
     if (step === 'verify') {
@@ -46,16 +52,21 @@ export function PhoneVerificationModal({
     }
   }, [step]);
 
-  async function handleSend() {
+  async function handleSend(phoneOverride?: string) {
     setIsSending(true);
     setError(null);
     try {
-      const result = await sendOtp();
+      const result = await sendOtp(phoneOverride ? { phone: phoneOverride } : undefined);
       setSessionId(result.sessionId);
+      setCurrentMasked(result.maskedPhone ?? '');
       setStep('verify');
     } catch (err) {
-      const status = (err as AxiosError)?.response?.status;
-      if (status === 503) {
+      const axiosErr = err as AxiosError;
+      const data = axiosErr?.response?.data as { code?: string } | undefined;
+      if (data?.code === 'NO_PHONE_ON_FILE') {
+        setStep('enter');
+        setError(t('checkout.phoneRequired'));
+      } else if (axiosErr?.response?.status === 503) {
         setError(t('account.account.profile.otp.whatsappUnavailable'));
       } else {
         setError(t('account.account.profile.otp.sendFailed'));
@@ -63,6 +74,15 @@ export function PhoneVerificationModal({
     } finally {
       setIsSending(false);
     }
+  }
+
+  async function handleEnterAndSend() {
+    const cleaned = phoneInput.replace(/\s/g, '');
+    if (cleaned.length < 7) {
+      setError(t('checkout.errors.phoneInvalid'));
+      return;
+    }
+    await handleSend(cleaned);
   }
 
   async function handleVerify() {
@@ -94,17 +114,37 @@ export function PhoneVerificationModal({
             {() => (
               <>
                 <Modal.Header>
-                  <Modal.Heading>{t('account.account.profile.otp.title')}</Modal.Heading>
+                  <Modal.Heading>{step === 'enter' ? t('checkout.phoneTitle') : t('account.account.profile.otp.title')}</Modal.Heading>
                 </Modal.Header>
                 <Modal.Body className="space-y-4">
-                  {step === 'send' ? (
+                  {step === 'enter' ? (
+                    <>
+                      <p className="text-sm text-default-600">
+                        {t('checkout.phoneRequiredDescription')}
+                      </p>
+                      <TextField
+                        value={phoneInput}
+                        onChange={(v: string) => { setPhoneInput(v); setError(null); }}
+                        isInvalid={Boolean(error)}
+                        className="flex flex-col gap-1.5"
+                      >
+                        <Label className="text-sm font-medium">{t('checkout.address.phone')}</Label>
+                        <Input
+                          inputMode="tel"
+                          autoComplete="tel"
+                          placeholder="+20 100 000 0000"
+                          className="border border-default-400 dark:border-default-300"
+                        />
+                      </TextField>
+                    </>
+                  ) : step === 'send' ? (
                     <p className="text-sm text-default-600">
-                      {t('account.account.profile.otp.sendDescription', { phone: maskedPhone })}
+                      {t('account.account.profile.otp.sendDescription', { phone: currentMasked })}
                     </p>
                   ) : (
                     <>
                       <p className="text-sm text-default-600">
-                        {t('account.account.profile.otp.enterDescription', { phone: maskedPhone })}
+                        {t('account.account.profile.otp.enterDescription', { phone: currentMasked })}
                       </p>
                       <TextField
                         value={code}
@@ -137,7 +177,18 @@ export function PhoneVerificationModal({
                   <Button type="button" variant="ghost" size="sm" onPress={onClose} isDisabled={isSending || isVerifying}>
                     {t('common.cancel')}
                   </Button>
-                  {step === 'send' ? (
+                  {step === 'enter' ? (
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      isPending={isSending}
+                      isDisabled={isSending || phoneInput.trim().length < 7}
+                      onPress={() => void handleEnterAndSend()}
+                    >
+                      {t('checkout.saveAndSendOtp')}
+                    </Button>
+                  ) : step === 'send' ? (
                     <Button type="button" variant="primary" size="sm" isPending={isSending} isDisabled={isSending} onPress={() => void handleSend()}>
                       {t('account.account.profile.otp.sendButton')}
                     </Button>

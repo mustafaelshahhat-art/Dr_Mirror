@@ -21,6 +21,7 @@ export interface UpdateProfileInput {
 
 export interface SendOtpInput {
   purpose?: 'profile' | 'checkout';
+  phone?: string;
 }
 
 export interface SendOtpResponse {

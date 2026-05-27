@@ -10,6 +10,10 @@
   "confirmOrder": "Confirm order",
   "confirming": "Confirming...",
   "phoneVerifiedRetry": "Phone verified! Click Place Order to continue.",
+  "phoneTitle": "Phone number required",
+  "phoneRequiredDescription": "A phone number is required to place an order. We'll send a verification code to this number.",
+  "phoneRequired": "Please enter your phone number to continue.",
+  "saveAndSendOtp": "Save & send code",
   "steps": {
     "address": "Shipping",
     "payment": "Payment",

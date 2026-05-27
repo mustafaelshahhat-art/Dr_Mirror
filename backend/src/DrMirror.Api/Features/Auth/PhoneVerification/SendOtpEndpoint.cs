@@ -3,6 +3,7 @@ using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.RateLimiting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -38,6 +39,7 @@ public static class SendOtpEndpoint
         SendOtpRequest request,
         ICurrentUser current,
         AppDbContext db,
+        UserManager<User> userManager,
         IWhatsAppSender sender,
         IOptions<WhatsAppOptions> whatsAppOptions,
         ILogger<SendOtpRequest> logger,
@@ -55,7 +57,27 @@ public static class SendOtpEndpoint
         var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId, ct);
         if (user is null || user.IsDisabled) return Results.Unauthorized();
 
-        if (string.IsNullOrWhiteSpace(user.PhoneNumber))
+        // If a phone was supplied in the request, save it before sending OTP.
+        // This allows users with no phone on file to enter one at checkout.
+        if (!string.IsNullOrWhiteSpace(request.Phone))
+        {
+            var newPhone = request.Phone.Trim();
+            if (newPhone != user.PhoneNumber)
+            {
+                user.PhoneNumber = newPhone;
+                user.PhoneNumberConfirmed = false;
+                user.UpdatedAt = DateTimeOffset.UtcNow;
+                var updateResult = await userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    logger.LogWarning("PhoneVerification: failed to save phone for userId={UserId}", userId);
+                    return Results.Problem(
+                        title: "Could not save phone number",
+                        statusCode: StatusCodes.Status400BadRequest);
+                }
+            }
+        }
+        else if (string.IsNullOrWhiteSpace(user.PhoneNumber))
         {
             return Results.Json(
                 new { code = PhoneVerificationErrorCodes.NoPhoneOnFile },

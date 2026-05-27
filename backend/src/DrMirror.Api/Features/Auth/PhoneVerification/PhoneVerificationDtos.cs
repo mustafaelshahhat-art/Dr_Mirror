@@ -1,6 +1,6 @@
 namespace DrMirror.Api.Features.Auth.PhoneVerification;
 
-public sealed record SendOtpRequest(string? Purpose = "profile");
+public sealed record SendOtpRequest(string? Purpose = "profile", string? Phone = null);
 
 public sealed record SendOtpResponse(Guid SessionId, string Status, string? MaskedPhone);
 

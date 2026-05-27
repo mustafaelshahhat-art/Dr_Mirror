@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../auth/useAuth';
-import { PhoneVerificationModal, maskPhone } from '../auth/components/PhoneVerificationModal';
+import { PhoneVerificationModal } from '../auth/components/PhoneVerificationModal';
 import { useAddressesQuery } from '../addresses/hooks';
 import { useCart } from '../cart/useCart';
 import { isPhoneNotVerifiedError, useCreateOrderMutation, usePaymentMethodsQuery } from '../orders/hooks';
@@ -209,6 +209,13 @@ function CheckoutBody() {
   async function handlePlaceOrder() {
     if (createOrder.isPending) return;
 
+    // Pre-check: if the user's phone is missing or unverified, show the OTP modal
+    // instead of wasting a round-trip to the backend.
+    if (!user?.phone || !user.phoneNumberConfirmed) {
+      setPhoneOtpOpen(true);
+      return;
+    }
+
     setFormError(null);
 
     const usingSaved = savedAddressId !== null;
@@ -408,20 +415,17 @@ function CheckoutBody() {
         <CheckoutSummary items={cart.items} subTotal={cart.subTotal} shippingFee={shippingFee} lang={lang} />
       </Form>
 
-      {user?.phone && (
-        <PhoneVerificationModal
-          isOpen={phoneOtpOpen}
-          onClose={() => setPhoneOtpOpen(false)}
-          maskedPhone={maskPhone(user.phone)}
-          sendOtp={() => sendPhoneOtp({ purpose: 'checkout' })}
-          verifyOtp={verifyPhoneOtp}
-          onVerified={() => {
-            setPhoneOtpOpen(false);
-            void refreshUser();
-            toast.success(t('checkout.phoneVerifiedRetry'));
-          }}
-        />
-      )}
+      <PhoneVerificationModal
+        isOpen={phoneOtpOpen}
+        onClose={() => setPhoneOtpOpen(false)}
+        maskedPhone={user?.phone ?? undefined}
+        sendOtp={(input) => sendPhoneOtp({ purpose: 'checkout', ...(input ?? {}) })}
+        verifyOtp={verifyPhoneOtp}
+        onVerified={() => {
+          setPhoneOtpOpen(false);
+          void refreshUser().then(() => handlePlaceOrder());
+        }}
+      />
     </section>
   );
 }
