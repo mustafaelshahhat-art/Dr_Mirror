@@ -173,7 +173,7 @@ function ShippingFeeRow({
           <Label className="text-sm uppercase tracking-wide text-default-600 font-medium">
             {t('shipping.fee.label')}
           </Label>
-          <NumberField.Group>
+          <NumberField.Group className="grid-cols-[1fr]">
             <NumberField.Input className="tabular-nums" />
           </NumberField.Group>
           <p className="text-xs text-default-500">
