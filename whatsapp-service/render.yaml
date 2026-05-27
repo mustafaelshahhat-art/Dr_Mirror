@@ -1,14 +1,28 @@
+# Render IaC configuration for the WhatsApp sidecar service.
+#
+# PLACEMENT: This file must live at the repository root to be picked up by
+# Render's infrastructure-as-code feature. If it stays inside
+# whatsapp-service/, either:
+#   (a) move it to the repo root (recommended), or
+#   (b) connect the service manually in the Render dashboard, pointing the
+#       root directory at whatsapp-service/ and entering the commands below.
+#
+# The rootDir field below assumes the file is at the repo root.
 services:
   - type: web
     name: drmirror-whatsapp-service
     runtime: node
+    nodeVersion: "20"
     plan: free
     rootDir: whatsapp-service
-    buildCommand: npm install
+    buildCommand: npm ci
     startCommand: npm start
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
+      # PORT is injected automatically by Render — do not set it here.
+      # The service binds to process.env.PORT (defaults to 3005 locally).
       - key: MONGODB_URI
         sync: false
       - key: INTERNAL_API_KEY

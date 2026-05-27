@@ -15,6 +15,10 @@ public class ProdSecretsValidatorTests
     {
         ["ConnectionStrings:Default"] = "Server=db;Database=Dr;Trusted_Connection=True;",
         ["Jwt:Secret"] = LongJwtSecret,
+        ["Jwt:Issuer"] = "drmirror.com",
+        ["Jwt:Audience"] = "drmirror.com",
+        ["Admin:SeedEmail"] = "admin@drmirror.com",
+        ["Admin:SeedPassword"] = "StrongPassword!1",
         ["Cors:AllowedOrigins:0"] = "https://app.drmirror.com",
     };
 
@@ -85,7 +89,47 @@ public class ProdSecretsValidatorTests
         Assert.Contains("ConnectionStrings:Default", ex.MissingKeys);
         Assert.Contains("Jwt:Secret", ex.MissingKeys);
         Assert.Contains(ex.MissingKeys, k => k.StartsWith("Cors:AllowedOrigins"));
-        Assert.Equal(3, ex.MissingKeys.Count);
+        Assert.Contains("Jwt:Issuer", ex.MissingKeys);
+        Assert.Contains("Jwt:Audience", ex.MissingKeys);
+        Assert.Contains("Admin:SeedEmail", ex.MissingKeys);
+        Assert.Contains("Admin:SeedPassword", ex.MissingKeys);
+        Assert.Equal(7, ex.MissingKeys.Count);
+    }
+
+    [Fact]
+    public void Missing_admin_seed_email_is_listed()
+    {
+        var values = ValidBase();
+        values.Remove("Admin:SeedEmail");
+        var config = BuildConfig(values);
+
+        var ex = Assert.Throws<ProdSecretsValidationException>(
+            () => ProdSecretsValidator.Validate(config));
+        Assert.Contains("Admin:SeedEmail", ex.MissingKeys);
+    }
+
+    [Fact]
+    public void Missing_admin_seed_password_is_listed()
+    {
+        var values = ValidBase();
+        values["Admin:SeedPassword"] = null;
+        var config = BuildConfig(values);
+
+        var ex = Assert.Throws<ProdSecretsValidationException>(
+            () => ProdSecretsValidator.Validate(config));
+        Assert.Contains("Admin:SeedPassword", ex.MissingKeys);
+    }
+
+    [Fact]
+    public void Short_admin_seed_password_is_rejected()
+    {
+        var values = ValidBase();
+        values["Admin:SeedPassword"] = "Short!1";
+        var config = BuildConfig(values);
+
+        var ex = Assert.Throws<ProdSecretsValidationException>(
+            () => ProdSecretsValidator.Validate(config));
+        Assert.Contains(ex.MissingKeys, k => k.StartsWith("Admin:SeedPassword") && k.Contains("12"));
     }
 
     [Fact]
@@ -116,5 +160,30 @@ public class ProdSecretsValidatorTests
         Assert.Contains("Email:SmtpPort", ex.MissingKeys);
         Assert.Contains("Email:SmtpUsername", ex.MissingKeys);
         Assert.Contains("Email:SmtpPassword", ex.MissingKeys);
+        Assert.Contains("Email:FrontendBaseUrl", ex.MissingKeys);
+    }
+
+    [Fact]
+    public void Missing_jwt_issuer_is_listed()
+    {
+        var values = ValidBase();
+        values.Remove("Jwt:Issuer");
+        var config = BuildConfig(values);
+
+        var ex = Assert.Throws<ProdSecretsValidationException>(
+            () => ProdSecretsValidator.Validate(config));
+        Assert.Contains("Jwt:Issuer", ex.MissingKeys);
+    }
+
+    [Fact]
+    public void Missing_jwt_audience_is_listed()
+    {
+        var values = ValidBase();
+        values.Remove("Jwt:Audience");
+        var config = BuildConfig(values);
+
+        var ex = Assert.Throws<ProdSecretsValidationException>(
+            () => ProdSecretsValidator.Validate(config));
+        Assert.Contains("Jwt:Audience", ex.MissingKeys);
     }
 }

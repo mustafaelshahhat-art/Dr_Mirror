@@ -46,8 +46,14 @@ internal static class ServiceCollectionExtensions
             ?? throw new InvalidOperationException(
                 "Jwt:Secret is required. " +
                 "In dev: dotnet user-secrets set \"Jwt:Secret\" \"<base64-or-long-random>\".");
-        var jwtIssuer = jwtSection["Issuer"] ?? "drmirror.local";
-        var jwtAudience = jwtSection["Audience"] ?? "drmirror.local";
+        var jwtIssuer = jwtSection["Issuer"];
+        if (string.IsNullOrWhiteSpace(jwtIssuer))
+            throw new InvalidOperationException(
+                "Jwt:Issuer is required. Set the Jwt__Issuer environment variable (e.g. drmirror.com).");
+        var jwtAudience = jwtSection["Audience"];
+        if (string.IsNullOrWhiteSpace(jwtAudience))
+            throw new InvalidOperationException(
+                "Jwt:Audience is required. Set the Jwt__Audience environment variable (e.g. drmirror.com).");
 
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

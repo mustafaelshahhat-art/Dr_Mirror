@@ -7,7 +7,14 @@ export function registerStatusRoutes(app, config, client) {
     res.json(client.status());
   });
 
-  app.get(['/pair', '/qr', '/qr/:token', '/qr:token'], auth, (req, res) => {
+  // Pairing UI is disabled by default. Set ENABLE_PAIRING_UI=true only
+  // temporarily when scanning the QR code, then set it back to false.
+  app.get(['/pair', '/qr', '/qr/:token', '/qr:token'], (req, res, next) => {
+    if (!config.enablePairingUi) {
+      return res.status(404).json({ error: 'not_found' });
+    }
+    return next();
+  }, auth, (req, res) => {
     const pairing = client.pair();
 
     // Render HTML for browser requests or when using UI-friendly token routes
