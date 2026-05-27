@@ -14,6 +14,8 @@ public sealed class WhatsAppOptions
     public int PollIntervalMs { get; set; } = 1000;
     /// <summary>Maximum number of messages to dispatch concurrently per batch.</summary>
     public int MaxSendConcurrency { get; set; } = 3;
+    /// <summary>Maximum WhatsApp messages allowed per phone number per day. Messages beyond this are skipped.</summary>
+    public int DailyLimitPerPhone { get; set; } = 10;
     public int MaxAttempts { get; set; } = 5;
     public TimeSpan MaxBackoff { get; set; } = TimeSpan.FromMinutes(30);
     public int RetentionDays { get; set; } = 90;

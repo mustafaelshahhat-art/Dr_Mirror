@@ -574,7 +574,10 @@
       "createdAt": "Created",
       "key": "Idempotency key",
       "actions": "Actions",
-      "none": "None"
+      "none": "None",
+      "openOrder": "Open related order",
+      "openReturn": "Open related return",
+      "noTarget": "The related entity is no longer available."
     },
     "qr": {
       "title": "Pair WhatsApp",

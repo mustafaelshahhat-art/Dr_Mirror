@@ -64,7 +64,7 @@ public sealed class WhatsAppMessageDispatcher
             m.Status == WhatsAppOutboxStatus.Sent &&
             m.CreatedAt >= today,
             ct);
-        if (sentToday >= 10)
+        if (sentToday >= _options.DailyLimitPerPhone)
         {
             MarkSkipped(message, "daily_limit_exceeded");
             return;

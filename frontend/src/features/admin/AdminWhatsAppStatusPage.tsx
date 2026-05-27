@@ -1,7 +1,7 @@
-import { AlertDialog, Button, Chip, Spinner, Table, useOverlayState } from '@heroui/react';
+import { AlertDialog, Button, Chip, Spinner, Table, toast, useOverlayState } from '@heroui/react';
 import { LogOut, MessageCircle, QrCode, RefreshCw } from 'lucide-react';
-import type { KeyboardEvent, ReactNode } from 'react';
-import { useState } from 'react';
+import type { ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -14,6 +14,7 @@ import { queryKeys } from '../../shared/lib/query-keys';
 import { adminWhatsAppApi } from './api';
 import { useDisconnectMutation, useRetryAllFailedMutation, useRetryAttemptMutation } from './hooks';
 import type { WhatsAppAttemptDto } from './types';
+import { getWhatsAppEventLabel } from './whatsapp-event-labels';
 
 const PAGE_SIZE = 20;
 
@@ -40,6 +41,26 @@ export function AdminWhatsAppStatusPage() {
     timeStyle: 'short',
     numberingSystem: 'latn',
   });
+
+  const targetMap = useMemo(() => {
+    const map = new Map<string, string | null>();
+    if (attemptsQuery.data) {
+      for (const a of attemptsQuery.data.items) {
+        map.set(a.id, resolveAttemptTarget(a));
+      }
+    }
+    return map;
+  }, [attemptsQuery.data]);
+
+  function handleRowAction(key: React.Key) {
+    const id = String(key);
+    const target = targetMap.get(id);
+    if (target) {
+      navigate(target);
+    } else {
+      toast.danger(t('admin.whatsapp.attempts.noTarget'));
+    }
+  }
 
   return (
     <section className="space-y-8">
@@ -135,7 +156,7 @@ export function AdminWhatsAppStatusPage() {
           <>
             <Table className="rounded-large border border-divider/60">
               <Table.ScrollContainer>
-                <Table.Content aria-label={t('admin.whatsapp.attempts.title')} aria-busy={attemptsQuery.isFetching}>
+                <Table.Content aria-label={t('admin.whatsapp.attempts.title')} aria-busy={attemptsQuery.isFetching} onRowAction={handleRowAction}>
                   <Table.Header>
                     <Table.Column isRowHeader className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-default-500">{t('admin.whatsapp.attempts.event')}</Table.Column>
                     <Table.Column className="px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-default-500">{t('admin.whatsapp.attempts.phone')}</Table.Column>
@@ -152,7 +173,6 @@ export function AdminWhatsAppStatusPage() {
                         key={attempt.id}
                         attempt={attempt}
                         dateFmt={dateFmt}
-                        onNavigate={navigate}
                         onRetry={(id) => retryMutation.mutate(id)}
                         isRetrying={retryMutation.isPending && retryMutation.variables === attempt.id}
                       />
@@ -259,16 +279,15 @@ function StatusCard({ label, value }: { label: string; value: ReactNode }) {
 }
 
 function resolveAttemptTarget(attempt: WhatsAppAttemptDto): string | null {
-  // Orders: entityReference from payload holds the order number (available even for old records)
-  if (attempt.entityReference && (attempt.entityType === 'Order' || attempt.idempotencyKey.startsWith('order:'))) {
+  if (attempt.entityType === 'Order' && attempt.entityReference) {
     return `/admin/orders/${attempt.entityReference}`;
   }
-  // Returns (new records): entityId column holds the return UUID
   if (attempt.entityType === 'Return' && attempt.entityId) {
     return `/admin/returns/${attempt.entityId}`;
   }
-  // Returns (old records, before EntityType column was added): parse UUID from idempotency key
-  // Key format: return:{uuid}:{status}
+  if (attempt.entityReference && attempt.idempotencyKey.startsWith('order:')) {
+    return `/admin/orders/${attempt.entityReference}`;
+  }
   const keyParts = attempt.idempotencyKey.split(':');
   if (keyParts[0] === 'return' && keyParts[1]) {
     return `/admin/returns/${keyParts[1]}`;
@@ -279,65 +298,49 @@ function resolveAttemptTarget(attempt: WhatsAppAttemptDto): string | null {
 function AttemptRow({
   attempt,
   dateFmt,
-  onNavigate,
   onRetry,
   isRetrying,
 }: {
   attempt: WhatsAppAttemptDto;
   dateFmt: Intl.DateTimeFormat;
-  onNavigate: (to: string) => void;
   onRetry: (id: string) => void;
   isRetrying: boolean;
 }) {
   const { t } = useTranslation();
   const target = resolveAttemptTarget(attempt);
-
-  const activate = () => {
-    if (target) onNavigate(target);
-  };
-  const rowProps = target
-    ? {
-      role: 'button',
-      tabIndex: 0,
-      onClick: activate,
-      onKeyDown: (event: KeyboardEvent) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          activate();
-        }
-      },
-    }
-    : {};
+  const eventLabel = getWhatsAppEventLabel(attempt.eventType, attempt.idempotencyKey);
 
   return (
     <Table.Row
-      {...rowProps}
       id={attempt.id}
       className={target
         ? 'cursor-pointer bg-content1 transition-colors hover:bg-default-100'
         : 'bg-content1 transition-colors'}
     >
-      <Table.Cell className="px-4 py-3 text-sm font-medium">{attempt.eventType}</Table.Cell>
+      <Table.Cell className="px-4 py-3 text-sm font-medium">
+        <span className="block leading-tight">{eventLabel.label}</span>
+        {eventLabel.sublabel ? (
+          <span className="block text-xs text-default-400">{eventLabel.sublabel}</span>
+        ) : null}
+      </Table.Cell>
       <Table.Cell className="px-4 py-3 text-sm tabular-nums text-default-600">{attempt.recipientPhoneMasked}</Table.Cell>
       <Table.Cell className="px-4 py-3"><AttemptStatusChip status={attempt.status} /></Table.Cell>
       <Table.Cell className="px-4 py-3 text-sm tabular-nums">{attempt.attempts}</Table.Cell>
       <Table.Cell className="px-4 py-3 text-sm text-default-500">{attempt.failureReason ?? t('admin.whatsapp.attempts.none')}</Table.Cell>
       <Table.Cell className="px-4 py-3 text-sm tabular-nums text-default-500">{dateFmt.format(new Date(attempt.createdAt))}</Table.Cell>
-      <Table.Cell className="px-4 py-3 text-xs text-default-500">{attempt.idempotencyKey}</Table.Cell>
+      <Table.Cell className="max-w-[160px] px-4 py-3 text-xs text-default-500"><div className="truncate" title={attempt.idempotencyKey}>{attempt.idempotencyKey}</div></Table.Cell>
       <Table.Cell className="px-4 py-3 text-end">
         {attempt.status === 'failed' ? (
-          <span onClick={(event) => event.stopPropagation()}>
-            <Button
-              size="sm"
-              variant="secondary"
-              isDisabled={isRetrying}
-              aria-label={t('admin.whatsapp.retry.button')}
-              onPress={() => onRetry(attempt.id)}
-            >
-              <RefreshCw className={isRetrying ? 'size-4 animate-spin' : 'size-4'} aria-hidden />
-              <span className="hidden sm:inline">{t('admin.whatsapp.retry.button')}</span>
-            </Button>
-          </span>
+          <Button
+            size="sm"
+            variant="secondary"
+            isDisabled={isRetrying}
+            aria-label={t('admin.whatsapp.retry.button')}
+            onPress={() => onRetry(attempt.id)}
+          >
+            <RefreshCw className={isRetrying ? 'size-4 animate-spin' : 'size-4'} aria-hidden />
+            <span className="hidden sm:inline">{t('admin.whatsapp.retry.button')}</span>
+          </Button>
         ) : null}
       </Table.Cell>
     </Table.Row>
