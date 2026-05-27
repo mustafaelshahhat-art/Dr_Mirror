@@ -1,6 +1,6 @@
 import { Alert, Button, Input, Label, Modal, TextField } from '@heroui/react';
 import type { AxiosError } from 'axios';
-import { useEffect, useRef, useReducer, type Reducer } from 'react';
+import { useEffect, useRef, useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { SendOtpResponse, VerifyOtpResponse } from '../api';
@@ -87,7 +87,7 @@ export function PhoneVerificationModal({
   onVerified,
 }: PhoneVerificationModalProps) {
   const { t } = useTranslation();
-  const [state, dispatch] = useReducer<Reducer<OtpState, OtpAction>>(otpReducer, maskedPhone ?? null, initOtpState);
+  const [state, dispatch] = useReducer(otpReducer, maskedPhone ?? null, initOtpState);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const prevOpenRef = useRef(isOpen);
@@ -197,7 +197,7 @@ export function PhoneVerificationModal({
                       </p>
 
                       {sendStatus === 'sending' ? (
-                        <Alert status="info" role="status">
+                        <Alert status="default" role="status">
                           <Alert.Content>
                             <Alert.Description>{t('account.account.profile.otp.sending')}</Alert.Description>
                           </Alert.Content>
