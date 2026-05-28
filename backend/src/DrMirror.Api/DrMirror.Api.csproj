@@ -5,7 +5,23 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>9598cee5-c999-43c3-b037-885dcdaf88a5</UserSecretsId>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <SelfContained>false</SelfContained>
+    <UseAppHost>false</UseAppHost>
   </PropertyGroup>
+
+  <!-- Files that must never reach the publish output -->
+  <ItemGroup>
+    <Content Update="appsettings.Development.json">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Update="appsettings.Example.json">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <!-- Defensive: remove any .env / deployment credential files if ever added -->
+    <Content Remove="**/.env;**/.env.*;**/*.publishSettings;**/*.pubxml.user" />
+    <None Remove="**/.env;**/.env.*;**/*.publishSettings;**/*.pubxml.user" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CloudinaryDotNet" Version="1.29.1" />

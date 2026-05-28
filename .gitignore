@@ -42,6 +42,13 @@ nuget.config.local
 [Pp]ublish/
 [Pp]ublish[Oo]utput/
 
+# Publish / deployment credentials
+*.publishSettings
+**/*.publishSettings
+backend/src/DrMirror.Api/Properties/PublishProfiles/*.pubxml.user
+backend/src/DrMirror.Api/Properties/PublishProfiles/*local*
+backend/src/DrMirror.Api/Properties/PublishProfiles/*secret*
+
 # Test results
 [Tt]est[Rr]esult*/
 TestResults/

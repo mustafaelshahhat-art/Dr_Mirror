@@ -37,6 +37,10 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateBootstrapLogger();
 
+// Ensure the logs directory exists so stdout logs (ANCM) and Serilog file
+// sinks have a writable target from the first moment.
+Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "logs"));
+
 // CI pre-deploy gate (FR-024): validate required production secrets and exit
 // without touching the database or starting the host. Invoked from
 // `backend/scripts/verify-prod-secrets.ps1`.
@@ -261,7 +265,21 @@ try
     // CI/runtime drift.
     if (app.Environment.IsProduction())
     {
-        ProdSecretsValidator.Validate(app.Configuration);
+        try
+        {
+            ProdSecretsValidator.Validate(app.Configuration);
+        }
+        catch (ProdSecretsValidationException ex)
+        {
+            Console.Error.WriteLine("=== PRODUCTION-SECRET VALIDATION FAILED ===");
+            Console.Error.WriteLine(ex.Message);
+            Console.Error.WriteLine("Set the missing keys as environment variables");
+            Console.Error.WriteLine("or via the MonsterASP control panel, then recycle the app pool.");
+            Console.Error.Flush();
+            Log.Fatal(ex, "Production-secret validation failed at startup");
+            Log.CloseAndFlush();
+            throw;
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -406,6 +424,9 @@ try
 }
 catch (Exception ex) when (ex is not HostAbortedException)
 {
+    Console.Error.WriteLine("=== Dr_Mirror API terminated unexpectedly ===");
+    Console.Error.WriteLine(ex.ToString());
+    Console.Error.Flush();
     Log.Fatal(ex, "Dr_Mirror API terminated unexpectedly");
 }
 finally

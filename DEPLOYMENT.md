@@ -135,10 +135,32 @@ own Kestrel server hosted inside the IIS worker process.
 
 ### Environment Variables
 
+> **IMPORTANT — Source of Truth**: All real production secrets MUST be set via
+> **MonsterASP Custom Environment Variables Settings** (control panel →
+> Application Settings). The `web.config` file in this repo deliberately
+> contains **no** `<environmentVariables>` section — it is kept minimal for
+> IIS hosting only. Never add secrets to `web.config`, `appsettings.*.json`,
+> publish profiles, or any file that enters version control.
+
 ASP.NET Core maps flat environment variable names to hierarchical config keys
 using double-underscore (`__`) as the separator. Set these in the MonsterASP
-control panel under **Application Settings** (or directly in `web.config`
-under `<aspNetCore><environmentVariables>`).
+control panel under **Application Settings**.
+
+For local development, copy `backend/.env.example` to `backend/.env` and fill
+in real values. `backend/.env` is gitignored and will never be committed.
+
+Refer to `backend/.env.example` for the complete list of all required and
+optional environment variables.
+
+#### MonsterASP-Specific Notes
+
+- **MonsterASP stores env vars permanently** — they survive redeploys and are
+  available immediately after setting them in the control panel.
+- **Restart the application pool** after adding/updating any environment
+  variable for the change to take effect.
+- **Do NOT duplicate env vars in `web.config`** — MonsterASP injects them
+  at the process level, which ASP.NET Core reads via
+  `IConfigurationBuilder.AddEnvironmentVariables()`.
 
 #### Required
 
@@ -221,8 +243,10 @@ Before uploading a new build, run the built-in validator to catch missing
 secrets early (exits 1 with a list of every missing key):
 
 ```powershell
+# Set env vars matching what MonsterASP will inject.
+# This simulates the production environment locally.
 $env:ASPNETCORE_ENVIRONMENT = "Production"
-$env:ConnectionStrings__Default = "..."
+$env:ConnectionStrings__Default = "Server=...;Database=...;..."
 $env:Jwt__Secret = "..."
 $env:Jwt__Issuer = "drmirror.com"
 $env:Jwt__Audience = "drmirror.com"
@@ -232,6 +256,10 @@ $env:Cors__AllowedOrigins__0 = "https://your-frontend.vercel.app"
 # ... set remaining optional vars (FileStorage, Email, WhatsApp) ...
 dotnet .\publish\DrMirror.Api.dll --validate-prod-secrets
 ```
+
+> Validation reads from environment variables only (matching how MonsterASP
+> injects them). If validation passes locally with the same env vars you set
+> in the MonsterASP panel, it will pass in production.
 
 ### Notes
 - Migrations must be run **before** each deployment that changes the schema.
@@ -283,9 +311,27 @@ and must **not** be prefixed with `VITE_` — they are consumed by
 
 ## 6. Credentials to Rotate Before Going Live
 
-The following credentials exist in local development files. They are
-gitignored and never committed, but should still be rotated before production
-use in case they were shared or exposed through other means.
+The following credentials exist in local files. They are gitignored and never
+committed, but should still be rotated before production use in case they were
+shared or exposed through other means.
+
+### Production Secrets (previously in `backend/src/DrMirror.Api/appsettings.Production.json`)
+The following production secrets were previously hardcoded in
+`appsettings.Production.json`. They have been removed — the file now contains
+only non-sensitive configuration. All real values must now come from MonsterASP
+Custom Environment Variables. Rotate every credential listed below:
+
+| Secret | Action Required |
+|--------|-----------------|
+| SQL Server connection string (databaseasp.net) | Rotate password in MonsterASP SQL Server admin panel |
+| JWT signing secret | Generate new: `openssl rand -hex 64` |
+| Admin seed password | Set a new strong password (≥12 chars, mixed case + symbols) |
+| Cloudinary API key + secret | Regenerate in Cloudinary dashboard → Settings → API Keys |
+| SMTP email + app password | Revoke app password in Google Account → Security → App passwords |
+| Support / CORS email | Update to production email address |
+
+> Rotate each credential at its source (Cloudinary dashboard, Google account,
+> SQL Server, etc.) before setting the new values in MonsterASP panel.
 
 ### MongoDB (`whatsapp-service/.env`)
 The MongoDB user and password previously stored in `whatsapp-service/.env`
