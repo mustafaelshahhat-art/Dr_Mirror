@@ -75,6 +75,7 @@
     "previous": "Previous",
     "next": "Next",
     "pageOf": "Page {{page}} of {{total}}",
+    "results_zero": "No results",
     "results_one": "{{count}} result",
     "results_other": "{{count}} results"
   },

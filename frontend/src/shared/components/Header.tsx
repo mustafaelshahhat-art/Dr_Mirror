@@ -62,7 +62,6 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-1 sm:hidden">
-            <CartButton />
             <LangSwitcher />
             <ThemeToggle />
           </div>
