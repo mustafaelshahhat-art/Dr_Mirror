@@ -17,10 +17,13 @@ import { authApi, type LoginInput, type RegisterInput, type SendOtpInput, type V
 import { AuthContext, type AuthContextValue } from './AuthContext';
 import type { AuthUser } from './types';
 
-const PUBLIC_PATHS = ['/login', '/register', '/forgot-password', '/reset-password'] as const;
+const PUBLIC_PATHS = ['/', '/login', '/register', '/forgot-password', '/reset-password'] as const;
+
+const PUBLIC_PREFIXES = ['/products/'] as const;
 
 function isPublicPath(pathname: string): boolean {
-  return PUBLIC_PATHS.includes(pathname as typeof PUBLIC_PATHS[number]);
+  if (PUBLIC_PATHS.includes(pathname as typeof PUBLIC_PATHS[number])) return true;
+  return PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
 }
 
 /**

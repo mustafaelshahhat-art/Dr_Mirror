@@ -69,7 +69,7 @@ const MOCK_ORDER: OrderDetailDto = {
   paymentMethodId: 'pm-1', paymentMethodKind: PAYMENT_METHOD_KIND.Instapay,
   paymentMethodNameEn: 'Instapay', paymentMethodNameAr: 'إنستاباي',
   paymentInstructionsEn: 'Send to @clinic', paymentInstructionsAr: 'أرسل إلى @clinic',
-  paymentAccountNumber: '01000000000', paymentAccountHolder: 'Dr. Mirror',
+  paymentAccountNumber: '01000000000', paymentAccountHolder: 'Dr.Mirror',
   buyerNote: 'Please deliver after 5 PM', cancellationReason: null,
   createdAt: '2026-01-15T10:30:00Z', updatedAt: '2026-01-15T10:30:00Z',
   confirmedAt: null, paidAt: null, preparingAt: null, shippedAt: null, deliveredAt: null, cancelledAt: null, pendingPaymentReviewAt: null, paymentStatusLabel: 'underReview',
@@ -188,7 +188,7 @@ describe('axe — WCAG 2.1 AA violations', () => {
           instructionsEn: 'Send to @clinic',
           instructionsAr: 'أرسل إلى @clinic',
           accountNumber: '01000000000',
-          accountHolder: 'Dr. Mirror',
+          accountHolder: 'Dr.Mirror',
           displayOrder: 1,
         }}
         buyerNote="Please deliver after 5 PM"

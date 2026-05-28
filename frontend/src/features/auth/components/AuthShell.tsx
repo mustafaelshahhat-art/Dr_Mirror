@@ -2,8 +2,8 @@ import { Shield, Truck, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 
-import { BrandMark } from '../../../shared/components/BrandMark';
 import { LangSwitcher } from '../../../shared/components/LangSwitcher';
+import { Logo } from '../../../shared/components/Logo';
 import { ThemeToggle } from '../../../shared/components/ThemeToggle';
 
 export function AuthShell() {
@@ -21,10 +21,9 @@ export function AuthShell() {
         <div className="relative flex flex-1 flex-col gap-8 px-10 py-10">
           <a
             href="/"
-            className="inline-flex items-center gap-2 text-sm font-bold tracking-tight transition-opacity hover:opacity-75"
+            className="inline-flex items-center gap-2 transition-opacity hover:opacity-75"
           >
-            <BrandMark size={24} title="Dr Mirror" />
-            <span>{t('appName')}</span>
+            <Logo size={48} />
           </a>
 
           <div className="mt-auto space-y-6 pb-4">
@@ -57,10 +56,7 @@ export function AuthShell() {
               href="/"
               className="inline-flex min-w-0 shrink items-center gap-2 text-foreground no-underline transition-opacity hover:opacity-80"
             >
-              <BrandMark size={20} />
-              <span className="truncate text-base font-semibold tracking-tight">
-                {t('appName')}
-              </span>
+              <Logo size={32} />
             </a>
             <div className="flex shrink-0 flex-nowrap items-center gap-1">
               <LangSwitcher />

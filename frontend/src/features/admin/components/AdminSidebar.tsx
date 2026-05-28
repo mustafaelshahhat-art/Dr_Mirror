@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
 import { useAuth } from '../../../features/auth/useAuth';
-import { BrandMark } from '../../../shared/components/BrandMark';
+import { Logo } from '../../../shared/components/Logo';
 
 import { ADMIN_DRAWER_HEIGHT_CLASS, ADMIN_HEADER_OFFSET_CLASS } from './adminShellTokens';
 import { ADMIN_NAV_GROUPS } from '../adminNav';
@@ -42,10 +42,9 @@ export function AdminSidebar({
   return (
     <>
       <div className="hidden md:w-[60px] lg:w-60 flex-col border-e border-border/50 bg-surface md:flex sticky top-14 h-[calc(100svh-3.5rem)] overflow-y-auto transition-all duration-300">
-        {/* Sidebar header — BrandMark + product name */}
+        {/* Sidebar header — Logo */}
         <div className="flex items-center justify-center lg:justify-start gap-2 border-b border-border/40 px-4 py-3.5 h-[53px]">
-          <BrandMark size={20} title="Dr Mirror" />
-          <span className="text-sm font-bold tracking-tight hidden lg:inline">{t('appName')}</span>
+          <Logo size={32} />
         </div>
         <SidebarNav label={t('admin.shell.navTitle')} onClose={onClose} isLg={isLg} />
         {/* Identity footer */}

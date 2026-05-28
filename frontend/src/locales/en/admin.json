@@ -58,7 +58,7 @@
     "printLabel": "Print shipping label"
   },
   "shippingLabel": {
-    "storeName": "Dr. Mirror",
+    "storeName": "Dr.Mirror",
     "orderInfo": "Order information",
     "customerInfo": "Customer",
     "address": "Shipping address",

@@ -1,5 +1,5 @@
 {
-  "appName": "د. ميرور",
+  "appName": "Dr.Mirror",
   "tagline": "متجر متخصص للسكرابات الطبية واليونيفورم",
   "header": {
     "switchTheme": "تبديل السمة",
@@ -80,7 +80,7 @@
     "skipToContent": "تخطي إلى المحتوى"
   },
   "footer": {
-    "copyright": "© {{year}} د. ميرور. جميع الحقوق محفوظة.",
+    "copyright": "© {{year}} Dr.Mirror. جميع الحقوق محفوظة.",
     "tagline": "سكرابات طبية ويونيفورم راقية لمهنيي الرعاية الصحية.",
     "quickLinks": "روابط سريعة",
     "browseCatalog": "تصفح المنتجات",

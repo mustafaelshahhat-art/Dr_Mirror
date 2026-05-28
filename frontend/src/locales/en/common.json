@@ -1,5 +1,5 @@
 {
-  "appName": "Dr. Mirror",
+  "appName": "Dr.Mirror",
   "tagline": "Specialist store for medical scrubs & uniforms",
   "header": {
     "switchTheme": "Switch theme",
@@ -77,7 +77,7 @@
     "skipToContent": "Skip to content"
   },
   "footer": {
-    "copyright": "© {{year}} Dr. Mirror. All rights reserved.",
+    "copyright": "© {{year}} Dr.Mirror. All rights reserved.",
     "tagline": "Premium medical scrubs & uniforms for healthcare professionals.",
     "quickLinks": "Quick links",
     "browseCatalog": "Browse catalog",

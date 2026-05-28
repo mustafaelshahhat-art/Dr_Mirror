@@ -7,8 +7,8 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../../features/auth/useAuth';
 import { CartButton } from '../../features/cart/components/CartButton';
 
-import { BrandMark } from './BrandMark';
 import { LangSwitcher } from './LangSwitcher';
+import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
 
 export function Header() {
@@ -26,10 +26,9 @@ export function Header() {
         <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-2 px-4 md:px-6 lg:px-8">
           <Link
             href="/"
-            className="flex items-center gap-2 text-base font-bold tracking-tight transition-opacity hover:opacity-75 sm:text-lg"
+            className="flex items-center gap-2 transition-opacity hover:opacity-75"
           >
-            <BrandMark size={20} />
-            <span className="hidden xs:inline">{t('appName')}</span>
+            <Logo size={32} />
           </Link>
 
           <nav

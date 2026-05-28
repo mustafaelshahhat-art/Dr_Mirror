@@ -3,8 +3,8 @@ import { Banknote, Smartphone, Wallet } from 'lucide-react';
 import { Link, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { BrandMark } from './BrandMark';
 import { DowntimeBanner } from './DowntimeBanner';
+import { Logo } from './Logo';
 import { ForbiddenBanner } from './ForbiddenBanner';
 import { Header } from './Header';
 import { LiveRegion } from './LiveRegion';
@@ -39,9 +39,8 @@ export function Layout() {
           <div className="grid grid-cols-1 gap-8 py-10 sm:grid-cols-2 lg:grid-cols-4">
             {/* Brand column */}
             <div className="space-y-4">
-              <span className="inline-flex items-center gap-2 text-sm font-bold tracking-tight">
-                <BrandMark size={20} />
-                {t('appName')}
+              <span className="inline-flex items-center gap-2">
+                <Logo size={32} />
               </span>
               <p className="max-w-xs text-sm leading-relaxed text-muted">
                 {t('common.footer.tagline')}

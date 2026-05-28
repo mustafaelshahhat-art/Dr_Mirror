@@ -28,7 +28,7 @@ const methods: PaymentMethodDto[] = [
     instructionsAr: null,
     instructionsEn: 'Upload proof after transfer.',
     accountNumber: '01000000000',
-    accountHolder: 'Dr Mirror',
+    accountHolder: 'Dr.Mirror',
     displayOrder: 2,
   },
 ];

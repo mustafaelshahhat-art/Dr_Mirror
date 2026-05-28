@@ -42,7 +42,7 @@ describe('AppRoutes — role routing', () => {
     });
     const adminHeading = screen.queryByRole('heading', { name: 'Admin dashboard' });
     expect(adminHeading).not.toBeInTheDocument();
-    expect(await screen.findByRole('link', { name: 'Dr. Mirror' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Dr.Mirror' })).toBeInTheDocument();
   });
 
   it('admin at /admin sees the admin hub and no storefront header', async () => {
@@ -51,7 +51,7 @@ describe('AppRoutes — role routing', () => {
       authValue: makeAuthValue({ user: makeAdminUser(), isAuthenticated: true, isAdmin: true }),
     });
     expect(await screen.findByRole('heading', { name: 'Admin dashboard' })).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Dr. Mirror' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Dr.Mirror' })).not.toBeInTheDocument();
   });
 
   it('admin at an unknown admin path sees the not found page inside admin chrome', async () => {
@@ -62,7 +62,7 @@ describe('AppRoutes — role routing', () => {
 
     expect(await screen.findByRole('heading', { name: 'Page not found' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Back to admin dashboard' })).toHaveAttribute('href', '/admin');
-    expect(screen.queryByRole('link', { name: 'Dr. Mirror' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Dr.Mirror' })).not.toBeInTheDocument();
   });
 
   it('admin at / is redirected to /admin by CustomerRoute', async () => {
@@ -78,7 +78,7 @@ describe('AppRoutes — role routing', () => {
       route: '/cart',
       authValue: makeAuthValue({ user: makeBuyerUser(), isAuthenticated: true, isAdmin: false }),
     });
-    expect(await screen.findByRole('link', { name: 'Dr. Mirror' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Dr.Mirror' })).toBeInTheDocument();
   });
 
   it('anonymous user at /cart is allowed by CustomerRoute and sees the storefront header', async () => {
@@ -86,7 +86,7 @@ describe('AppRoutes — role routing', () => {
       route: '/cart',
       authValue: makeAuthValue(),
     });
-    expect(await screen.findByRole('link', { name: 'Dr. Mirror' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Dr.Mirror' })).toBeInTheDocument();
   });
 
   it('anonymous user at /inquiries can open the general inquiry page', async () => {
@@ -136,7 +136,7 @@ describe('AppRoutes — role routing', () => {
       route: '/admin',
       authValue: makeAuthValue({ user: makeBuyerUser(), isAuthenticated: true, isAdmin: false }),
     });
-    expect(await screen.findByRole('link', { name: 'Dr. Mirror' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Dr.Mirror' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Admin dashboard' })).not.toBeInTheDocument();
   });
 

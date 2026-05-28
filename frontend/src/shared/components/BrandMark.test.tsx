@@ -31,9 +31,9 @@ describe('BrandMark', () => {
   });
 
   it('renders <title> and role="img" when title prop is provided', () => {
-    render(<BrandMark title="Dr Mirror" />);
-    expect(screen.getByRole('img', { name: 'Dr Mirror' })).toBeInTheDocument();
-    expect(screen.getByText('Dr Mirror').tagName.toLowerCase()).toBe('title');
+    render(<BrandMark title="Dr.Mirror" />);
+    expect(screen.getByRole('img', { name: 'Dr.Mirror' })).toBeInTheDocument();
+    expect(screen.getByText('Dr.Mirror').tagName.toLowerCase()).toBe('title');
   });
 
   it('sets aria-hidden="true" when no title is provided', () => {
@@ -48,7 +48,7 @@ describe('BrandMark', () => {
   });
 
   it('has no axe violations when titled (role=img)', async () => {
-    const { container } = render(<BrandMark title="Dr Mirror" />);
+    const { container } = render(<BrandMark title="Dr.Mirror" />);
     expect(await axe(container)).toHaveNoViolations();
   });
 });

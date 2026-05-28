@@ -34,7 +34,7 @@ const MOCK_ORDER: OrderDetailDto = {
   paymentInstructionsEn: 'Send to @clinic',
   paymentInstructionsAr: 'أرسل إلى @clinic',
   paymentAccountNumber: '01000000000',
-  paymentAccountHolder: 'Dr. Mirror',
+  paymentAccountHolder: 'Dr.Mirror',
   buyerNote: 'Please deliver after 5 PM',
   cancellationReason: null,
   createdAt: '2026-01-15T10:30:00Z',

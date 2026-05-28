@@ -53,7 +53,7 @@ function makeOrder(overrides: Partial<OrderDetailDto> = {}): OrderDetailDto {
     paymentInstructionsEn: 'Send to 01000000000',
     paymentInstructionsAr: null,
     paymentAccountNumber: '01000000000',
-    paymentAccountHolder: 'Dr Mirror',
+    paymentAccountHolder: 'Dr.Mirror',
     buyerNote: null,
     cancellationReason: null,
     createdAt: '2026-01-01T00:00:00Z',
