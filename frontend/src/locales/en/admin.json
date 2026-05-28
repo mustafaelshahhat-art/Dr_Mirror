@@ -523,7 +523,8 @@
       "skipped": "Skipped",
       "retrying": "Retrying",
       "pairDevice": "Pair device",
-      "lastSentAt": "Last sent: {{date}}"
+      "lastSentAt": "Last sent: {{date}}",
+      "refresh": "Refresh"
     },
     "states": {
       "connected": "Connected",
@@ -579,7 +580,11 @@
       "none": "None",
       "openOrder": "Open related order",
       "openReturn": "Open related return",
-      "noTarget": "The related entity is no longer available."
+      "noTarget": "The related entity is no longer available.",
+      "searchPlaceholder": "Search by phone, event type...",
+      "filterPlaceholder": "Status",
+      "filterAll": "All Statuses",
+      "noResults": "No attempts match your filters."
     },
     "qr": {
       "title": "Pair WhatsApp",
@@ -589,7 +594,10 @@
       "instructions": "Open WhatsApp on the phone, go to Linked devices, then scan this code.",
       "refresh": "Refresh code",
       "sidecarUnavailable": "The WhatsApp sidecar is unavailable. Check Node.js and try again.",
-      "connectedToast": "WhatsApp connected successfully."
+      "connectedToast": "WhatsApp connected successfully.",
+      "step1": "Open WhatsApp on your phone",
+      "step2": "Tap Settings > Linked Devices",
+      "step3": "Tap Link a Device and scan the QR code"
     }
   },
   "returns": {
