@@ -17,11 +17,21 @@ import { authApi, type LoginInput, type RegisterInput, type SendOtpInput, type V
 import { AuthContext, type AuthContextValue } from './AuthContext';
 import type { AuthUser } from './types';
 
+const PUBLIC_PATHS = ['/login', '/register', '/forgot-password', '/reset-password'] as const;
+
+function isPublicPath(pathname: string): boolean {
+  return PUBLIC_PATHS.includes(pathname as typeof PUBLIC_PATHS[number]);
+}
+
 /**
  * Sole owner of authenticated-user state. Runs the session-restore handshake
  * on mount (calls /auth/refresh once; the httpOnly cookie does the heavy
  * lifting). Wires the api-client's expiry handler so a downstream 401-refresh
  * failure flows back into React state.
+ *
+ * On known public routes (login, register, forgot/reset-password) the refresh
+ * call is skipped — there is no session to restore, and the 401 would be
+ * expected noise in the console.
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -41,8 +51,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Session restore on app boot. /auth/refresh either succeeds (cookie valid)
   // or 401s (no/expired cookie). Either way, we resolve isBootstrapping.
+  // Skipped on public routes where no session is expected.
   useEffect(() => {
     let cancelled = false;
+
+    if (isPublicPath(window.location.pathname)) {
+      clearAccessToken();
+      queueMicrotask(() => {
+        if (!cancelled) setIsBootstrapping(false);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
+
     (async () => {
       try {
         const r = await authApi.refresh();

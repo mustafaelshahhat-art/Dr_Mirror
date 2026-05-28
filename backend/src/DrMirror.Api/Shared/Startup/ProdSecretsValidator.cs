@@ -24,6 +24,19 @@ public static class ProdSecretsValidator
         if (corsOrigins is null || corsOrigins.Length == 0)
             missing.Add("Cors:AllowedOrigins (must contain at least one origin)");
 
+        // Cross-site cookies — required when CORS origins point to a different
+        // domain than the API. Without SameSite=None the browser silently strips
+        // the refresh cookie from cross-origin POST requests, breaking session
+        // persistence on every page reload.
+        if (corsOrigins is { Length: > 0 })
+        {
+            var useCrossSite = configuration.GetValue<bool>("Auth:UseCrossSiteCookies");
+            if (!useCrossSite)
+                missing.Add(
+                    "Auth:UseCrossSiteCookies (must be true when CORS origins are configured — " +
+                    "the refresh cookie needs SameSite=None for cross-origin session restore)");
+        }
+
         // Database.
         Require(configuration, "ConnectionStrings:Default", missing);
 

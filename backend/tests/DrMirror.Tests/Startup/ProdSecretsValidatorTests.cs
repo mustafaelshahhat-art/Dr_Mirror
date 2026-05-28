@@ -20,6 +20,7 @@ public class ProdSecretsValidatorTests
         ["Admin:SeedEmail"] = "admin@drmirror.com",
         ["Admin:SeedPassword"] = "StrongPassword!1",
         ["Cors:AllowedOrigins:0"] = "https://app.drmirror.com",
+        ["Auth:UseCrossSiteCookies"] = "true",
     };
 
     [Fact]
@@ -161,6 +162,18 @@ public class ProdSecretsValidatorTests
         Assert.Contains("Email:SmtpUsername", ex.MissingKeys);
         Assert.Contains("Email:SmtpPassword", ex.MissingKeys);
         Assert.Contains("Email:FrontendBaseUrl", ex.MissingKeys);
+    }
+
+    [Fact]
+    public void Missing_cross_site_cookie_flag_is_listed_when_cors_origins_present()
+    {
+        var values = ValidBase();
+        values.Remove("Auth:UseCrossSiteCookies");
+        var config = BuildConfig(values);
+
+        var ex = Assert.Throws<ProdSecretsValidationException>(
+            () => ProdSecretsValidator.Validate(config));
+        Assert.Contains(ex.MissingKeys, k => k.StartsWith("Auth:UseCrossSiteCookies"));
     }
 
     [Fact]
