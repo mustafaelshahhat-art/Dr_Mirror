@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace DrMirror.Api.Features.Auth.Me;
 
-public sealed record UpdateMeRequest(string? DisplayName, string? Phone, string? Email);
+public sealed record UpdateMeRequest(string? DisplayName, string? Phone);
 
 public sealed class UpdateMeValidator : AbstractValidator<UpdateMeRequest>
 {
@@ -27,11 +27,6 @@ public sealed class UpdateMeValidator : AbstractValidator<UpdateMeRequest>
             .WithMessage("Phone number is not valid.")
             .When(x => x.Phone is not null);
 
-        RuleFor(x => x.Email)
-            .NotEmpty()
-            .EmailAddress()
-            .MaximumLength(254)
-            .When(x => x.Email is not null);
     }
 }
 
@@ -128,26 +123,6 @@ public static class MeEndpoint
             {
                 user.PhoneNumber = newPhone;
                 user.PhoneNumberConfirmed = false;
-            }
-        }
-
-        if (request.Email is not null)
-        {
-            var trimmedEmail = request.Email.Trim();
-            if (!string.Equals(trimmedEmail, user.Email, StringComparison.OrdinalIgnoreCase))
-            {
-                var existing = await userManager.FindByEmailAsync(trimmedEmail);
-                if (existing is not null && existing.Id != user.Id)
-                {
-                    return Results.Problem(
-                        title: "Email already in use",
-                        detail: "This email address is already associated with another account.",
-                        statusCode: StatusCodes.Status409Conflict);
-                }
-                user.Email = trimmedEmail;
-                user.NormalizedEmail = userManager.NormalizeEmail(trimmedEmail);
-                user.UserName = trimmedEmail;
-                user.NormalizedUserName = userManager.NormalizeName(trimmedEmail);
             }
         }
 

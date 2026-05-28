@@ -198,7 +198,7 @@ public class EmailOutboxTests : IClassFixture<EmailOutboxTests.Factory>
             using var scope = Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-            var buyer = new User { Id = userId, FullName = "Outbox Buyer", Email = $"{userId}@example.com", UserName = $"{userId}@example.com" };
+            var buyer = new User { Id = userId, FullName = "Outbox Buyer", Email = $"{userId}@example.com", UserName = $"{userId}@example.com", EmailConfirmed = true, PhoneNumber = "+201000000000", PhoneNumberConfirmed = true };
             var pm = new PaymentMethod { Id = Guid.NewGuid(), NameEn = "COD", NameAr = "COD", Kind = PaymentMethodKind.Cod, IsActive = true };
             var cat = new Category { Id = Guid.NewGuid(), NameEn = "Cat", NameAr = "Cat", Slug = $"cat-{userId}", IsActive = true };
             var prod = new Product { Id = Guid.NewGuid(), CategoryId = cat.Id, NameEn = "Prod", NameAr = "Prod", Slug = $"prod-{userId}", IsPublished = true, Price = 50 };

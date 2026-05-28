@@ -216,6 +216,24 @@ try
         .Bind(builder.Configuration.GetSection("Security:Headers"));
 
     // -----------------------------------------------------------------------
+    // Swagger / OpenAPI — intentionally NOT registered.
+    //
+    // This API uses explicit endpoint metadata for discoverability (route
+    // tables, WithName, WithSummary, WithDescription, Produces, etc.). No
+    // Swagger middleware, UI, or JSON endpoint is added at any environment
+    // level. This eliminates an entire class of production attack surface:
+    //   - No /swagger, /swagger/index.html, or /swagger/v1/swagger.json
+    //   - No schema endpoint exposing internal DTO shapes
+    //   - No "Try it out" execution from the browser
+    //   - No middleware that could leak its own routes
+    //
+    // If Swagger is ever needed in the future, it MUST be:
+    //   1. Conditionally registered only when builder.Environment.IsDevelopment()
+    //   2. Never deployed to production
+    //   3. Blocked by the ProductionSwaggerBlockMiddleware if accidentally enabled
+    // -----------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------
     // JSON serializer — use UnsafeRelaxedJsonEscaping so Arabic (and other
     // non-ASCII) characters are written as native UTF-8 in responses instead
     // of being escaped as \uXXXX sequences. The payload is still valid UTF-8
@@ -309,6 +327,14 @@ try
     // Security headers — registered before CORS/static/auth so the
     // OnStarting callback runs for every response shape (JSON, stream, 401, 404, 429).
     app.UseMiddleware<SecurityHeadersMiddleware>();
+
+    // Defense-in-depth: block Swagger/OpenAPI paths in all environments. Even
+    // though Swagger is not currently registered, this middleware prevents
+    // accidental exposure if it is added later without proper environment gating.
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseMiddleware<ProductionSwaggerBlockMiddleware>();
+    }
 
     app.UseCors(CorsPolicy);
 

@@ -375,12 +375,31 @@ revoked and replaced.
 - [ ] `Email__SmtpPassword` (if using MailKit) — rotated
 - [ ] `WhatsApp__InternalApiKey` — matches sidecar `INTERNAL_API_KEY`
 - [ ] `--validate-prod-secrets` exits 0
+- [ ] Swagger is disabled — no `/swagger` routes respond
+- [ ] `ProductionSwaggerBlockMiddleware` is active (blocks `/swagger*` in non-Development)
+- [ ] Protected endpoints return 401 for unauthenticated requests
+- [ ] Admin endpoints return 403 for non-admin authenticated requests
+- [ ] WhatsApp admin endpoints (`/api/admin/whatsapp/*`) inherit admin group authorization
+- [ ] Customers cannot access another customer's order or data
 
 ### WhatsApp Sidecar (Render)
 - [ ] `MONGODB_URI` — rotated Atlas credentials
 - [ ] `INTERNAL_API_KEY` — matches backend `WhatsApp__InternalApiKey`
 - [ ] `ENABLE_PAIRING_UI=false`
 - [ ] `/health` returns `{"ok":true}`
+
+### Production Hardening Verification
+- [ ] Swagger/OpenAPI endpoints return 404 (`/swagger`, `/swagger/index.html`, `/swagger/v1/swagger.json`)
+- [ ] Anonymous requests to `/api/admin/*` return 401
+- [ ] Anonymous requests to `/api/admin/whatsapp/*` return 401
+- [ ] Anonymous requests to protected customer endpoints return 401 (cart, orders, addresses, checkout)
+- [ ] Buyer requests to `/api/admin/*` return 403
+- [ ] Customers cannot access another customer's order by changing the order number in the URL (returns 404)
+- [ ] Customers cannot access another customer's payment proof file (returns 404)
+- [ ] Admin users can access any customer's order via `/api/admin/orders/{orderNumber}`
+- [ ] WhatsApp admin endpoints (`/api/admin/whatsapp/*`) return 403 for non-admin authenticated users
+- [ ] Error responses do not contain stack traces or internal implementation details
+- [ ] Phone numbers are masked in WhatsApp outbox logs and admin-facing WhatsApp attempt lists
 
 ### Frontend (Vercel)
 - [ ] `VITE_API_BASE_URL` — points to the live MonsterASP URL

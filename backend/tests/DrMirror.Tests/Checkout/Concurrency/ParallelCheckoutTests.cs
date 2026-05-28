@@ -191,6 +191,8 @@ public class ParallelCheckoutTests : IClassFixture<ParallelCheckoutTests.Factory
                     Email = $"parallel-{buyerId:N}@example.com",
                     UserName = $"parallel-{buyerId:N}@example.com",
                     EmailConfirmed = true,
+                    PhoneNumber = "+201000000000",
+                    PhoneNumberConfirmed = true,
                 });
                 var cart = new DrMirror.Api.Domain.Entities.Cart { Id = Guid.NewGuid(), UserId = buyerId };
                 db.Carts.Add(cart);
