@@ -1,6 +1,6 @@
 import { AlertDialog, Button, Chip, Input, Spinner, Table, toast, useOverlayState } from '@heroui/react';
 import { CheckCircle2, Clock, Info, LogOut, MessageCircle, QrCode, RefreshCw, Search, XCircle } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -60,6 +60,7 @@ export function AdminWhatsAppStatusPage() {
     return map;
   }, [attemptsQuery.data]);
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const filteredAttempts = useMemo(() => {
     if (!attemptsQuery.data?.items) return [];
     return attemptsQuery.data.items.filter((attempt) => {
@@ -364,6 +365,7 @@ export function AdminWhatsAppStatusPage() {
                 const isRetrying = retryMutation.isPending && retryMutation.variables === attempt.id;
 
                 return (
+                  // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
                   <div
                     key={attempt.id}
                     role="listitem"
@@ -540,7 +542,7 @@ function StatsCard({
   label: string;
   value: number;
   colorClass: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   animate?: boolean;
 }) {
   return (

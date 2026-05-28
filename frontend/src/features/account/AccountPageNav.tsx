@@ -4,7 +4,7 @@ import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
-export const ACCOUNT_TAB_KEYS = ['personal-data', 'orders', 'returns', 'addresses', 'security'] as const;
+const ACCOUNT_TAB_KEYS = ['personal-data', 'orders', 'returns', 'addresses', 'security'] as const;
 export type AccountTabKey = typeof ACCOUNT_TAB_KEYS[number];
 
 const tabs: Array<{ key: AccountTabKey; labelKey: string; icon: ReactNode }> = [

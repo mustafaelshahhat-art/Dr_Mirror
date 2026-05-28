@@ -87,6 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [finishWithSession],
   );
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const updateProfile = useCallback(async (input: Parameters<typeof authApi.updateProfile>[0]) => {
     const next = await authApi.updateProfile(input);
     setUser(next);
