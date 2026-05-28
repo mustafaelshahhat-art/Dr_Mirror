@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
 import { useAuth } from '../../../features/auth/useAuth';
-import { Logo } from '../../../shared/components/Logo';
+import { BrandLockup } from '../../../shared/components/BrandLockup';
 
 import { ADMIN_DRAWER_HEIGHT_CLASS, ADMIN_HEADER_OFFSET_CLASS } from './adminShellTokens';
 import { ADMIN_NAV_GROUPS } from '../adminNav';
@@ -44,7 +44,12 @@ export function AdminSidebar({
       {/* ───────── DESKTOP SIDEBAR (unchanged) ───────── */}
       <div className="hidden md:w-[60px] lg:w-60 flex-col border-e border-border/50 bg-surface md:flex sticky top-14 h-[calc(100svh-3.5rem)] overflow-y-auto transition-all duration-300">
         <div className="flex items-center justify-center lg:justify-start gap-2 border-b border-border/40 px-4 py-3.5 h-[53px]">
-          <Logo size={32} />
+          <span className="hidden lg:inline-flex" aria-hidden="true">
+            <BrandLockup size="sm" />
+          </span>
+          <span className="lg:hidden" aria-hidden="true">
+            <BrandLockup size="sm" iconOnly />
+          </span>
         </div>
         <SidebarNav
           label={t('admin.shell.navTitle')}
@@ -103,12 +108,12 @@ export function AdminSidebar({
           >
             <Drawer.Dialog aria-label={t('admin.shell.navTitleMobile')} className="flex h-full flex-col outline-none">
               <Drawer.Header className="flex items-center justify-between border-b border-divider/60 px-4 py-4">
-                <Drawer.Heading className="text-sm font-semibold tracking-tight text-foreground">
-                  {t('admin.shell.navTitle')}
+                <Drawer.Heading className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground" aria-hidden="true">
+                  <BrandLockup size="sm" />
                 </Drawer.Heading>
                 <Drawer.CloseTrigger />
               </Drawer.Header>
-              <Drawer.Body className="p-0 flex-1 overflow-y-auto">
+              <Drawer.Body className="p-0 flex-1 min-h-0 overflow-y-auto">
                 <SidebarNav
                   label={t('admin.shell.navTitleMobile')}
                   onClose={onClose}
@@ -116,7 +121,7 @@ export function AdminSidebar({
                 />
               </Drawer.Body>
               {user && (
-                <div className="border-t border-divider/60 px-4 py-4">
+                <div className="shrink-0 border-t border-divider/60 px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
                   <div className="flex items-center gap-3">
                     <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-sm font-bold text-brand">
                       {initials}
@@ -158,7 +163,11 @@ function SidebarNav({
   return (
     <nav
       aria-label={label}
-      className="flex flex-1 flex-col overflow-y-auto px-2 pb-4 pt-2 gap-1 items-center lg:items-stretch"
+      className={
+        variant === 'desktop'
+          ? 'flex flex-1 flex-col overflow-y-auto px-2 pb-4 pt-2 gap-1 items-center lg:items-stretch'
+          : 'flex flex-col px-2 pb-4 pt-2 gap-1 items-stretch w-full'
+      }
     >
       {ADMIN_NAV_GROUPS.map((group) => (
         <div key={group.groupKey} className="w-full">

@@ -2,8 +2,8 @@ import { Shield, Truck, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 
+import { BrandLockup } from '../../../shared/components/BrandLockup';
 import { LangSwitcher } from '../../../shared/components/LangSwitcher';
-import { Logo } from '../../../shared/components/Logo';
 import { ThemeToggle } from '../../../shared/components/ThemeToggle';
 
 export function AuthShell() {
@@ -22,8 +22,9 @@ export function AuthShell() {
           <a
             href="/"
             className="inline-flex items-center gap-2 transition-opacity hover:opacity-75"
+            aria-label="Dr.Mirror"
           >
-            <Logo size={48} />
+            <BrandLockup size="md" />
           </a>
 
           <div className="mt-auto space-y-6 pb-4">
@@ -55,8 +56,9 @@ export function AuthShell() {
             <a
               href="/"
               className="inline-flex min-w-0 shrink items-center gap-2 text-foreground no-underline transition-opacity hover:opacity-80"
+              aria-label="Dr.Mirror"
             >
-              <Logo size={32} />
+              <BrandLockup size="sm" />
             </a>
             <div className="flex shrink-0 flex-nowrap items-center gap-1">
               <LangSwitcher />

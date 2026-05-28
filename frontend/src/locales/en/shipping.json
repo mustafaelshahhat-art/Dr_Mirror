@@ -33,9 +33,22 @@
     "updatedAtValue": "Last updated: {{value}}",
     "active": "Available for delivery",
     "inactive": "Unavailable",
-    "save": "Save changes",
+    "save": "Save",
     "saving": "Saving...",
     "saved": "Shipping fee saved.",
-    "conflict": "This governorate was changed by another admin. Refresh the list and try again."
+    "conflict": "This governorate was changed by another admin. Refresh the list and try again.",
+    "headers": {
+      "governorate": "Governorate",
+      "arabicName": "Arabic Name",
+      "shippingFee": "Shipping Fee",
+      "status": "Availability Status",
+      "lastUpdated": "Last Updated",
+      "actions": "Actions"
+    },
+    "stats": {
+      "total": "Total Governorates",
+      "active": "Available for Delivery",
+      "inactive": "Disabled"
+    }
   }
 }

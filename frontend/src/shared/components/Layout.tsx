@@ -3,8 +3,8 @@ import { Banknote, Smartphone, Wallet } from 'lucide-react';
 import { Link, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+import { BrandLockup } from './BrandLockup';
 import { DowntimeBanner } from './DowntimeBanner';
-import { Logo } from './Logo';
 import { ForbiddenBanner } from './ForbiddenBanner';
 import { Header } from './Header';
 import { LiveRegion } from './LiveRegion';
@@ -40,7 +40,7 @@ export function Layout() {
             {/* Brand column */}
             <div className="space-y-4">
               <span className="inline-flex items-center gap-2">
-                <Logo size={32} />
+                <BrandLockup size="sm" />
               </span>
               <p className="max-w-xs text-sm leading-relaxed text-muted">
                 {t('common.footer.tagline')}

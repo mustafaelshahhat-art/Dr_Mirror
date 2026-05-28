@@ -7,8 +7,8 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../../features/auth/useAuth';
 import { CartButton } from '../../features/cart/components/CartButton';
 
+import { BrandLockup } from './BrandLockup';
 import { LangSwitcher } from './LangSwitcher';
-import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
 
 export function Header() {
@@ -27,8 +27,9 @@ export function Header() {
           <Link
             href="/"
             className="flex items-center gap-2 transition-opacity hover:opacity-75"
+            aria-label="Dr.Mirror"
           >
-            <Logo size={32} />
+            <BrandLockup size="sm" />
           </Link>
 
           <nav
