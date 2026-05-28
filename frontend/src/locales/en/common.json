@@ -113,10 +113,12 @@
   "mobileNav": {
     "label": "Main navigation",
     "home": "Home",
+    "shop": "Shop",
     "cart": "Cart",
     "account": "Account",
     "signIn": "Sign in",
-    "inquiries": "Contact"
+    "inquiries": "Contact",
+    "orders": "Orders"
   },
   "dismiss": "Dismiss",
   "contactSupport": "Contact support",

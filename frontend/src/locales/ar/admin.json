@@ -474,9 +474,10 @@
       "users": "المستخدمون",
       "audit": "سجل التدقيق",
       "groups": {
-        "operations": "العمليات",
-        "catalog": "الكتالوج",
-        "people": "المستخدمون"
+        "overview": "نظرة عامة",
+        "commerce": "التجارة",
+        "support": "الدعم",
+        "system": "النظام"
       }
     },
     "accountMenu": {

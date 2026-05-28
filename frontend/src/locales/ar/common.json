@@ -116,10 +116,12 @@
   "mobileNav": {
     "label": "التنقل الرئيسي",
     "home": "الرئيسية",
+    "shop": "المتجر",
     "cart": "السلة",
     "account": "حسابي",
     "signIn": "دخول",
-    "inquiries": "تواصل"
+    "inquiries": "تواصل",
+    "orders": "طلباتي"
   },
   "dismiss": "إغلاق",
   "contactSupport": "تواصل مع الدعم",

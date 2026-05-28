@@ -293,6 +293,38 @@
   text-align: start;
 }
 
+/* ----------------------------------------------------------------------------
+ * Input / InputGroup RTL padding fix
+ *
+ * HeroUI's InputGroup applies physical `pr-0` / `pl-0` to remove the
+ * suffix/prefix side padding so text does not collide with the icon.  In RTL
+ * the physical property targets the wrong visual side, leaving the start side
+ * (right edge) unpadded while the end side (left edge) retains the full
+ * padding-inline value from `px-3`.
+ *
+ * We override with logical equivalents — the end-side padding is removed in
+ * both LTR and RTL, while the start-side padding (from the base `padding-inline`
+ * on `.input` / `.input-group__input`) is preserved.  See the analysis in
+ * AGENTS.md / tasks.md for a full cascade breakdown.
+ * -------------------------------------------------------------------------- */
+
+/* Suffix present → remove logical end-side padding so text can flow up to the
+   icon regardless of direction.  Keeps physical `pr-0` as a fallback for
+   browsers that ignore logical properties, but adds `padding-inline-end: 0`
+   which correctly maps to the suffix side in every writing mode. */
+.input-group:has([data-slot="input-group-suffix"]) .input-group__input,
+.input-group:has([data-slot="input-group-suffix"]) [data-slot="input"] {
+  padding-right: 0;
+  padding-inline-end: 0;
+}
+
+/* Prefix present → remove logical start-side padding (mirror of suffix). */
+.input-group:has([data-slot="input-group-prefix"]) .input-group__input,
+.input-group:has([data-slot="input-group-prefix"]) [data-slot="input"] {
+  padding-left: 0;
+  padding-inline-start: 0;
+}
+
 @layer components {
   .cq {
     container-type: inline-size;

@@ -1,4 +1,4 @@
-import { Drawer, Tooltip } from '@heroui/react';
+import { Drawer } from '@heroui/react';
 import { LogOut } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -41,13 +41,16 @@ export function AdminSidebar({
 
   return (
     <>
+      {/* ───────── DESKTOP SIDEBAR (unchanged) ───────── */}
       <div className="hidden md:w-[60px] lg:w-60 flex-col border-e border-border/50 bg-surface md:flex sticky top-14 h-[calc(100svh-3.5rem)] overflow-y-auto transition-all duration-300">
-        {/* Sidebar header — Logo */}
         <div className="flex items-center justify-center lg:justify-start gap-2 border-b border-border/40 px-4 py-3.5 h-[53px]">
           <Logo size={32} />
         </div>
-        <SidebarNav label={t('admin.shell.navTitle')} onClose={onClose} isLg={isLg} />
-        {/* Identity footer */}
+        <SidebarNav
+          label={t('admin.shell.navTitle')}
+          onClose={onClose}
+          variant="desktop"
+        />
         {user && (
           <div className="border-t border-border/40 px-3 py-3 flex justify-center lg:justify-start">
             <div className="flex items-center gap-2.5 w-full justify-center lg:justify-start">
@@ -70,23 +73,21 @@ export function AdminSidebar({
                   </button>
                 </>
               ) : (
-                <Tooltip>
-                  <button
-                    type="button"
-                    onClick={() => void logout()}
-                    className="group flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-xs font-bold text-brand hover:bg-danger-50 dark:hover:bg-danger-950/20 hover:text-danger transition-all duration-300"
-                  >
-                    <span className="group-hover:hidden">{initials}</span>
-                    <LogOut className="hidden group-hover:block size-4" aria-hidden />
-                  </button>
-                  <Tooltip.Content placement="right">{t('admin.shell.accountMenu.signOut')}</Tooltip.Content>
-                </Tooltip>
+                <button
+                  type="button"
+                  onClick={() => void logout()}
+                  className="group flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-xs font-bold text-brand hover:bg-danger-50 dark:hover:bg-danger-950/20 hover:text-danger transition-all duration-300"
+                >
+                  <span className="group-hover:hidden">{initials}</span>
+                  <LogOut className="hidden group-hover:block size-4" aria-hidden />
+                </button>
               )}
             </div>
           </div>
         )}
       </div>
 
+      {/* ───────── MOBILE DRAWER ───────── */}
       <Drawer isOpen={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
         <Drawer.Backdrop
           variant="transparent"
@@ -95,21 +96,46 @@ export function AdminSidebar({
           <Drawer.Content
             placement={i18n.dir() === "rtl" ? "right" : "left"}
             className={[
-              'w-56 max-w-xs rounded-none border-divider/60 bg-background p-0 data-[placement=left]:border-e data-[placement=right]:border-s',
+              'w-72 max-w-sm rounded-none border-divider/60 bg-background p-0 data-[placement=left]:border-e data-[placement=right]:border-s',
               ADMIN_HEADER_OFFSET_CLASS,
               ADMIN_DRAWER_HEIGHT_CLASS,
             ].join(' ')}
           >
             <Drawer.Dialog aria-label={t('admin.shell.navTitleMobile')} className="flex h-full flex-col outline-none">
-              <Drawer.Header className="flex items-center justify-between border-b border-divider/60 px-3 py-3">
+              <Drawer.Header className="flex items-center justify-between border-b border-divider/60 px-4 py-4">
                 <Drawer.Heading className="text-sm font-semibold tracking-tight text-foreground">
                   {t('admin.shell.navTitle')}
                 </Drawer.Heading>
                 <Drawer.CloseTrigger />
               </Drawer.Header>
-              <Drawer.Body className="p-0">
-                <SidebarNav label={t('admin.shell.navTitleMobile')} onClose={onClose} isLg={true} />
+              <Drawer.Body className="p-0 flex-1 overflow-y-auto">
+                <SidebarNav
+                  label={t('admin.shell.navTitleMobile')}
+                  onClose={onClose}
+                  variant="drawer"
+                />
               </Drawer.Body>
+              {user && (
+                <div className="border-t border-divider/60 px-4 py-4">
+                  <div className="flex items-center gap-3">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-sm font-bold text-brand">
+                      {initials}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">{user.fullName}</p>
+                      <p className="truncate text-xs text-muted" dir="ltr">{user.email}</p>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label={t('admin.shell.accountMenu.signOut')}
+                      onClick={() => { void logout(); onClose(); }}
+                      className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-danger-50 dark:hover:bg-danger-950/20 hover:text-danger"
+                    >
+                      <LogOut className="size-4" aria-hidden />
+                    </button>
+                  </div>
+                </div>
+              )}
             </Drawer.Dialog>
           </Drawer.Content>
         </Drawer.Backdrop>
@@ -118,19 +144,43 @@ export function AdminSidebar({
   );
 }
 
-function SidebarNav({ label, onClose, isLg }: { label: string; onClose?: () => void; isLg: boolean }) {
+function SidebarNav({
+  label,
+  onClose,
+  variant,
+}: {
+  label: string;
+  onClose?: () => void;
+  variant: 'desktop' | 'drawer';
+}) {
   const { t } = useTranslation();
 
   return (
-    <nav aria-label={label} className="flex flex-1 flex-col overflow-y-auto px-2 pb-4 pt-2 gap-1 items-center lg:items-stretch">
+    <nav
+      aria-label={label}
+      className="flex flex-1 flex-col overflow-y-auto px-2 pb-4 pt-2 gap-1 items-center lg:items-stretch"
+    >
       {ADMIN_NAV_GROUPS.map((group) => (
         <div key={group.groupKey} className="w-full">
-          <p className="px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-wide text-default-500 hidden lg:block">
+          <p
+            className={[
+              'px-3 pb-1 pt-3 text-xs font-medium uppercase tracking-wide text-default-500',
+              variant === 'desktop' ? 'hidden lg:block' : 'block',
+            ].join(' ')}
+          >
             {t(`admin.shell.nav.groups.${group.groupKey}`)}
           </p>
           <div className="flex flex-col gap-0.5 w-full items-center lg:items-stretch">
             {group.items.map(({ to, icon: Icon, labelKey, end }) => (
-              <NavItem key={to} to={to} icon={Icon} label={t(labelKey)} end={end} onClick={onClose} isLg={isLg} />
+              <NavItem
+                key={to}
+                to={to}
+                icon={Icon}
+                label={t(labelKey)}
+                end={end}
+                onClick={onClose}
+                variant={variant}
+              />
             ))}
           </div>
         </div>
@@ -145,42 +195,32 @@ function NavItem({
   label,
   end,
   onClick,
-  isLg,
+  variant,
 }: {
   to: string;
   icon: LucideIcon;
   label: string;
   end?: boolean;
   onClick?: () => void;
-  isLg: boolean;
+  variant: 'desktop' | 'drawer';
 }) {
-  const content = (
+  return (
     <NavLink
       to={to}
       end={end}
       onClick={onClick}
       className={({ isActive }) =>
         [
-          'flex items-center justify-center lg:justify-start gap-2.5 rounded-medium p-2 lg:px-3 lg:py-2 text-sm font-medium transition-colors motion-reduce:transition-none w-11 h-11 lg:w-full lg:h-auto',
+          'flex items-center justify-center lg:justify-start gap-2.5 rounded-lg p-2 lg:px-3 lg:py-2 text-sm font-medium transition-colors motion-reduce:transition-none',
+          variant === 'drawer' ? 'w-full px-3 py-2.5' : 'w-11 h-11 lg:w-full lg:h-auto',
           isActive
             ? 'relative bg-brand-subtle text-brand lg:before:absolute lg:before:start-0 lg:before:top-1 lg:before:h-[calc(100%-8px)] lg:before:w-[3px] lg:before:rounded-e-full lg:before:bg-brand'
             : 'text-default-600 hover:bg-default-100 hover:text-foreground dark:text-default-500 dark:hover:bg-default-50/5 dark:hover:text-foreground',
         ].join(' ')
       }
     >
-      <Icon size={15} aria-hidden className="shrink-0" />
-      <span className="hidden lg:inline">{label}</span>
+      <Icon size={18} aria-hidden className="shrink-0" />
+      <span className={variant === 'drawer' ? 'inline' : 'hidden lg:inline'}>{label}</span>
     </NavLink>
   );
-
-  if (!isLg) {
-    return (
-      <Tooltip delay={0} closeDelay={0}>
-        <div className="flex justify-center w-full">{content}</div>
-        <Tooltip.Content placement="right">{label}</Tooltip.Content>
-      </Tooltip>
-    );
-  }
-
-  return content;
 }

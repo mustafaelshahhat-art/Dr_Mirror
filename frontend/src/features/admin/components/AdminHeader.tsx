@@ -1,4 +1,4 @@
-import { Breadcrumbs, Button, Tooltip } from '@heroui/react';
+import { Breadcrumbs, Button } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
@@ -20,26 +20,28 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
   return (
     <header className="sticky top-0 z-40 border-b border-divider/60 bg-content1">
       <div className={['flex items-center justify-between gap-3 px-4 md:px-6', ADMIN_HEADER_HEIGHT_CLASS].join(' ')}>
-        <div className="flex items-center gap-2">
-          <Tooltip>
-            <Button
-              isIconOnly
-              variant="ghost"
-              size="sm"
-              className="md:hidden"
-              onPress={onMenuPress}
-              aria-label={t('admin.shell.navTitle')}
-            >
-              <Menu size={18} aria-hidden />
-            </Button>
-            <Tooltip.Content placement="bottom">{t('admin.shell.navTitle')}</Tooltip.Content>
-          </Tooltip>
+        <div className="flex items-center gap-2 min-w-0">
+          <Button
+            isIconOnly
+            variant="ghost"
+            size="sm"
+            className="md:hidden"
+            onPress={onMenuPress}
+            aria-label={t('admin.shell.navTitle')}
+          >
+            <Menu size={18} aria-hidden />
+          </Button>
           <Breadcrumbs
             aria-label={t('admin.shell.breadcrumbs')}
-            className="text-sm font-semibold tracking-tight text-default-700 dark:text-default-300"
+            className="text-sm font-semibold tracking-tight text-default-700 dark:text-default-300 truncate"
           >
             {titleKeys.map((key) => (
-              <Breadcrumbs.Item key={key}>{t(key)}</Breadcrumbs.Item>
+              <Breadcrumbs.Item
+                key={key}
+                className={titleKeys.length > 1 && key !== titleKeys[titleKeys.length - 1] ? 'hidden sm:inline' : ''}
+              >
+                {t(key)}
+              </Breadcrumbs.Item>
             ))}
           </Breadcrumbs>
         </div>
@@ -48,6 +50,7 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
           <Button
             variant="ghost"
             size="sm"
+            className="hidden sm:flex"
             onPress={() => void logout()}
             aria-label={t('admin.shell.accountMenu.signOut')}
           >

@@ -1,4 +1,4 @@
-import { Home, ShoppingBag, User, MessageSquare } from 'lucide-react';
+import { Home, Store, ShoppingCart, Package, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 
@@ -6,8 +6,9 @@ import { useAuth } from '../../features/auth/useAuth';
 
 const NAV_ITEMS = [
   { to: '/', icon: Home, labelKey: 'common.mobileNav.home', end: true },
-  { to: '/cart', icon: ShoppingBag, labelKey: 'common.mobileNav.cart', end: false },
-  { to: '/inquiries', icon: MessageSquare, labelKey: 'common.mobileNav.inquiries', end: false },
+  { to: '/', icon: Store, labelKey: 'common.mobileNav.shop', end: true },
+  { to: '/cart', icon: ShoppingCart, labelKey: 'common.mobileNav.cart', end: false },
+  { to: '/account/orders', icon: Package, labelKey: 'common.mobileNav.orders', end: true },
 ] as const;
 
 export function MobileBottomNav() {
@@ -22,7 +23,7 @@ export function MobileBottomNav() {
     >
       <ul className="flex h-14 items-center justify-around">
         {NAV_ITEMS.map(({ to, icon: Icon, labelKey, end }) => (
-          <li key={to}>
+          <li key={labelKey}>
             <NavLink
               to={to}
               end={end}

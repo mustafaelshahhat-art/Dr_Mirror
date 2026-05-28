@@ -27,29 +27,34 @@ interface AdminNavGroup {
 
 export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
-    groupKey: 'operations',
+    groupKey: 'overview',
     items: [
       { to: '/admin', icon: LayoutDashboard, labelKey: 'admin.shell.nav.dashboard', end: true },
-      { to: '/admin/orders', icon: ClipboardList, labelKey: 'admin.shell.nav.orders' },
-      { to: '/admin/returns', icon: ArchiveRestore, labelKey: 'admin.shell.nav.returns' },
-      { to: '/admin/shipping-fees', icon: Truck, labelKey: 'admin.shell.nav.shippingFees' },
-      { to: '/admin/inquiries', icon: MessageSquare, labelKey: 'admin.shell.nav.inquiries' },
-      { to: '/admin/whatsapp', icon: MessageCircle, labelKey: 'admin.shell.nav.whatsapp' },
-      { to: '/admin/audit', icon: ScrollText, labelKey: 'admin.shell.nav.audit' },
     ],
   },
   {
-    groupKey: 'catalog',
+    groupKey: 'commerce',
     items: [
+      { to: '/admin/orders', icon: ClipboardList, labelKey: 'admin.shell.nav.orders' },
+      { to: '/admin/returns', icon: ArchiveRestore, labelKey: 'admin.shell.nav.returns' },
       { to: '/admin/products', icon: Package, labelKey: 'admin.shell.nav.products' },
       { to: '/admin/categories', icon: FolderTree, labelKey: 'admin.shell.nav.categories' },
+      { to: '/admin/shipping-fees', icon: Truck, labelKey: 'admin.shell.nav.shippingFees' },
       { to: '/admin/payment-methods', icon: CreditCard, labelKey: 'admin.shell.nav.paymentMethods' },
     ],
   },
   {
-    groupKey: 'people',
+    groupKey: 'support',
+    items: [
+      { to: '/admin/inquiries', icon: MessageSquare, labelKey: 'admin.shell.nav.inquiries' },
+      { to: '/admin/whatsapp', icon: MessageCircle, labelKey: 'admin.shell.nav.whatsapp' },
+    ],
+  },
+  {
+    groupKey: 'system',
     items: [
       { to: '/admin/users', icon: Users, labelKey: 'admin.shell.nav.users' },
+      { to: '/admin/audit', icon: ScrollText, labelKey: 'admin.shell.nav.audit' },
     ],
   },
 ];

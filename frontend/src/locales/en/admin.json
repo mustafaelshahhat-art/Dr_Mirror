@@ -438,9 +438,10 @@
       "users": "Users",
       "audit": "Audit log",
       "groups": {
-        "operations": "Operations",
-        "catalog": "Catalog",
-        "people": "People"
+        "overview": "Overview",
+        "commerce": "Commerce",
+        "support": "Support",
+        "system": "System"
       }
     },
     "accountMenu": {
