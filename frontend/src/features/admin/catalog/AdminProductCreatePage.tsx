@@ -12,7 +12,7 @@ import type { ProductGender } from '../../catalog/types';
 import { useAdminCategoriesQuery, useCreateProductMutation } from './hooks';
 
 import { Field, TextAreaField } from '../../../shared/components/Field';
-import { PageHeader } from '../../../shared/components/PageHeader';
+import { AdminPageHeader } from '../components/AdminPageHeader';
 import { SelectField } from '../../../shared/components/SelectField';
 import { Skeleton } from '../../../shared/components/Skeleton';
 
@@ -60,7 +60,7 @@ export function AdminProductCreatePage() {
   if (categories.isLoading) {
     return (
       <section
-        className="space-y-8"
+        className="space-y-8 animate-pulse"
         aria-busy="true"
         aria-label={t('admin.products.create.loading')}
       >
@@ -92,13 +92,13 @@ export function AdminProductCreatePage() {
   const error = (message?: string) => (message ? t(`admin.products.validation.${message}`) : null);
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
       <Link to="/admin/products" className="back-link">
         <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
         {t('admin.products.create.back')}
       </Link>
 
-      <PageHeader title={t('admin.products.create.title')} subtitle={t('admin.products.create.subtitle')} />
+      <AdminPageHeader title={t('admin.products.create.title')} subtitle={t('admin.products.create.subtitle')} />
 
       <Form
         onSubmit={handleSubmit(async (values) => {

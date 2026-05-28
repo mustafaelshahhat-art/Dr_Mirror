@@ -12,7 +12,8 @@ import type { ProductGender } from '../../catalog/types';
 import { AdminProductsListMobileCards } from './AdminProductsListMobileCards';
 import { useAdminCategoriesQuery, useAdminProductsQuery } from './hooks';
 
-import { PageHeader } from '../../../shared/components/PageHeader';
+import { AdminPageHeader } from '../components/AdminPageHeader';
+import { AdminFiltersBar } from '../components/AdminFiltersBar';
 import { PaginationControls } from '../../../shared/components/PaginationControls';
 import { SelectField } from '../../../shared/components/SelectField';
 import { TableRowSkeleton, TableSkeletonHeader } from '../../../shared/components/TableRowSkeleton';
@@ -36,8 +37,8 @@ export function AdminProductsListPage() {
   const products = useAdminProductsQuery({ q: q || undefined, categoryId, gender, published, page });
 
   return (
-    <section className="space-y-8">
-      <PageHeader
+    <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <AdminPageHeader
         title={t('admin.products.list.title')}
         subtitle={t('admin.products.list.subtitle')}
         action={
@@ -48,59 +49,63 @@ export function AdminProductsListPage() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-[1fr_12rem_10rem_10rem]">
-        <div className="col-span-2">
+      <AdminFiltersBar
+        search={
           <SearchInput
             value={q}
             onCommit={(val) => { setQ(val); setPage(1); }}
           />
-        </div>
-        <SelectField
-          label={t('admin.products.fields.category')}
-          hideLabel
-          isFilter
-          value={categoryId ?? ''}
-          emptyLabel={t('admin.products.list.allCategories')}
-          onChange={(next) => { setCategoryId(next || undefined); setPage(1); }}
-          options={(categories.data ?? []).map((c) => ({
-            value: c.id,
-            label: isAr ? c.nameAr : c.nameEn,
-          }))}
-        />
-        <SelectField
-          label={t('admin.products.fields.gender')}
-          hideLabel
-          isFilter
-          value={gender === undefined ? '' : String(gender)}
-          emptyLabel={t('admin.products.list.allGenders')}
-          onChange={(next) => {
-            setGender(next === '' ? undefined : (Number(next) as ProductGender));
-            setPage(1);
-          }}
-          options={[0, 1, 2].map((next) => ({
-            value: String(next),
-            label: t(genderTranslationKey(next as ProductGender)),
-          }))}
-        />
-        <SelectField
-          label={t('admin.list.status')}
-          hideLabel
-          isFilter
-          // eslint-disable-next-line i18next/no-literal-string -- API enum values, not user copy
-          value={published === undefined ? '' : published ? 'pub' : 'draft'}
-          emptyLabel={t('admin.products.list.allStatuses')}
-          onChange={(next) => {
-            setPublished(next === '' ? undefined : next === 'pub');
-            setPage(1);
-          }}
-          options={[
-            // eslint-disable-next-line i18next/no-literal-string -- API enum value, not user copy
-            { value: 'pub', label: t('admin.products.list.published') },
-            // eslint-disable-next-line i18next/no-literal-string -- API enum value, not user copy
-            { value: 'draft', label: t('admin.products.list.draft') },
-          ]}
-        />
-      </div>
+        }
+        filters={
+          <>
+            <SelectField
+              label={t('admin.products.fields.category')}
+              hideLabel
+              isFilter
+              value={categoryId ?? ''}
+              emptyLabel={t('admin.products.list.allCategories')}
+              onChange={(next) => { setCategoryId(next || undefined); setPage(1); }}
+              options={(categories.data ?? []).map((c) => ({
+                value: c.id,
+                label: isAr ? c.nameAr : c.nameEn,
+              }))}
+              className="w-full sm:w-40"
+            />
+            <SelectField
+              label={t('admin.products.fields.gender')}
+              hideLabel
+              isFilter
+              value={gender === undefined ? '' : String(gender)}
+              emptyLabel={t('admin.products.list.allGenders')}
+              onChange={(next) => {
+                setGender(next === '' ? undefined : (Number(next) as ProductGender));
+                setPage(1);
+              }}
+              options={[0, 1, 2].map((next) => ({
+                value: String(next),
+                label: t(genderTranslationKey(next as ProductGender)),
+              }))}
+              className="w-full sm:w-40"
+            />
+            <SelectField
+              label={t('admin.list.status')}
+              hideLabel
+              isFilter
+              value={published === undefined ? '' : published ? 'pub' : 'draft'}
+              emptyLabel={t('admin.products.list.allStatuses')}
+              onChange={(next) => {
+                setPublished(next === '' ? undefined : next === 'pub');
+                setPage(1);
+              }}
+              options={[
+                { value: 'pub', label: t('admin.products.list.published') },
+                { value: 'draft', label: t('admin.products.list.draft') },
+              ]}
+              className="w-full sm:w-40"
+            />
+          </>
+        }
+      />
 
       {products.isLoading ? (
         <Table className="rounded-large border border-divider/60">

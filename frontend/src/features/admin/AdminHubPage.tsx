@@ -1,6 +1,7 @@
 import { Heading } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
-import { PageHeader } from '../../shared/components/PageHeader';
+import { AdminPageHeader } from './components/AdminPageHeader';
+import { AdminStatsGrid } from './components/AdminStatsGrid';
 import { Stat } from '../../shared/components/Stat';
 import {
   ChevronRight,
@@ -52,8 +53,8 @@ export function AdminHubPage() {
   const proofQueueCount = stats?.countsByStatus[ORDER_STATUSES.PendingPaymentReview] ?? 0;
 
   return (
-    <section className="space-y-8">
-      <PageHeader title={t('admin.hub.title')} subtitle={t('admin.hub.subtitle')} />
+    <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <AdminPageHeader title={t('admin.hub.title')} subtitle={t('admin.hub.subtitle')} />
 
       {statsQuery.isLoading ? (
         <div className="space-y-6" aria-busy="true" aria-label={t('admin.hub.subtitle')}>
@@ -125,8 +126,8 @@ export function AdminHubPage() {
                   />
                 </span>
               </Link>
-              <div className="cq p-3">
-                <div className="grid gap-2 @md:grid-cols-2 @lg:grid-cols-4">
+              <div className="p-3">
+                <AdminStatsGrid cols={4}>
                   {KPI_STATUSES.map(({ key, status }) => (
                     <Stat
                       key={key}
@@ -135,7 +136,7 @@ export function AdminHubPage() {
                       size="sm"
                     />
                   ))}
-                </div>
+                </AdminStatsGrid>
               </div>
             </div>
           </div>

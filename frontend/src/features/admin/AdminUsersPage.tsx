@@ -21,7 +21,9 @@ import { useAdminUsersQuery, useDisableUserMutation, useEnableUserMutation, useU
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { EmptyState } from '../../shared/components/EmptyState';
 import { AdminUsersMobileCards } from './AdminUsersMobileCards';
-import { PageHeader } from '../../shared/components/PageHeader';
+import { AdminPageHeader } from './components/AdminPageHeader';
+import { AdminStatsGrid } from './components/AdminStatsGrid';
+import { AdminFiltersBar } from './components/AdminFiltersBar';
 import { Stat } from '../../shared/components/Stat';
 import { SelectField } from '../../shared/components/SelectField';
 import { ConfirmDialog } from '../../shared/components/ConfirmDialog';
@@ -124,70 +126,72 @@ export function AdminUsersPage() {
 
   return (
     <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <PageHeader
+      <AdminPageHeader
         title={t('admin.users.title')}
         subtitle={t('admin.users.subtitle')}
       />
 
       {/* KPI Stats Cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+      <AdminStatsGrid cols={5}>
         <Stat label={t('admin.users.stats.total')} value={query.isLoading ? '...' : String(total)} size="sm" />
         <Stat label={t('admin.users.stats.active')} value={query.isLoading ? '...' : String(activeCount)} size="sm" />
         <Stat label={t('admin.users.stats.admins')} value={query.isLoading ? '...' : String(adminCount)} size="sm" />
         <Stat label={t('admin.users.stats.customers')} value={query.isLoading ? '...' : String(customerCount)} size="sm" />
         <Stat label={t('admin.users.stats.blocked')} value={query.isLoading ? '...' : String(blockedCount)} size="sm" />
-      </div>
+      </AdminStatsGrid>
 
       {/* Filters & Search Control Panel */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border border-divider/40 bg-content1 px-4 py-3 rounded-2xl shadow-sm">
-        <div className="max-w-sm flex-1">
+      <AdminFiltersBar
+        search={
           <SearchInput
             value={q}
             onCommit={(val) => { setQ(val); setPage(1); }}
           />
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <SelectField
-            label={t('admin.users.filterRole')}
-            hideLabel
-            isFilter
-            value={roleFilter}
-            emptyLabel={t('admin.users.allRoles')}
-            onChange={(next) => { setRoleFilter(next); setPage(1); }}
-            options={[
-              { value: 'Buyer', label: t('admin.users.roleCustomer') },
-              { value: 'Admin', label: t('admin.users.roleAdmin') },
-            ]}
-            className="w-full sm:w-40 text-xs font-semibold"
-          />
-          <SelectField
-            label={t('admin.users.filterStatus')}
-            hideLabel
-            isFilter
-            value={statusFilter}
-            emptyLabel={t('admin.users.allStatuses')}
-            onChange={(next) => { setStatusFilter(next); setPage(1); }}
-            options={[
-              { value: 'active', label: t('admin.users.statusActive') },
-              { value: 'blocked', label: t('admin.users.statusBlocked') },
-            ]}
-            className="w-full sm:w-40 text-xs font-semibold"
-          />
-          <SelectField
-            label={t('admin.users.sortBy')}
-            hideLabel
-            isFilter
-            value={sortBy}
-            onChange={setSortBy}
-            options={[
-              { value: 'newest', label: t('admin.users.sortNewest') },
-              { value: 'oldest', label: t('admin.users.sortOldest') },
-              { value: 'name', label: t('admin.users.sortName') },
-            ]}
-            className="w-full sm:w-40 text-xs font-semibold"
-          />
-        </div>
-      </div>
+        }
+        filters={
+          <>
+            <SelectField
+              label={t('admin.users.filterRole')}
+              hideLabel
+              isFilter
+              value={roleFilter}
+              emptyLabel={t('admin.users.allRoles')}
+              onChange={(next) => { setRoleFilter(next); setPage(1); }}
+              options={[
+                { value: 'Buyer', label: t('admin.users.roleCustomer') },
+                { value: 'Admin', label: t('admin.users.roleAdmin') },
+              ]}
+              className="w-full sm:w-40 text-xs font-semibold"
+            />
+            <SelectField
+              label={t('admin.users.filterStatus')}
+              hideLabel
+              isFilter
+              value={statusFilter}
+              emptyLabel={t('admin.users.allStatuses')}
+              onChange={(next) => { setStatusFilter(next); setPage(1); }}
+              options={[
+                { value: 'active', label: t('admin.users.statusActive') },
+                { value: 'blocked', label: t('admin.users.statusBlocked') },
+              ]}
+              className="w-full sm:w-40 text-xs font-semibold"
+            />
+            <SelectField
+              label={t('admin.users.sortBy')}
+              hideLabel
+              isFilter
+              value={sortBy}
+              onChange={setSortBy}
+              options={[
+                { value: 'newest', label: t('admin.users.sortNewest') },
+                { value: 'oldest', label: t('admin.users.sortOldest') },
+                { value: 'name', label: t('admin.users.sortName') },
+              ]}
+              className="w-full sm:w-40 text-xs font-semibold"
+            />
+          </>
+        }
+      />
 
       {query.isLoading ? (
         <Table className="rounded-large border border-divider/60">

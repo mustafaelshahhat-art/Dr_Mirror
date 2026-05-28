@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
-import { PageHeader } from '../../shared/components/PageHeader';
+import { AdminPageHeader } from './components/AdminPageHeader';
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { TableRowSkeleton, TableSkeletonHeader } from '../../shared/components/TableRowSkeleton';
@@ -90,8 +90,8 @@ export function AdminWhatsAppStatusPage() {
   const connectionStateVal = statusQuery.data?.connectionState ?? 'disconnected';
 
   return (
-    <section className="space-y-8 animate-fade-in">
-      <PageHeader
+    <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <AdminPageHeader
         title={t('admin.whatsapp.status.title')}
         subtitle={t('admin.whatsapp.status.subtitle')}
       />

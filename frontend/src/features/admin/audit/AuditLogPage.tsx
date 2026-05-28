@@ -5,6 +5,8 @@ import { ArrowRight, ChevronLeft, ChevronRight, ScrollText } from 'lucide-react'
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AdminPageHeader } from '../components/AdminPageHeader';
+import { AdminFiltersBar } from '../components/AdminFiltersBar';
 import { PaginationControls } from '../../../shared/components/PaginationControls';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { EmptyState } from '../../../shared/components/EmptyState';
@@ -45,42 +47,43 @@ export function AuditLogPage() {
   const loadingRows = actionType || targetType || from || to ? 4 : 15;
 
   return (
-    <section className="space-y-8">
-      <header className="page-header">
-        <h1 className="page-title">{t('admin.audit.title')}</h1>
-        <p className="page-subtitle">{t('admin.audit.subtitle')}</p>
-      </header>
+    <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <AdminPageHeader title={t('admin.audit.title')} subtitle={t('admin.audit.subtitle')} />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-[auto_auto_auto_auto] sm:flex-wrap">
-        <SelectField
-          label={t('admin.audit.filters.actionType')}
-          value={actionType}
-          emptyLabel={t('admin.filters.all')}
-          options={ACTION_TYPES.map((a) => ({ value: a, label: t(`admin.audit.actionTypes.${a}`, { defaultValue: a }) }))}
-          onChange={(next) => { setActionType(next); setPage(1); }}
-          isFilter
-          className="col-span-2 min-w-40"
-        />
-        <SelectField
-          label={t('admin.audit.filters.target')}
-          value={targetType}
-          emptyLabel={t('admin.filters.all')}
-          options={TARGET_TYPES.map((type) => ({ value: type, label: t(`admin.audit.targetTypes.${type}`, { defaultValue: type }) }))}
-          onChange={(next) => { setTargetType(next); setPage(1); }}
-          isFilter
-          className="min-w-40"
-        />
-        <AuditDateFilter
-          label={t('admin.audit.filters.from')}
-          value={from}
-          onChange={(next) => { setFrom(next); setPage(1); }}
-        />
-        <AuditDateFilter
-          label={t('admin.audit.filters.to')}
-          value={to}
-          onChange={(next) => { setTo(next); setPage(1); }}
-        />
-      </div>
+      <AdminFiltersBar
+        filters={
+          <>
+            <SelectField
+              label={t('admin.audit.filters.actionType')}
+              value={actionType}
+              emptyLabel={t('admin.filters.all')}
+              options={ACTION_TYPES.map((a) => ({ value: a, label: t(`admin.audit.actionTypes.${a}`, { defaultValue: a }) }))}
+              onChange={(next) => { setActionType(next); setPage(1); }}
+              isFilter
+              className="w-full sm:w-44 text-xs font-semibold"
+            />
+            <SelectField
+              label={t('admin.audit.filters.target')}
+              value={targetType}
+              emptyLabel={t('admin.filters.all')}
+              options={TARGET_TYPES.map((type) => ({ value: type, label: t(`admin.audit.targetTypes.${type}`, { defaultValue: type }) }))}
+              onChange={(next) => { setTargetType(next); setPage(1); }}
+              isFilter
+              className="w-full sm:w-44 text-xs font-semibold"
+            />
+            <AuditDateFilter
+              label={t('admin.audit.filters.from')}
+              value={from}
+              onChange={(next) => { setFrom(next); setPage(1); }}
+            />
+            <AuditDateFilter
+              label={t('admin.audit.filters.to')}
+              value={to}
+              onChange={(next) => { setTo(next); setPage(1); }}
+            />
+          </>
+        }
+      />
 
       {query.isLoading ? (
         <Table className="rounded-large border border-divider/60">

@@ -17,24 +17,15 @@ import { authApi, type LoginInput, type RegisterInput, type SendOtpInput, type V
 import { AuthContext, type AuthContextValue } from './AuthContext';
 import type { AuthUser } from './types';
 
-const PUBLIC_PATHS = ['/', '/login', '/register', '/forgot-password', '/reset-password'] as const;
-
-const PUBLIC_PREFIXES = ['/products/'] as const;
-
-function isPublicPath(pathname: string): boolean {
-  if (PUBLIC_PATHS.includes(pathname as typeof PUBLIC_PATHS[number])) return true;
-  return PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
-}
-
 /**
  * Sole owner of authenticated-user state. Runs the session-restore handshake
  * on mount (calls /auth/refresh once; the httpOnly cookie does the heavy
  * lifting). Wires the api-client's expiry handler so a downstream 401-refresh
  * failure flows back into React state.
  *
- * On known public routes (login, register, forgot/reset-password) the refresh
- * call is skipped — there is no session to restore, and the 401 would be
- * expected noise in the console.
+ * The refresh is attempted on every page load so that logged-in users who
+ * land on or refresh a public route (e.g. /) keep their session. A 401
+ * (no/expired cookie) is silently treated as "no active session".
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -52,21 +43,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryClient.clear();
   }, [queryClient]);
 
-  // Session restore on app boot. /auth/refresh either succeeds (cookie valid)
-  // or 401s (no/expired cookie). Either way, we resolve isBootstrapping.
-  // Skipped on public routes where no session is expected.
   useEffect(() => {
     let cancelled = false;
-
-    if (isPublicPath(window.location.pathname)) {
-      clearAccessToken();
-      queueMicrotask(() => {
-        if (!cancelled) setIsBootstrapping(false);
-      });
-      return () => {
-        cancelled = true;
-      };
-    }
 
     (async () => {
       try {
@@ -78,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!cancelled) setIsBootstrapping(false);
       }
     })();
+
     return () => {
       cancelled = true;
     };

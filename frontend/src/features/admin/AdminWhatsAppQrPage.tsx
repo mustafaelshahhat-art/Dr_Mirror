@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
-import { PageHeader } from '../../shared/components/PageHeader';
+import { AdminPageHeader } from './components/AdminPageHeader';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { queryKeys } from '../../shared/lib/query-keys';
 import { adminWhatsAppApi } from './api';
@@ -52,7 +52,7 @@ export function AdminWhatsAppQrPage() {
   const sidecarUnavailable = isAxiosError(qrQuery.error) && qrQuery.error.response?.status === 503;
 
   return (
-    <section className="space-y-6 animate-fade-in max-w-4xl mx-auto">
+    <section className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 max-w-4xl mx-auto">
       <div className="flex items-center gap-3">
         <Button
           variant="secondary"
@@ -63,7 +63,7 @@ export function AdminWhatsAppQrPage() {
         >
           <ArrowLeft className={`size-4 ${isRtl ? 'rotate-180' : ''}`} />
         </Button>
-        <PageHeader title={t('admin.whatsapp.qr.title')} subtitle={t('admin.whatsapp.qr.subtitle')} />
+        <AdminPageHeader title={t('admin.whatsapp.qr.title')} subtitle={t('admin.whatsapp.qr.subtitle')} />
       </div>
 
       <div className="content-surface mx-auto max-w-xl p-6 sm:p-8 text-center border border-divider/60 rounded-3xl shadow-lg relative overflow-hidden backdrop-blur-md bg-background/95">

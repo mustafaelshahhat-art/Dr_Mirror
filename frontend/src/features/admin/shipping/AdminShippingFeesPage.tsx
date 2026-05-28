@@ -12,7 +12,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import { PageHeader } from '../../../shared/components/PageHeader';
+import { AdminPageHeader } from '../components/AdminPageHeader';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { Skeleton } from '../../../shared/components/Skeleton';
 import { StatusPill } from '../../../shared/components/StatusPill';
@@ -40,8 +40,8 @@ export function AdminShippingFeesPage() {
 
   if (query.isLoading) {
     return (
-      <section className="space-y-8" aria-busy="true" aria-label={t('shipping.admin.loading')}>
-        <PageHeader title={t('shipping.admin.title')} subtitle={t('shipping.admin.description')} />
+      <section className="space-y-8 animate-pulse" aria-busy="true" aria-label={t('shipping.admin.loading')}>
+        <AdminPageHeader title={t('shipping.admin.title')} subtitle={t('shipping.admin.description')} />
         
         {/* Stats Skeleton */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -105,8 +105,8 @@ export function AdminShippingFeesPage() {
 
   if (query.isError) {
     return (
-      <section className="space-y-8">
-        <PageHeader title={t('shipping.admin.title')} subtitle={t('shipping.admin.description')} />
+      <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <AdminPageHeader title={t('shipping.admin.title')} subtitle={t('shipping.admin.description')} />
         <QueryErrorState
           message={t('shipping.admin.errorLoad')}
           retryLabel={t('admin.query.retry')}
@@ -123,8 +123,8 @@ export function AdminShippingFeesPage() {
   const inactiveGovs = governorates.filter((g) => !g.isActive).length;
 
   return (
-    <section className="space-y-8">
-      <PageHeader title={t('shipping.admin.title')} subtitle={t('shipping.admin.description')} />
+    <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <AdminPageHeader title={t('shipping.admin.title')} subtitle={t('shipping.admin.description')} />
 
       {governorates.length === 0 ? (
         <div className="content-surface p-10 text-center">

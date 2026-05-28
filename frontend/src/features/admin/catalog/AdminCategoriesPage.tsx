@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import { PageHeader } from '../../../shared/components/PageHeader';
+import { AdminPageHeader } from '../components/AdminPageHeader';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { Skeleton } from '../../../shared/components/Skeleton';
 import { StatusPill } from '../../../shared/components/StatusPill';
@@ -66,8 +66,8 @@ export function AdminCategoriesPage() {
 
   if (query.isError) {
     return (
-      <section className="space-y-8">
-        <PageHeader title={t('admin.catalog.categories.title')} subtitle={t('admin.catalog.categories.subtitle')} />
+      <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <AdminPageHeader title={t('admin.catalog.categories.title')} subtitle={t('admin.catalog.categories.subtitle')} />
         <QueryErrorState
           message={t('admin.catalog.categories.errorLoad')}
           retryLabel={t('admin.query.retry')}
@@ -81,8 +81,8 @@ export function AdminCategoriesPage() {
   const categories = query.data ?? [];
 
   return (
-    <section className="space-y-8">
-      <PageHeader
+    <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <AdminPageHeader
         title={t('admin.catalog.categories.title')}
         subtitle={t('admin.catalog.categories.subtitle')}
         action={

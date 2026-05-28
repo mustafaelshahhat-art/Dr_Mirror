@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { EmptyState } from '../../shared/components/EmptyState';
-import { PageHeader } from '../../shared/components/PageHeader';
+import { AdminPageHeader } from './components/AdminPageHeader';
+import { AdminFiltersBar } from './components/AdminFiltersBar';
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { TableRowSkeleton, TableSkeletonHeader } from '../../shared/components/TableRowSkeleton';
@@ -33,11 +34,14 @@ export function AdminReturnsListPage() {
   });
 
   return (
-    <section className="space-y-8">
-      <PageHeader
+    <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <AdminPageHeader
         title={t('admin.returns.list.title')}
         subtitle={t('admin.returns.list.subtitle')}
-        action={
+      />
+
+      <AdminFiltersBar
+        filters={
           <ReturnStatusFilterDropdown
             value={statusFilter}
             onChange={(next) => {

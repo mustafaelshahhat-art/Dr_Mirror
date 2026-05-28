@@ -3,7 +3,7 @@ import { CreditCard, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { PageHeader } from '../../../shared/components/PageHeader';
+import { AdminPageHeader } from '../components/AdminPageHeader';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 import { PaymentMethodTileSkeleton } from '../../../shared/components/Skeleton';
 
@@ -31,11 +31,11 @@ export function AdminPaymentMethodsPage() {
   if (query.isLoading) {
     return (
       <section
-        className="space-y-8"
+        className="space-y-8 animate-pulse"
         aria-busy="true"
         aria-label={t('admin.payments.loading')}
       >
-        <PageHeader title={t('admin.payments.title')} subtitle={t('admin.payments.subtitle')} />
+        <AdminPageHeader title={t('admin.payments.title')} subtitle={t('admin.payments.subtitle')} />
         <ul className="space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (
             <li key={i}>
@@ -49,8 +49,8 @@ export function AdminPaymentMethodsPage() {
 
   if (query.isError) {
     return (
-      <section className="space-y-8">
-        <PageHeader title={t('admin.payments.title')} subtitle={t('admin.payments.subtitle')} />
+      <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <AdminPageHeader title={t('admin.payments.title')} subtitle={t('admin.payments.subtitle')} />
         <QueryErrorState
           message={t('admin.payments.errorLoad')}
           retryLabel={t('admin.query.retry')}
@@ -64,8 +64,8 @@ export function AdminPaymentMethodsPage() {
   const methods = query.data ?? [];
 
   return (
-    <section className="space-y-8">
-      <PageHeader
+    <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <AdminPageHeader
         title={t('admin.payments.title')}
         subtitle={t('admin.payments.subtitle')}
         action={

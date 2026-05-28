@@ -15,6 +15,7 @@ import {
   useMarkInquiryReadMutation,
   useMarkInquiryRespondedMutation,
 } from '../inquiries/hooks';
+import { AdminPageHeader } from './components/AdminPageHeader';
 import { PaginationControls } from '../../shared/components/PaginationControls';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 import { Skeleton } from '../../shared/components/Skeleton';
@@ -38,11 +39,11 @@ export function AdminInquiriesPage() {
   });
 
   return (
-    <section className="space-y-8">
-      <header className="page-header">
-        <h1 className="page-title">{t('inquiries.admin.title')}</h1>
-        <p className="page-subtitle">{t('inquiries.admin.subtitle')}</p>
-      </header>
+    <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <AdminPageHeader
+        title={t('inquiries.admin.title')}
+        subtitle={t('inquiries.admin.subtitle')}
+      />
 
       <div className="flex flex-wrap gap-2" role="group" aria-label={t('inquiries.admin.filterLabel')}>
         <FilterPill

@@ -6,7 +6,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useAdminProductQuery } from './hooks';
 import type { AdminProductDetailDto } from './types';
 
-import { PageHeader } from '../../../shared/components/PageHeader';
+import { AdminPageHeader } from '../components/AdminPageHeader';
 import { QueryErrorState } from '../../../shared/components/QueryErrorState';
 
 import { ProductImagesSection } from './components/ProductImagesSection';
@@ -41,13 +41,13 @@ export function AdminProductEditPage() {
 function Inner({ product }: { product: AdminProductDetailDto }) {
   const { t } = useTranslation();
   return (
-    <section className="space-y-8">
+    <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
       <Link to="/admin/products" className="back-link">
         <ArrowLeft className="size-4 rtl:rotate-180" aria-hidden />
         {t('admin.products.edit.back')}
       </Link>
 
-      <PageHeader title={product.nameEn} subtitle={`/${product.slug}`} />
+      <AdminPageHeader title={product.nameEn} subtitle={`/${product.slug}`} />
 
       <Tabs variant="secondary" className="space-y-4">
         <Tabs.ListContainer>

@@ -11,7 +11,8 @@ import { ORDER_STATUSES, type OrderStatus } from '../orders/types';
 import { StatusFilterDropdown } from './components/StatusFilterDropdown';
 import { AdminOrdersListMobileCards } from './AdminOrdersListMobileCards';
 import { useAdminOrdersQuery } from './hooks';
-import { PageHeader } from '../../shared/components/PageHeader';
+import { AdminPageHeader } from './components/AdminPageHeader';
+import { AdminFiltersBar } from './components/AdminFiltersBar';
 import { QueryErrorState } from '../../shared/components/QueryErrorState';
 
 import { formatCurrency } from '../../shared/lib/format';
@@ -40,11 +41,14 @@ export function AdminOrdersListPage() {
   });
 
   return (
-    <section className="space-y-8">
-      <PageHeader
+    <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <AdminPageHeader
         title={t('admin.list.title')}
         subtitle={t('admin.list.subtitle')}
-        action={
+      />
+
+      <AdminFiltersBar
+        filters={
           <StatusFilterDropdown
             value={statusFilter}
             onChange={(next) => {
