@@ -1,11 +1,9 @@
-/* eslint-disable i18next/no-literal-string -- Allow filter values and styling constants */
 import { AlertDialog, Button, Chip, Input, Spinner, Table, toast, useOverlayState } from '@heroui/react';
 import { CheckCircle2, Clock, Info, LogOut, MessageCircle, QrCode, RefreshCw, Search, XCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import type { LucideIcon } from 'lucide-react';
 
 import { PageHeader } from '../../shared/components/PageHeader';
 import { PaginationControls } from '../../shared/components/PaginationControls';
@@ -77,7 +75,7 @@ export function AdminWhatsAppStatusPage() {
 
       return matchesSearch && matchesStatus;
     });
-  }, [attemptsQuery.data, search, statusFilter]);
+  }, [attemptsQuery.data?.items, search, statusFilter]);
 
   function handleRowAction(key: React.Key) {
     const id = String(key);
@@ -177,7 +175,7 @@ export function AdminWhatsAppStatusPage() {
                 <Button
                   variant="primary"
                   onPress={() => navigate('/admin/whatsapp/pair')}
-                  className="w-full md:w-auto font-semibold"
+                  className="w-full md:w-auto"
                 >
                   <QrCode className="size-4" aria-hidden />
                   {t('admin.whatsapp.status.pairDevice')}
@@ -187,7 +185,7 @@ export function AdminWhatsAppStatusPage() {
                 <Button
                   variant="danger"
                   onPress={disconnectState.open}
-                  className="w-full md:w-auto font-semibold"
+                  className="w-full md:w-auto"
                 >
                   <LogOut className="size-4" aria-hidden />
                   {t('admin.whatsapp.disconnect.button')}
@@ -196,7 +194,7 @@ export function AdminWhatsAppStatusPage() {
               <Button
                 variant="secondary"
                 onPress={() => void statusQuery.refetch()}
-                className="w-full md:w-auto font-semibold"
+                className="w-full md:w-auto"
               >
                 <RefreshCw className={statusQuery.isFetching ? 'size-4 animate-spin' : 'size-4'} aria-hidden />
                 {t('admin.whatsapp.status.refresh')}
@@ -264,23 +262,19 @@ export function AdminWhatsAppStatusPage() {
         {/* Elegant Search & Status Filters Toolbar */}
         <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center w-full bg-default-50/50 dark:bg-default-100/5 p-3 rounded-2xl border border-divider/30">
           <div className="relative flex-1 flex items-center group">
-            <Search
-              aria-hidden
-              className="pointer-events-none absolute start-3.5 top-1/2 size-4 -translate-y-1/2 text-default-400 group-hover:text-brand/70 group-focus-within:text-brand transition-colors duration-300 shrink-0"
-            />
+            <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-default-400 group-hover:text-brand/70 group-focus-within:text-brand transition-colors duration-300 shrink-0" aria-hidden />
             <Input
-              type="search"
               aria-label={t('admin.whatsapp.attempts.searchPlaceholder')}
               placeholder={t('admin.whatsapp.attempts.searchPlaceholder')}
               value={search}
-              onChange={(e) => setSearch((e.target as HTMLInputElement).value)}
-              className="w-full h-10 ps-10 pe-10 rounded-full border border-default-200/60 bg-default-100/30 dark:bg-default-50/10 text-sm text-default-700 dark:text-default-300 placeholder:text-default-500 font-semibold transition-all duration-300 hover:border-brand/40 hover:bg-brand/5 dark:hover:bg-brand/10 focus:border-brand/80 focus:outline-none focus:ring-2 focus:ring-brand/20"
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full font-medium ps-9"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch('')}
-                className="absolute end-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-default-400 hover:text-default-600 focus:outline-none cursor-pointer"
+                className="absolute right-3 p-1 rounded-full text-default-400 hover:text-default-600 focus:outline-none cursor-pointer"
                 aria-label="Clear search"
               >
                 <XCircle className="size-4" />
@@ -373,7 +367,12 @@ export function AdminWhatsAppStatusPage() {
                   <div
                     key={attempt.id}
                     role="listitem"
-                    className="content-surface p-4 border border-divider/60 rounded-2xl space-y-3 transition-all"
+                    onClick={() => {
+                      if (target) navigate(target);
+                    }}
+                    className={`content-surface p-4 border border-divider/60 rounded-2xl space-y-3 transition-all ${
+                      target ? 'cursor-pointer hover:border-brand/40 active:scale-[0.99]' : ''
+                    }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -416,32 +415,21 @@ export function AdminWhatsAppStatusPage() {
                       <span className="text-xs text-default-400">
                         {t('admin.whatsapp.attempts.attempts')}: <span className="font-semibold text-default-700 dark:text-default-300 tabular-nums">{attempt.attempts}</span>
                       </span>
-                      <div className="flex items-center gap-2">
-                        {target ? (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onPress={() => navigate(target)}
-                            className="h-8 px-3 rounded-lg text-xs font-semibold transition-all hover:bg-brand/10 hover:text-brand"
-                          >
-                            {attempt.entityType === 'Return'
-                              ? t('admin.whatsapp.attempts.openReturn')
-                              : t('admin.whatsapp.attempts.openOrder')}
-                          </Button>
-                        ) : null}
-                        {attempt.status === 'failed' ? (
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            isDisabled={isRetrying}
-                            onPress={() => retryMutation.mutate(attempt.id)}
-                            className="h-8 min-w-[70px] rounded-lg text-xs"
-                          >
-                            <RefreshCw className={isRetrying ? 'size-3.5 animate-spin' : 'size-3.5'} aria-hidden />
-                            {t('admin.whatsapp.retry.button')}
-                          </Button>
-                        ) : null}
-                      </div>
+                      {attempt.status === 'failed' ? (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          isDisabled={isRetrying}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            retryMutation.mutate(attempt.id);
+                          }}
+                          className="h-8 min-w-[70px] rounded-lg text-xs"
+                        >
+                          <RefreshCw className={isRetrying ? 'size-3.5 animate-spin' : 'size-3.5'} aria-hidden />
+                          {t('admin.whatsapp.retry.button')}
+                        </Button>
+                      ) : null}
                     </div>
                   </div>
                 );
@@ -552,7 +540,7 @@ function StatsCard({
   label: string;
   value: number;
   colorClass: string;
-  icon: LucideIcon;
+  icon: any;
   animate?: boolean;
 }) {
   return (

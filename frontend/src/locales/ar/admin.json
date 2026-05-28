@@ -512,7 +512,32 @@
     "unblockConfirm": "إلغاء حظر {{name}}؟",
     "unblockConfirmMsg": "سيستعيد هذا المستخدم الوصول إلى حسابه.",
     "blockError": "تعذّر حظر هذا الحساب. حاول مرة أخرى.",
-    "unblockError": "تعذّر إلغاء حظر هذا الحساب. حاول مرة أخرى."
+    "unblockError": "تعذّر إلغاء حظر هذا الحساب. حاول مرة أخرى.",
+    "stats": {
+      "total": "إجمالي المستخدمين",
+      "active": "المستخدمون النشطون",
+      "admins": "المسؤولون",
+      "customers": "العملاء",
+      "blocked": "المستخدمون المحظورون"
+    },
+    "colEmailPhone": "البريد الإلكتروني / الهاتف",
+    "colRole": "الدور",
+    "colActions": "الإجراءات",
+    "roleAdmin": "مسؤول",
+    "roleCustomer": "عميل",
+    "filterRole": "الدور",
+    "filterStatus": "الحالة",
+    "sortBy": "ترتيب حسب",
+    "allRoles": "جميع الأدوار",
+    "allStatuses": "جميع الحالات",
+    "sortNewest": "الأحدث انضماماً",
+    "sortOldest": "الأقدم انضماماً",
+    "sortName": "الاسم (أ-ي)",
+    "changeRole": "تغيير الدور",
+    "changeRoleConfirm": "تغيير دور {{name}}؟",
+    "changeRoleConfirmMsg": "هل أنت متأكد من تغيير دور {{name}} إلى {{role}}؟ سيؤدي ذلك إلى تحديث صلاحياتهم.",
+    "changeRoleSuccess": "تم تحديث دور المستخدم بنجاح.",
+    "changeRoleError": "تعذر تحديث دور المستخدم. يرجى المحاولة مرة أخرى."
   },
   "audit": {
     "title": "سجل تدقيق الإدارة",

@@ -1,4 +1,3 @@
-/* eslint-disable i18next/no-literal-string -- Allow page routes */
 import { Button, Spinner } from '@heroui/react';
 import { toast } from '@heroui/react/toast';
 import { isAxiosError } from 'axios';

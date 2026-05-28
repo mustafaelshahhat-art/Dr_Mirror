@@ -476,7 +476,32 @@
     "unblockConfirm": "Unblock {{name}}?",
     "unblockConfirmMsg": "This user will regain access to their account.",
     "blockError": "Couldn't block this account. Please try again.",
-    "unblockError": "Couldn't unblock this account. Please try again."
+    "unblockError": "Couldn't unblock this account. Please try again.",
+    "stats": {
+      "total": "Total Users",
+      "active": "Active Users",
+      "admins": "Admins",
+      "customers": "Customers",
+      "blocked": "Blocked Users"
+    },
+    "colEmailPhone": "Email & Phone",
+    "colRole": "Role",
+    "colActions": "Actions",
+    "roleAdmin": "Admin",
+    "roleCustomer": "Customer",
+    "filterRole": "Role",
+    "filterStatus": "Status",
+    "sortBy": "Sort By",
+    "allRoles": "All Roles",
+    "allStatuses": "All Statuses",
+    "sortNewest": "Newest Joined",
+    "sortOldest": "Oldest Joined",
+    "sortName": "Name (A-Z)",
+    "changeRole": "Change Role",
+    "changeRoleConfirm": "Change role of {{name}}?",
+    "changeRoleConfirmMsg": "Are you sure you want to change the role of {{name}} to {{role}}? This will update their permissions.",
+    "changeRoleSuccess": "User role updated successfully.",
+    "changeRoleError": "Couldn't update user role. Please try again."
   },
   "audit": {
     "title": "Admin audit log",
