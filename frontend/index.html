@@ -8,24 +8,14 @@
     <title>Dr. Mirror</title>
 
     <!--
-      Self-hosted variable fonts. Preloaded with crossorigin so the WOFF2
-      files are ready before first paint and there's no FOUT.
+      Self-hosted variable fonts loaded via @font-face in fonts.css.
+      No manual <link rel="preload"> — all page components are lazy-loaded
+      via React.lazy(), so no visible text exists until well after window
+      load. Preloading caused "preloaded but not used" console warnings
+      without measurable first-paint benefit. font-display: swap provides
+      an acceptable fallback during the brief async font fetch.
       Per A17 / §1.3: zero third-party font CDN at runtime.
     -->
-    <link
-      rel="preload"
-      href="/fonts/Satoshi-Variable.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/Alexandria-Variable.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
 
     <!--
       Anti-FOUC theme + locale bootstrap. Runs synchronously BEFORE React

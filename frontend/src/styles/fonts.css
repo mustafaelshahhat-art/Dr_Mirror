@@ -3,7 +3,9 @@
  * - Satoshi: English primary (Latin glyphs); single variable WOFF2, weights 300–900.
  * - Alexandria: Arabic primary (Arabic glyphs); single variable WOFF2, weights 100–900.
  *
- * Both files live in /public/fonts and are preloaded from index.html.
+ * Both files live in /public/fonts. No manual <link rel="preload"> in
+ * index.html — the SPA's lazy-loaded routes mean no visible text exists
+ * at window-load time, so preload offered no benefit.
  * font-display: swap → no invisible text during load.
  * Mixed-script content is handled at the font-family level (see globals.css);
  * Satoshi has no Arabic glyphs, so Arabic runs fall through to Alexandria,
