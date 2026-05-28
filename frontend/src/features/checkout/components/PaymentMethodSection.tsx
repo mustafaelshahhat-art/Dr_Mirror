@@ -1,7 +1,9 @@
-import { Alert, Button } from '@heroui/react';
+import { Button } from '@heroui/react';
 import { CreditCard } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { StatusAlert } from '../../../shared/components/StatusAlert';
 
 import { usePaymentMethodsQuery } from '../../orders/hooks';
 import { ContactSupportLink } from '../../../shared/components/ContactSupportLink';
@@ -55,19 +57,17 @@ export function PaymentMethodSection({
 
   if (query.isError) {
     return (
-      <Alert status="danger" role="alert" className="rounded-xl">
-        <Alert.Content>
-          <Alert.Description>{t('checkout.payment.errorLoad')}</Alert.Description>
-        </Alert.Content>
+      <StatusAlert variant="danger" className="rounded-xl flex items-center justify-between gap-3">
+        <span>{t('checkout.payment.errorLoad')}</span>
         <Button
           variant="ghost"
           size="sm"
           onPress={() => void query.refetch()}
-          className="shrink-0 rounded-xl text-danger"
+          className="shrink-0 rounded-xl text-danger hover:bg-danger/10"
         >
           {t('checkout.payment.retry')}
         </Button>
-      </Alert>
+      </StatusAlert>
     );
   }
 

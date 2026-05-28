@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Form, Modal, useOverlayState } from '@heroui/react';
+import { Button, Form, useOverlayState } from '@heroui/react';
 import { toast } from '@heroui/react/toast';
 import { CheckCircle2, ShieldAlert, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
+
+import { ConfirmDialog } from '../../shared/components/ConfirmDialog';
 
 import { FormField } from '../auth/components/FormField';
 import { PhoneVerificationModal, maskPhone } from '../auth/components/PhoneVerificationModal';
@@ -157,32 +159,17 @@ export function AccountProfilePage() {
       </div>
 
       {/* Delete phone confirmation modal */}
-      <Modal>
-        <Modal.Backdrop isOpen={deleteConfirmState.isOpen} isDismissable={!isDeletingPhone} onOpenChange={(open) => { if (!open) deleteConfirmState.close(); }}>
-          <Modal.Container size="sm">
-            <Modal.Dialog>
-              {() => (
-                <>
-                  <Modal.Header>
-                    <Modal.Heading>{t('account.account.profile.deletePhoneTitle')}</Modal.Heading>
-                  </Modal.Header>
-                  <Modal.Body>
-                    <p className="text-sm text-default-600">{t('account.account.profile.deletePhoneConfirm')}</p>
-                  </Modal.Body>
-                  <Modal.Footer>
-                    <Button type="button" variant="ghost" size="sm" isDisabled={isDeletingPhone} onPress={deleteConfirmState.close}>
-                      {t('common.cancel')}
-                    </Button>
-                    <Button type="button" variant="danger" size="sm" isPending={isDeletingPhone} isDisabled={isDeletingPhone} onPress={handleDeletePhone}>
-                      {t('account.account.profile.deletePhoneConfirmButton')}
-                    </Button>
-                  </Modal.Footer>
-                </>
-              )}
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
+      <ConfirmDialog
+        isOpen={deleteConfirmState.isOpen}
+        onOpenChange={(open) => { if (!open) deleteConfirmState.close(); }}
+        title={t('account.account.profile.deletePhoneTitle')}
+        description={t('account.account.profile.deletePhoneConfirm')}
+        confirmLabel={t('account.account.profile.deletePhoneConfirmButton')}
+        cancelLabel={t('common.cancel')}
+        onConfirm={handleDeletePhone}
+        isPending={isDeletingPhone}
+        variant="danger"
+      />
 
       {/* Phone OTP verification modal */}
       {phoneUnverified && (

@@ -112,6 +112,13 @@
   "quantityMultiplier": "× {{count}}",
   "cancel": "إلغاء",
   "submitting": "جاري التنفيذ...",
+  "confirm": {
+    "logout": {
+      "title": "تسجيل الخروج",
+      "body": "هل أنت متأكد من رغبتك في تسجيل الخروج؟ ستغادر الجلسة الحالية.",
+      "confirm": "تسجيل الخروج"
+    }
+  },
   "clear": "مسح",
   "mobileNav": {
     "label": "التنقل الرئيسي",

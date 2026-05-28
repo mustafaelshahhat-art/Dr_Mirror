@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Breadcrumbs, Button } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Menu } from 'lucide-react';
@@ -8,12 +9,14 @@ import { LangSwitcher } from '../../../shared/components/LangSwitcher';
 import { ThemeToggle } from '../../../shared/components/ThemeToggle';
 import { getAdminHeaderTitleKeys } from '../adminNav';
 import { ADMIN_HEADER_HEIGHT_CLASS } from './adminShellTokens';
+import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 
 export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
   const { t } = useTranslation();
   const { logout, isAdmin } = useAuth();
   const location = useLocation();
   const titleKeys = getAdminHeaderTitleKeys(location.pathname);
+  const [isConfirmingSignOut, setIsConfirmingSignOut] = useState(false);
 
   if (!isAdmin) return null;
 
@@ -51,7 +54,7 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
             variant="ghost"
             size="sm"
             className="hidden sm:flex"
-            onPress={() => void logout()}
+            onPress={() => setIsConfirmingSignOut(true)}
             aria-label={t('admin.shell.accountMenu.signOut')}
           >
             {t('admin.shell.accountMenu.signOut')}
@@ -60,6 +63,20 @@ export function AdminHeader({ onMenuPress }: { onMenuPress: () => void }) {
           <ThemeToggle />
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={isConfirmingSignOut}
+        onOpenChange={setIsConfirmingSignOut}
+        title={t('confirm.logout.title')}
+        description={t('confirm.logout.body')}
+        confirmLabel={t('confirm.logout.confirm')}
+        cancelLabel={t('common.cancel')}
+        onConfirm={() => {
+          setIsConfirmingSignOut(false);
+          void logout();
+        }}
+        variant="danger"
+      />
     </header>
   );
 }

@@ -1,10 +1,12 @@
-import { Alert, Button, Form } from '@heroui/react';
+import { Button, Form } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
+
+import { StatusAlert } from '../../shared/components/StatusAlert';
 
 import { useAuth } from '../auth/useAuth';
 import { PhoneVerificationModal } from '../auth/components/PhoneVerificationModal';
@@ -296,21 +298,15 @@ function CheckoutBody() {
       >
         <div className="space-y-4">
           {formError ? (
-            // eslint-disable-next-line i18next/no-literal-string -- component status token, not user copy
-            <Alert status="danger" role="alert" className="rounded-xl">
-              <Alert.Content>
-                <Alert.Description>{formError}</Alert.Description>
-              </Alert.Content>
-            </Alert>
+            <StatusAlert variant="danger" className="rounded-xl">
+              {formError}
+            </StatusAlert>
           ) : null}
 
           {shippingGovernorateUnavailable ? (
-            // eslint-disable-next-line i18next/no-literal-string -- component status token, not user copy
-            <Alert status="warning" role="alert" className="rounded-xl">
-              <Alert.Content>
-                <Alert.Description>{t('shipping.validation.governorateUnavailable')}</Alert.Description>
-              </Alert.Content>
-            </Alert>
+            <StatusAlert variant="warning" className="rounded-xl">
+              {t('shipping.validation.governorateUnavailable')}
+            </StatusAlert>
           ) : null}
 
           <div key={step} className="checkout-card enter-fade-up">

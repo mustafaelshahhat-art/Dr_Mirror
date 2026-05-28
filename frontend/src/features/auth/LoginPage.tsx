@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, Button, Form } from '@heroui/react';
+import { Button, Form } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { isAxiosError } from 'axios';
+
+import { StatusAlert } from '../../shared/components/StatusAlert';
 
 import { AuthCard } from './components/AuthCard';
 import { FormField } from './components/FormField';
@@ -68,11 +70,9 @@ export function LoginPage() {
     >
       <Form onSubmit={onSubmit} className="flex flex-col gap-4">
         {serverError ? (
-          <Alert status="danger" role="alert">
-            <Alert.Content>
-              <Alert.Description>{serverError}</Alert.Description>
-            </Alert.Content>
-          </Alert>
+          <StatusAlert variant="danger">
+            {serverError}
+          </StatusAlert>
         ) : null}
 
         <FormField

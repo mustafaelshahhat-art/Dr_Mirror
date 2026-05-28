@@ -1,11 +1,12 @@
-import { Alert, Button, FieldError, Fieldset, Form, Heading, Input, Label, Paragraph, TextArea, TextField } from '@heroui/react';
+import { Button, FieldError, Fieldset, Form, Heading, Input, Label, Paragraph, TextArea, TextField } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
+import { StatusAlert } from '../../../shared/components/StatusAlert';
 import { useSubmitInquiryMutation } from '../hooks';
 
 const egyptPhoneRegex = /^\+?2?01[0125]\d{8}$/;
@@ -81,18 +82,15 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
 
   if (success) {
     return (
-      <Alert status="success">
-        <Alert.Indicator>
-          <Check className="size-5" aria-hidden />
-        </Alert.Indicator>
-        <Alert.Content>
-          <Alert.Title>{t('inquiries.form.successTitle')}</Alert.Title>
-          <Alert.Description>{t('inquiries.form.successSubtitle')}</Alert.Description>
-        </Alert.Content>
-        <Button type="button" variant="ghost" size="sm" onPress={onReset}>
+      <StatusAlert variant="success" className="flex items-center justify-between gap-3">
+        <div>
+          <h4 className="font-semibold text-success-800 dark:text-success">{t('inquiries.form.successTitle')}</h4>
+          <p className="text-xs mt-0.5 text-success-700 dark:text-success-400">{t('inquiries.form.successSubtitle')}</p>
+        </div>
+        <Button type="button" variant="ghost" size="sm" onPress={onReset} className="text-success-800 hover:bg-success/10 shrink-0">
           {t('inquiries.form.sendAnother')}
         </Button>
-      </Alert>
+      </StatusAlert>
     );
   }
 
@@ -254,11 +252,9 @@ export function InquiryForm({ productId, defaultSubject }: InquiryFormProps) {
       </Fieldset>
 
       {submitError && (
-        <Alert status="danger" role="alert">
-          <Alert.Content>
-            <Alert.Description>{submitError}</Alert.Description>
-          </Alert.Content>
-        </Alert>
+        <StatusAlert variant="danger">
+          {submitError}
+        </StatusAlert>
       )}
 
       <Button

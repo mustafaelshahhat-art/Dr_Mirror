@@ -1,7 +1,9 @@
-import { Alert, Button, Input, Label, Modal, TextField } from '@heroui/react';
+import { Button, Input, Label, Modal, TextField } from '@heroui/react';
 import type { AxiosError } from 'axios';
 import { useEffect, useRef, useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { StatusAlert } from '../../../shared/components/StatusAlert';
 
 import type { SendOtpResponse, VerifyOtpResponse } from '../api';
 
@@ -197,17 +199,13 @@ export function PhoneVerificationModal({
                       </p>
 
                       {sendStatus === 'sending' ? (
-                        <Alert status="default" role="status">
-                          <Alert.Content>
-                            <Alert.Description>{t('account.account.profile.otp.sending')}</Alert.Description>
-                          </Alert.Content>
-                        </Alert>
+                        <StatusAlert variant="info">
+                          {t('account.account.profile.otp.sending')}
+                        </StatusAlert>
                       ) : sendStatus === 'sent' ? (
-                        <Alert status="success" role="status">
-                          <Alert.Content>
-                            <Alert.Description>{t('account.account.profile.otp.sent')}</Alert.Description>
-                          </Alert.Content>
-                        </Alert>
+                        <StatusAlert variant="success">
+                          {t('account.account.profile.otp.sent')}
+                        </StatusAlert>
                       ) : null}
 
                       <TextField
@@ -229,11 +227,9 @@ export function PhoneVerificationModal({
                   )}
 
                   {error ? (
-                    <Alert status="danger" role="alert">
-                      <Alert.Content>
-                        <Alert.Description>{error}</Alert.Description>
-                      </Alert.Content>
-                    </Alert>
+                    <StatusAlert variant="danger">
+                      {error}
+                    </StatusAlert>
                   ) : null}
                 </Modal.Body>
                 <Modal.Footer>
@@ -296,6 +292,7 @@ export function PhoneVerificationModal({
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function maskPhone(phone: string): string {
   if (phone.length <= 4) return '*'.repeat(phone.length);
   return phone.slice(0, 2) + '*'.repeat(phone.length - 4) + phone.slice(-2);

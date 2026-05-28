@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Separator } from '@heroui/react';
+import { Button, Card, Separator } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
@@ -10,6 +10,7 @@ import type { AppLang } from '../../shared/lib/theme-storage';
 import { CartLineSkeleton } from '../../shared/components/Skeleton';
 import { EmptyState } from '../../shared/components/EmptyState';
 import { PageHeader } from '../../shared/components/PageHeader';
+import { StatusAlert } from '../../shared/components/StatusAlert';
 
 import { CartLineRow } from './components/CartLineRow';
 import { useCart } from './useCart';
@@ -42,27 +43,23 @@ export function CartPage() {
       />
 
       {mergeError ? (
-        <Alert status="danger" role="alert">
-          <Alert.Content>
-            <Alert.Description>{mergeError}</Alert.Description>
-          </Alert.Content>
+        <StatusAlert variant="danger" className="flex items-center justify-between gap-3">
+          <span>{mergeError}</span>
           <Button
             variant="ghost"
             size="sm"
             onPress={() => void retryMerge()}
-            className="shrink-0 text-danger"
+            className="shrink-0 text-danger hover:bg-danger/10"
           >
             {t('cart.retryMerge')}
           </Button>
-        </Alert>
+        </StatusAlert>
       ) : null}
 
       {errorMessage ? (
-        <Alert status="danger" role="alert">
-          <Alert.Content>
-            <Alert.Description>{errorMessage}</Alert.Description>
-          </Alert.Content>
-        </Alert>
+        <StatusAlert variant="danger">
+          {errorMessage}
+        </StatusAlert>
       ) : null}
 
       {cart.isLoading ? (

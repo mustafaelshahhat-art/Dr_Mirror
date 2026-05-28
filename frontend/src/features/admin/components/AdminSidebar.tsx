@@ -7,6 +7,7 @@ import type { LucideIcon } from 'lucide-react';
 
 import { useAuth } from '../../../features/auth/useAuth';
 import { BrandLockup } from '../../../shared/components/BrandLockup';
+import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 
 import { ADMIN_DRAWER_HEIGHT_CLASS, ADMIN_HEADER_OFFSET_CLASS } from './adminShellTokens';
 import { ADMIN_NAV_GROUPS } from '../adminNav';
@@ -25,6 +26,8 @@ export function AdminSidebar({
     .slice(0, 2)
     .map((n) => n[0]?.toUpperCase() ?? '')
     .join('');
+
+  const [isConfirmingSignOut, setIsConfirmingSignOut] = useState(false);
 
   const [isLg, setIsLg] = useState(() => {
     if (typeof window === 'undefined') return true;
@@ -71,7 +74,7 @@ export function AdminSidebar({
                   <button
                     type="button"
                     aria-label={t('admin.shell.accountMenu.signOut')}
-                    onClick={() => void logout()}
+                    onClick={() => setIsConfirmingSignOut(true)}
                     className="flex size-7 shrink-0 items-center justify-center rounded-medium text-muted transition-colors hover:text-danger"
                   >
                     <LogOut className="size-3.5" aria-hidden />
@@ -80,7 +83,7 @@ export function AdminSidebar({
               ) : (
                 <button
                   type="button"
-                  onClick={() => void logout()}
+                  onClick={() => setIsConfirmingSignOut(true)}
                   className="group flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-xs font-bold text-brand hover:bg-danger-50 dark:hover:bg-danger-950/20 hover:text-danger transition-all duration-300"
                 >
                   <span className="group-hover:hidden">{initials}</span>
@@ -133,7 +136,7 @@ export function AdminSidebar({
                     <button
                       type="button"
                       aria-label={t('admin.shell.accountMenu.signOut')}
-                      onClick={() => { void logout(); onClose(); }}
+                      onClick={() => { setIsConfirmingSignOut(true); }}
                       className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-danger-50 dark:hover:bg-danger-950/20 hover:text-danger"
                     >
                       <LogOut className="size-4" aria-hidden />
@@ -145,6 +148,21 @@ export function AdminSidebar({
           </Drawer.Content>
         </Drawer.Backdrop>
       </Drawer>
+
+      <ConfirmDialog
+        isOpen={isConfirmingSignOut}
+        onOpenChange={setIsConfirmingSignOut}
+        title={t('confirm.logout.title')}
+        description={t('confirm.logout.body')}
+        confirmLabel={t('confirm.logout.confirm')}
+        cancelLabel={t('common.cancel')}
+        onConfirm={() => {
+          setIsConfirmingSignOut(false);
+          void logout();
+          onClose();
+        }}
+        variant="danger"
+      />
     </>
   );
 }

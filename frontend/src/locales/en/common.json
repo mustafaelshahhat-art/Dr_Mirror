@@ -109,6 +109,13 @@
   "quantityMultiplier": "× {{count}}",
   "cancel": "Cancel",
   "submitting": "Submitting...",
+  "confirm": {
+    "logout": {
+      "title": "Sign out",
+      "body": "Are you sure you want to sign out? You will leave the current session.",
+      "confirm": "Sign out"
+    }
+  },
   "clear": "Clear",
   "mobileNav": {
     "label": "Main navigation",
