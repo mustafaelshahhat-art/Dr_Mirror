@@ -8,6 +8,7 @@ import { DowntimeBanner } from './DowntimeBanner';
 import { ForbiddenBanner } from './ForbiddenBanner';
 import { Header } from './Header';
 import { LiveRegion } from './LiveRegion';
+import { MobileBottomNav } from './MobileBottomNav';
 
 /**
  * Global app shell — Header + outlet for route content + rich footer.
@@ -28,7 +29,7 @@ export function Layout() {
       <DowntimeBanner />
       <ForbiddenBanner />
       <Header />
-      <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 md:px-6 md:py-10 lg:px-8">
+      <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 pb-20 sm:pb-8 md:px-6 md:py-10 lg:px-8">
         <Outlet />
       </main>
 
@@ -134,6 +135,7 @@ export function Layout() {
         </div>
       </footer>
 
+      <MobileBottomNav />
       <LiveRegion />
     </div>
   );

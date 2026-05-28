@@ -39,5 +39,6 @@
   "adding": "Adding...",
   "selectVariantFirst": "Pick a color and size first",
   "outOfStockShort": "Out of stock",
-  "addError": "Couldn't add this item to your cart. Please try again."
+  "addError": "Couldn't add this item to your cart. Please try again.",
+  "retryMerge": "Retry merging cart"
 }

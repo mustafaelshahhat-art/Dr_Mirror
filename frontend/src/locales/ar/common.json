@@ -110,6 +110,17 @@
     "returns": "إرجاع سهل"
   },
   "quantityMultiplier": "× {{count}}",
+  "cancel": "إلغاء",
+  "submitting": "جاري التنفيذ...",
+  "clear": "مسح",
+  "mobileNav": {
+    "label": "التنقل الرئيسي",
+    "home": "الرئيسية",
+    "cart": "السلة",
+    "account": "حسابي",
+    "signIn": "دخول",
+    "inquiries": "تواصل"
+  },
   "dismiss": "إغلاق",
   "contactSupport": "تواصل مع الدعم",
   "errorBoundary": {

@@ -403,7 +403,8 @@
     "status": {
       "pending": "Awaiting review",
       "approved": "Approved",
-      "rejected": "Rejected"
+      "rejected": "Rejected",
+      "superseded": "Superseded"
     }
   },
   "sidebar": {

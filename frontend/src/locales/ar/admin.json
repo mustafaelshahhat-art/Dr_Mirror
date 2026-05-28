@@ -439,7 +439,8 @@
     "status": {
       "pending": "في انتظار المراجعة",
       "approved": "مقبول",
-      "rejected": "مرفوض"
+      "rejected": "مرفوض",
+      "superseded": "تم الاستبدال"
     }
   },
   "sidebar": {

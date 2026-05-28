@@ -107,6 +107,17 @@
     "returns": "Easy returns"
   },
   "quantityMultiplier": "× {{count}}",
+  "cancel": "Cancel",
+  "submitting": "Submitting...",
+  "clear": "Clear",
+  "mobileNav": {
+    "label": "Main navigation",
+    "home": "Home",
+    "cart": "Cart",
+    "account": "Account",
+    "signIn": "Sign in",
+    "inquiries": "Contact"
+  },
   "dismiss": "Dismiss",
   "contactSupport": "Contact support",
   "errorBoundary": {
