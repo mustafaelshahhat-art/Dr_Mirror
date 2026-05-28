@@ -11,7 +11,11 @@ const NAV_ITEMS = [
   { to: '/account/orders', icon: Package, labelKey: 'common.mobileNav.orders', end: true },
 ] as const;
 
-export function MobileBottomNav() {
+interface MobileBottomNavProps {
+  onAccountPress?: () => void;
+}
+
+export function MobileBottomNav({ onAccountPress }: MobileBottomNavProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
 
@@ -41,19 +45,30 @@ export function MobileBottomNav() {
           </li>
         ))}
         <li>
-          <NavLink
-            to={user ? '/account' : '/login'}
-            className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors ${
-                isActive
-                  ? 'text-brand'
-                  : 'text-default-500 hover:text-foreground'
-              }`
-            }
-          >
-            <User className="size-5" aria-hidden />
-            <span>{user ? t('common.mobileNav.account') : t('common.mobileNav.signIn')}</span>
-          </NavLink>
+          {user ? (
+            <button
+              type="button"
+              onClick={onAccountPress}
+              className="flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors text-default-500 hover:text-foreground cursor-pointer focus:outline-none w-full"
+            >
+              <User className="size-5" aria-hidden />
+              <span>{t('common.mobileNav.account')}</span>
+            </button>
+          ) : (
+            <NavLink
+              to="/login"
+              className={({ isActive }) =>
+                `flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors ${
+                  isActive
+                    ? 'text-brand'
+                    : 'text-default-500 hover:text-foreground'
+                }`
+              }
+            >
+              <User className="size-5" aria-hidden />
+              <span>{t('common.mobileNav.signIn')}</span>
+            </NavLink>
+          )}
         </li>
       </ul>
     </nav>

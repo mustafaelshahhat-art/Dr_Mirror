@@ -140,5 +140,15 @@
     "path": "Couldn't find {{path}}",
     "cta": "Back to catalog",
     "adminCta": "Back to admin dashboard"
+  },
+  "accountMenu": {
+    "account": "Account",
+    "myAccount": "My Account",
+    "profile": "Profile",
+    "myOrders": "My Orders",
+    "signOut": "Sign out",
+    "signOutConfirmTitle": "Sign out",
+    "signOutConfirmBody": "Are you sure you want to sign out? You will leave the current session.",
+    "cancel": "Cancel"
   }
 }
