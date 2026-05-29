@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Separator, Drawer } from '@heroui/react';
 import { Banknote, Smartphone, Wallet, LogOut as LogOutIcon, Package as PackageIcon, User as UserIcon } from 'lucide-react';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '../../features/auth/useAuth';
@@ -21,6 +21,7 @@ import { ConfirmDialog } from './ConfirmDialog';
 export function Layout() {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isConfirmingSignOut, setIsConfirmingSignOut] = useState(false);
 
@@ -175,22 +176,28 @@ export function Layout() {
               </div>
               
               <div className="px-3 py-2 space-y-1">
-                <Link
-                  to="/account"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3.5 w-full text-start px-4 py-3.5 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    navigate('/account');
+                  }}
+                  className="flex items-center gap-3.5 w-full text-start px-4 py-3.5 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <UserIcon className="size-5 text-default-500" aria-hidden />
                   <span>{t('common.accountMenu.myAccount')}</span>
-                </Link>
-                <Link
-                  to="/account/orders"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3.5 w-full text-start px-4 py-3.5 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    navigate('/account/orders');
+                  }}
+                  className="flex items-center gap-3.5 w-full text-start px-4 py-3.5 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <PackageIcon className="size-5 text-default-500" aria-hidden />
                   <span>{t('common.accountMenu.myOrders')}</span>
-                </Link>
+                </button>
                 
                 <div className="h-[1px] bg-divider/60 my-2 mx-4" />
                 

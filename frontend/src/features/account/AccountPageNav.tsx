@@ -1,6 +1,6 @@
 import { Tabs, Tooltip } from '@heroui/react';
 import { Lock, MapPin, RotateCcw, ShoppingBag, UserRound } from 'lucide-react';
-import { type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
@@ -22,13 +22,45 @@ function normalizeTab(value: string | null): AccountTabKey {
 export function AccountPageNav({ panels }: { panels: Record<AccountTabKey, ReactNode> }) {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const selected = normalizeTab(searchParams.get('tab'));
+
+  const rawTab = searchParams.get('tab');
+  const selected = normalizeTab(rawTab);
+
+  // Idempotently normalize missing/invalid tab params ONCE after mount,
+  // without triggering onSelectionChange (which would cause an infinite
+  // loop if HeroUI fires onSelectionChange on mount or prop change).
+  useEffect(() => {
+    if (rawTab !== selected) {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.set('tab', selected);
+          return next;
+        },
+        { replace: true },
+      );
+    }
+  }, [rawTab, selected, setSearchParams]);
 
   return (
     <Tabs
       variant="secondary"
       selectedKey={selected}
-      onSelectionChange={(key) => setSearchParams({ tab: String(key) }, { replace: true })}
+      onSelectionChange={(key) => {
+        const nextTab = String(key) as AccountTabKey;
+        // Guard: only write to URL when the tab actually changes.
+        // This prevents mount-time onSelectionChange calls and
+        // spurious re-renders from creating a loop.
+        if (nextTab === normalizeTab(searchParams.get('tab'))) return;
+        setSearchParams(
+          (prev) => {
+            const next = new URLSearchParams(prev);
+            next.set('tab', nextTab);
+            return next;
+          },
+          { replace: true },
+        );
+      }}
       className="space-y-6"
     >
       <Tabs.ListContainer className="overflow-x-auto">
