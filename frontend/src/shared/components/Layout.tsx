@@ -1,20 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
-import { Separator, Drawer } from '@heroui/react';
-import {
-  Banknote,
-  Smartphone,
-  Wallet,
-  LogOut as LogOutIcon,
-  Package as PackageIcon,
-  User as UserIcon,
-  RotateCcw as RotateCcwIcon,
-  MapPin as MapPinIcon,
-  Lock as LockIcon,
-} from 'lucide-react';
-import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Separator } from '@heroui/react';
+import { Banknote, Smartphone, Wallet } from 'lucide-react';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '../../features/auth/useAuth';
+import { AccountSheet } from './AccountSheet';
 import { BrandLockup } from './BrandLockup';
 import { DowntimeBanner } from './DowntimeBanner';
 import { ForbiddenBanner } from './ForbiddenBanner';
@@ -32,45 +23,16 @@ export function Layout() {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isConfirmingSignOut, setIsConfirmingSignOut] = useState(false);
 
-  // Controlled navigate-before-close pattern to allow HeroUI Drawer and React Aria 
-  // to cleanly exit and naturally remove their body/DOM locks without interruption.
+  // The account menu is a non-modal sheet that unmounts cleanly on close, so we
+  // can close and navigate in the same tick — no timeout or body cleanup needed.
+  // (The sheet also self-closes on route change for back/forward navigations.)
   const handleMobileNav = (to: string) => {
     setIsMobileMenuOpen(false);
-    setTimeout(() => {
-      navigate(to);
-    }, 200);
+    navigate(to);
   };
-
-  // Track previous location to detect actual route changes (not state changes).
-  // When the route changes, close the drawer if open and clean up any body style
-  // artifacts left by the focus trap. Calling setIsMobileMenuOpen(false) when already
-  // closed is a safe no-op (React skips the re-render on identical state).
-  const prevLocationRef = useRef(location.pathname + location.search);
-
-  useEffect(() => {
-    const currentLocation = location.pathname + location.search;
-    const prevLocation = prevLocationRef.current;
-    prevLocationRef.current = currentLocation;
-
-    if (currentLocation !== prevLocation) {
-      setIsMobileMenuOpen(false);
-      const cleanupTimer = setTimeout(() => {
-        document.body.style.removeProperty('overflow');
-        document.body.style.removeProperty('pointer-events');
-      }, 250);
-      return () => clearTimeout(cleanupTimer);
-    }
-  }, [location.pathname, location.search]);
-
-  const initials = (user?.fullName ?? '')
-    .split(' ')
-    .slice(0, 2)
-    .map((n) => n[0]?.toUpperCase() ?? '')
-    .join('');
 
   return (
     <div className="flex min-h-svh flex-col bg-background text-foreground">
@@ -193,87 +155,16 @@ export function Layout() {
       <LiveRegion />
 
       {user && (
-        <Drawer
+        <AccountSheet
           isOpen={isMobileMenuOpen}
-          onOpenChange={setIsMobileMenuOpen}
-        >
-          <Drawer.Backdrop className="bg-background/80 backdrop-blur-sm z-50" />
-          {/* eslint-disable-next-line i18next/no-literal-string */}
-          <Drawer.Content placement="bottom" className="rounded-t-2xl border-t border-divider/60 bg-background pb-[max(1rem,env(safe-area-inset-bottom))] p-0 z-50">
-            <Drawer.Dialog aria-label={t('common.accountMenu.account')} className="outline-none">
-              {/* Premium Grabber Handle */}
-              <div className="mx-auto my-3 h-1.5 w-12 rounded-full bg-default-300 dark:bg-default-700" />
-              
-              <div className="px-5 py-3">
-                <div className="flex items-center gap-4">
-                  <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-base font-bold text-brand">
-                    {initials}
-                  </span>
-                  <div className="min-w-0 flex-1 text-start">
-                    <p className="truncate text-base font-bold text-foreground leading-tight">{user.fullName}</p>
-                    <p className="truncate text-sm text-muted leading-tight mt-1" dir="ltr">{user.email}</p>
-                  </div>
-                </div>
-              </div>
-                       <div className="px-3 py-2 space-y-0.5">
-                <button
-                  type="button"
-                  onClick={() => handleMobileNav('/account?tab=personal-data')}
-                  className="flex items-center gap-3.5 w-full text-start px-4 py-3 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
-                >
-                  <UserIcon className="size-5 text-default-500" aria-hidden />
-                  <span>{t('account.account.tabs.personalData')}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleMobileNav('/account?tab=orders')}
-                  className="flex items-center gap-3.5 w-full text-start px-4 py-3 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
-                >
-                  <PackageIcon className="size-5 text-default-500" aria-hidden />
-                  <span>{t('account.account.tabs.orders')}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleMobileNav('/account?tab=returns')}
-                  className="flex items-center gap-3.5 w-full text-start px-4 py-3 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
-                >
-                  <RotateCcwIcon className="size-5 text-default-500" aria-hidden />
-                  <span>{t('account.account.tabs.returns')}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleMobileNav('/account?tab=addresses')}
-                  className="flex items-center gap-3.5 w-full text-start px-4 py-3 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
-                >
-                  <MapPinIcon className="size-5 text-default-500" aria-hidden />
-                  <span>{t('account.account.tabs.addresses')}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleMobileNav('/account?tab=security')}
-                  className="flex items-center gap-3.5 w-full text-start px-4 py-3 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
-                >
-                  <LockIcon className="size-5 text-default-500" aria-hidden />
-                  <span>{t('account.account.tabs.security')}</span>
-                </button>
-                
-                <div className="h-[1px] bg-divider/60 my-2 mx-4" />
-                
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    setIsConfirmingSignOut(true);
-                  }}
-                  className="flex items-center gap-3.5 w-full text-start px-4 py-3 rounded-xl text-sm font-semibold text-danger hover:bg-danger-50 dark:hover:bg-danger-950/20 active:scale-[0.98] transition-all cursor-pointer"
-                >
-                  <LogOutIcon className="size-5 text-danger/80" aria-hidden />
-                  <span>{t('common.accountMenu.signOut')}</span>
-                </button>
-              </div>
-            </Drawer.Dialog>
-          </Drawer.Content>
-        </Drawer>
+          onClose={() => setIsMobileMenuOpen(false)}
+          user={user}
+          onNavigate={handleMobileNav}
+          onSignOut={() => {
+            setIsMobileMenuOpen(false);
+            setIsConfirmingSignOut(true);
+          }}
+        />
       )}
 
       <ConfirmDialog
