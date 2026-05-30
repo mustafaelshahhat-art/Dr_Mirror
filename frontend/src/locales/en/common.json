@@ -120,12 +120,10 @@
   "mobileNav": {
     "label": "Main navigation",
     "home": "Home",
-    "shop": "Shop",
     "cart": "Cart",
     "account": "Account",
     "signIn": "Sign in",
-    "inquiries": "Contact",
-    "orders": "Orders"
+    "inquiries": "Contact"
   },
   "dismiss": "Dismiss",
   "contactSupport": "Contact support",

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Separator, Drawer } from '@heroui/react';
 import {
   Banknote,
@@ -45,34 +45,26 @@ export function Layout() {
     }, 200);
   };
 
-  // Safe, narrow failsafe route-change listener. If the route changes (e.g. browser back/forward buttons),
-  // we ensure the menu closed state is set. As a non-disruptive, narrow fallback, if the menu was open,
-  // we do a targeted body overflow/pointer-events clean up.
+  // Track previous location to detect actual route changes (not state changes).
+  // When the route changes, close the drawer if open and clean up any body style
+  // artifacts left by the focus trap. Calling setIsMobileMenuOpen(false) when already
+  // closed is a safe no-op (React skips the re-render on identical state).
+  const prevLocationRef = useRef(location.pathname + location.search);
+
   useEffect(() => {
-    let active = true;
-    if (isMobileMenuOpen) {
-      // Close the menu asynchronously to avoid synchronous setState inside render warnings
-      const closeTimer = setTimeout(() => {
-        if (active) {
-          setIsMobileMenuOpen(false);
-        }
-      }, 0);
+    const currentLocation = location.pathname + location.search;
+    const prevLocation = prevLocationRef.current;
+    prevLocationRef.current = currentLocation;
 
-      // Targeted failsafe: ONLY clean up body styles if the menu was open, and only after transition
+    if (currentLocation !== prevLocation) {
+      setIsMobileMenuOpen(false);
       const cleanupTimer = setTimeout(() => {
-        if (active) {
-          document.body.style.removeProperty('overflow');
-          document.body.style.removeProperty('pointer-events');
-        }
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('pointer-events');
       }, 250);
-
-      return () => {
-        active = false;
-        clearTimeout(closeTimer);
-        clearTimeout(cleanupTimer);
-      };
+      return () => clearTimeout(cleanupTimer);
     }
-  }, [location.pathname, location.search, isMobileMenuOpen]);
+  }, [location.pathname, location.search]);
 
   const initials = (user?.fullName ?? '')
     .split(' ')

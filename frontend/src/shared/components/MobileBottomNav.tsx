@@ -1,14 +1,12 @@
-import { Home, Store, ShoppingCart, Package, User } from 'lucide-react';
+import { Home, ShoppingCart, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 
 import { useAuth } from '../../features/auth/useAuth';
 
 const NAV_ITEMS = [
   { to: '/', icon: Home, labelKey: 'common.mobileNav.home', end: true },
-  { to: '/', icon: Store, labelKey: 'common.mobileNav.shop', end: true },
   { to: '/cart', icon: ShoppingCart, labelKey: 'common.mobileNav.cart', end: false },
-  { to: '/account/orders', icon: Package, labelKey: 'common.mobileNav.orders', end: true },
 ] as const;
 
 interface MobileBottomNavProps {
@@ -18,6 +16,9 @@ interface MobileBottomNavProps {
 export function MobileBottomNav({ onAccountPress }: MobileBottomNavProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const location = useLocation();
+
+  const isAccountActive = location.pathname === '/account' || location.pathname.startsWith('/account/');
 
   return (
     <nav
@@ -49,7 +50,11 @@ export function MobileBottomNav({ onAccountPress }: MobileBottomNavProps) {
             <button
               type="button"
               onClick={onAccountPress}
-              className="flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors text-default-500 hover:text-foreground cursor-pointer focus:outline-none w-full"
+              className={`flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors cursor-pointer focus:outline-none w-full ${
+                isAccountActive
+                  ? 'text-brand'
+                  : 'text-default-500 hover:text-foreground'
+              }`}
             >
               <User className="size-5" aria-hidden />
               <span>{t('common.mobileNav.account')}</span>

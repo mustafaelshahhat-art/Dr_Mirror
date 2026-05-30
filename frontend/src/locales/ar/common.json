@@ -123,12 +123,10 @@
   "mobileNav": {
     "label": "التنقل الرئيسي",
     "home": "الرئيسية",
-    "shop": "المتجر",
     "cart": "السلة",
     "account": "حسابي",
     "signIn": "دخول",
-    "inquiries": "تواصل",
-    "orders": "طلباتي"
+    "inquiries": "تواصل"
   },
   "dismiss": "إغلاق",
   "contactSupport": "تواصل مع الدعم",
