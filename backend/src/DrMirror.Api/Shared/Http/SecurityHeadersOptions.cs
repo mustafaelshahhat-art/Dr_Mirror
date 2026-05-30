@@ -13,7 +13,7 @@ public sealed class SecurityHeadersOptions
     public string ContentTypeOptions { get; set; } = "nosniff";
     public string ReferrerPolicy { get; set; } = "strict-origin-when-cross-origin";
     public string FrameOptions { get; set; } = "DENY";
-    public string CrossOriginResourcePolicy { get; set; } = "same-site";
+    public string CrossOriginResourcePolicy { get; set; } = "cross-origin";
     public bool EmitInDevelopment { get; set; } = true;
     public bool EmitHstsOnlyOverHttps { get; set; } = true;
 }

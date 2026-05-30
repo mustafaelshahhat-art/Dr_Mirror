@@ -13,7 +13,13 @@ import { setRateLimitState } from './rate-limit-store';
  * Single axios instance for the app.
  *
  * In dev, requests to `/api/*` are proxied to the .NET backend via vite.config.ts.
- * In prod, set VITE_API_BASE_URL to the deployed backend origin or /api path.
+ * In prod, `vercel.json` rewrites `/api/*` to the deployed backend so all
+ * requests remain same-origin, avoiding cross-origin cookie restrictions
+ * that mobile browsers enforce on SameSite=None cookies.
+ *
+ * `VITE_API_BASE_URL` is respected when it points to a relative path or the
+ * same origin. When it points to a different origin, the function returns `/api`
+ * so the Vercel rewrites proxy handles the request, keeping cookies same-origin.
  *
  * `withCredentials: true` is essential — the refresh cookie must ride along
  * with every request (Path=/api/auth on the cookie limits its surface).
@@ -24,6 +30,18 @@ export function normalizeApiBaseUrl(raw: string | null | undefined): string {
 
   const withoutTrailingSlash = value.replace(/\/+$/, '');
   if (!withoutTrailingSlash) return '/api';
+
+  if (typeof window !== 'undefined') {
+    try {
+      const configured = new URL(withoutTrailingSlash);
+      if (configured.origin !== window.location.origin) {
+        return '/api';
+      }
+    } catch {
+      // Ignored: fallback to default '/api' normalization if URL parsing fails
+    }
+  }
+
   if (/\/api$/i.test(withoutTrailingSlash)) return withoutTrailingSlash;
 
   return `${withoutTrailingSlash}/api`;

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import axios from 'axios';
 
 import { normalizeApiBaseUrl } from './api-client';
@@ -6,6 +6,22 @@ import * as authStorage from './auth-storage';
 import * as forbiddenStore from './forbidden-store';
 
 describe('normalizeApiBaseUrl', () => {
+  const originalLocation = window.location;
+
+  beforeEach(() => {
+    Object.defineProperty(window, 'location', {
+      value: new URL('http://localhost:5000'),
+      writable: true,
+    });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, 'location', {
+      value: originalLocation,
+      writable: true,
+    });
+  });
+
   it('returns /api for null', () => {
     expect(normalizeApiBaseUrl(null)).toBe('/api');
   });
@@ -30,7 +46,15 @@ describe('normalizeApiBaseUrl', () => {
     expect(normalizeApiBaseUrl('/api/')).toBe('/api');
   });
 
-  it('appends /api to backend origin', () => {
+  it('returns /api for a different-origin URL (cross-origin → use proxy)', () => {
+    expect(normalizeApiBaseUrl('http://other-origin:5000')).toBe('/api');
+  });
+
+  it('returns /api for a different-origin URL already ending in /api', () => {
+    expect(normalizeApiBaseUrl('http://other-origin:5000/api')).toBe('/api');
+  });
+
+  it('appends /api to same-origin backend URL', () => {
     expect(normalizeApiBaseUrl('http://localhost:5000')).toBe('http://localhost:5000/api');
   });
 
@@ -38,8 +62,8 @@ describe('normalizeApiBaseUrl', () => {
     expect(normalizeApiBaseUrl('http://localhost:5000/api')).toBe('http://localhost:5000/api');
   });
 
-  it('strips trailing slashes', () => {
-    expect(normalizeApiBaseUrl('http://backend/')).toBe('http://backend/api');
+  it('strips trailing slashes for same-origin URL', () => {
+    expect(normalizeApiBaseUrl('http://localhost:5000/')).toBe('http://localhost:5000/api');
   });
 });
 

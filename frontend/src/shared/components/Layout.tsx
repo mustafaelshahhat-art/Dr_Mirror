@@ -1,7 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Separator, Drawer } from '@heroui/react';
-import { Banknote, Smartphone, Wallet, LogOut as LogOutIcon, Package as PackageIcon, User as UserIcon } from 'lucide-react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import {
+  Banknote,
+  Smartphone,
+  Wallet,
+  LogOut as LogOutIcon,
+  Package as PackageIcon,
+  User as UserIcon,
+  RotateCcw as RotateCcwIcon,
+  MapPin as MapPinIcon,
+  Lock as LockIcon,
+} from 'lucide-react';
+import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '../../features/auth/useAuth';
@@ -22,8 +32,47 @@ export function Layout() {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isConfirmingSignOut, setIsConfirmingSignOut] = useState(false);
+
+  // Controlled navigate-before-close pattern to allow HeroUI Drawer and React Aria 
+  // to cleanly exit and naturally remove their body/DOM locks without interruption.
+  const handleMobileNav = (to: string) => {
+    setIsMobileMenuOpen(false);
+    setTimeout(() => {
+      navigate(to);
+    }, 200);
+  };
+
+  // Safe, narrow failsafe route-change listener. If the route changes (e.g. browser back/forward buttons),
+  // we ensure the menu closed state is set. As a non-disruptive, narrow fallback, if the menu was open,
+  // we do a targeted body overflow/pointer-events clean up.
+  useEffect(() => {
+    let active = true;
+    if (isMobileMenuOpen) {
+      // Close the menu asynchronously to avoid synchronous setState inside render warnings
+      const closeTimer = setTimeout(() => {
+        if (active) {
+          setIsMobileMenuOpen(false);
+        }
+      }, 0);
+
+      // Targeted failsafe: ONLY clean up body styles if the menu was open, and only after transition
+      const cleanupTimer = setTimeout(() => {
+        if (active) {
+          document.body.style.removeProperty('overflow');
+          document.body.style.removeProperty('pointer-events');
+        }
+      }, 250);
+
+      return () => {
+        active = false;
+        clearTimeout(closeTimer);
+        clearTimeout(cleanupTimer);
+      };
+    }
+  }, [location.pathname, location.search, isMobileMenuOpen]);
 
   const initials = (user?.fullName ?? '')
     .split(' ')
@@ -174,29 +223,46 @@ export function Layout() {
                   </div>
                 </div>
               </div>
-              
-              <div className="px-3 py-2 space-y-1">
+                       <div className="px-3 py-2 space-y-0.5">
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    navigate('/account');
-                  }}
-                  className="flex items-center gap-3.5 w-full text-start px-4 py-3.5 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
+                  onClick={() => handleMobileNav('/account?tab=personal-data')}
+                  className="flex items-center gap-3.5 w-full text-start px-4 py-3 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <UserIcon className="size-5 text-default-500" aria-hidden />
-                  <span>{t('common.accountMenu.myAccount')}</span>
+                  <span>{t('account.account.tabs.personalData')}</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    navigate('/account/orders');
-                  }}
-                  className="flex items-center gap-3.5 w-full text-start px-4 py-3.5 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
+                  onClick={() => handleMobileNav('/account?tab=orders')}
+                  className="flex items-center gap-3.5 w-full text-start px-4 py-3 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <PackageIcon className="size-5 text-default-500" aria-hidden />
-                  <span>{t('common.accountMenu.myOrders')}</span>
+                  <span>{t('account.account.tabs.orders')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleMobileNav('/account?tab=returns')}
+                  className="flex items-center gap-3.5 w-full text-start px-4 py-3 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
+                >
+                  <RotateCcwIcon className="size-5 text-default-500" aria-hidden />
+                  <span>{t('account.account.tabs.returns')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleMobileNav('/account?tab=addresses')}
+                  className="flex items-center gap-3.5 w-full text-start px-4 py-3 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
+                >
+                  <MapPinIcon className="size-5 text-default-500" aria-hidden />
+                  <span>{t('account.account.tabs.addresses')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleMobileNav('/account?tab=security')}
+                  className="flex items-center gap-3.5 w-full text-start px-4 py-3 rounded-xl text-sm font-medium text-default-700 hover:bg-default-100 hover:text-foreground active:scale-[0.98] transition-all cursor-pointer"
+                >
+                  <LockIcon className="size-5 text-default-500" aria-hidden />
+                  <span>{t('account.account.tabs.security')}</span>
                 </button>
                 
                 <div className="h-[1px] bg-divider/60 my-2 mx-4" />
@@ -207,7 +273,7 @@ export function Layout() {
                     setIsMobileMenuOpen(false);
                     setIsConfirmingSignOut(true);
                   }}
-                  className="flex items-center gap-3.5 w-full text-start px-4 py-3.5 rounded-xl text-sm font-semibold text-danger hover:bg-danger-50 dark:hover:bg-danger-950/20 active:scale-[0.98] transition-all cursor-pointer"
+                  className="flex items-center gap-3.5 w-full text-start px-4 py-3 rounded-xl text-sm font-semibold text-danger hover:bg-danger-50 dark:hover:bg-danger-950/20 active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <LogOutIcon className="size-5 text-danger/80" aria-hidden />
                   <span>{t('common.accountMenu.signOut')}</span>

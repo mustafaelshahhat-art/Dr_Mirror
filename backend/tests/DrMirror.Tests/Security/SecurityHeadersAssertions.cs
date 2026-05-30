@@ -20,7 +20,7 @@ public static class SecurityHeadersAssertions
         AssertHeader(response, "X-Content-Type-Options", "nosniff");
         AssertHeader(response, "Referrer-Policy", "strict-origin-when-cross-origin");
         AssertHeader(response, "X-Frame-Options", "DENY");
-        AssertHeader(response, "Cross-Origin-Resource-Policy", "same-site");
+        AssertHeader(response, "Cross-Origin-Resource-Policy", "cross-origin");
     }
 
     public static void AssertHsts(HttpResponseMessage response, bool expectPresent)
