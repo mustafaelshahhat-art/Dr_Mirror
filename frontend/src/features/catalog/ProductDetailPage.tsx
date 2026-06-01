@@ -251,7 +251,11 @@ export function ProductDetailPage() {
                 </div>
                 <div
                   className={[
-                    'fixed inset-x-0 bottom-0 z-30 flex gap-2 bg-background p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] lg:hidden',
+                    // Phones (<sm) also render the fixed customer bottom nav
+                    // (h-14 + safe-area). Sit this bar directly above it so the
+                    // two fixed layers never overlap. At sm+ the nav is hidden,
+                    // so drop to bottom-0 and own the safe-area padding here.
+                    'fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 flex gap-2 bg-background p-4 sm:bottom-0 sm:pb-[calc(1rem+env(safe-area-inset-bottom))] lg:hidden',
                     hasContentBehindBar ? 'border-t border-divider/60' : 'border-t border-transparent',
                   ].join(' ')}
                 >
@@ -306,9 +310,12 @@ export function ProductDetailPage() {
       {/* Sentinel sits right above the spacer; the IntersectionObserver above
           watches it to decide whether the mobile bar's top border should show. */}
       <div ref={mobileBarSentinelRef} className="h-px lg:hidden" aria-hidden />
+      {/* Bottom spacer reserves room so the last content scrolls clear of the
+          fixed action bar. Combined with the app shell's bottom padding this
+          clears both the action bar and (on phones) the bottom nav beneath it. */}
       <div
         className="lg:hidden"
-        style={{ height: 'calc(5rem + env(safe-area-inset-bottom))' }}
+        style={{ height: 'calc(4rem + env(safe-area-inset-bottom))' }}
         aria-hidden
       />
     </article>
