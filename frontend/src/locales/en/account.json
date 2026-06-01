@@ -50,6 +50,7 @@
         "sending": "Sending code via WhatsApp…",
         "sent": "Code sent via WhatsApp.",
         "resend": "Resend code",
+        "resendIn": "Resend code in {{seconds}}s",
         "retry": "Retry",
         "verifyButton": "Verify",
         "sendFailed": "Failed to send the verification code. Please try again.",
