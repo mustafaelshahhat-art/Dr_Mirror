@@ -56,7 +56,7 @@ function CheckoutBody() {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language?.startsWith('ar') ? 'ar' : 'en') as AppLang;
   const isAr = lang === 'ar';
-  const { user, sendPhoneOtp, verifyPhoneOtp, refreshUser } = useAuth();
+  const { user, sendPhoneOtp, verifyPhoneOtp } = useAuth();
   const { cart } = useCart();
   const paymentMethodsQuery = usePaymentMethodsQuery();
   const governoratesQuery = useGovernoratesQuery();
@@ -211,11 +211,24 @@ function CheckoutBody() {
     if (createOrder.isPending) return;
 
     // Pre-check: if the user's phone is missing or unverified, show the OTP modal
-    // instead of wasting a round-trip to the backend.
+    // instead of wasting a round-trip to the backend. Once verified, the modal's
+    // onVerified resumes via submitOrder() directly (see below).
     if (!user?.phone || !user.phoneNumberConfirmed) {
       setPhoneOtpOpen(true);
       return;
     }
+
+    await submitOrder();
+  }
+
+  // The actual order submission, with the phone gate already cleared. Kept
+  // separate from handlePlaceOrder so the post-OTP resume path can call it
+  // WITHOUT re-running the phone pre-check — that check reads `user` from the
+  // triggering render's closure, which is still unverified right after OTP
+  // success and would otherwise re-open the modal and fire a second OTP.
+  async function submitOrder() {
+    // Guard against double-submit (button is also disabled while pending).
+    if (createOrder.isPending) return;
 
     setFormError(null);
 
@@ -423,8 +436,14 @@ function CheckoutBody() {
         sendOtp={(input) => sendPhoneOtp({ purpose: 'checkout', ...(input ?? {}) })}
         verifyOtp={verifyPhoneOtp}
         onVerified={() => {
+          // The phone is now verified — verifyPhoneOtp() already refetched the
+          // auth user, so the verified state is current in context. Close the
+          // modal and resume the order directly. We deliberately call
+          // submitOrder() (not handlePlaceOrder), bypassing the phone pre-check
+          // whose closed-over `user` is still stale this render and would
+          // re-open the modal + trigger a redundant second OTP send.
           setPhoneOtpOpen(false);
-          void refreshUser().then(() => handlePlaceOrder());
+          void submitOrder();
         }}
       />
     </section>
