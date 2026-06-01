@@ -5,6 +5,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -31,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isBootstrapping, setIsBootstrapping] = useState(true);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const finishWithSession = useCallback((next: AuthUser, token: string) => {
     setAccessToken(token);
@@ -126,7 +128,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Even if the server call fails, clear local state — we don't trust the cookie anymore.
     }
     clearSession();
-  }, [clearSession]);
+    // Centralized post-logout navigation: every sign-out entry point funnels
+    // through this handler, so redirecting here covers the account menu, the
+    // mobile sheet, the admin header, and the admin drawer alike. `replace`
+    // drops the now-protected page from history so Back can't resurface stale
+    // (account/cart/admin) UI. Public pages also land on /login intentionally.
+    navigate('/login', { replace: true });
+  }, [clearSession, navigate]);
 
   const isAdmin = useMemo(() => user?.roles.includes('Admin') ?? false, [user]);
 
