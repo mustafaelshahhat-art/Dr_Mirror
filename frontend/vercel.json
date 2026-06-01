@@ -1,5 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://drmirrorscrubs.runasp.net/api/$1" }
+    { "source": "/api/:path*", "destination": "https://drmirrorscrubs.runasp.net/api/:path*" },
+    { "source": "/:path*", "destination": "/index.html" }
   ]
 }
