@@ -109,7 +109,7 @@ export function AdminSidebar({
               ADMIN_DRAWER_HEIGHT_CLASS,
             ].join(' ')}
           >
-            <Drawer.Dialog aria-label={t('admin.shell.navTitleMobile')} className="flex h-full flex-col outline-none">
+            <Drawer.Dialog aria-label={t('admin.shell.navTitleMobile')} className="flex h-full flex-col p-0 outline-none">
               <Drawer.Header className="flex items-center justify-between border-b border-divider/60 px-4 py-4">
                 <Drawer.Heading className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground" aria-hidden="true">
                   <BrandLockup size="sm" />
