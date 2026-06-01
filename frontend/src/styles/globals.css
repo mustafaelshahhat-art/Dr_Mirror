@@ -296,32 +296,38 @@
 /* ----------------------------------------------------------------------------
  * Input / InputGroup RTL padding fix
  *
- * HeroUI's InputGroup applies physical `pr-0` / `pl-0` to remove the
- * suffix/prefix side padding so text does not collide with the icon.  In RTL
- * the physical property targets the wrong visual side, leaving the start side
- * (right edge) unpadded while the end side (left edge) retains the full
- * padding-inline value from `px-3`.
+ * HeroUI's `.input-group__input` ships `px-3` (physical, symmetric) and then,
+ * when a prefix/suffix is present, drops one *physical* side with `pl-0` / `pr-0`
+ * so the text can flow up to the adornment (e.g. the password reveal eye).
  *
- * We override with logical equivalents — the end-side padding is removed in
- * both LTR and RTL, while the start-side padding (from the base `padding-inline`
- * on `.input` / `.input-group__input`) is preserved.  See the analysis in
- * AGENTS.md / tasks.md for a full cascade breakdown.
+ * In RTL those physical zeros target the wrong visual side: a *suffix* sits on
+ * the visual left, but the text now starts on the visual right — exactly the
+ * side `pr-0` zeroed out — so Arabic text ends up touching the right border.
+ * The previous override made this worse by also forcing `padding-right: 0`,
+ * collapsing the start-side padding in RTL entirely.
+ *
+ * Fix: drive padding for grouped inputs with *logical* properties only, declared
+ * outside any `@layer` so they win over HeroUI's layered physical rules.  The
+ * start side always keeps a comfortable `0.75rem` (matching the LTR look); only
+ * the side that actually hosts the adornment is zeroed, in both writing modes.
  * -------------------------------------------------------------------------- */
 
-/* Suffix present → remove logical end-side padding so text can flow up to the
-   icon regardless of direction.  Keeps physical `pr-0` as a fallback for
-   browsers that ignore logical properties, but adds `padding-inline-end: 0`
-   which correctly maps to the suffix side in every writing mode. */
+/* Base: comfortable logical padding on both sides, mirroring HeroUI's px-3. */
+.input-group__input,
+.input-group [data-slot="input"] {
+  padding-inline: 0.75rem;
+}
+
+/* Suffix present → drop only the logical end-side padding (the adornment side),
+   keeping the start side padded so typed text never touches the start border. */
 .input-group:has([data-slot="input-group-suffix"]) .input-group__input,
 .input-group:has([data-slot="input-group-suffix"]) [data-slot="input"] {
-  padding-right: 0;
   padding-inline-end: 0;
 }
 
-/* Prefix present → remove logical start-side padding (mirror of suffix). */
+/* Prefix present → drop only the logical start-side padding (mirror of suffix). */
 .input-group:has([data-slot="input-group-prefix"]) .input-group__input,
 .input-group:has([data-slot="input-group-prefix"]) [data-slot="input"] {
-  padding-left: 0;
   padding-inline-start: 0;
 }
 
