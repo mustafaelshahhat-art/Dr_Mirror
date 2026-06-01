@@ -324,6 +324,9 @@ function CheckoutBody() {
                 setSaveAsNewAddress={(value) =>
                   setValue('saveAsNewAddress', value, { shouldDirty: true, shouldValidate: false })
                 }
+                isLoading={addressesQuery.isLoading}
+                isError={addressesQuery.isError}
+                onRetry={() => void addressesQuery.refetch()}
                 lang={lang}
               />
             ) : null}
@@ -383,7 +386,10 @@ function CheckoutBody() {
               <Button
                 type="button"
                 variant="primary"
-                isDisabled={step === 'payment' && !paymentAvailable}
+                isDisabled={
+                  (step === 'payment' && !paymentAvailable) ||
+                  (step === 'address' && (addressesQuery.isLoading || addressesQuery.isError))
+                }
                 onPress={() => void next()}
                 className="rounded-xl"
               >

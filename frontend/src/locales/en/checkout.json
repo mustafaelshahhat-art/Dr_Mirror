@@ -34,6 +34,9 @@
     "notes": "Notes for the courier (optional)",
     "notesHint": "E.g. ring twice, use the side entrance, etc.",
     "savedHeading": "Saved addresses",
+    "loading": "Loading your saved addresses...",
+    "errorLoad": "Couldn't load your saved addresses. Please try again.",
+    "retry": "Retry",
     "useNew": {
       "title": "Use a new address",
       "subtitle": "Fill in the shipping details below"

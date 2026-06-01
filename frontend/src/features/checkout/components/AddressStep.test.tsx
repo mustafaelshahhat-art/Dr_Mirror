@@ -44,7 +44,21 @@ const savedAddresses: BuyerAddressDto[] = [
   },
 ];
 
-function AddressStepHarness({ onSavedChange = vi.fn() }: { onSavedChange?: (id: string | null) => void }) {
+function AddressStepHarness({
+  onSavedChange = vi.fn(),
+  isLoading = false,
+  isError = false,
+  onRetry,
+  addresses = savedAddresses,
+  initialSavedId = 'addr-home',
+}: {
+  onSavedChange?: (id: string | null) => void;
+  isLoading?: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
+  addresses?: BuyerAddressDto[];
+  initialSavedId?: string | null;
+}) {
   const form = useForm<CheckoutForm>({
     defaultValues: {
       address: {
@@ -58,14 +72,14 @@ function AddressStepHarness({ onSavedChange = vi.fn() }: { onSavedChange?: (id: 
         landmark: '',
         notes: '',
       },
-      buyerAddressId: 'addr-home',
+      buyerAddressId: initialSavedId,
       paymentMethodId: '',
       saveAsNewAddress: false,
       label: '',
       buyerNote: '',
     },
   });
-  const [savedAddressId, setSavedAddressId] = useState<string | null>('addr-home');
+  const [savedAddressId, setSavedAddressId] = useState<string | null>(initialSavedId);
   const [saveAsNewAddress, setSaveAsNewAddress] = useState(false);
 
   function handleSavedChange(id: string | null) {
@@ -78,11 +92,14 @@ function AddressStepHarness({ onSavedChange = vi.fn() }: { onSavedChange?: (id: 
       control={form.control}
       watch={form.watch}
       setValue={form.setValue}
-      savedAddresses={savedAddresses}
+      savedAddresses={addresses}
       savedAddressId={savedAddressId}
       setSavedAddressId={handleSavedChange}
       saveAsNewAddress={saveAsNewAddress}
       setSaveAsNewAddress={setSaveAsNewAddress}
+      isLoading={isLoading}
+      isError={isError}
+      onRetry={onRetry}
     />
   );
 }
@@ -113,5 +130,39 @@ describe('AddressStep saved address radios', () => {
     fireEvent.keyDown(home, { key: 'ArrowDown' });
 
     expect(onSavedChange).toHaveBeenCalledWith('addr-work');
+  });
+});
+
+describe('AddressStep query states', () => {
+  it('shows a loading placeholder and no new-address form while addresses load', () => {
+    renderWithProviders(<AddressStepHarness isLoading initialSavedId={null} />);
+
+    // Loading placeholder is announced; neither saved radios nor the inline
+    // new-address form should appear yet (this is the anti-flicker guarantee).
+    expect(screen.getByLabelText(/loading your saved addresses/i)).toBeInTheDocument();
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/recipient name/i)).not.toBeInTheDocument();
+  });
+
+  it('shows an error state with retry instead of the new-address form on failure', async () => {
+    const onRetry = vi.fn();
+    renderWithProviders(
+      <AddressStepHarness isError onRetry={onRetry} initialSavedId={null} />,
+    );
+
+    expect(screen.getByText(/couldn't load your saved addresses/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/recipient name/i)).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /retry/i }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the new-address form once loading settles with zero saved addresses', () => {
+    renderWithProviders(
+      <AddressStepHarness addresses={[]} initialSavedId={null} />,
+    );
+
+    expect(screen.queryByLabelText(/loading your saved addresses/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/recipient name/i)).toBeInTheDocument();
   });
 });

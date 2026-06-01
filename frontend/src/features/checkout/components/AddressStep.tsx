@@ -1,10 +1,12 @@
-import { Checkbox, Fieldset, Radio, RadioGroup } from '@heroui/react';
+import { Button, Checkbox, Fieldset, Radio, RadioGroup } from '@heroui/react';
 import { Plus } from 'lucide-react';
 import type { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import type { BuyerAddressDto } from '../../addresses/types';
 import { FormField } from '../../auth/components/FormField';
+import { StatusAlert } from '../../../shared/components/StatusAlert';
+import { Skeleton } from '../../../shared/components/Skeleton';
 import type { CheckoutForm } from '../schemas';
 import { GovernorateSelect } from './GovernorateSelect';
 import type { AppLang } from '../../../shared/lib/theme-storage';
@@ -18,6 +20,12 @@ interface Props {
   setSavedAddressId: (id: string | null) => void;
   saveAsNewAddress: boolean;
   setSaveAsNewAddress: (v: boolean) => void;
+  /** True while the saved-addresses query is still in flight. */
+  isLoading?: boolean;
+  /** True when the saved-addresses query failed. */
+  isError?: boolean;
+  /** Refetch callback for the error retry button. */
+  onRetry?: () => void;
   lang?: AppLang;
 }
 
@@ -32,9 +40,70 @@ export function AddressStep({
   setSavedAddressId,
   saveAsNewAddress,
   setSaveAsNewAddress,
+  isLoading = false,
+  isError = false,
+  onRetry,
   lang = 'ar',
 }: Props) {
   const { t } = useTranslation();
+
+  // While the saved-addresses query is pending we deliberately render neither
+  // the saved list nor the new-address form. Both states are derived from the
+  // query result, so showing either before it settles flashes the wrong UI
+  // (e.g. the new-address form for a buyer who actually has saved addresses).
+  if (isLoading) {
+    return (
+      <Fieldset className="space-y-4">
+        <Fieldset.Legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
+          {t('checkout.address.heading')}
+        </Fieldset.Legend>
+        <div
+          className="space-y-2"
+          aria-busy="true"
+          aria-label={t('checkout.address.loading')}
+        >
+          <Skeleton className="h-4 w-32" />
+          <div className="grid gap-2 sm:grid-cols-2">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="space-y-2 rounded-xl border border-divider bg-content1 p-3.5">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-3 w-2/5" />
+                <Skeleton className="h-3 w-3/5" />
+                <Skeleton className="h-3 w-2/5" />
+              </div>
+            ))}
+          </div>
+          <Skeleton className="h-14 w-full rounded-xl" />
+        </div>
+      </Fieldset>
+    );
+  }
+
+  // Loading failed: surface a clear error with a retry affordance instead of
+  // silently falling through to the new-address form (which would look like
+  // "you have no saved addresses").
+  if (isError) {
+    return (
+      <Fieldset className="space-y-4">
+        <Fieldset.Legend className="text-sm font-semibold uppercase tracking-wide text-default-600">
+          {t('checkout.address.heading')}
+        </Fieldset.Legend>
+        <StatusAlert variant="danger" className="rounded-xl flex items-center justify-between gap-3">
+          <span>{t('checkout.address.errorLoad')}</span>
+          {onRetry ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onPress={onRetry}
+              className="shrink-0 rounded-xl text-danger hover:bg-danger/10"
+            >
+              {t('checkout.address.retry')}
+            </Button>
+          ) : null}
+        </StatusAlert>
+      </Fieldset>
+    );
+  }
 
   return (
     <Fieldset className="space-y-4">
