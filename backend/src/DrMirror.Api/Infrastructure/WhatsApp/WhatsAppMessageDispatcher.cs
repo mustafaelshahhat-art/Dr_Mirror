@@ -2,6 +2,7 @@ using System.Text.Json;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Domain.Orders;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -114,28 +115,34 @@ public sealed class WhatsAppMessageDispatcher
         };
     }
 
+    // Legacy fallback only — used when an older queued message has no body snapshot.
+    // New messages always carry a pre-rendered (already-localized) body in the payload.
     private async Task<ResolvedMessage?> ResolveOrderConfirmationAsync(string payload, CancellationToken ct)
     {
         var p = JsonSerializer.Deserialize<WhatsAppOutboxHelper.OrderPayload>(payload)!;
-        var order = await _db.Orders.AsNoTracking().FirstOrDefaultAsync(o => o.Id == p.OrderId, ct);
-        return order is null
-            ? null
-            : new ResolvedMessage(order.BuyerUserId, order.ShippingAddress.Phone, WhatsAppMessageTemplates.OrderConfirmation(order.OrderNumber));
+        var order = await _db.Orders.AsNoTracking().Include(o => o.BuyerUser).FirstOrDefaultAsync(o => o.Id == p.OrderId, ct);
+        if (order is null) return null;
+        var lang = NotificationLanguage.Normalize(order.BuyerUser?.Language);
+        return new ResolvedMessage(
+            order.BuyerUserId,
+            order.ShippingAddress.Phone,
+            WhatsAppMessageTemplates.OrderConfirmation(lang, order.OrderNumber, order.ShippingAddress.RecipientName, order.Total, order.Currency));
     }
 
     private async Task<ResolvedMessage?> ResolveOrderStatusChangedAsync(string payload, CancellationToken ct)
     {
         var p = JsonSerializer.Deserialize<WhatsAppOutboxHelper.OrderPayload>(payload)!;
-        var order = await _db.Orders.AsNoTracking().FirstOrDefaultAsync(o => o.Id == p.OrderId, ct);
+        var order = await _db.Orders.AsNoTracking().Include(o => o.BuyerUser).FirstOrDefaultAsync(o => o.Id == p.OrderId, ct);
         if (order is null) return null;
 
         var status = Enum.TryParse<OrderStatus>(p.Status, ignoreCase: true, out var parsed)
             ? parsed
             : order.Status;
+        var lang = NotificationLanguage.Normalize(order.BuyerUser?.Language);
         return new ResolvedMessage(
             order.BuyerUserId,
             order.ShippingAddress.Phone,
-            WhatsAppMessageTemplates.OrderStatusChanged(order.OrderNumber, status));
+            WhatsAppMessageTemplates.OrderStatusChanged(lang, order.OrderNumber, status, order.ShippingAddress.RecipientName));
     }
 
     private async Task<ResolvedMessage?> ResolveReturnCreatedAsync(string payload, CancellationToken ct)
@@ -144,13 +151,15 @@ public sealed class WhatsAppMessageDispatcher
         var returnRequest = await _db.ReturnRequests
             .AsNoTracking()
             .Include(r => r.Order)
+            .Include(r => r.BuyerUser)
             .FirstOrDefaultAsync(r => r.Id == p.ReturnRequestId, ct);
         if (returnRequest?.Order is null) return null;
 
+        var lang = NotificationLanguage.Normalize(returnRequest.BuyerUser?.Language);
         return new ResolvedMessage(
             returnRequest.BuyerUserId,
             returnRequest.Order.ShippingAddress.Phone,
-            WhatsAppMessageTemplates.ReturnCreated(ReturnRef(returnRequest.Id)));
+            WhatsAppMessageTemplates.ReturnCreated(lang, ReturnRef(returnRequest.Id), returnRequest.Order.ShippingAddress.RecipientName));
     }
 
     private async Task<ResolvedMessage?> ResolveReturnStatusChangedAsync(string payload, CancellationToken ct)
@@ -159,16 +168,18 @@ public sealed class WhatsAppMessageDispatcher
         var returnRequest = await _db.ReturnRequests
             .AsNoTracking()
             .Include(r => r.Order)
+            .Include(r => r.BuyerUser)
             .FirstOrDefaultAsync(r => r.Id == p.ReturnRequestId, ct);
         if (returnRequest?.Order is null) return null;
 
         var status = Enum.TryParse<ReturnStatus>(p.Status, ignoreCase: true, out var parsed)
             ? parsed
             : returnRequest.Status;
+        var lang = NotificationLanguage.Normalize(returnRequest.BuyerUser?.Language);
         return new ResolvedMessage(
             returnRequest.BuyerUserId,
             returnRequest.Order.ShippingAddress.Phone,
-            WhatsAppMessageTemplates.ReturnStatusChanged(ReturnRef(returnRequest.Id), status));
+            WhatsAppMessageTemplates.ReturnStatusChanged(lang, ReturnRef(returnRequest.Id), status, returnRequest.Order.ShippingAddress.RecipientName));
     }
 
     private static void MarkSkipped(WhatsAppOutboxMessage message, string reason)
@@ -182,7 +193,8 @@ public sealed class WhatsAppMessageDispatcher
     private static string ReturnRef(Guid id) => id.ToString("N")[..8].ToUpperInvariant();
 
     private static bool IsKnownEventType(string eventType) => eventType is
-        "OrderConfirmation" or "OrderStatusChanged" or "ReturnCreated" or "ReturnStatusChanged";
+        "OrderConfirmation" or "OrderStatusChanged" or "ReturnCreated" or "ReturnStatusChanged"
+        or "PaymentProofReceived" or "PaymentProofApproved" or "PaymentProofRejected";
 
     private static WhatsAppOutboxHelper.MessagePayload? TryReadSnapshot(string payload)
     {

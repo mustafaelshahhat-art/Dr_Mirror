@@ -5,6 +5,7 @@ using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.Auditing;
+using DrMirror.Api.Shared.Localization;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -110,7 +111,8 @@ public static class TransitionReturnEndpoint
             {
                 db.EmailOutboxMessages.Add(EmailOutboxHelper.ForReturnStatusChanged(returnRequest.Id, nextStatus));
             }
-            db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForReturn(returnRequest, "ReturnStatusChanged", nextStatus.ToString()));
+            var language = NotificationLanguage.Normalize(returnRequest.BuyerUser?.Language);
+            db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForReturn(returnRequest, "ReturnStatusChanged", nextStatus.ToString(), language));
 
             try
             {

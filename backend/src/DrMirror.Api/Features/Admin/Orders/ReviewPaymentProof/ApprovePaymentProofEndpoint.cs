@@ -4,7 +4,9 @@ using DrMirror.Api.Features.Orders.Common;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.Auditing;
+using DrMirror.Api.Shared.Localization;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -114,10 +116,13 @@ public static class ApprovePaymentProofEndpoint
             request.ReviewNote);
 
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForStatusChanged(order.Id, order.Status));
+        var language = NotificationLanguage.Normalize(order.BuyerUser?.Language);
+        db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForOrder(
+            order, "PaymentProofApproved", $"approved-{proof.Id:N}"[..16], language));
 
         try
         {
-            await db.SaveChangesAsync(ct);
+            await WhatsAppOutboxHelper.SaveChangesIgnoringDuplicateAsync(db, ct);
         }
         catch (DbUpdateConcurrencyException)
         {

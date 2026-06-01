@@ -3,6 +3,7 @@ using System.Text;
 using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.Localization;
 using DrMirror.Api.Shared.RateLimiting;
 using DrMirror.Api.Shared.Validation;
 using FluentValidation;
@@ -42,7 +43,6 @@ public static class ForgotPasswordEndpoint
         ForgotPasswordRequest request,
         UserManager<User> userManager,
         AppDbContext db,
-        HttpContext http,
         ILogger<ForgotPasswordRequest> logger,
         IOptions<EmailOptions> emailOptions,
         CancellationToken ct)
@@ -81,7 +81,9 @@ public static class ForgotPasswordEndpoint
         var encodedToken = Uri.EscapeDataString(rawToken);
         var resetUrl = emailOptions.Value.FrontendBaseUrl!.TrimEnd('/') +
             $"/reset-password?userId={userId}&token={encodedToken}";
-        var language = ResolveLanguage(http);
+        // Use the customer's stored language so the reset email is deterministic and
+        // matches their account preference (the request itself is unauthenticated).
+        var language = NotificationLanguage.Normalize(user.Language);
 
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForPasswordReset(
             user.Email!, resetUrl, language));
@@ -95,14 +97,5 @@ public static class ForgotPasswordEndpoint
     {
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
         return Convert.ToHexString(bytes).ToLowerInvariant();
-    }
-
-    private static string ResolveLanguage(HttpContext http)
-    {
-        var firstTag = http.Request.Headers.AcceptLanguage.ToString()
-            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .FirstOrDefault();
-
-        return firstTag?.StartsWith("en", StringComparison.OrdinalIgnoreCase) == true ? "en" : "ar";
     }
 }

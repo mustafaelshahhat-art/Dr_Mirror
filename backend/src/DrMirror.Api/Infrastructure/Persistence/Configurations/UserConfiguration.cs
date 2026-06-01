@@ -21,6 +21,11 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.IsDisabled)
             .HasDefaultValue(false);
 
+        builder.Property(u => u.Language)
+            .HasMaxLength(8)
+            .HasDefaultValue("en")
+            .IsRequired();
+
         // Refresh tokens are owned by the user — cascade delete is appropriate;
         // wiping a user wipes their outstanding sessions.
         builder.HasMany(u => u.RefreshTokens)

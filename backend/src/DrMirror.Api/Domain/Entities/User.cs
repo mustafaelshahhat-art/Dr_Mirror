@@ -22,6 +22,14 @@ public class User : IdentityUser<Guid>
     /// <summary>Soft-disable flag. When true, login is refused even with valid credentials.</summary>
     public bool IsDisabled { get; set; }
 
+    /// <summary>
+    /// Preferred language for customer-facing notifications: <c>"en"</c> (default) or
+    /// <c>"ar"</c>. Captured from the active UI locale at register/checkout and used to
+    /// render emails and WhatsApp messages — including admin-triggered ones — in the
+    /// customer's own language.
+    /// </summary>
+    public string Language { get; set; } = "en";
+
     /// <summary>Navigation: outstanding refresh tokens for this user (one row per device/session).</summary>
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

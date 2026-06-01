@@ -5,6 +5,7 @@ using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.WhatsApp;
+using DrMirror.Api.Shared.Localization;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +51,10 @@ public static class SubmitReturnEndpoint
         {
             return Results.Problem(title: "Order not found", statusCode: StatusCodes.Status404NotFound);
         }
+
+        // Resolve the buyer's stored notification language for the WhatsApp body snapshot.
+        var language = NotificationLanguage.Normalize(
+            await db.Users.Where(u => u.Id == userId).Select(u => u.Language).FirstOrDefaultAsync(ct));
 
         if (order.Status != OrderStatus.Delivered)
         {
@@ -130,7 +135,7 @@ public static class SubmitReturnEndpoint
 
             db.ReturnRequests.Add(returnRequest);
             db.EmailOutboxMessages.Add(EmailOutboxHelper.ForReturnCreated(returnRequest.Id));
-            db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForReturn(returnRequest, "ReturnCreated", ReturnStatus.Requested.ToString()));
+            db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForReturn(returnRequest, "ReturnCreated", ReturnStatus.Requested.ToString(), language));
 
             try
             {

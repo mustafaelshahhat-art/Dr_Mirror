@@ -17,8 +17,8 @@ public sealed class EmailOptions : IValidatableObject
     [Required]
     public string FromAddress { get; set; } = "no-reply@drmirror.local";
 
-    /// <summary>Sender display name.</summary>
-    public string FromName { get; set; } = "Dr. Mirror";
+    /// <summary>Sender display name. Brand renders exactly as "Dr.Mirror".</summary>
+    public string FromName { get; set; } = "Dr.Mirror";
 
     /// <summary>Optional reply-to mailbox. Defaults to <see cref="FromAddress"/>.</summary>
     public string? ReplyToAddress { get; set; }

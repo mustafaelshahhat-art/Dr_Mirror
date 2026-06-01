@@ -32,8 +32,10 @@ public class OrderEmailMessagesTests
                 new OrderItem
                 {
                     NameEn = "Shirt",
+                    NameAr = "قميص",
                     Size = "M",
                     ColorName = "Blue",
+                    ColorNameAr = "أزرق",
                     Quantity = 2,
                     LineTotal = 500m,
                 },
@@ -45,21 +47,21 @@ public class OrderEmailMessagesTests
     [Fact]
     public void OrderConfirmation_cod_subject_says_confirmed()
     {
-        var msg = OrderEmailMessages.OrderConfirmation(MakeOrder(PaymentMethodKind.Cod));
+        var msg = OrderEmailMessages.OrderConfirmation(MakeOrder(PaymentMethodKind.Cod), "en");
         Assert.Equal("Order DM-2026-000001 confirmed", msg.Subject);
     }
 
     [Fact]
     public void OrderConfirmation_online_subject_says_awaiting_payment()
     {
-        var msg = OrderEmailMessages.OrderConfirmation(MakeOrder(PaymentMethodKind.BankTransfer));
+        var msg = OrderEmailMessages.OrderConfirmation(MakeOrder(PaymentMethodKind.BankTransfer), "en");
         Assert.Contains("awaiting payment", msg.Subject);
     }
 
     [Fact]
     public void OrderConfirmation_body_contains_item_line()
     {
-        var msg = OrderEmailMessages.OrderConfirmation(MakeOrder());
+        var msg = OrderEmailMessages.OrderConfirmation(MakeOrder(), "en");
         Assert.Contains("Shirt", msg.TextBody);
         Assert.Contains("×2", msg.TextBody);
     }
@@ -67,8 +69,30 @@ public class OrderEmailMessagesTests
     [Fact]
     public void OrderConfirmation_to_is_buyer_email()
     {
-        var msg = OrderEmailMessages.OrderConfirmation(MakeOrder());
+        var msg = OrderEmailMessages.OrderConfirmation(MakeOrder(), "en");
         Assert.Equal("buyer@example.com", msg.To);
+    }
+
+    [Fact]
+    public void OrderConfirmation_renders_branded_html_body()
+    {
+        var msg = OrderEmailMessages.OrderConfirmation(MakeOrder(), "en");
+        Assert.NotNull(msg.HtmlBody);
+        Assert.Contains("<html", msg.HtmlBody);
+        Assert.Contains("Dr.Mirror", msg.HtmlBody);
+    }
+
+    [Fact]
+    public void OrderConfirmation_arabic_is_not_mixed_and_uses_latin_brand()
+    {
+        var msg = OrderEmailMessages.OrderConfirmation(MakeOrder(), "ar");
+        // Single-language: no English greeting leaks into the Arabic message…
+        Assert.DoesNotContain("Hi ", msg.TextBody);
+        Assert.DoesNotContain("Your order", msg.TextBody);
+        // …and the brand stays Latin "Dr.Mirror", never translated.
+        Assert.Contains("Dr.Mirror", msg.TextBody);
+        Assert.DoesNotContain("ميرور", msg.TextBody);
+        Assert.Equal("ar", System.Text.RegularExpressions.Regex.Match(msg.HtmlBody!, "lang=\"(?<l>[a-z]+)\"").Groups["l"].Value);
     }
 
     // ── PaymentReviewNeeded ──────────────────────────────────────────────────
@@ -76,14 +100,14 @@ public class OrderEmailMessagesTests
     [Fact]
     public void PaymentReviewNeeded_subject_contains_order_number()
     {
-        var msg = OrderEmailMessages.PaymentReviewNeeded(MakeOrder());
+        var msg = OrderEmailMessages.PaymentReviewNeeded(MakeOrder(), "en");
         Assert.Contains("DM-2026-000001", msg.Subject);
     }
 
     [Fact]
     public void PaymentReviewNeeded_body_mentions_review()
     {
-        var msg = OrderEmailMessages.PaymentReviewNeeded(MakeOrder());
+        var msg = OrderEmailMessages.PaymentReviewNeeded(MakeOrder(), "en");
         Assert.Contains("payment proof", msg.TextBody);
     }
 
@@ -97,7 +121,7 @@ public class OrderEmailMessagesTests
     [InlineData(OrderStatus.Cancelled, "cancelled")]
     public void StatusChanged_subject_reflects_event_status(OrderStatus eventStatus, string expectedFragment)
     {
-        var msg = OrderEmailMessages.StatusChanged(MakeOrder(), eventStatus);
+        var msg = OrderEmailMessages.StatusChanged(MakeOrder(), eventStatus, "en");
         Assert.Contains(expectedFragment, msg.Subject, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -105,7 +129,7 @@ public class OrderEmailMessagesTests
     public void StatusChanged_cancelled_with_reason_includes_reason_in_body()
     {
         var order = MakeOrder(status: OrderStatus.Cancelled, cancellationReason: "Out of stock");
-        var msg = OrderEmailMessages.StatusChanged(order, OrderStatus.Cancelled);
+        var msg = OrderEmailMessages.StatusChanged(order, OrderStatus.Cancelled, "en");
         Assert.Contains("Out of stock", msg.TextBody);
     }
 
@@ -113,11 +137,22 @@ public class OrderEmailMessagesTests
     public void StatusChanged_cancelled_without_reason_omits_reason_line()
     {
         var order = MakeOrder(status: OrderStatus.Cancelled, cancellationReason: "");
-        var msg = OrderEmailMessages.StatusChanged(order, OrderStatus.Cancelled);
+        var msg = OrderEmailMessages.StatusChanged(order, OrderStatus.Cancelled, "en");
         Assert.DoesNotContain("Reason:", msg.TextBody);
     }
 
-    // ── InquiryReceived ──────────────────────────────────────────────────────
+    // ── InquiryConfirmation (customer-facing) ─────────────────────────────────
+
+    [Fact]
+    public void InquiryConfirmation_to_is_customer_email()
+    {
+        var inquiry = new Inquiry { FullName = "Alice", Email = "alice@example.com", Subject = "Hello", Message = "Test" };
+        var msg = OrderEmailMessages.InquiryConfirmation(inquiry, "en");
+        Assert.Equal("alice@example.com", msg.To);
+        Assert.Contains("Dr.Mirror", msg.Subject);
+    }
+
+    // ── InquiryReceived (admin) ──────────────────────────────────────────────
 
     [Fact]
     public void InquiryReceived_to_is_admin_email()

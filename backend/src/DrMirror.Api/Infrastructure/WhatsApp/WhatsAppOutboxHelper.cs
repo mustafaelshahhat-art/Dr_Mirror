@@ -28,13 +28,21 @@ public static class WhatsAppOutboxHelper
         }
     }
 
-    public static WhatsAppOutboxMessage CreateForOrder(Order order, string eventType, string status)
+    public static WhatsAppOutboxMessage CreateForOrder(Order order, string eventType, string status, string language)
     {
         var normalizedStatus = status.Trim();
         var now = DateTimeOffset.UtcNow;
-        var messageBody = eventType == "OrderConfirmation"
-            ? WhatsAppMessageTemplates.OrderConfirmation(order.OrderNumber)
-            : WhatsAppMessageTemplates.OrderStatusChanged(order.OrderNumber, ParseOrderStatus(normalizedStatus, order.Status));
+        var name = order.ShippingAddress.RecipientName;
+        // Body is rendered in the customer's language NOW and snapshotted into the payload,
+        // so a later profile-language change cannot alter an already-queued message.
+        var messageBody = eventType switch
+        {
+            "OrderConfirmation" => WhatsAppMessageTemplates.OrderConfirmation(language, order.OrderNumber, name, order.Total, order.Currency),
+            "PaymentProofReceived" => WhatsAppMessageTemplates.PaymentProofReceived(language, order.OrderNumber, name),
+            "PaymentProofApproved" => WhatsAppMessageTemplates.PaymentProofApproved(language, order.OrderNumber, name),
+            "PaymentProofRejected" => WhatsAppMessageTemplates.PaymentProofRejected(language, order.OrderNumber, name),
+            _ => WhatsAppMessageTemplates.OrderStatusChanged(language, order.OrderNumber, ParseOrderStatus(normalizedStatus, order.Status), name),
+        };
 
         return new WhatsAppOutboxMessage
         {
@@ -60,16 +68,17 @@ public static class WhatsAppOutboxHelper
         };
     }
 
-    public static WhatsAppOutboxMessage CreateForReturn(ReturnRequest returnRequest, string eventType, string status)
+    public static WhatsAppOutboxMessage CreateForReturn(ReturnRequest returnRequest, string eventType, string status, string language)
     {
         var normalizedStatus = status.Trim();
         var now = DateTimeOffset.UtcNow;
         var returnRef = ReturnRef(returnRequest.Id);
         var parsedStatus = ParseReturnStatus(normalizedStatus, returnRequest.Status);
         var phone = returnRequest.Order?.ShippingAddress.Phone;
+        var name = returnRequest.Order?.ShippingAddress.RecipientName;
         var messageBody = eventType == "ReturnCreated"
-            ? WhatsAppMessageTemplates.ReturnCreated(returnRef)
-            : WhatsAppMessageTemplates.ReturnStatusChanged(returnRef, parsedStatus);
+            ? WhatsAppMessageTemplates.ReturnCreated(language, returnRef, name)
+            : WhatsAppMessageTemplates.ReturnStatusChanged(language, returnRef, parsedStatus, name);
 
         return new WhatsAppOutboxMessage
         {

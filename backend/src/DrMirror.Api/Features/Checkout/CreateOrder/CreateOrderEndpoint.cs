@@ -6,6 +6,7 @@ using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.WhatsApp;
+using DrMirror.Api.Shared.Localization;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +40,7 @@ public static class CreateOrderEndpoint
         [FromServices] OrderStateMachine fsm,
         [FromServices] OrderNumberGenerator numberGenerator,
         [FromServices] UserManager<User> userManager,
+        HttpContext http,
         CancellationToken ct)
     {
         if (!current.IsAuthenticated || current.UserId is not { } userId)
@@ -57,6 +59,16 @@ public static class CreateOrderEndpoint
             return Results.Json(
                 new { code = "PHONE_NOT_VERIFIED", detail = "Your phone number must be verified before placing an order." },
                 statusCode: StatusCodes.Status400BadRequest);
+        }
+
+        // Capture the active UI locale as the customer's notification language. This
+        // tracked update persists with the order's SaveChanges below and drives the
+        // language of the confirmation email + WhatsApp message.
+        var language = NotificationLanguage.FromRequest(http);
+        if (buyer.Language != language)
+        {
+            buyer.Language = language;
+            buyer.UpdatedAt = DateTimeOffset.UtcNow;
         }
 
         if (idempotencyKey is { } key)
@@ -190,7 +202,7 @@ public static class CreateOrderEndpoint
         db.CartItems.RemoveRange(cart.Items);
         cart.UpdatedAt = DateTimeOffset.UtcNow;
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForOrderConfirmation(order.Id));
-        db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForOrder(order, "OrderConfirmation", "Placed"));
+        db.WhatsAppOutboxMessages.Add(WhatsAppOutboxHelper.CreateForOrder(order, "OrderConfirmation", "Placed", language));
 
         // ---- Optional: save the inline address to the buyer's address book. ----
         var addressSaveOutcome = AddressSaveOutcome.NotRequested;

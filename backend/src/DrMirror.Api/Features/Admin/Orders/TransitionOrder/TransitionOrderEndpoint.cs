@@ -5,6 +5,7 @@ using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.WhatsApp;
 using DrMirror.Api.Shared.Auditing;
+using DrMirror.Api.Shared.Localization;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -114,8 +115,10 @@ public static class TransitionOrderEndpoint
             previousStatus == OrderStatus.Pending;
         if (!isRedundantConfirmation)
         {
+            // Admin-triggered: render in the CUSTOMER's stored language, not the admin's.
+            var language = NotificationLanguage.Normalize(order.BuyerUser?.Language);
             db.WhatsAppOutboxMessages.Add(
-                WhatsAppOutboxHelper.CreateForOrder(order, "OrderStatusChanged", order.Status.ToString()));
+                WhatsAppOutboxHelper.CreateForOrder(order, "OrderStatusChanged", order.Status.ToString(), language));
         }
         try
         {

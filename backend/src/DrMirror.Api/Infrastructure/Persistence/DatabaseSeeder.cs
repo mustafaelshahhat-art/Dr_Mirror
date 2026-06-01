@@ -104,7 +104,7 @@ public sealed class DatabaseSeeder
                 InstructionsEn = "Transfer the total to the Instapay handle below, then upload a screenshot of the receipt.",
                 InstructionsAr = "حوّل المبلغ إلى حساب إنستاباي التالي، ثم ارفع لقطة شاشة من إيصال التحويل.",
                 AccountNumber = "drmirror@instapay",
-                AccountHolder = "Dr. Mirror Sales",
+                AccountHolder = "Dr.Mirror Sales",
                 // Seeded inactive — placeholder account numbers must be updated in the
                 // admin panel before activating in production.
                 IsActive = false,
@@ -120,7 +120,7 @@ public sealed class DatabaseSeeder
                 InstructionsEn = "Send the total to the wallet number below (Vodafone Cash / Etisalat Cash / Orange Money / We Pay) and upload the confirmation.",
                 InstructionsAr = "حوّل المبلغ إلى رقم المحفظة التالي (فودافون كاش / اتصالات كاش / أورنج موني / وي باي) وارفع لقطة شاشة من التأكيد.",
                 AccountNumber = "01001234567",
-                AccountHolder = "Dr. Mirror Sales",
+                AccountHolder = "Dr.Mirror Sales",
                 // Seeded inactive — placeholder account numbers must be updated in the
                 // admin panel before activating in production.
                 IsActive = false,

@@ -2,6 +2,7 @@ using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Features.Inquiries.Common;
 using DrMirror.Api.Infrastructure.Email;
 using DrMirror.Api.Infrastructure.Persistence;
+using DrMirror.Api.Shared.Localization;
 using DrMirror.Api.Shared.RateLimiting;
 using DrMirror.Api.Shared.Validation;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,7 @@ public static class SubmitInquiryEndpoint
     private static async Task<IResult> HandleAsync(
         SubmitInquiryRequest request,
         AppDbContext db,
+        HttpContext http,
         CancellationToken ct)
     {
         // If a productId is provided, verify the product exists and is published.
@@ -62,7 +64,13 @@ public static class SubmitInquiryEndpoint
         };
 
         db.Inquiries.Add(inquiry);
+        // Internal admin notification (unchanged) + customer-facing confirmation in the
+        // active request locale. WhatsApp is intentionally not sent here: inquiries are
+        // anonymous (no user row / verified phone / opt-in), so there is no reliable
+        // WhatsApp delivery path — email is the supported channel.
         db.EmailOutboxMessages.Add(EmailOutboxHelper.ForInquiryReceived(inquiry.Id));
+        db.EmailOutboxMessages.Add(EmailOutboxHelper.ForInquiryConfirmation(
+            inquiry.Id, NotificationLanguage.FromRequest(http)));
         await db.SaveChangesAsync(ct);
 
         return Results.Created($"/api/inquiries/{inquiry.Id}", inquiry.ToDto());

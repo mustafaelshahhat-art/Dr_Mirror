@@ -2,6 +2,7 @@ using DrMirror.Api.Domain.Entities;
 using DrMirror.Api.Infrastructure.Identity;
 using DrMirror.Api.Infrastructure.Persistence;
 using DrMirror.Api.Infrastructure.WhatsApp;
+using DrMirror.Api.Shared.Localization;
 using DrMirror.Api.Shared.RateLimiting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,7 @@ public static class SendOtpEndpoint
         UserManager<User> userManager,
         IWhatsAppSender sender,
         IOptions<WhatsAppOptions> whatsAppOptions,
+        HttpContext http,
         ILogger<SendOtpRequest> logger,
         CancellationToken ct)
     {
@@ -119,7 +121,9 @@ public static class SendOtpEndpoint
 
         try
         {
-            var body = $"رمز التحقق لـ Dr. Mirror هو: {code}\nصالح لمدة 10 دقائق.\nDr. Mirror verification code: {code}\nValid for 10 minutes.";
+            // Single-language OTP, matching the active UI/request locale (never bilingual).
+            var language = NotificationLanguage.FromRequest(http);
+            var body = WhatsAppMessageTemplates.OtpVerification(language, code, minutes: 10);
             using var sendCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
             sendCts.CancelAfter(TimeSpan.FromSeconds(options.TimeoutSeconds + 5));
             await sender.SendAsync(user.PhoneNumber, body, sendCts.Token);

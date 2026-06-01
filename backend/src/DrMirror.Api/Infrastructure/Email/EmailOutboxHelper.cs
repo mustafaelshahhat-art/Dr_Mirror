@@ -48,6 +48,18 @@ public static class EmailOutboxHelper
         CreatedAt = DateTimeOffset.UtcNow,
     };
 
+    public static EmailOutboxMessage ForInquiryConfirmation(Guid inquiryId, string language) => new()
+    {
+        Id = Guid.NewGuid(),
+        EventType = "InquiryConfirmation",
+        // Language is resolved at enqueue time (from the active UI locale) and frozen
+        // in the payload so a later profile change cannot alter an already-queued message.
+        Payload = JsonSerializer.Serialize(new InquiryConfirmationPayload(inquiryId, language)),
+        IdempotencyKey = $"InquiryConfirmation:{inquiryId}",
+        NextRetryAt = DateTimeOffset.UtcNow,
+        CreatedAt = DateTimeOffset.UtcNow,
+    };
+
     public static EmailOutboxMessage ForReturnStatusChanged(Guid returnRequestId, ReturnStatus status) => new()
     {
         Id = Guid.NewGuid(),
@@ -71,6 +83,7 @@ public static class EmailOutboxHelper
     public sealed record StatusChangedPayload(Guid OrderId, OrderStatus Status);
     public sealed record ReturnStatusChangedPayload(Guid ReturnRequestId, ReturnStatus Status);
     public sealed record PasswordResetPayload(string ToEmail, string ResetUrl, string Language);
+    public sealed record InquiryConfirmationPayload(Guid InquiryId, string Language);
 
     public static EmailOutboxMessage ForPasswordReset(string toEmail, string resetUrl, string language) => new()
     {

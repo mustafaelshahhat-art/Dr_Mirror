@@ -7,7 +7,9 @@ import {
   setAccessToken,
 } from './auth-storage';
 import { setForbiddenMessage } from './forbidden-store';
+import i18n from './i18n';
 import { setRateLimitState } from './rate-limit-store';
+import { DEFAULT_LANG } from './theme-storage';
 
 /**
  * Single axios instance for the app.
@@ -64,6 +66,11 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.set('Authorization', `Bearer ${token}`);
   }
+  // Send the ACTIVE UI locale (not the browser locale) so the backend renders
+  // notifications — OTP, order confirmation, etc. — in the language the user is
+  // currently viewing, even after a manual in-app language switch.
+  const lang = i18n.language?.startsWith('ar') ? 'ar' : DEFAULT_LANG;
+  config.headers.set('Accept-Language', lang);
   return config;
 });
 
