@@ -89,7 +89,11 @@ void i18n
     nsSeparator: '.',
     interpolation: { escapeValue: false },
     detection: {
-      order: ['localStorage', 'navigator'],
+      // localStorage only: respect a saved choice, otherwise fall back to
+      // DEFAULT_LANG (English). 'navigator' is intentionally omitted so a
+      // new visitor's browser locale does not override the English default
+      // or fight the anti-FOUC bootstrap script in index.html.
+      order: ['localStorage'],
       lookupLocalStorage: LANG_STORAGE_KEY,
       caches: ['localStorage'],
     },
