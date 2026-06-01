@@ -1,7 +1,7 @@
 import { Button } from '@heroui/react';
 import { buttonVariants } from '@heroui/styles';
 import { ArrowLeft, Check, MessageSquare, PackageX, ShoppingBag } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 
@@ -56,7 +56,48 @@ export function ProductDetailPage() {
   const { cart } = useCart();
   const { addState, addError, handleAddToCart } = useAddToCart();
   const [showInquiry, setShowInquiry] = useState(false);
+  // Wraps the inquiry form so "Ask about this product" can bring it into view.
+  // The wrapper carries `scroll-mt-*` so scrollIntoView lands the form below the
+  // sticky header instead of underneath it (see JSX below).
+  const inquiryRef = useRef<HTMLDivElement | null>(null);
+  // Set when the inquire button opens a collapsed form; the effect below scrolls
+  // once the form has actually mounted (its ref is null until then).
+  const scrollToInquiryPendingRef = useRef(false);
   const mobileBarSentinelRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollToInquiry = useCallback(() => {
+    const el = inquiryRef.current;
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Defer focus until the smooth scroll settles. On iOS a focus() raised
+    // outside a direct user gesture does not open the keyboard, so this moves
+    // focus to the first field (full name) on desktop without the mobile
+    // keyboard jank of focusing mid-scroll; preventScroll keeps the browser
+    // from re-jumping past the scroll-margin offset.
+    window.setTimeout(() => {
+      inquiryRef.current
+        ?.querySelector<HTMLInputElement | HTMLTextAreaElement>('input, textarea')
+        ?.focus({ preventScroll: true });
+    }, 450);
+  }, []);
+
+  const handleInquireClick = useCallback(() => {
+    if (showInquiry) {
+      // Already open: just bring it back into view.
+      scrollToInquiry();
+    } else {
+      scrollToInquiryPendingRef.current = true;
+      setShowInquiry(true);
+    }
+  }, [showInquiry, scrollToInquiry]);
+
+  // Scroll once the freshly-opened form has mounted and its ref is attached.
+  useEffect(() => {
+    if (showInquiry && scrollToInquiryPendingRef.current) {
+      scrollToInquiryPendingRef.current = false;
+      scrollToInquiry();
+    }
+  }, [showInquiry, scrollToInquiry]);
   // Whether content is currently scrolled behind the mobile action bar. Used
   // to gate the bar's top border — a hairline that shouldn't appear when the
   // bar visually floats over an empty page bottom.
@@ -241,7 +282,7 @@ export function ProductDetailPage() {
                   <Button
                     variant="outline"
                     fullWidth
-                    onPress={() => setShowInquiry((s) => !s)}
+                    onPress={handleInquireClick}
                   >
                     <span className="inline-flex items-center gap-2">
                       <MessageSquare className="size-4" aria-hidden />
@@ -262,7 +303,7 @@ export function ProductDetailPage() {
                   <Button
                     variant="outline"
                     fullWidth
-                    onPress={() => setShowInquiry((s) => !s)}
+                    onPress={handleInquireClick}
                   >
                     <span className="inline-flex items-center gap-2">
                       <MessageSquare className="size-4" aria-hidden />
@@ -289,10 +330,19 @@ export function ProductDetailPage() {
             );
           })()}
           {showInquiry ? (
-            <InquiryForm
-              productId={product.id}
-              defaultSubject={isAr ? product.nameAr : product.nameEn}
-            />
+            // scroll-mt offsets the scrollIntoView landing point below the
+            // sticky header (h-14) plus the device safe-area, so the form's
+            // heading and first field are clearly in view rather than tucked
+            // under the navbar. Works the same in RTL/LTR and light/dark.
+            <div
+              ref={inquiryRef}
+              className="scroll-mt-[calc(env(safe-area-inset-top)+5rem)]"
+            >
+              <InquiryForm
+                productId={product.id}
+                defaultSubject={isAr ? product.nameAr : product.nameEn}
+              />
+            </div>
           ) : null}
           {addError ? (
             <p className="text-xs text-danger" role="alert">
@@ -312,10 +362,16 @@ export function ProductDetailPage() {
       <div ref={mobileBarSentinelRef} className="h-px lg:hidden" aria-hidden />
       {/* Bottom spacer reserves room so the last content scrolls clear of the
           fixed action bar. Combined with the app shell's bottom padding this
-          clears both the action bar and (on phones) the bottom nav beneath it. */}
+          clears both the action bar and (on phones) the bottom nav beneath it.
+          When the inquiry form is open it grows so the form's submit button can
+          be scrolled fully above the action bar (~bar height + bottom nav). */}
       <div
         className="lg:hidden"
-        style={{ height: 'calc(4rem + env(safe-area-inset-bottom))' }}
+        style={{
+          height: showInquiry
+            ? 'calc(8rem + env(safe-area-inset-bottom))'
+            : 'calc(4rem + env(safe-area-inset-bottom))',
+        }}
         aria-hidden
       />
     </article>
